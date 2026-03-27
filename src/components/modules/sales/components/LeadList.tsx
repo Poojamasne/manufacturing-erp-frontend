@@ -1,0 +1,12 @@
+﻿import React from 'react';
+export const LeadList: React.FC = () => <div>Lead List Component</div>;
+export const LeadForm: React.FC = () => <div>Lead Form Component</div>;
+export const OpportunityList: React.FC = () => <div>Opportunity List Component</div>;
+export const OpportunityForm: React.FC = () => <div>Opportunity Form Component</div>;
+export const QuotationGenerator: React.FC = () => <div>Quotation Generator Component</div>;
+export const QuotationList: React.FC = () => <div>Quotation List Component</div>;
+export const SalesOrderList: React.FC = () => <div>Sales Order List Component</div>;
+export const SalesOrderForm: React.FC = () => <div>Sales Order Form Component</div>;
+export const CustomerManagement: React.FC = () => <div>Customer Management Component</div>;
+export const OrderTracker: React.FC = () => <div>Order Tracker Component</div>;
+export const SalesReport: React.FC = () => <div>Sales Report Component</div>;
