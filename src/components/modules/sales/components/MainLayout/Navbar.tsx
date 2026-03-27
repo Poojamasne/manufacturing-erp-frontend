@@ -8,7 +8,7 @@ const Navbar: React.FC<NavbarProps> = ({ setIsSidebarOpen }) => {
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("userRole");
-    window.location.href = "/login";
+    window.location.href = "/";
   };
 
   return (
