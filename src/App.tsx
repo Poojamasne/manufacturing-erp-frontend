@@ -13,6 +13,7 @@ import NotFound from "./components/common/NotFound";
 import NewLead from "./pages/sales/NewLead";
 import { SalesReport } from "./components/modules/sales/components/SalesReport";
 import SalesEmployees from "./components/modules/sales/components/SalesEmployees";
+import RoleNotMatched from "./components/common/RoleNotMatched";
 
 // const Layout = () => {
 //   return (
@@ -28,6 +29,11 @@ function App() {
     {
       path: "/",
       element: <LoginPage />,
+    },
+
+    {
+      path: "/role-mismatch",
+      element: <RoleNotMatched />,
     },
 
     // Sales Module Routes

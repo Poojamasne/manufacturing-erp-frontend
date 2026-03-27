@@ -1,4 +1,4 @@
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, Link } from "react-router-dom";
 
 const Sidebar = () => {
   const navigate = useNavigate();
@@ -12,9 +12,9 @@ const Sidebar = () => {
       
       {/* Logo */}
       <div className="p-6 border-b border-gray-100 flex items-center gap-3">
-        <div className="bg-black p-2 rounded-lg text-white">
+        <Link to="/sales/dashboard" className="bg-black p-2 rounded-lg text-white">
           <img src="/icons/salesDashboardLogo.svg" className="h-8 w-8" alt="" />
-        </div>
+        </Link>
         <span className="font-bold text-xl text-gray-800">Sales</span>
       </div>
 

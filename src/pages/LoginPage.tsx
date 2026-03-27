@@ -24,7 +24,7 @@ const LoginPage: React.FC = () => {
       finance: '/finance',
     };
     
-    const redirectPath = moduleRoutes[user.module] || '/sales';
+    const redirectPath = moduleRoutes[user.module] || '/role-mismatch';
     navigate(redirectPath);
   };
   

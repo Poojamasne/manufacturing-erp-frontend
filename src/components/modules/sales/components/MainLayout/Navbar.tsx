@@ -3,8 +3,6 @@ import { useNavigate } from "react-router-dom";
 const Navbar = () => {
   const navigate = useNavigate();
   const onLogout = () => {
-    // Implement logout logic here
-    console.log("Logout clicked");
     localStorage.clear();
     navigate("/");
   }
