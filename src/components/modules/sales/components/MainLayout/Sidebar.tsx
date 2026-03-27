@@ -8,8 +8,7 @@ const Sidebar = () => {
     location.pathname.startsWith(path);
 
   return (
-    <div className="w-64 bg-white h-full border-r border-gray-200 flex flex-col">
-      
+<div className="w-64 bg-white h-full lg:h-screen border-r border-gray-200 flex flex-col overflow-y-auto">      
       {/* Logo */}
       <div className="p-6 border-b border-gray-100 flex items-center gap-3">
         <Link to="/sales/dashboard" className="bg-black p-2 rounded-lg text-white">
