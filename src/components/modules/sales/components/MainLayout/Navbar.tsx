@@ -1,6 +1,13 @@
-import { Bell, LogOut } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const Navbar = () => {
+  const navigate = useNavigate();
+  const onLogout = () => {
+    // Implement logout logic here
+    console.log("Logout clicked");
+    localStorage.clear();
+    navigate("/");
+  }
   return (
     <header className="h-20 bg-white border-b border-gray-200 flex items-center justify-between px-8">
       {/* Search Bar */}
@@ -16,8 +23,7 @@ const Navbar = () => {
       <div className="flex items-center gap-6">
         {/* Notification */}
         <button className="relative p-2 text-gray-500 hover:bg-gray-100 rounded-full transition-colors">
-          <Bell size={24} />
-          <span className="absolute top-2 right-2.5 w-2 h-2 bg-gray-800 border-2 border-white rounded-full"></span>
+          <img src="/icons/Bell.svg" className="h-6 w-6" alt="" />
         </button>
 
         {/* User Profile */}
@@ -30,8 +36,10 @@ const Navbar = () => {
             SM
           </div>
         </div>
-        <button className="relative p-2 text-gray-500 hover:bg-gray-100 rounded-full transition-colors">
-          <LogOut size={24} />
+        <button
+          onClick={onLogout}
+          className="relative p-2 text-gray-500 hover:bg-gray-100 rounded-full transition-colors">
+          <img src="/icons/logout.svg" className="h-6 w-6" alt="" />
         </button>
       </div>
     </header>

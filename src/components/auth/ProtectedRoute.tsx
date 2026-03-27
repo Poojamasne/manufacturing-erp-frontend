@@ -18,7 +18,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ requiredRole }) => {
 
   if (isAllowed === null) return <div>Checking access...</div>;
 
-  return isAllowed ? <Outlet /> : <Navigate to="/login" replace />;
+  return isAllowed ? <Outlet /> : <Navigate to="/" replace />;
 };
 
 export default ProtectedRoute;
