@@ -86,9 +86,9 @@ const ReportsAndAnalytics: FC = () => {
   const currentData = useMemo(() => DATA_STORE[range], [range]);
 
   return (
-    <div className="min-h-screen bg-white p-4 md:p-8 font-sans text-[#1a1a1a]">
+    <div className="min-h-screen bg-[#FDFDFD] p-4 md:p-8 font-sans text-slate-900">
       {/* Header */}
-      <div className="max-w-7xl mx-auto mb-10">
+      <div className="max-w-6xl mx-auto mb-10">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
           <div>
             <h1 className="text-3xl font-black tracking-tight text-slate-900">Reports & Performance</h1>
@@ -104,22 +104,26 @@ const ReportsAndAnalytics: FC = () => {
         </div>
       </div>
 
-      {/* Tabs */}
-      <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-4 mb-8 border-b border-gray-100 pb-6">
-        <div className="flex bg-gray-100 p-1 rounded-xl">
+      {/* REVISED: Separate Filter Buttons */}
+      <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-6 mb-10 border-b border-gray-100 pb-6">
+        <div className="flex flex-wrap items-center gap-10">
           {(["Weekly", "Monthly", "Quarterly", "Yearly"] as TimeRange[]).map((r) => (
             <button
               key={r}
               onClick={() => setRange(r)}
-              className={`px-6 py-2 rounded-lg text-sm font-semibold transition-all ${
-                range === r ? "bg-white text-black shadow-sm" : "text-gray-500 hover:text-black"
+              className={`min-w-30 px-6 py-2.5 text-sm font-semibold rounded-lg border transition-all duration-200 shadow-sm ${
+                range === r
+                  ? "bg-slate-900 text-white border-slate-900 shadow-md"
+                  : "bg-white text-slate-600 border-slate-300 hover:border-slate-400 hover:bg-slate-50"
               }`}
             >
               {r}
             </button>
           ))}
         </div>
-        <button className="p-2 border border-gray-200 rounded-lg hover:bg-gray-50"><Filter size={18}/></button>
+        <button className="p-2.5 border border-slate-200 rounded-lg bg-white shadow-sm hover:bg-gray-50 text-slate-600">
+          <Filter size={18}/>
+        </button>
       </div>
 
       {/* KPI Grid */}
@@ -189,7 +193,7 @@ const ReportsAndAnalytics: FC = () => {
         </div>
       </div>
 
-      {/* NEW: Performance Leaderboard Table */}
+      {/* Performance Leaderboard Table */}
       <div className="max-w-7xl mx-auto border border-gray-200 rounded-2xl overflow-hidden shadow-sm bg-white">
         <div className="p-6 border-b border-gray-100 flex justify-between items-center">
             <h3 className="font-bold text-lg">Performance Leaderboard</h3>
@@ -228,7 +232,6 @@ const ReportsAndAnalytics: FC = () => {
           </table>
         </div>
       </div>
-
     </div>
   );
 };

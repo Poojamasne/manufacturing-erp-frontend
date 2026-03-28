@@ -68,7 +68,7 @@ const LeadList: React.FC = () => {
     };
 
     return (
-        <div className="min-h-screen bg-white p-4 md:p-8 font-sans text-slate-900">
+        <div className="min-h-screen bg-[#FDFDFD] p-4 md:p-8 font-sans text-slate-900">
             {/* Header Section */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
                 <div>
@@ -89,14 +89,14 @@ const LeadList: React.FC = () => {
 
             {/* Time Range Tabs */}
             <div className="flex flex-wrap items-center justify-between gap-4 mb-6 border-b border-gray-100 pb-6">
-                <div className="flex gap-2">
+                <div className="flex gap-10">
                     {["Weekly", "Monthly", "Quarterly", "Yearly"].map((tab) => (
                         <button
                             key={tab}
                             onClick={() => setActiveTab(tab)}
-                            className={`px-6 py-2 rounded-lg border text-sm font-medium transition-all ${activeTab === tab
-                                    ? "border-black bg-black text-white"
-                                    : "border-gray-200 text-gray-600 hover:bg-gray-50"
+                            className={`min-w-30 px-6 py-2.5 text-sm font-semibold rounded-lg border transition-all duration-200 shadow-sm ${activeTab === tab
+                                    ? "bg-slate-900 text-white border-slate-900 shadow-md"
+                                    : "bg-white text-slate-600 border-slate-300 hover:border-slate-400 hover:bg-slate-50"
                                 }`}
                         >
                             {tab}
