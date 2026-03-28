@@ -10,7 +10,7 @@ const Sidebar = () => {
   return (
 <div className="w-64 bg-white h-full lg:h-screen border-r border-gray-200 flex flex-col overflow-y-auto">      
       {/* Logo */}
-      <div className="p-6 border-b border-gray-100 flex items-center gap-3">
+      <div className="p-6 py-4 border-b border-gray-200 flex items-center gap-3">
         <Link to="/sales/dashboard" className="bg-black p-2 rounded-lg text-white">
           <img src="/icons/salesDashboardLogo.svg" className="h-8 w-8" alt="" />
         </Link>
@@ -23,7 +23,7 @@ const Sidebar = () => {
         {/* Dashboard */}
         <button
           onClick={() => navigate("/sales/dashboard")}
-          className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
+          className={`w-full flex items-center gap-3 px-4 py-3 cursor-pointer rounded-lg transition-all ${
             isActive("/sales/dashboard")
               ? "bg-black text-white shadow-lg"
               : "text-gray-700 hover:bg-gray-100"
@@ -44,7 +44,7 @@ const Sidebar = () => {
         {/* Lead */}
         <button
           onClick={() => navigate("/sales/leads")}
-          className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
+          className={`w-full flex items-center gap-3 px-4 cursor-pointer py-3 rounded-lg transition-all ${
             isActive("/sales/leads")
               ? "bg-black text-white shadow-lg"
               : "text-gray-700 hover:bg-gray-100"
@@ -65,7 +65,7 @@ const Sidebar = () => {
         {/* Employees */}
         <button
           onClick={() => navigate("/sales/employees")}
-          className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
+          className={`w-full flex items-center gap-3 px-4 cursor-pointer py-3 rounded-lg transition-all ${
             isActive("/sales/employees")
               ? "bg-black text-white shadow-lg"
               : "text-gray-700 hover:bg-gray-100"
@@ -86,7 +86,7 @@ const Sidebar = () => {
         {/* Reports */}
         <button
           onClick={() => navigate("/sales/reports")}
-          className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
+          className={`w-full flex items-center gap-3 px-4 hover:cursor-pointer py-3 rounded-lg transition-all ${
             isActive("/sales/reports")
               ? "bg-black text-white shadow-lg"
               : "text-gray-700 hover:bg-gray-100"
