@@ -1,44 +1,44 @@
 ﻿import {
   createBrowserRouter,
   RouterProvider,
-  // Outlet
 } from "react-router-dom";
 import { lazy, Suspense } from "react";
 
+// Lazy imports
 const SalesDashboard = lazy(() => import("./pages/sales/SalesDashboard"));
 const LoginPage = lazy(() => import("./pages/LoginPage"));
+
+// Normal imports
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import MainLayout from "./components/modules/sales/components/MainLayout/MainLayout";
 import NotFound from "./components/common/NotFound";
-import NewLead from "./pages/sales/NewLead";
-import { SalesReport } from "./components/modules/sales/components/SalesReport";
+import SalesReport from "./components/modules/sales/components/SalesReport";
 import SalesEmployees from "./components/modules/sales/components/SalesEmployees";
 import RoleNotMatched from "./components/common/RoleNotMatched";
 import LeadsPage from "./pages/sales/LeadsPage";
 import LeadForm from "./components/modules/sales/components/LeadForm";
 
-// const Layout = () => {
-//   return (
-//     <>
-//       {/* Common UI like Navbar, Sidebar */}
-//       <Outlet />
-//     </>
-//   );
-// };
+/* Global Suspense Wrapper */
+const withSuspense = (Component: React.ReactNode) => (
+  <Suspense fallback={<div className="text-xl text-green-400 text-center">Loading...</div>}>{Component}</Suspense>
+);
 
 function App() {
   const router = createBrowserRouter([
+
+    // Login Route
     {
       path: "/",
-      element: <LoginPage />,
+      element: withSuspense(<LoginPage />),
     },
 
+    // Role mismatch
     {
       path: "/role-mismatch",
       element: <RoleNotMatched />,
     },
 
-    // Sales Module Routes
+    // Sales Module
     {
       path: "/sales",
       element: <ProtectedRoute requiredRole="sales_manager" />,
@@ -46,30 +46,34 @@ function App() {
         {
           element: <MainLayout />,
           children: [
+
+            // Default route → /sales
             {
-              index: true, // default route → /sales
-              element: <Suspense fallback={<div>Loading...</div>}>
-                <SalesDashboard />
-              </Suspense>,
+              index: true,
+              element: withSuspense(<SalesDashboard />),
             },
+
             {
               path: "dashboard",
-              element: <Suspense fallback={<div>Loading...</div>}>
-                <SalesDashboard />
-              </Suspense>,
+              element: withSuspense(<SalesDashboard />),
             },
+
             {
               path: "leads",
               element: <LeadsPage />,
-            }, 
-             {
+            },
+
+            {
               path: "new-lead",
               element: <LeadForm />,
             },
+
             {
               path: "reports",
               element: <SalesReport />,
-            },{
+            },
+
+            {
               path: "employees",
               element: <SalesEmployees />,
             },
@@ -78,13 +82,18 @@ function App() {
       ],
     },
 
+    // Fallback Route
     {
       path: "*",
       element: <NotFound />,
     },
   ]);
 
-  return <RouterProvider router={router} />;
+  return (
+    <Suspense fallback={<div className="text-xl text-green-400 text-center">Loading App...</div>}>
+      <RouterProvider router={router} />
+    </Suspense>
+  );
 }
 
 export default App;
