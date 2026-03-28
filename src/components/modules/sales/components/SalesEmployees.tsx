@@ -58,12 +58,7 @@ const SalesEmployees: React.FC<EmployeeComponentProps> = () => {
       <div className="max-w-7xl mx-auto mb-8">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
-            <div className="flex items-center gap-2 text-gray-400 text-sm mb-1">
-              <span>Employee</span>
-              <ChevronRight size={14} />
-              <span className="text-black font-medium">Sales Team</span>
-            </div>
-            <h1 className="text-3xl font-bold tracking-tight">Sales Employees</h1>
+            <h1 className="text-3xl font-black tracking-tight text-slate-900">Sales Employees</h1>
             <p className="text-sm text-gray-500 mt-1">
               Manage your sales force, track their performance and account status.
             </p>

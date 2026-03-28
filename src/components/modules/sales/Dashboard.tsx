@@ -180,7 +180,7 @@ export const Dashboard = () => {
   const currentData = DATA[filter] || DATA.Weekly;
 
   return (
-    <div className="min-h-screen bg-[#FDFDFD] p-6 md:p-10 text-slate-900 font-sans">
+    <div className="min-h-screen bg-[#FDFDFD] p-4 md:p-8 text-slate-900 font-sans">
       <div className="max-w-6xl mx-auto">
 
         {/* HEADER SECTION */}

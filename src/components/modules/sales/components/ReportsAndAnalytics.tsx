@@ -92,12 +92,7 @@ const ReportsAndAnalytics: FC = () => {
       <div className="max-w-7xl mx-auto mb-10">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
           <div>
-            <div className="flex items-center gap-2 text-gray-400 text-sm mb-1">
-              <span>Dashboard</span>
-              <ChevronRight size={14} />
-              <span className="text-black font-medium">Analytics</span>
-            </div>
-            <h1 className="text-3xl font-bold tracking-tight">Reports & Performance</h1>
+            <h1 className="text-3xl font-black tracking-tight text-slate-900">Reports & Performance</h1>
           </div>
           <div className="flex gap-3">
             <button className="flex items-center gap-2 px-4 py-2.5 border border-gray-200 rounded-lg text-sm font-semibold hover:bg-gray-50 active:scale-95 transition-all">
