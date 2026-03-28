@@ -17,7 +17,6 @@ import {
   Users,
   Target,
   DollarSign,
-  ChevronRight,
   Download,
   Calendar,
   ArrowUpRight,

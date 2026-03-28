@@ -7,7 +7,6 @@ import {
   MoreHorizontal, 
   Mail, 
   Phone,
-  ChevronRight,
   Filter
 } from "lucide-react";
 
