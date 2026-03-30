@@ -72,11 +72,24 @@ const StatCard = ({ title, value, svg }: StatCardProps) => (
   <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm transition-all hover:shadow-md">
     <div className="flex flex-col gap-3">
       <div className="flex items-center justify-between">
-        <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">{title}</p>
-        <div className="p-2 rounded-lg bg-[#d1e9e7]">
-          <img src={svg} alt="" className="w-6 h-6 opacity-40" />
+        <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">
+          {title}
+        </p>
+
+        {/* Light green background */}
+        <div className="p-2 rounded-lg bg-[#e6f4f2] flex items-center justify-center">
+          <img
+            src={svg}
+            alt=""
+            className="w-6 h-6 opacity-80"
+            style={{
+              filter:
+                "invert(23%) sepia(21%) saturate(1100%) hue-rotate(120deg) brightness(90%)",
+            }}
+          />
         </div>
       </div>
+
       <h3 className="text-2xl font-extrabold text-gray-800">{value}</h3>
     </div>
   </div>
