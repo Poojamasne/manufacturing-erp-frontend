@@ -7,7 +7,9 @@ import {
   MoreHorizontal, 
   Mail, 
   Phone,
-  Filter
+  Filter,
+  ChevronLeft,
+  ChevronRight
 } from "lucide-react";
 
 // --- Interfaces ---
@@ -19,17 +21,14 @@ interface Employee {
   phone: string;
   status: "Active" | "Inactive";
   joinedDate: string;
-  image?: string;
 }
 
-interface EmployeeComponentProps {
-  // onAddEmployeeClick: () => void; // For navigation logic
-}
-
-const SalesEmployees: React.FC<EmployeeComponentProps> = () => {
+const SalesEmployees: React.FC = () => {
   // --- State ---
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState<"Active" | "All">("Active");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
 
   // --- Mock Data ---
   const [employees] = useState<Employee[]>([
@@ -38,6 +37,7 @@ const SalesEmployees: React.FC<EmployeeComponentProps> = () => {
     { id: "EMP003", name: "Anjali Sharma", designation: "Territory Lead", email: "anjali.s@electronics.in", phone: "+91 98234 44556", status: "Active", joinedDate: "20 Nov 2023" },
     { id: "EMP004", name: "Vikram Rathore", designation: "Junior Sales Associate", email: "vikram.r@electronics.in", phone: "+91 98234 99887", status: "Inactive", joinedDate: "15 Feb 2024" },
     { id: "EMP005", name: "Priya Mehta", designation: "Sales Executive", email: "priya.m@electronics.in", phone: "+91 98234 77665", status: "Active", joinedDate: "01 Dec 2023" },
+    { id: "EMP006", name: "Karan Johar", designation: "Regional Head", email: "karan.j@electronics.in", phone: "+91 98234 22334", status: "Active", joinedDate: "10 Jan 2023" },
   ]);
 
   // --- Filtering Logic ---
@@ -50,117 +50,115 @@ const SalesEmployees: React.FC<EmployeeComponentProps> = () => {
     });
   }, [employees, searchQuery, activeTab]);
 
+  // --- Pagination Logic ---
+  const totalPages = Math.ceil(filteredEmployees.length / itemsPerPage);
+  const paginatedData = filteredEmployees.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
   return (
-    <div className="min-h-screen bg-white p-4 md:p-8 font-sans text-[#1a1a1a]">
+    <div className="min-h-screen bg-[#f4f7f6] p-4 sm:p-6 lg:p-8 font-sans text-gray-900">
       
       {/* Header Section */}
-      <div className="max-w-7xl mx-auto mb-8">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+      <div className="max-w-7xl mx-auto mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6">
           <div>
-            <h1 className="text-3xl font-black tracking-tight text-slate-900">Sales Employees</h1>
-            <p className="text-sm text-gray-500 mt-1">
-              Manage your sales force, track their performance and account status.
-            </p>
+            <h1 className="text-2xl font-bold text-gray-800 tracking-tight">Sales Employees</h1>
+            <p className="text-sm text-gray-400 mt-1">Manage your sales force and track performance accounts.</p>
           </div>
 
-          <button 
-            // onClick={onAddEmployeeClick}
-            className="flex items-center gap-2 bg-black text-white px-5 py-2.5 rounded-lg font-semibold hover:bg-zinc-800 transition-all active:scale-95 shadow-md"
-          >
-            <UserPlus size={18} />
+          <button className="flex items-center gap-2 bg-[#005d52] text-white px-6 py-2.5 rounded-full font-bold text-sm shadow-lg shadow-teal-900/20 hover:opacity-90 transition-all active:scale-95">
+            <UserPlus size={18} strokeWidth={3} />
             Add Sales Employee
           </button>
-        </div>
       </div>
 
       {/* Tabs & Search Row */}
-      <div className="max-w-7xl mx-auto flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6 border-b border-gray-100 pb-6">
-        <div className="flex bg-gray-100 p-1 rounded-xl">
+      <div className="max-w-7xl mx-auto flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-8">
+        <div className="flex flex-wrap gap-2 p-1.5 bg-white/60 rounded-2xl border border-white w-fit shadow-sm">
           <button 
-            onClick={() => setActiveTab("Active")}
-            className={`px-6 py-2 rounded-lg text-sm font-semibold transition-all ${activeTab === "Active" ? "bg-white text-black shadow-sm" : "text-gray-500 hover:text-black"}`}
+            onClick={() => { setActiveTab("Active"); setCurrentPage(1); }}
+            className={`px-6 py-2 rounded-xl text-xs font-bold transition-all ${activeTab === "Active" ? "bg-[#d1e9e7] text-[#005d52] shadow-sm" : "text-gray-400 hover:text-gray-600"}`}
           >
             Active
           </button>
           <button 
-            onClick={() => setActiveTab("All")}
-            className={`px-6 py-2 rounded-lg text-sm font-semibold transition-all ${activeTab === "All" ? "bg-white text-black shadow-sm" : "text-gray-500 hover:text-black"}`}
+            onClick={() => { setActiveTab("All"); setCurrentPage(1); }}
+            className={`px-6 py-2 rounded-xl text-xs font-bold transition-all ${activeTab === "All" ? "bg-[#d1e9e7] text-[#005d52] shadow-sm" : "text-gray-400 hover:text-gray-600"}`}
           >
             All Employees
           </button>
         </div>
 
         <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto">
-          <div className="relative flex-1 lg:w-72">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
+          <div className="relative flex-1 lg:w-80">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300" size={18} />
             <input 
               type="text"
               placeholder="Search by name or email..."
               value={searchQuery}
-              onChange={(e: ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 bg-gray-100 border-none rounded-lg text-sm outline-none focus:ring-2 focus:ring-black/5"
+              onChange={(e: ChangeEvent<HTMLInputElement>) => { setSearchQuery(e.target.value); setCurrentPage(1); }}
+              className="w-full pl-11 pr-4 py-2.5 bg-white border-none rounded-full text-sm outline-none shadow-sm focus:ring-2 focus:ring-[#005d52]/20 transition-all placeholder:text-gray-300"
             />
           </div>
-          <button className="flex items-center gap-2 px-4 py-2 border border-gray-200 rounded-lg text-sm font-medium hover:bg-gray-50">
-            <Filter size={14} /> Filter <ChevronDown size={14} />
+          <button className="flex items-center gap-2 px-5 py-2.5 bg-white border border-gray-100 rounded-full text-xs font-bold text-gray-500 hover:bg-gray-50 shadow-sm transition-colors">
+            <Filter size={14} className="opacity-50" /> Filter <ChevronDown size={14} className="opacity-50" />
           </button>
         </div>
       </div>
 
       {/* Table Container */}
-      <div className="max-w-7xl mx-auto border border-gray-200 rounded-2xl overflow-hidden shadow-sm bg-white">
+      <div className="max-w-7xl mx-auto bg-white rounded-4xl border border-gray-100 shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
+          <table className="w-full text-left">
             <thead>
-              <tr className="bg-[#F9FAFB] border-b border-gray-200">
-                <th className="px-6 py-4 text-[12px] font-bold text-gray-500 uppercase tracking-wider">Employee Name</th>
-                <th className="px-6 py-4 text-[12px] font-bold text-gray-500 uppercase tracking-wider">Designation</th>
-                <th className="px-6 py-4 text-[12px] font-bold text-gray-500 uppercase tracking-wider">Contact Info</th>
-                <th className="px-6 py-4 text-[12px] font-bold text-gray-500 uppercase tracking-wider">Status</th>
-                <th className="px-6 py-4 text-[12px] font-bold text-gray-500 uppercase tracking-wider">Joined Date</th>
-                <th className="px-6 py-4 text-right"></th>
+              <tr className="bg-gray-50/30 border-b border-gray-50">
+                <th className="px-8 py-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Employee Name</th>
+                <th className="px-8 py-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Designation</th>
+                <th className="px-8 py-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Contact Info</th>
+                <th className="px-8 py-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Status</th>
+                <th className="px-8 py-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Joined Date</th>
+                <th className="px-8 py-5 text-right"></th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
-              {filteredEmployees.map((emp) => (
-                <tr key={emp.id} className="hover:bg-gray-50/50 transition-colors group">
-                  <td className="px-6 py-5">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-[#E5E7EB] flex items-center justify-center text-gray-600 font-bold text-sm">
+            <tbody className="divide-y divide-gray-50">
+              {paginatedData.map((emp) => (
+                <tr key={emp.id} className="hover:bg-[#f4f7f6]/50 transition-colors group">
+                  <td className="px-8 py-5">
+                    <div className="flex items-center gap-4">
+                      <div className="w-10 h-10 rounded-full bg-[#d1e9e7] flex items-center justify-center text-[#005d52] font-bold text-sm shadow-sm border-2 border-white">
                         {emp.name.split(' ').map(n => n[0]).join('')}
                       </div>
                       <div>
-                        <p className="text-sm font-bold text-gray-900">{emp.name}</p>
-                        <p className="text-[11px] text-gray-400">{emp.id}</p>
+                        <p className="text-sm font-bold text-gray-800">{emp.name}</p>
+                        <p className="text-[11px] font-bold text-[#005d52] uppercase tracking-tighter opacity-70">{emp.id}</p>
                       </div>
                     </div>
                   </td>
-                  <td className="px-6 py-5">
-                    <span className="text-sm text-gray-600 font-medium">{emp.designation}</span>
+                  <td className="px-8 py-5">
+                    <span className="text-sm text-gray-600 font-semibold">{emp.designation}</span>
                   </td>
-                  <td className="px-6 py-5">
+                  <td className="px-8 py-5">
                     <div className="space-y-1">
-                      <div className="flex items-center gap-2 text-xs text-gray-500">
-                        <Mail size={12} /> {emp.email}
+                      <div className="flex items-center gap-2 text-[11px] font-medium text-gray-400">
+                        <Mail size={12} className="opacity-50" /> {emp.email}
                       </div>
-                      <div className="flex items-center gap-2 text-xs text-gray-500">
-                        <Phone size={12} /> {emp.phone}
+                      <div className="flex items-center gap-2 text-[11px] font-medium text-gray-400">
+                        <Phone size={12} className="opacity-50" /> {emp.phone}
                       </div>
                     </div>
                   </td>
-                  <td className="px-6 py-5">
-                    <div className="flex items-center gap-2">
-                      <div className={`w-2 h-2 rounded-full ${emp.status === 'Active' ? 'bg-green-500' : 'bg-gray-300'}`} />
-                      <span className={`text-xs font-bold ${emp.status === 'Active' ? 'text-green-700' : 'text-gray-400'}`}>
-                        {emp.status}
-                      </span>
-                    </div>
+                  <td className="px-8 py-5">
+                    <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-tight ${emp.status === 'Active' ? 'bg-green-50 text-green-600' : 'bg-gray-100 text-gray-400'}`}>
+                      <div className={`w-1.5 h-1.5 rounded-full ${emp.status === 'Active' ? 'bg-green-600' : 'bg-gray-400'}`} />
+                      {emp.status}
+                    </span>
                   </td>
-                  <td className="px-6 py-5">
-                    <span className="text-sm text-gray-500">{emp.joinedDate}</span>
+                  <td className="px-8 py-5">
+                    <span className="text-sm text-gray-400 font-medium">{emp.joinedDate}</span>
                   </td>
-                  <td className="px-6 py-5 text-right">
-                    <button className="p-2 text-gray-400 hover:text-black rounded-lg hover:bg-gray-100 transition-colors">
+                  <td className="px-8 py-5 text-right">
+                    <button className="p-2 text-gray-300 hover:text-[#005d52] rounded-full hover:bg-gray-50 transition-all">
                       <MoreHorizontal size={18} />
                     </button>
                   </td>
@@ -168,8 +166,11 @@ const SalesEmployees: React.FC<EmployeeComponentProps> = () => {
               ))}
               {filteredEmployees.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="px-6 py-20 text-center text-gray-400 italic">
-                    No employees found matching your criteria.
+                  <td colSpan={6} className="px-8 py-24 text-center">
+                    <div className="flex flex-col items-center gap-2">
+                       <Search size={40} className="text-gray-100 mb-2" />
+                       <p className="text-sm text-gray-400 font-medium italic">No employees found matching your criteria.</p>
+                    </div>
                   </td>
                 </tr>
               )}
@@ -177,17 +178,40 @@ const SalesEmployees: React.FC<EmployeeComponentProps> = () => {
           </table>
         </div>
 
-        {/* Footer */}
-        <div className="px-6 py-4 bg-[#F9FAFB] border-t border-gray-100 flex flex-col sm:flex-row justify-between items-center gap-4">
-          <p className="text-xs text-gray-500 font-medium">
-            Showing <span className="text-black">{filteredEmployees.length}</span> of <span className="text-black">{employees.length}</span> Employees
+        {/* Interactive Footer / Pagination */}
+        <div className="px-8 py-6 bg-gray-50/30 border-t border-gray-50 flex flex-col sm:flex-row justify-between items-center gap-6">
+          <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+            Showing <span className="text-gray-800">{paginatedData.length === 0 ? 0 : (currentPage - 1) * itemsPerPage + 1} - {Math.min(currentPage * itemsPerPage, filteredEmployees.length)}</span> of <span className="text-gray-800">{filteredEmployees.length}</span> Employees
           </p>
-          <div className="flex gap-2">
-            <button className="px-4 py-1.5 text-xs font-bold border border-gray-200 rounded-md bg-white hover:bg-gray-50 disabled:opacity-50" disabled>
-              Previous
+          <div className="flex items-center gap-4">
+            <button 
+                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                className="flex items-center gap-1 text-[10px] font-bold text-gray-400 hover:text-[#005d52] disabled:opacity-30 transition-all uppercase"
+                disabled={currentPage === 1}
+            >
+              <ChevronLeft size={16} /> Prev
             </button>
-            <button className="px-4 py-1.5 text-xs font-bold border border-gray-200 rounded-md bg-white hover:bg-gray-50">
-              Next
+
+            <div className="flex gap-2">
+                {[...Array(totalPages)].map((_, i) => (
+                    <button 
+                        key={i} 
+                        onClick={() => setCurrentPage(i + 1)}
+                        className={`w-8 h-8 flex items-center justify-center rounded-xl text-xs font-bold transition-all ${
+                            currentPage === i + 1 ? "bg-[#005d52] text-white shadow-lg shadow-teal-900/20" : "text-gray-400 hover:bg-gray-100"
+                        }`}
+                    >
+                        {i + 1}
+                    </button>
+                ))}
+            </div>
+
+            <button 
+                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                className="flex items-center gap-1 text-[10px] font-bold text-gray-400 hover:text-[#005d52] disabled:opacity-30 transition-all uppercase"
+                disabled={currentPage === totalPages || totalPages === 0}
+            >
+              Next <ChevronRight size={16} />
             </button>
           </div>
         </div>

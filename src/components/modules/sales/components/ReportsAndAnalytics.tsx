@@ -13,7 +13,6 @@ import {
   Cell,
 } from "recharts";
 import {
-  TrendingUp,
   Users,
   Target,
   DollarSign,
@@ -22,9 +21,10 @@ import {
   ArrowUpRight,
   ArrowDownRight,
   Filter,
+  BarChart3
 } from "lucide-react";
 
-// --- Types ---
+// --- Types & Interfaces ---
 type TimeRange = "Weekly" | "Monthly" | "Quarterly" | "Yearly";
 
 interface LeaderboardItem {
@@ -34,16 +34,31 @@ interface LeaderboardItem {
   revenue: string;
 }
 
-// --- Mock Data Store ---
+interface StatCardProps {
+  label: string;
+  value: string;
+  trend: string;
+  icon: React.ReactNode;
+  isNeg?: boolean;
+}
+
+// --- Theme Colors ---
+const THEME = {
+  primary: "#005d52",
+  secondary: "#4fb29b",
+  lightTeal: "#d1e9e7",
+  accent: "#f08552",
+  bg: "#f4f7f6",
+  chart: ["#005d52", "#4fb29b", "#b0d9d9"]
+};
+
+// --- Mock Data ---
 const DATA_STORE: Record<TimeRange, any> = {
   Weekly: {
     revenue: [{ name: "Mon", val: 1.2 }, { name: "Tue", val: 2.1 }, { name: "Wed", val: 1.8 }, { name: "Thu", val: 3.4 }, { name: "Fri", val: 2.9 }, { name: "Sat", val: 4.1 }, { name: "Sun", val: 3.2 }],
     sources: [{ name: "Trade Fair", value: 400 }, { name: "Referral", value: 300 }, { name: "Web", value: 200 }],
     kpis: { rev: "₹12.4L", leads: "42", conv: "9.5%", avg: "₹0.8L" },
-    leaderboard: [
-      { name: "Sneha Patil", leads: 12, conversion: "10%", revenue: "₹2.1L" },
-      { name: "Rahul Deshpande", leads: 8, conversion: "12%", revenue: "₹3.4L" }
-    ]
+    leaderboard: [{ name: "Sneha Patil", leads: 12, conversion: "10%", revenue: "₹2.1L" }, { name: "Rahul Deshpande", leads: 8, conversion: "12%", revenue: "₹3.4L" }]
   },
   Monthly: {
     revenue: [{ name: "W1", val: 10 }, { name: "W2", val: 18 }, { name: "W3", val: 14 }, { name: "W4", val: 22 }],
@@ -60,193 +75,203 @@ const DATA_STORE: Record<TimeRange, any> = {
     revenue: [{ name: "Jan", val: 35 }, { name: "Feb", val: 42 }, { name: "Mar", val: 51 }],
     sources: [{ name: "Trade Fair", value: 3500 }, { name: "Referral", value: 2100 }, { name: "Web", value: 1400 }],
     kpis: { rev: "₹1.2Cr", leads: "680", conv: "12.8%", avg: "₹1.9L" },
-    leaderboard: [
-      { name: "Priya Mehta", leads: 120, conversion: "20%", revenue: "₹45.2L" },
-      { name: "Rahul Deshpande", leads: 95, conversion: "18%", revenue: "₹38.1L" },
-      { name: "Sneha Patil", leads: 110, conversion: "14%", revenue: "₹31.5L" }
-    ]
+    leaderboard: [{ name: "Priya Mehta", leads: 120, conversion: "20%", revenue: "₹45.2L" }, { name: "Rahul Deshpande", leads: 95, conversion: "18%", revenue: "₹38.1L" }, { name: "Sneha Patil", leads: 110, conversion: "14%", revenue: "₹31.5L" }]
   },
   Yearly: {
     revenue: [{ name: "2022", val: 120 }, { name: "2023", val: 180 }, { name: "2024", val: 240 }, { name: "2025", val: 310 }],
     sources: [{ name: "Trade Fair", value: 15000 }, { name: "Referral", value: 10000 }, { name: "Web", value: 5000 }],
     kpis: { rev: "₹4.8Cr", leads: "2450", conv: "15.4%", avg: "₹2.2L" },
-    leaderboard: [
-      { name: "Rahul Deshpande", leads: 420, conversion: "16%", revenue: "₹1.4Cr" },
-      { name: "Sneha Patil", leads: 380, conversion: "14%", revenue: "₹1.1Cr" },
-      { name: "Priya Mehta", leads: 450, conversion: "24%", revenue: "₹1.8Cr" }
-    ]
+    leaderboard: [{ name: "Rahul Deshpande", leads: 420, conversion: "16%", revenue: "₹1.4Cr" }, { name: "Sneha Patil", leads: 380, conversion: "14%", revenue: "₹1.1Cr" }, { name: "Priya Mehta", leads: 450, conversion: "24%", revenue: "₹1.8Cr" }]
   }
 };
 
-const COLORS = ["#000000", "#666666", "#cccccc"];
-
 const ReportsAndAnalytics: FC = () => {
   const [range, setRange] = useState<TimeRange>("Monthly");
-
   const currentData = useMemo(() => DATA_STORE[range], [range]);
 
   return (
-    <div className="min-h-screen bg-[#FDFDFD] p-4 md:p-8 font-sans text-slate-900">
-      {/* Header */}
-      <div className="max-w-6xl mx-auto mb-10">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+    <div className="min-h-screen bg-[#f4f7f6] p-4 md:p-8 font-sans text-gray-900">
+      <div className="max-w-7xl mx-auto">
+        
+        {/* Header */}
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-10">
           <div>
-            <h1 className="text-3xl font-black tracking-tight text-slate-900">Reports & Performance</h1>
+            <h1 className="text-2xl font-bold text-gray-800 tracking-tight">Reports & Analytics</h1>
+            <p className="text-sm text-gray-400 mt-1">Deep dive into sales performance and conversion metrics.</p>
           </div>
-          <div className="flex gap-3">
-            <button className="flex items-center gap-2 px-4 py-2.5 border border-gray-200 rounded-lg text-sm font-semibold hover:bg-gray-50 active:scale-95 transition-all">
-              <Download size={18} /> Export
+          <div className="flex gap-3 w-full md:w-auto">
+            <button className="flex-1 md:flex-none flex items-center justify-center gap-2 px-5 py-2.5 bg-white border border-gray-100 rounded-full text-xs font-bold text-gray-500 hover:bg-gray-50 transition-all shadow-sm">
+              <Download size={16} /> Export Data
             </button>
-            <button className="flex items-center gap-2 bg-black text-white px-5 py-2.5 rounded-lg font-semibold hover:bg-zinc-800 active:scale-95 transition-all shadow-md">
-              <Calendar size={18} /> Schedule
+            <button className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-[#005d52] text-white px-6 py-2.5 rounded-full text-xs font-bold shadow-lg shadow-teal-900/20 hover:opacity-95 transition-all">
+              <Calendar size={16} /> Schedule Report
             </button>
           </div>
         </div>
-      </div>
 
-      {/* REVISED: Separate Filter Buttons */}
-      <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-6 mb-10 border-b border-gray-100 pb-6">
-        <div className="flex flex-wrap items-center gap-10">
-          {(["Weekly", "Monthly", "Quarterly", "Yearly"] as TimeRange[]).map((r) => (
-            <button
-              key={r}
-              onClick={() => setRange(r)}
-              className={`min-w-30 px-6 py-2.5 text-sm font-semibold rounded-lg border transition-all duration-200 shadow-sm ${
-                range === r
-                  ? "bg-slate-900 text-white border-slate-900 shadow-md"
-                  : "bg-white text-slate-600 border-slate-300 hover:border-slate-400 hover:bg-slate-50"
-              }`}
-            >
-              {r}
-            </button>
-          ))}
-        </div>
-        <button className="p-2.5 border border-slate-200 rounded-lg bg-white shadow-sm hover:bg-gray-50 text-slate-600">
-          <Filter size={18}/>
-        </button>
-      </div>
-
-      {/* KPI Grid */}
-      <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
-        <StatCard label="Total Revenue" value={currentData.kpis.rev} trend="+12%" icon={<DollarSign size={20}/>}/>
-        <StatCard label="Active Leads" value={currentData.kpis.leads} trend="+18" icon={<Users size={20}/>}/>
-        <StatCard label="Conversion" value={currentData.kpis.conv} trend="-2%" isNeg icon={<Target size={20}/>}/>
-        <StatCard label="Avg Deal" value={currentData.kpis.avg} trend="+5%" icon={<TrendingUp size={20}/>}/>
-      </div>
-
-      {/* Analytics Grid */}
-      <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
-        <div className="lg:col-span-2 border border-gray-200 rounded-2xl p-6 bg-white shadow-sm">
-          <div className="flex justify-between items-center mb-10">
-            <h3 className="font-bold text-lg">Revenue Growth Trend</h3>
-            <div className="flex items-center gap-2 text-xs font-bold text-gray-400 tracking-wider uppercase">
-                <div className="w-2 h-2 rounded-full bg-black"></div> Revenue (Lakhs)
-            </div>
-          </div>
-          <div className="h-72 w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={currentData.revenue}>
-                <defs>
-                  <linearGradient id="colorVal" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#000" stopOpacity={0.1}/>
-                    <stop offset="95%" stopColor="#000" stopOpacity={0}/>
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
-                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fontSize: 12, fill: '#999'}} dy={10} />
-                <YAxis axisLine={false} tickLine={false} tick={{fontSize: 12, fill: '#999'}} />
-                <Tooltip 
-                    contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
-                    cursor={{ stroke: '#000', strokeWidth: 1 }}
-                />
-                <Area type="monotone" dataKey="val" stroke="#000" strokeWidth={3} fillOpacity={1} fill="url(#colorVal)" />
-              </AreaChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-
-        <div className="border border-gray-200 rounded-2xl p-6 bg-white shadow-sm">
-          <h3 className="font-bold text-lg mb-4">Lead Source Distribution</h3>
-          <div className="h-64 w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie data={currentData.sources} innerRadius={60} outerRadius={80} paddingAngle={5} dataKey="value">
-                  {currentData.sources.map((_:any, index:number) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                  ))}
-                </Pie>
-                <Tooltip />
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
-          <div className="space-y-3 mt-4">
-            {currentData.sources.map((s:any, i:number) => (
-                <div key={i} className="flex justify-between items-center text-xs font-bold">
-                    <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 rounded-full" style={{backgroundColor: COLORS[i]}}></div>
-                        <span className="text-gray-500 uppercase">{s.name}</span>
-                    </div>
-                    <span>{Math.round((s.value / currentData.sources.reduce((a:number,b:any)=>a+b.value, 0)) * 100)}%</span>
-                </div>
+        {/* Unified Filter Section */}
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-6 mb-10">
+          <div className="flex gap-2 p-1.5 bg-white/60 rounded-2xl border border-white shadow-sm w-fit">
+            {(["Weekly", "Monthly", "Quarterly", "Yearly"] as TimeRange[]).map((r) => (
+              <button
+                key={r}
+                onClick={() => setRange(r)}
+                className={`px-6 py-2 text-xs font-bold rounded-xl transition-all duration-300 ${
+                  range === r ? "bg-[#d1e9e7] text-[#005d52] shadow-sm" : "text-gray-400 hover:text-gray-600"
+                }`}
+              >
+                {r}
+              </button>
             ))}
           </div>
+          <div className="flex items-center gap-3">
+             <div className="bg-[#005d52] text-white px-4 py-2 rounded-full text-[11px] font-bold shadow-md shadow-teal-900/10">
+                FY 2025-26
+             </div>
+             <button className="p-2.5 bg-white border border-gray-100 rounded-full text-gray-400 hover:text-[#005d52] shadow-sm">
+                <Filter size={18}/>
+             </button>
+          </div>
         </div>
-      </div>
 
-      {/* Performance Leaderboard Table */}
-      <div className="max-w-7xl mx-auto border border-gray-200 rounded-2xl overflow-hidden shadow-sm bg-white">
-        <div className="p-6 border-b border-gray-100 flex justify-between items-center">
-            <h3 className="font-bold text-lg">Performance Leaderboard</h3>
-            <button className="text-sm font-bold text-gray-500 hover:text-black transition-colors">View All Members</button>
+        {/* KPI Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+          <StatCard label="Total Revenue" value={currentData.kpis.rev} trend="+12.4%" icon={<DollarSign size={20}/>}/>
+          <StatCard label="Total Leads" value={currentData.kpis.leads} trend="+18" icon={<Users size={20}/>}/>
+          <StatCard label="Conv. Rate" value={currentData.kpis.conv} trend="-2.1%" isNeg icon={<Target size={20}/>}/>
+          <StatCard label="Avg Deal Value" value={currentData.kpis.avg} trend="+5.2%" icon={<BarChart3 size={20}/>}/>
         </div>
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
-            <thead>
-              <tr className="bg-[#F9FAFB] border-b border-gray-200">
-                <th className="px-6 py-4 text-[11px] font-bold text-gray-500 uppercase tracking-widest">Representative</th>
-                <th className="px-6 py-4 text-[11px] font-bold text-gray-500 uppercase tracking-widest text-center">Leads</th>
-                <th className="px-6 py-4 text-[11px] font-bold text-gray-500 uppercase tracking-widest text-center">Conversion</th>
-                <th className="px-6 py-4 text-[11px] font-bold text-gray-500 uppercase tracking-widest text-right">Revenue</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-100">
-              {currentData.leaderboard.map((person: LeaderboardItem, idx: number) => (
-                <tr key={idx} className="hover:bg-gray-50/50 transition-colors">
-                  <td className="px-6 py-5">
-                    <span className="text-sm font-bold text-gray-900">{person.name}</span>
-                  </td>
-                  <td className="px-6 py-5 text-center">
-                    <span className="text-sm text-gray-600 font-medium">{person.leads}</span>
-                  </td>
-                  <td className="px-6 py-5 text-center">
-                    <span className="inline-block text-[11px] font-bold px-2.5 py-1 bg-gray-100 rounded-md text-gray-700">
-                        {person.conversion}
-                    </span>
-                  </td>
-                  <td className="px-6 py-5 text-right">
-                    <span className="text-sm font-bold text-black">{person.revenue}</span>
-                  </td>
+
+        {/* Analytics Section */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+          
+          {/* Main Chart Card */}
+          <div className="lg:col-span-2 bg-white rounded-4xl p-8 border border-gray-50 shadow-sm">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-10 gap-4">
+              <div>
+                <h3 className="font-bold text-lg text-gray-800">Revenue Growth Trend</h3>
+                <p className="text-xs text-gray-400 mt-1">Real-time revenue monitoring</p>
+              </div>
+              <div className="flex items-center gap-2 text-[10px] font-bold text-gray-400 tracking-widest uppercase">
+                  <div className="w-2.5 h-2.5 rounded-full bg-[#005d52]"></div> Revenue (INR)
+              </div>
+            </div>
+            <div className="h-80 w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={currentData.revenue} margin={{ top: 0, right: 0, left: -25, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="pineGradient" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor={THEME.primary} stopOpacity={0.15}/>
+                      <stop offset="95%" stopColor={THEME.primary} stopOpacity={0}/>
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid vertical={false} stroke="#f1f5f9" />
+                  <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fontSize: 11, fill: '#94a3b8'}} dy={15} />
+                  <YAxis axisLine={false} tickLine={false} tick={{fontSize: 11, fill: '#cbd5e1'}} />
+                  <Tooltip contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }} />
+                  <Area type="monotone" dataKey="val" stroke={THEME.primary} strokeWidth={4} fill="url(#pineGradient)" />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+
+          {/* Side Distribution Card */}
+          <div className="bg-white rounded-4xl p-8 border border-gray-50 shadow-sm flex flex-col">
+            <h3 className="font-bold text-lg text-gray-800 mb-2">Lead Sources</h3>
+            <p className="text-xs text-gray-400 mb-8">Channel performance distribution</p>
+            <div className="flex-1 flex flex-col justify-center">
+                <div className="h-56 w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                    <Pie data={currentData.sources} tabIndex={-1} style={{outline:"none"}} innerRadius={65} outerRadius={85} paddingAngle={8} dataKey="value" cornerRadius={6}>
+                        {currentData.sources.map((_:any, index:number) => (
+                        <Cell key={`cell-${index}`} fill={THEME.chart[index % THEME.chart.length]} />
+                        ))}
+                    </Pie>
+                    <Tooltip />
+                    </PieChart>
+                </ResponsiveContainer>
+                </div>
+                <div className="space-y-4 mt-8">
+                {currentData.sources.map((s:any, i:number) => (
+                    <div key={i} className="flex justify-between items-center text-[10px] font-bold">
+                        <div className="flex items-center gap-3">
+                            <div className="w-2.5 h-2.5 rounded-full" style={{backgroundColor: THEME.chart[i % THEME.chart.length]}}></div>
+                            <span className="text-gray-400 uppercase tracking-widest">{s.name}</span>
+                        </div>
+                        <span className="text-gray-800">{Math.round((s.value / currentData.sources.reduce((a:number,b:any)=>a+b.value, 0)) * 100)}%</span>
+                    </div>
+                ))}
+                </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Leaderboard Table Card */}
+        <div className="bg-white rounded-4xl border border-gray-50 shadow-sm overflow-hidden">
+          <div className="p-8 border-b border-gray-50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+              <div>
+                <h3 className="font-bold text-lg text-gray-800">Performance Leaderboard</h3>
+                <p className="text-xs text-gray-400 mt-1">Top sales representatives by converted revenue</p>
+              </div>
+              <button className="text-[10px] font-bold text-[#005d52] hover:underline uppercase tracking-widest">View Detailed Rankings</button>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-left">
+              <thead>
+                <tr className="bg-gray-50/30 border-b border-gray-50">
+                  <th className="px-8 py-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Representative</th>
+                  <th className="px-8 py-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest text-center">Leads Managed</th>
+                  <th className="px-8 py-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest text-center">Conversion</th>
+                  <th className="px-8 py-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest text-right">Revenue Won</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="divide-y divide-gray-50">
+                {currentData.leaderboard.map((person: LeaderboardItem, idx: number) => (
+                  <tr key={idx} className="hover:bg-gray-50/50 transition-colors group">
+                    <td className="px-8 py-5">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-[#d1e9e7] flex items-center justify-center text-[#005d52] font-bold text-xs uppercase">
+                            {person.name.split(' ').map(n => n[0]).join('')}
+                        </div>
+                        <span className="text-sm font-bold text-gray-800">{person.name}</span>
+                      </div>
+                    </td>
+                    <td className="px-8 py-5 text-center">
+                      <span className="text-sm text-gray-500 font-semibold">{person.leads}</span>
+                    </td>
+                    <td className="px-8 py-5 text-center">
+                      <span className="inline-block text-[10px] font-bold px-3 py-1 bg-[#d1e9e7] text-[#005d52] rounded-full">
+                          {person.conversion}
+                      </span>
+                    </td>
+                    <td className="px-8 py-5 text-right">
+                      <span className="text-sm font-bold text-gray-800">{person.revenue}</span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>
   );
 };
 
-// --- Sub Component ---
-const StatCard: FC<{label: string, value: string, trend: string, icon: React.ReactNode, isNeg?: boolean}> = ({label, value, trend, icon, isNeg}) => (
-    <div className="border border-gray-200 rounded-2xl p-6 hover:border-black transition-all group bg-white shadow-sm">
-        <div className="flex justify-between items-start mb-4">
-            <div className="p-2.5 bg-gray-100 rounded-lg group-hover:bg-black group-hover:text-white transition-all duration-300">{icon}</div>
-            <div className={`flex items-center gap-1 text-xs font-bold ${isNeg ? 'text-red-500' : 'text-green-600'}`}>
+// --- Stat Card Sub-Component ---
+const StatCard: FC<StatCardProps> = ({label, value, trend, icon, isNeg}) => (
+    <div className="bg-white rounded-[28px] p-6 border border-gray-50 hover:border-[#005d52]/30 transition-all group shadow-sm">
+        <div className="flex justify-between items-start mb-6">
+            <div className="p-3 bg-[#f4f7f6] rounded-2xl text-[#005d52] group-hover:bg-[#005d52] group-hover:text-white transition-all duration-300 shadow-sm">{icon}</div>
+            <div className={`flex items-center gap-1 text-[11px] font-bold px-2 py-1 rounded-full ${isNeg ? 'bg-red-50 text-red-500' : 'bg-green-50 text-green-600'}`}>
                 {isNeg ? <ArrowDownRight size={14}/> : <ArrowUpRight size={14}/>} {trend}
             </div>
         </div>
-        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">{label}</p>
-        <p className="text-2xl font-bold">{value}</p>
+        <div>
+            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">{label}</p>
+            <p className="text-2xl font-bold text-gray-800">{value}</p>
+        </div>
     </div>
 );
 
