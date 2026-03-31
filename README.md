@@ -7,8 +7,8 @@ Designed to streamline lead management, analytics, and overall sales workflow wi
 
 ## 🌐 Live Demo  
 👉 [View Live Application](https://manufacturing-erp-zonixtec.vercel.app/)
-Email: salesmanager@erp.com
-Password: sales123
+- Email: salesmanager@erp.com
+- Password: sales123
 
 ---
 
