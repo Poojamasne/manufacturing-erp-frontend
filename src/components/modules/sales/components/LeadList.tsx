@@ -1,450 +1,347 @@
 ﻿import React, { useState, useMemo } from "react";
 import {
-    Plus,
-    ChevronDown,
-    Search,
-    Trash2,
-    ChevronLeft,
-    ChevronRight,
-    ChevronsUpDown,
-    Calendar,
-    Eye,
-    FileEdit,
-    X
+  Plus,
+  ChevronDown,
+  Search,
+  Trash2,
+  ChevronLeft,
+  ChevronRight,
+  Eye,
+  FileEdit,
+  X,
+  Filter
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
-// --- Types ---
+// --- Robust Types ---
 type Priority = "Hot" | "Warm" | "Cold" | "All";
 type Status = "New Lead" | "Contacted" | "Converted" | "Quotation" | "Won" | "Lost" | "All";
 type Source = "Dealer" | "Website" | "Referral" | "Trade Show" | "Cold Call" | "All";
-type TimeTab = "Weekly" | "Monthly" | "Quarterly" | "Yearly" | "All Time";
+type TimeTab = "Weekly" | "Monthly" | "Quarterly" | "Yearly" | "All Time" | "Custom";
 
-type Lead = {
-    id: string;
-    company: string;
-    contact: string;
-    number: string;
-    email: string;
-    gst: string;
-    state: string;
-    product: string;
-    variant: string;
-    quantity: number;
-    unit: string;
-    estValue: string;
-    source: Exclude<Source, "All">;
-    status: Exclude<Status, "All">;
-    priority: Exclude<Priority, "All">;
-    assignedTo: string;
-    followUp: string;
-    createdAt: string; // Added for date filtering (ISO Format: YYYY-MM-DD)
-};
+interface Lead {
+  id: string;
+  company: string;
+  contact: string;
+  number: string;
+  email: string;
+  gst: string;
+  state: string;
+  product: string;
+  variant: string;
+  quantity: number;
+  unit: string;
+  estValue: string;
+  source: Exclude<Source, "All">;
+  status: Exclude<Status, "All">;
+  priority: Exclude<Priority, "All">;
+  assignedTo: string;
+  followUp: string;
+  createdAt: string; // ISO Format: YYYY-MM-DD
+}
 
-// --- Mock Data with varied dates for filtering ---
 const INITIAL_LEADS: Lead[] = [
-    { 
-        id: "L001", company: "Rajesh Electronics", contact: "Rakesh Patil", number: "9869226825", 
-        email: "rajeshelectronics@gmail.com", gst: "NPSS91543234342", state: "Maharashtra", 
-        product: "Refrigerator", variant: "4-door 500L", quantity: 10, unit: "Units", 
-        estValue: "₹ 18.5L", source: "Dealer", status: "New Lead", priority: "Hot", 
-        assignedTo: "Rahul Patil", followUp: "21-03-2026", createdAt: "2026-03-18" 
-    },
-    { 
-        id: "L002", company: "Modern Appliances", contact: "Rohit Sharma", number: "9822334455", 
-        email: "modern@appl.com", gst: "GSTIN2233445566", state: "Delhi", 
-        product: "AC", variant: "1.5 Ton Split", quantity: 5, unit: "Units", 
-        estValue: "₹ 2.5L", source: "Website", status: "Quotation", priority: "Warm", 
-        assignedTo: "Sneha P.", followUp: "22-03-2026", createdAt: "2026-03-10" 
-    },
-    { 
-        id: "L003", company: "Kitchen Hub", contact: "Anjali M.", number: "9123456789", 
-        email: "hub@kitchen.com", gst: "GSTIN998877", state: "Karnataka", 
-        product: "Microwave", variant: "Solo 20L", quantity: 20, unit: "Units", 
-        estValue: "₹ 1.2L", source: "Referral", status: "Won", priority: "Cold", 
-        assignedTo: "Rahul Patil", followUp: "15-02-2026", createdAt: "2026-02-15" 
-    },
-    { 
-        id: "L004", company: "Elite Tech Solutions", contact: "Vikram Singh", number: "9811223344", 
-        email: "v.singh@elitetech.in", gst: "27AAACE1234F1Z5", state: "Gujarat", 
-        product: "Washing Machine", variant: "Front Load 8kg", quantity: 15, unit: "Units", 
-        estValue: "₹ 6.75L", source: "Trade Show", status: "Contacted", priority: "Hot", 
-        assignedTo: "Amit S.", followUp: "25-03-2026", createdAt: "2026-03-19" // Weekly
-    },
-    { 
-        id: "L005", company: "Global Traders", contact: "Suresh Raina", number: "9766554433", 
-        email: "suresh@global.com", gst: "07AABC9988H1Z2", state: "Uttar Pradesh", 
-        product: "Air Purifier", variant: "HEPA Pro Max", quantity: 50, unit: "Units", 
-        estValue: "₹ 12.0L", source: "Cold Call", status: "New Lead", priority: "Cold", 
-        assignedTo: "Sneha P.", followUp: "10-04-2026", createdAt: "2026-03-05" // Monthly
-    },
-    { 
-        id: "L006", company: "Oceanic Resorts", contact: "Priya Nair", number: "9000112233", 
-        email: "procurement@oceanic.com", gst: "33BBDDC4433P1Z9", state: "Tamil Nadu", 
-        product: "Deep Freezer", variant: "Double Door 400L", quantity: 8, unit: "Units", 
-        estValue: "₹ 4.2L", source: "Website", status: "Quotation", priority: "Warm", 
-        assignedTo: "Rahul Patil", followUp: "28-03-2026", createdAt: "2026-02-20" // Quarterly
-    },
-    { 
-        id: "L007", company: "Sunshine Schools", contact: "Meera Das", number: "8877665544", 
-        email: "admin@sunshine.edu", gst: "19CCCDD5566Q1Z0", state: "West Bengal", 
-        product: "Water Cooler", variant: "Stainless Steel 60L", quantity: 12, unit: "Units", 
-        estValue: "₹ 3.1L", source: "Referral", status: "Converted", priority: "Hot", 
-        assignedTo: "Amit S.", followUp: "30-03-2026", createdAt: "2026-01-15" // Quarterly
-    },
-    { 
-        id: "L008", company: "Apex Hospitals", contact: "Dr. K. Verma", number: "7766554433", 
-        email: "verma@apexhospital.org", gst: "09EEFFG1122R1Z4", state: "Haryana", 
-        product: "Air Conditioner", variant: "2.0 Ton Cassette", quantity: 4, unit: "Units", 
-        estValue: "₹ 5.8L", source: "Dealer", status: "Won", priority: "Hot", 
-        assignedTo: "Sneha P.", followUp: "20-03-2026", createdAt: "2026-03-17" // Weekly
-    },
-    { 
-        id: "L009", company: "Blue Diamond Hotels", contact: "Sandeep Gupta", number: "9988443322", 
-        email: "sandeep@bluediamond.com", gst: "24GGHHI3344S1Z1", state: "Rajasthan", 
-        product: "Dishwasher", variant: "Commercial 12-place", quantity: 6, unit: "Units", 
-        estValue: "₹ 9.4L", source: "Trade Show", status: "Lost", priority: "Warm", 
-        assignedTo: "Rahul Patil", followUp: "05-03-2026", createdAt: "2026-01-05" // Quarterly
-    },
-    { 
-        id: "L010", company: "Smart Offices", contact: "Kiran Shah", number: "9112233445", 
-        email: "kiran@smartoffice.com", gst: "27IIJJK5566T1Z8", state: "Maharashtra", 
-        product: "Smart TV", variant: "65-inch 4K OLED", quantity: 25, unit: "Units", 
-        estValue: "₹ 32.5L", source: "Website", status: "New Lead", priority: "Hot", 
-        assignedTo: "Amit S.", followUp: "02-04-2026", createdAt: "2026-03-14" // Weekly/Monthly
-    },
-    { 
-        id: "L011", company: "Tech Park Canteen", contact: "Arjun Rao", number: "8008007001", 
-        email: "arjun@techpark.in", gst: "36KKLLM7788U1Z3", state: "Telangana", 
-        product: "Induction Cooktop", variant: "High Power 3000W", quantity: 30, unit: "Units", 
-        estValue: "₹ 1.8L", source: "Cold Call", status: "Contacted", priority: "Cold", 
-        assignedTo: "Sneha P.", followUp: "26-03-2026", createdAt: "2025-12-15" // Yearly
-    }
+    { id: "L001", company: "Rajesh Electronics", contact: "Rakesh Patil", number: "9869226825", email: "rajeshelectronics@gmail.com", gst: "NPSS91543234342", state: "Maharashtra", product: "Refrigerator", variant: "4-door 500L", quantity: 10, unit: "Units", estValue: "₹ 18.5L", source: "Dealer", status: "New Lead", priority: "Hot", assignedTo: "Rahul Patil", followUp: "21-03-2026", createdAt: "2026-03-18" },
+    { id: "L002", company: "Modern Appliances", contact: "Rohit Sharma", number: "9822334455", email: "modern@appl.com", gst: "GSTIN2233445566", state: "Delhi", product: "AC", variant: "1.5 Ton Split", quantity: 5, unit: "Units", estValue: "₹ 2.5L", source: "Website", status: "Quotation", priority: "Warm", assignedTo: "Sneha P.", followUp: "22-03-2026", createdAt: "2026-03-10" },
+    { id: "L003", company: "Sunshine Solar", contact: "Amit Varma", number: "9123456789", email: "contact@sunshine.in", gst: "SUNS8877665544", state: "Gujarat", product: "Solar Panel", variant: "300W Mono", quantity: 50, unit: "Panels", estValue: "₹ 12.0L", source: "Referral", status: "Won", priority: "Hot", assignedTo: "Rahul Patil", followUp: "15-03-2026", createdAt: "2026-03-19" },
+    { id: "L004", company: "Tech Logistics", contact: "Sarah Khan", number: "9988776655", email: "sarah@techlog.com", gst: "TLOG1122334455", state: "Karnataka", product: "Forklift", variant: "Electric 2T", quantity: 2, unit: "Units", estValue: "₹ 15.0L", source: "Trade Show", status: "Contacted", priority: "Warm", assignedTo: "Sneha P.", followUp: "25-03-2026", createdAt: "2026-03-14" },
+    { id: "L005", company: "Blue Water Corp", contact: "John Doe", number: "9000112233", email: "info@bluewater.com", gst: "BWTR9900112233", state: "Goa", product: "Water Purifier", variant: "Industrial RO", quantity: 3, unit: "Units", estValue: "₹ 4.2L", source: "Cold Call", status: "Lost", priority: "Cold", assignedTo: "Rahul Patil", followUp: "10-03-2026", createdAt: "2026-03-02" },
+    { id: "L006", company: "Green Earth Ltd", contact: "Priya Singh", number: "9876543210", email: "priya@greenearth.org", gst: "GELT5566778899", state: "Sikkim", product: "Compost Bin", variant: "Large 500L", quantity: 20, unit: "Units", estValue: "₹ 1.8L", source: "Website", status: "Converted", priority: "Hot", assignedTo: "Sneha P.", followUp: "28-03-2026", createdAt: "2026-02-20" },
+    { id: "L007", company: "Swift Mart", contact: "Kevin Peter", number: "9223344556", email: "kevin@swiftmart.com", gst: "SWFT3344556677", state: "Tamil Nadu", product: "Deep Freezer", variant: "Double Door", quantity: 8, unit: "Units", estValue: "₹ 6.4L", source: "Dealer", status: "Quotation", priority: "Warm", assignedTo: "Rahul Patil", followUp: "24-03-2026", createdAt: "2026-02-05" },
+    { id: "L008", company: "Heritage Foods", contact: "Meera Nair", number: "9556677889", email: "meera@heritage.in", gst: "HERI0011223344", state: "Kerala", product: "Cooler", variant: "Walk-in", quantity: 1, unit: "Units", estValue: "₹ 9.5L", source: "Referral", status: "New Lead", priority: "Cold", assignedTo: "Sneha P.", followUp: "30-03-2026", createdAt: "2026-01-15" },
+    { id: "L009", company: "Urban Stay Hotels", contact: "Rahul Dev", number: "9445566778", email: "ops@urbanstay.com", gst: "URBN7788990011", state: "Rajasthan", product: "Television", variant: "Smart 55-inch", quantity: 25, unit: "Units", estValue: "₹ 13.5L", source: "Trade Show", status: "Won", priority: "Hot", assignedTo: "Rahul Patil", followUp: "12-03-2026", createdAt: "2026-03-17" },
+    { id: "L010", company: "Global Traders", contact: "Linda M.", number: "9112233445", email: "linda@global.com", gst: "GLOB2233445566", state: "Punjab", product: "Air Purifier", variant: "HEPA Filter X", quantity: 15, unit: "Units", estValue: "₹ 3.0L", source: "Cold Call", status: "Contacted", priority: "Warm", assignedTo: "Sneha P.", followUp: "19-03-2026", createdAt: "2025-12-10" },
+    { id: "L011", company: "Apex Buildtech", contact: "Sanjay Jha", number: "9667788990", email: "sanjay@apex.com", gst: "APEX4455667788", state: "Haryana", product: "Generator", variant: "Silent 5kVA", quantity: 4, unit: "Units", estValue: "₹ 5.8L", source: "Website", status: "Converted", priority: "Hot", assignedTo: "Rahul Patil", followUp: "22-03-2026", createdAt: "2026-03-12" },
+    { id: "L012", company: "Elite Motors", contact: "Vicky Kaushal", number: "9778899001", email: "vicky@elitemotors.in", gst: "ELIT9988776655", state: "Madhya Pradesh", product: "Washing Machine", variant: "Top Load 10kg", quantity: 6, unit: "Units", estValue: "₹ 2.1L", source: "Dealer", status: "New Lead", priority: "Cold", assignedTo: "Sneha P.", followUp: "27-03-2026", createdAt: "2026-02-28" }
 ];
 
 const LeadList: React.FC = () => {
-    const navigate = useNavigate();
-    const [leads, setLeads] = useState<Lead[]>(INITIAL_LEADS);
-    const [searchQuery, setSearchQuery] = useState<string>("");
-    const [selectedIds, setSelectedIds] = useState<string[]>([]);
-    const [activeTab, setActiveTab] = useState<TimeTab>("Weekly");
-    
-    // Filter States
-    const [priorityFilter, setPriorityFilter] = useState<Priority>("All");
-    const [statusFilter, setStatusFilter] = useState<Status>("All");
-    const [sourceFilter, setSourceFilter] = useState<Source>("All");
-    
-    // UI Open/Close States
-    const [isPriorityOpen, setIsPriorityOpen] = useState(false);
-    const [isStatusOpen, setIsStatusOpen] = useState(false);
-    const [isSourceOpen, setIsSourceOpen] = useState(false);
+  const navigate = useNavigate();
+  const [leads, setLeads] = useState<Lead[]>(INITIAL_LEADS);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [activeTab, setActiveTab] = useState<TimeTab>("All Time");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 8;
 
-    const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 8;
+  // Filters State
+  const [customRange, setCustomRange] = useState({ start: "", end: "" });
+  const [priorityFilter, setPriorityFilter] = useState<Priority>("All");
+  const [statusFilter, setStatusFilter] = useState<Status>("All");
+  const [sourceFilter, setSourceFilter] = useState<Source>("All");
 
-    // --- Date Filtering Helper ---
-    // Note: We use March 20, 2026 as a reference "today" to match your UI context
-    const isDateInRange = (dateStr: string, range: TimeTab) => {
-        const date = new Date(dateStr);
-        const now = new Date("2026-03-20"); // Using your mock year/month as 'today'
+  // Dropdown UI state
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+
+  const toggleDropdown = (name: string) => {
+    setOpenDropdown(openDropdown === name ? null : name);
+  };
+
+  // --- Filtering Logic ---
+  const filteredLeads = useMemo(() => {
+    return leads.filter((lead) => {
+      // 1. Search filter
+      const matchesSearch = lead.company.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                            lead.id.toLowerCase().includes(searchQuery.toLowerCase());
+
+      // 2. Main Filters
+      const matchesPriority = priorityFilter === "All" || lead.priority === priorityFilter;
+      const matchesStatus = statusFilter === "All" || lead.status === statusFilter;
+      const matchesSource = sourceFilter === "All" || lead.source === sourceFilter;
+
+      // 3. Time/Date Filter
+      let matchesTime = true;
+      const leadDate = new Date(lead.createdAt);
+      const now = new Date("2026-03-20"); // Reference mock date
+
+      if (activeTab === "Custom") {
+        const start = customRange.start ? new Date(customRange.start) : null;
+        const end = customRange.end ? new Date(customRange.end) : null;
+        if (start) matchesTime = matchesTime && leadDate >= start;
+        if (end) matchesTime = matchesTime && leadDate <= end;
+      } else if (activeTab !== "All Time") {
+        const diffInDays = (now.getTime() - leadDate.getTime()) / (1000 * 60 * 60 * 24);
+        if (activeTab === "Weekly") matchesTime = diffInDays <= 7 && diffInDays >= 0;
+        if (activeTab === "Monthly") matchesTime = leadDate.getMonth() === now.getMonth() && leadDate.getFullYear() === now.getFullYear();
+        if (activeTab === "Quarterly") matchesTime = Math.floor(leadDate.getMonth() / 3) === Math.floor(now.getMonth() / 3) && leadDate.getFullYear() === now.getFullYear();
+        if (activeTab === "Yearly") matchesTime = leadDate.getFullYear() === now.getFullYear();
+      }
+
+      return matchesSearch && matchesPriority && matchesStatus && matchesSource && matchesTime;
+    });
+  }, [leads, searchQuery, priorityFilter, statusFilter, sourceFilter, activeTab, customRange]);
+
+  // --- Pagination Logic ---
+  const totalPages = Math.ceil(filteredLeads.length / itemsPerPage);
+  const paginatedLeads = filteredLeads.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+
+  const toggleSelectAll = () => {
+    setSelectedIds(selectedIds.length === paginatedLeads.length ? [] : paginatedLeads.map(l => l.id));
+  };
+
+  const getStatusStyle = (status: string) => {
+    const base = "px-3 py-1 rounded-full text-[10px] font-medium border "; // Note: font-medium here for status pill only
+    switch (status) {
+      case 'Won': return base + 'bg-green-50 text-green-700 border-green-200';
+      case 'Lost': return base + 'bg-red-50 text-red-700 border-red-200';
+      case 'Quotation': return base + 'bg-blue-50 text-blue-700 border-blue-200';
+      default: return base + 'bg-gray-50 text-gray-600 border-gray-200';
+    }
+  }
+
+  return (
+    <div className="min-h-screen bg-[#f4f7f6] p-4 md:p-8 text-gray-900 transition-all">
+      <div className="max-w-7xl mx-auto">
         
-        const diffInMs = now.getTime() - date.getTime();
-        const diffInDays = diffInMs / (1000 * 60 * 60 * 24);
+        {/* Header Section */}
+        <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-800 tracking-tight">Leads</h1>
+            <p className="text-sm text-gray-400 font-normal">Manage and track your customer conversions</p>
+          </div>
+          <button
+            onClick={() => navigate("/sales/new-lead")}
+            className="w-full md:w-auto flex items-center justify-center gap-2 bg-[#005d52] text-white px-6 py-3 rounded-full font-bold text-sm shadow-lg shadow-teal-900/20 hover:scale-105 transition-transform active:scale-95"
+          >
+            <Plus size={18} strokeWidth={3} /> New Lead
+          </button>
+        </header>
 
-        switch (range) {
-            case "Weekly":
-                return diffInDays <= 7 && diffInDays >= 0;
-            case "Monthly":
-                return date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear();
-            case "Quarterly":
-                const currentQuarter = Math.floor(now.getMonth() / 3);
-                const leadQuarter = Math.floor(date.getMonth() / 3);
-                return currentQuarter === leadQuarter && date.getFullYear() === now.getFullYear();
-            case "Yearly":
-                return date.getFullYear() === now.getFullYear();
-            default:
-                return true;
-        }
-    };
+        {/* Time Tabs & Custom Range UI */}
+        <section className="flex flex-col gap-4 mb-8">
+          <div className="flex flex-wrap items-center gap-2 p-1.5 bg-white/80 backdrop-blur-md rounded-2xl border border-white shadow-sm w-fit">
+            {(["Weekly", "Monthly", "Quarterly", "Yearly", "All Time", "Custom"] as TimeTab[]).map((tab) => (
+              <button
+                key={tab}
+                onClick={() => { setActiveTab(tab); setCurrentPage(1); }}
+                className={`px-5 py-2 text-xs font-bold rounded-xl transition-all ${activeTab === tab ? "bg-[#d1e9e7] text-[#005d52] shadow-sm" : "text-gray-400 hover:text-gray-600"}`}
+              >
+                {tab}
+              </button>
+            ))}
+          </div>
 
-    const filteredLeads = useMemo(() => {
-        return leads.filter((lead) => {
-            const matchesSearch = Object.values(lead).some((val) =>
-                String(val).toLowerCase().includes(searchQuery.toLowerCase())
-            );
-            const matchesPriority = priorityFilter === "All" || lead.priority === priorityFilter;
-            const matchesStatus = statusFilter === "All" || lead.status === statusFilter;
-            const matchesSource = sourceFilter === "All" || lead.source === sourceFilter;
-            const matchesTime = isDateInRange(lead.createdAt, activeTab);
-
-            return matchesSearch && matchesPriority && matchesStatus && matchesSource && matchesTime;
-        });
-    }, [leads, searchQuery, priorityFilter, statusFilter, sourceFilter, activeTab]);
-
-    // Derived values for labels
-    const priorityLabel = priorityFilter === "All" ? "Priorities" : priorityFilter;
-    const statusLabel = statusFilter === "All" ? "Filter" : statusFilter;
-    const sourceLabel = sourceFilter === "All" ? "Select source" : sourceFilter;
-
-    const totalPages = Math.ceil(filteredLeads.length / itemsPerPage);
-    const paginatedLeads = filteredLeads.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
-
-    const toggleSelectAll = () => {
-        if (selectedIds.length === paginatedLeads.length) setSelectedIds([]);
-        else setSelectedIds(paginatedLeads.map(l => l.id));
-    };
-
-    const toggleSelectOne = (id: string) => {
-        setSelectedIds(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
-    };
-
-    const handleDelete = () => {
-        if (window.confirm(`Delete ${selectedIds.length} leads?`)) {
-            setLeads(prev => prev.filter(l => !selectedIds.includes(l.id)));
-            setSelectedIds([]);
-            setCurrentPage(1);
-        }
-    };
-
-    return (
-        <div className="min-h-screen bg-[#f4f7f6] p-4 sm:p-6 lg:p-8 font-sans text-gray-900">
-            <div className="max-w-400 mx-auto">
-                
-                {/* Header */}
-                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
-                    <div>
-                        <h1 className="text-2xl font-bold text-gray-800">Leads</h1>
-                        <p className="text-sm text-gray-400 mt-1">Full customer pipeline overview</p>
-                    </div>
-                    <button
-                        onClick={() => navigate("/sales/new-lead")}
-                        className="flex items-center gap-2 bg-[#005d52] text-white px-6 py-2.5 rounded-full font-bold text-sm shadow-lg shadow-teal-900/20"
-                    >
-                        <Plus size={18} strokeWidth={3} /> New Lead
-                    </button>
-                </div>
-
-                {/* KPI/Time Tabs Row */}
-                <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-8">
-                    <div className="flex flex-wrap gap-2 p-1.5 bg-white/60 rounded-2xl border border-white shadow-sm">
-                        {(["Weekly", "Monthly", "Quarterly", "Yearly", "All Time"] as TimeTab[]).map((tab) => (
-                            <button
-                                key={tab}
-                                onClick={() => { setActiveTab(tab); setCurrentPage(1); }}
-                                className={`px-6 py-2 text-xs font-bold rounded-xl transition-all ${
-                                    activeTab === tab ? "bg-[#d1e9e7] text-[#005d52] shadow-sm" : "text-gray-400 hover:text-gray-600"
-                                }`}
-                            >
-                                {tab}
-                            </button>
-                        ))}
-                    </div>
-                    <div className="flex items-center gap-2 bg-[#005d52] text-white px-4 py-2 rounded-full text-[11px] font-bold">
-                        <Calendar size={13} /> {activeTab} View: Mar 2026
-                    </div>
-                </div>
-
-                {/* Main Table Card */}
-                <div className="bg-white rounded-4xl shadow-sm border border-gray-100 overflow-hidden">
-                    
-                    {/* Toolbar */}
-                    <div className="p-6 flex flex-col xl:flex-row justify-between items-center gap-4 border-b border-gray-50">
-                        <div className="relative w-full xl:w-80">
-                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300" size={18} />
-                            <input
-                                type="text"
-                                placeholder="Search leads..."
-                                value={searchQuery}
-                                onChange={(e) => {setSearchQuery(e.target.value); setCurrentPage(1);}}
-                                className="w-full pl-11 pr-4 py-2.5 bg-[#f4f7f6] border-none rounded-full focus:ring-2 focus:ring-[#005d52]/20 text-sm outline-none"
-                            />
-                        </div>
-
-                        <div className="flex flex-wrap items-center gap-3 w-full xl:w-auto justify-center">
-                            
-                            {/* Source Filter */}
-                            <div className="relative">
-                                <button 
-                                    onClick={() => {setIsSourceOpen(!isSourceOpen); setIsPriorityOpen(false); setIsStatusOpen(false)}}
-                                    className={`flex items-center gap-3 px-6 py-2.5 border rounded-lg text-sm font-medium transition-all duration-200 ${
-                                        sourceFilter !== "All" 
-                                        ? "bg-[#d1e9e7] border-[#005d52] text-[#005d52]" 
-                                        : "bg-white border-gray-200 text-gray-700"
-                                    }`}
-                                >
-                                    {sourceLabel} 
-                                    <ChevronDown className={`transition-transform duration-300 ${isSourceOpen ? 'rotate-180' : ''}`} size={16}/>
-                                </button>
-                                {isSourceOpen && (
-                                    <div className="absolute top-full mt-1 left-0 w-48 bg-white border border-gray-100 rounded-xl shadow-xl z-50 overflow-hidden">
-                                        {(["All", "Dealer", "Website", "Referral", "Trade Show", "Cold Call"] as Source[]).map(s => (
-                                            <button 
-                                                key={s} 
-                                                onClick={() => {setSourceFilter(s); setIsSourceOpen(false); setCurrentPage(1)}}
-                                                className={`w-full text-left px-5 py-3 text-sm hover:bg-gray-50 transition-colors ${sourceFilter === s ? "text-[#005d52] font-bold" : "text-gray-600"}`}
-                                            >
-                                                {s}
-                                            </button>
-                                        ))}
-                                    </div>
-                                )}
-                            </div>
-
-                            {/* Priorities Dropdown */}
-                            <div className="relative">
-                                <button 
-                                    onClick={() => {setIsPriorityOpen(!isPriorityOpen); setIsStatusOpen(false); setIsSourceOpen(false)}}
-                                    className={`flex items-center gap-3 px-6 py-2.5 border rounded-lg text-sm font-medium transition-all duration-200 ${
-                                        priorityFilter !== "All" 
-                                        ? "bg-[#d1e9e7] border-[#005d52] text-[#005d52]" 
-                                        : "bg-white border-gray-200 text-gray-700"
-                                    }`}
-                                >
-                                    {priorityLabel} 
-                                    <ChevronDown className={`transition-transform duration-300 ${isPriorityOpen ? 'rotate-180' : ''}`} size={16}/>
-                                </button>
-                                {isPriorityOpen && (
-                                    <div className="absolute top-full mt-1 left-0 w-48 bg-white border border-gray-100 rounded-xl shadow-xl z-50 overflow-hidden">
-                                        {(["All", "Hot", "Warm", "Cold"] as Priority[]).map(p => (
-                                            <button 
-                                                key={p} 
-                                                onClick={() => {setPriorityFilter(p); setIsPriorityOpen(false); setCurrentPage(1)}}
-                                                className={`w-full text-left px-5 py-3 text-sm hover:bg-gray-50 transition-colors ${priorityFilter === p ? "text-[#005d52] font-bold" : "text-gray-600"}`}
-                                            >
-                                                {p}
-                                            </button>
-                                        ))}
-                                    </div>
-                                )}
-                            </div>
-
-                            {/* Status Filter */}
-                            <div className="relative">
-                                <button 
-                                    onClick={() => {setIsStatusOpen(!isStatusOpen); setIsPriorityOpen(false); setIsSourceOpen(false)}}
-                                    className={`flex items-center gap-3 px-6 py-2.5 border rounded-lg text-sm font-medium transition-all duration-200 ${
-                                        statusFilter !== "All" 
-                                        ? "bg-[#d1e9e7] border-[#005d52] text-[#005d52]" 
-                                        : "bg-white border-gray-200 text-gray-700"
-                                    }`}
-                                >
-                                    {statusLabel}
-                                    <ChevronDown className={`transition-transform duration-300 ${isStatusOpen ? 'rotate-180' : ''}`} size={16}/>
-                                </button>
-                                {isStatusOpen && (
-                                    <div className="absolute top-full mt-1 left-0 w-48 bg-white border border-gray-100 rounded-xl shadow-xl z-50 overflow-hidden">
-                                        {(["All", "New Lead", "Contacted", "Converted", "Quotation", "Won", "Lost"] as Status[]).map(s => (
-                                            <button 
-                                                key={s} 
-                                                onClick={() => {setStatusFilter(s); setIsStatusOpen(false); setCurrentPage(1)}}
-                                                className={`w-full text-left px-5 py-3 text-sm hover:bg-gray-50 transition-colors ${statusFilter === s ? "text-[#005d52] font-bold" : "text-gray-600"}`}
-                                            >
-                                                {s}
-                                            </button>
-                                        ))}
-                                    </div>
-                                )}
-                            </div>
-
-                            {/* Clear All Filters */}
-                            {(priorityFilter !== "All" || statusFilter !== "All" || sourceFilter !== "All" || activeTab !== "All Time") && (
-                                <button 
-                                    onClick={() => {setPriorityFilter("All"); setStatusFilter("All"); setSourceFilter("All"); setActiveTab("All Time"); setCurrentPage(1)}}
-                                    className="p-2.5 text-gray-400 hover:text-[#005d52] transition-colors"
-                                    title="Clear Filters"
-                                >
-                                    <X size={20} />
-                                </button>
-                            )}
-
-                            <button onClick={handleDelete} disabled={selectedIds.length === 0} className="p-2.5 bg-red-50 text-red-500 rounded-lg disabled:opacity-30 transition-all">
-                                <Trash2 size={18} />
-                            </button>
-                        </div>
-                    </div>
-
-                    {/* Table */}
-                    <div className="overflow-x-auto">
-                        <table className="w-full text-left border-collapse min-w-500">
-                            <thead>
-                                <tr className="bg-gray-50/50 border-b border-gray-100 text-[11px] font-bold text-gray-400 uppercase tracking-widest">
-                                    <th className="p-5 w-12 sticky left-0 bg-gray-50/50 z-10"><input type="checkbox" className="accent-[#005d52]" checked={selectedIds.length === paginatedLeads.length && paginatedLeads.length > 0} onChange={toggleSelectAll} /></th>
-                                    {[
-                                        "Lead ID", "Date Created", "Company name", "Contact person", "Number", "Email ID", "GST", "State", 
-                                        "Product", "Variant", "Qty", "Unit", "Est. value", "Source", 
-                                        "Status", "Priority", "Assigned", "Follow up", "Actions"
-                                    ].map((col) => (
-                                        <th key={col} className="p-5 border-l border-gray-100 whitespace-nowrap">
-                                            <div className="flex items-center gap-2 cursor-pointer hover:text-gray-800">
-                                                {col} <ChevronsUpDown size={12} className="opacity-40" />
-                                            </div>
-                                        </th>
-                                    ))}
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-gray-50">
-                                {paginatedLeads.map((lead) => (
-                                    <tr key={lead.id} className="hover:bg-gray-50/40 transition-colors">
-                                        <td className="p-5 sticky left-0 bg-white z-10"><input type="checkbox" className="accent-[#005d52]" checked={selectedIds.includes(lead.id)} onChange={() => toggleSelectOne(lead.id)} /></td>
-                                        <td className="p-5 text-sm font-bold text-[#005d52]">{lead.id}</td>
-                                        <td className="p-5 text-sm text-gray-400 italic">{lead.createdAt}</td>
-                                        <td className="p-5 text-sm font-medium text-gray-700">{lead.company}</td>
-                                        <td className="p-5 text-sm text-gray-500">{lead.contact}</td>
-                                        <td className="p-5 text-sm text-gray-500">{lead.number}</td>
-                                        <td className="p-5 text-sm text-gray-500 underline decoration-gray-200">{lead.email}</td>
-                                        <td className="p-5 text-sm text-gray-400">{lead.gst}</td>
-                                        <td className="p-5 text-sm text-gray-500">{lead.state}</td>
-                                        <td className="p-5 text-sm text-gray-500 font-semibold">{lead.product}</td>
-                                        <td className="p-5 text-sm text-gray-400">{lead.variant}</td>
-                                        <td className="p-5 text-sm text-gray-800 font-bold">{lead.quantity}</td>
-                                        <td className="p-5 text-sm text-gray-400">{lead.unit}</td>
-                                        <td className="p-5 text-sm text-gray-800 font-extrabold">{lead.estValue}</td>
-                                        <td className="p-5 text-sm text-gray-500">{lead.source}</td>
-                                        <td className="p-5">
-                                            <span className="px-3 py-1 rounded-lg border border-gray-300 text-[10px] font-bold text-gray-600 whitespace-nowrap">
-                                                {lead.status}
-                                            </span>
-                                        </td>
-                                        <td className="p-5 text-sm text-gray-700 font-medium">{lead.priority}</td>
-                                        <td className="p-5 text-sm text-gray-500">{lead.assignedTo}</td>
-                                        <td className="p-5 text-sm text-gray-400">{lead.followUp}</td>
-                                        <td className="p-5">
-                                            <div className="flex gap-2">
-                                                <button className="p-1.5 hover:bg-gray-100 rounded-md text-gray-400 transition-colors"><Eye size={16}/></button>
-                                                <button className="p-1.5 hover:bg-gray-100 rounded-md text-gray-400 transition-colors"><FileEdit size={16}/></button>
-                                                <button className="p-1.5 hover:bg-red-50 rounded-md text-gray-400 hover:text-red-500 transition-colors" onClick={() => {setLeads(prev => prev.filter(l => l.id !== lead.id))}}><Trash2 size={16}/></button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ))}
-                                {paginatedLeads.length === 0 && (
-                                    <tr>
-                                        <td colSpan={19} className="p-20 text-center text-gray-400 italic">No leads match your criteria for the selected period.</td>
-                                    </tr>
-                                )}
-                            </tbody>
-                        </table>
-                    </div>
-
-                    {/* Pagination */}
-                    <div className="p-6 bg-gray-50/20 border-t border-gray-50 flex flex-col md:flex-row justify-between items-center gap-4">
-                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
-                            Showing <span className="text-gray-800">{paginatedLeads.length === 0 ? 0 : (currentPage - 1) * itemsPerPage + 1} - {Math.min(currentPage * itemsPerPage, filteredLeads.length)}</span> out of <span className="text-gray-800">{filteredLeads.length}</span> Leads
-                        </p>
-                        <div className="flex items-center gap-3">
-                            <button onClick={() => setCurrentPage(prev => Math.max(prev-1, 1))} disabled={currentPage === 1} className="text-xs font-bold text-gray-400 hover:text-[#005d52] disabled:opacity-20 flex items-center gap-1 uppercase"><ChevronLeft size={16}/> Prev</button>
-                            <div className="flex gap-2">
-                                {[...Array(totalPages)].map((_, i) => (
-                                    <button key={i} onClick={() => setCurrentPage(i+1)} className={`w-8 h-8 rounded-lg text-xs font-bold ${currentPage === i+1 ? "bg-[#005d52] text-white shadow-md" : "text-gray-400 hover:bg-gray-100"}`}>{i+1}</button>
-                                ))}
-                            </div>
-                            <button onClick={() => setCurrentPage(prev => Math.min(prev+1, totalPages))} disabled={currentPage === totalPages || totalPages === 0} className="text-xs font-bold text-gray-400 hover:text-[#005d52] disabled:opacity-20 flex items-center gap-1 uppercase">Next <ChevronRight size={16}/></button>
-                        </div>
-                    </div>
-                </div>
+          {activeTab === "Custom" && (
+            <div className="flex flex-col sm:flex-row items-center gap-4 p-4 bg-white rounded-2xl border border-teal-100 shadow-sm animate-in slide-in-from-top-2 duration-300">
+              <div className="flex items-center gap-3 w-full sm:w-auto">
+                <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">From</span>
+                <input 
+                    type="date" 
+                    className="flex-1 sm:w-40 bg-gray-50 border-none rounded-lg p-2 text-sm text-[#005d52] outline-none focus:ring-2 focus:ring-teal-500/20"
+                    onChange={(e) => setCustomRange({...customRange, start: e.target.value})}
+                />
+              </div>
+              <div className="flex items-center gap-3 w-full sm:w-auto">
+                <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">To</span>
+                <input 
+                    type="date" 
+                    className="flex-1 sm:w-40 bg-gray-50 border-none rounded-lg p-2 text-sm text-[#005d52] outline-none focus:ring-2 focus:ring-teal-500/20"
+                    onChange={(e) => setCustomRange({...customRange, end: e.target.value})}
+                />
+              </div>
+              <button onClick={() => {setCustomRange({start:"", end:""}); setActiveTab("All Time")}} className="ml-auto text-gray-400 hover:text-red-500 p-2">
+                <X size={18} />
+              </button>
             </div>
+          )}
+        </section>
+
+        {/* Main Table Container */}
+        <div className="bg-white rounded-4xl shadow-xl shadow-gray-200/50 border border-gray-100 overflow-hidden">
+          
+          {/* Toolbar */}
+          <div className="p-6 flex flex-col xl:flex-row justify-between items-center gap-4 bg-white">
+            <div className="relative w-full xl:w-96 group">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-[#005d52] transition-colors" size={18} />
+              <input
+                type="text"
+                placeholder="Search by Lead ID or Company..."
+                className="w-full pl-12 pr-4 py-3 bg-[#f8faf9] border-transparent rounded-2xl focus:bg-white focus:ring-2 focus:ring-[#005d52]/10 text-sm outline-none transition-all"
+                value={searchQuery}
+                onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1); }}
+              />
+            </div>
+
+            <div className="flex flex-wrap items-center justify-end gap-3 w-full">
+               {[
+                 { label: 'Source', value: sourceFilter, options: ["All", "Dealer", "Website", "Referral", "Trade Show", "Cold Call"], setter: setSourceFilter },
+                 { label: 'Priority', value: priorityFilter, options: ["All", "Hot", "Warm", "Cold"], setter: setPriorityFilter },
+                 { label: 'Status', value: statusFilter, options: ["All", "New Lead", "Contacted", "Converted", "Quotation", "Won", "Lost"], setter: setStatusFilter }
+               ].map((f) => (
+                 <div key={f.label} className="relative">
+                   <button 
+                    onClick={() => toggleDropdown(f.label)}
+                    className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border text-xs font-bold transition-all ${f.value !== "All" ? "bg-teal-50 border-[#005d52] text-[#005d52]" : "bg-white border-gray-100 text-gray-500 hover:border-gray-300"}`}
+                   >
+                     {f.value === "All" ? f.label : f.value} <ChevronDown size={14} className={openDropdown === f.label ? "rotate-180 transition-transform" : "transition-transform"}/>
+                   </button>
+                   {openDropdown === f.label && (
+                     <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-50 rounded-2xl shadow-2xl z-50 overflow-hidden py-1 animate-in zoom-in-95 duration-200">
+                        {f.options.map(opt => (
+                          <button 
+                            key={opt} 
+                            onClick={() => { f.setter(opt as any); setOpenDropdown(null); setCurrentPage(1); }}
+                            className={`w-full text-left px-4 py-2.5 text-xs hover:bg-gray-50 transition-colors ${f.value === opt ? "text-[#005d52] font-bold" : "text-gray-600 font-normal"}`}
+                          >
+                            {opt}
+                          </button>
+                        ))}
+                     </div>
+                   )}
+                 </div>
+               ))}
+               
+               <button 
+                onClick={() => {setLeads(prev => prev.filter(l => !selectedIds.includes(l.id))); setSelectedIds([])}}
+                disabled={selectedIds.length === 0} 
+                className="p-2.5 bg-red-50 text-red-500 rounded-xl disabled:opacity-20 hover:bg-red-100 transition-colors"
+               >
+                 <Trash2 size={18} />
+               </button>
+            </div>
+          </div>
+
+          {/* Table Area */}
+          <div className="w-full overflow-x-auto">
+            <table className="w-full text-left border-collapse min-w-200">
+              <thead>
+                <tr className="bg-gray-50/50 border-b border-gray-100">
+                  <th className="p-6 w-12 text-center">
+                    <input 
+                        type="checkbox" 
+                        className="accent-[#005d52] w-4 h-4" 
+                        checked={selectedIds.length === paginatedLeads.length && paginatedLeads.length > 0} 
+                        onChange={toggleSelectAll} 
+                    />
+                  </th>
+                  {["Lead ID", "Date Created", "Company Name", "Product Name", "Quantity", "Status", "Actions"].map(h => (
+                    <th key={h} className="p-6 text-[10px] font-bold text-gray-400 uppercase tracking-[0.15em]">{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-50">
+                {paginatedLeads.map((lead) => (
+                  <tr key={lead.id} className="hover:bg-[#f8faf9]/50 transition-colors group font-normal text-gray-600">
+                    <td className="p-6 text-center">
+                        <input 
+                            type="checkbox" 
+                            className="accent-[#005d52] w-4 h-4" 
+                            checked={selectedIds.includes(lead.id)} 
+                            onChange={() => setSelectedIds(prev => prev.includes(lead.id) ? prev.filter(i => i !== lead.id) : [...prev, lead.id])} 
+                        />
+                    </td>
+                    <td className="p-6 text-sm font-bold text-[#005d52]">{lead.id}</td>
+                    <td className="p-6 text-sm">{lead.createdAt}</td>
+                    <td className="p-6 text-sm text-gray-800">{lead.company}</td>
+                    <td className="p-6 text-sm">{lead.product}</td>
+                    <td className="p-6 text-sm">
+                      <span className="text-gray-900">{lead.quantity}</span> <span className="text-[10px] text-gray-400 uppercase">{lead.unit}</span>
+                    </td>
+                    <td className="p-6">
+                      <span className={getStatusStyle(lead.status)}>
+                        {lead.status}
+                      </span>
+                    </td>
+                    <td className="p-6">
+                      <div className="flex gap-1 justify-end">
+                        <button title="View" className="p-2 hover:bg-teal-50 text-gray-400 hover:text-[#005d52] rounded-lg transition-all"><Eye size={16} /></button>
+                        <button title="Edit" className="p-2 hover:bg-blue-50 text-gray-400 hover:text-blue-600 rounded-lg transition-all"><FileEdit size={16} /></button>
+                        <button title="Delete" onClick={() => setLeads(prev => prev.filter(l => l.id !== lead.id))} className="p-2 hover:bg-red-50 text-gray-400 hover:text-red-500 rounded-lg transition-all"><Trash2 size={16} /></button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            {paginatedLeads.length === 0 && (
+              <div className="py-24 text-center">
+                <div className="inline-flex p-6 bg-gray-50 rounded-full mb-4"><Filter className="text-gray-300" size={32}/></div>
+                <h3 className="text-gray-800 font-bold">No leads found</h3>
+                <p className="text-gray-400 text-sm font-normal">Try adjusting your filters or date range</p>
+              </div>
+            )}
+          </div>
+
+          {/* Footer / Pagination */}
+          <footer className="p-6 bg-gray-50/30 border-t border-gray-50 flex flex-col md:flex-row justify-between items-center gap-6">
+            <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+              Showing <span className="text-gray-900">{paginatedLeads.length > 0 ? (currentPage - 1) * itemsPerPage + 1 : 0} - {Math.min(currentPage * itemsPerPage, filteredLeads.length)}</span> of <span className="text-gray-900">{filteredLeads.length}</span> Results
+            </div>
+            
+            <div className="flex items-center gap-4">
+              <button 
+                onClick={() => setCurrentPage(p => Math.max(1, p - 1))} 
+                disabled={currentPage === 1}
+                className="p-2 text-gray-400 hover:text-[#005d52] disabled:opacity-20 transition-colors"
+              >
+                <ChevronLeft size={20}/>
+              </button>
+              
+              <div className="flex gap-2">
+                {[...Array(totalPages)].map((_, i) => (
+                  <button 
+                    key={i} 
+                    onClick={() => setCurrentPage(i + 1)}
+                    className={`w-9 h-9 rounded-xl text-xs font-bold transition-all ${currentPage === i + 1 ? "bg-[#005d52] text-white shadow-lg shadow-teal-900/20" : "text-gray-400 hover:bg-gray-100"}`}
+                  >
+                    {i + 1}
+                  </button>
+                ))}
+              </div>
+
+              <button 
+                onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} 
+                disabled={currentPage === totalPages || totalPages === 0}
+                className="p-2 text-gray-400 hover:text-[#005d52] disabled:opacity-20 transition-colors"
+              >
+                <ChevronRight size={20}/>
+              </button>
+            </div>
+          </footer>
         </div>
-    );
+      </div>
+    </div>
+  );
 };
 
 export default LeadList;
