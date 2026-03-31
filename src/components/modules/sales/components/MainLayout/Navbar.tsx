@@ -149,7 +149,7 @@ const Navbar = ({ onMenuClick }: { onMenuClick: () => void }) => {
         {/* Profile */}
         <div className="flex items-center gap-2 sm:gap-3">
           <div className="w-9 h-9 sm:w-10 sm:h-10 bg-white border-2 border-white shadow-sm rounded-full flex items-center justify-center text-xs sm:text-sm font-bold text-[#005d52]">
-            SM
+            RJ
           </div>
           <div className="hidden lg:block text-left">
             <p className="text-xs font-bold text-gray-800">Rahul Jagtap</p>

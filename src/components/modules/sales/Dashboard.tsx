@@ -145,7 +145,7 @@ export const Dashboard = () => {
         {/* HEADER & TIME FILTERS */}
         <div className="mb-10 flex flex-col xl:flex-row xl:items-end justify-between gap-6">
           <div>
-            <h1 className="text-2xl font-bold text-gray-800 tracking-tight">Dashboard Overview</h1>
+            <h1 className="text-2xl font-bold text-gray-800 tracking-tight">Dashboard</h1>
             <p className="text-sm text-gray-400 mt-1 font-normal">Real-time performance of your sales pipeline</p>
             <div className="flex items-center gap-2 mt-4">
               <div className="flex items-center gap-2 bg-[#005d52] text-white px-4 py-1.5 rounded-full text-[11px] font-bold shadow-lg shadow-teal-900/10">
