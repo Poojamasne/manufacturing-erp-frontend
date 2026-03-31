@@ -1,4 +1,4 @@
-﻿import React, { useState } from "react";
+﻿import  { useState } from "react";
 import {
   BarChart,
   Bar,
@@ -9,7 +9,7 @@ import {
   CartesianGrid,
   Cell,
 } from "recharts";
-import { Calendar, X, TrendingUp } from "lucide-react";
+import { Calendar, X } from "lucide-react";
 
 // ---------------- TYPES ----------------
 interface StatCardProps {
@@ -208,7 +208,7 @@ export const Dashboard = () => {
         <div className="flex flex-col gap-8">
 
           {/* 1st Chart: Sales Pipeline (Updated Stages) */}
-          <div className="bg-white p-6 sm:p-8 rounded-[2rem] border border-gray-100 shadow-sm w-full">
+          <div className="bg-white p-6 sm:p-8 rounded-4xl border border-gray-100 shadow-sm w-full">
             <div className="mb-8 px-2">
               <h3 className="text-md font-bold text-gray-800 uppercase tracking-wider text-[11px]">Sales Pipeline</h3>
               <p className="text-sm text-gray-400 font-normal">Conversion stages from lead to won</p>
@@ -242,7 +242,7 @@ export const Dashboard = () => {
           </div>
 
           {/* 2nd Chart: Product Comparison */}
-          <div className="bg-white p-6 sm:p-8 rounded-[2rem] border border-gray-100 shadow-sm w-full">
+          <div className="bg-white p-6 sm:p-8 rounded-4xl border border-gray-100 shadow-sm w-full">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 px-2 gap-4">
               <div>
                 <h3 className="text-md font-bold text-gray-800 uppercase tracking-wider text-[11px]">Product Performance</h3>
