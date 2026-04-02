@@ -15,12 +15,13 @@ import {
 import { useNavigate } from "react-router-dom";
 import {
     formatDateForInput,
-    getTimeTabLabel,
     isDateInRange,
     isDateWithinCustomRange,
     type DateRange,
     type TimeTab,
 } from "../utils/dateFilters";
+
+type TimeTabWithCustom = TimeTab | "Custom";
 
 // --- Types ---
 type Status = "Draft" | "Sent" | "Accepted" | "Rejected" | "Expired" | "All";
@@ -52,7 +53,7 @@ const QuotationList: React.FC = () => {
     const [quotations, setQuotations] = useState<Quotation[]>(INITIAL_QUOTATIONS);
     const [searchQuery, setSearchQuery] = useState<string>("");
     const [selectedIds, setSelectedIds] = useState<string[]>([]);
-    const [activeTab, setActiveTab] = useState<TimeTab>("All Time");
+    const [activeTab, setActiveTab] = useState<TimeTabWithCustom>("All Time");
     const [isCalendarOpen, setIsCalendarOpen] = useState(false);
     const [customDateRange, setCustomDateRange] = useState<DateRange>({
         from: "",
@@ -134,7 +135,7 @@ const QuotationList: React.FC = () => {
                 {/* Tabs & Custom Range Button */}
                 <section className="relative mb-8 flex flex-wrap items-center gap-3">
                     <div className="flex flex-wrap items-center gap-2 p-1.5 bg-white/80 backdrop-blur-md rounded-2xl border border-white shadow-sm w-fit">
-                        {(["Weekly", "Monthly", "Quarterly", "Yearly", "All Time"] as TimeTab[]).map((tab) => (
+                        {(["Weekly", "Monthly", "Quarterly", "Yearly", "All Time"] as const).map((tab) => (
                             <button
                                 key={tab}
                                 onClick={() => { setActiveTab(tab); setCurrentPage(1); setIsCalendarOpen(false); }}
