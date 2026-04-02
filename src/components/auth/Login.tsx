@@ -34,6 +34,7 @@ const Login: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [authError, setAuthError] = useState("");
   const navigate = useNavigate();
+  const [isSubmitted, setIsSubmitted] = useState(false);
 
   const emailStatus = useMemo(() => {
     if (!email) return { error: null, isValid: false };
@@ -94,21 +95,22 @@ const Login: React.FC = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    setIsSubmitted(true);
     if (!emailStatus.isValid || !passwordStatus.isValid) return;
 
     setIsSubmitting(true);
     setAuthError("");
 
-      const user = USERS.find((u) => u.email === email && u.password === password);
-      if (user) {
-        localStorage.setItem("user", JSON.stringify(user));
-        localStorage.setItem("token", "mock-jwt-token");
-        localStorage.setItem("userRole", user.role);
-        navigate("/sales/dashboard");
-      } else {
-        setAuthError("Unauthorized: Invalid credentials");
-      }
-      setIsSubmitting(false);
+    const user = USERS.find((u) => u.email === email && u.password === password);
+    if (user) {
+      localStorage.setItem("user", JSON.stringify(user));
+      localStorage.setItem("token", "mock-jwt-token");
+      localStorage.setItem("userRole", user.role);
+      navigate("/sales/dashboard");
+    } else {
+      setAuthError("Unauthorized: Invalid credentials");
+    }
+    setIsSubmitting(false);
   };
 
   return (
@@ -137,13 +139,13 @@ const Login: React.FC = () => {
         <div className="w-full md:w-1/2 p-6 sm:p-8 lg:p-10 flex flex-col justify-center">
 
           {/* HEADER */}
-          <div className="mb-8 flex flex-col items-center md:items-start">
+          <div className="mb-8 flex flex-col items-center">
             {/* LOGO CONTAINER */}
-            <div className="mb-6">
+            <div className="mb-6 flex justify-center w-full">
               <img
                 src="/logo.svg"
                 alt="Zonixtec Logo"
-                className="h-12 w-auto object-contain"
+                className="h-8 w-auto object-contain"
               />
             </div>
 
@@ -170,18 +172,22 @@ const Login: React.FC = () => {
                   onChange={(e) => setEmail(e.target.value)}
                 />
               </div>
-              {!emailStatus.isValid && email && (
+              {(isSubmitted && !email) ? (
+                <p className="text-red-500 text-xs mt-1 flex items-center gap-1">
+                  <AlertCircle size={12} /> Email is required
+                </p>
+              ) : (!emailStatus.isValid && email && (
                 <p className="text-red-500 text-xs mt-1 flex items-center gap-1">
                   <AlertCircle size={12} /> {emailStatus.error}
                 </p>
-              )}
+              ))}
             </div>
 
             {/* PASSWORD */}
             <div>
               <div className="flex justify-between">
                 <label className="text-xs text-gray-400 font-semibold uppercase">Password</label>
-                <button type="button" className="text-xs text-[#005d52] hover:underline">Forgot?</button>
+                {/* <button type="button" className="text-xs text-[#005d52] hover:underline">Forgot?</button> */}
               </div>
               <div className="relative mt-1">
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
@@ -200,11 +206,15 @@ const Login: React.FC = () => {
                   {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
               </div>
-              {!passwordStatus.isValid && password && (
+              {(isSubmitted && !password) ? (
+                <p className="text-red-500 text-xs mt-1 flex items-center gap-1">
+                  <AlertCircle size={12} /> Password is required
+                </p>
+              ) : (!passwordStatus.isValid && password && (
                 <p className="text-red-500 text-xs mt-1 flex items-center gap-1">
                   <AlertCircle size={12} /> {passwordStatus.error}
                 </p>
-              )}
+              ))}
             </div>
 
             {authError && (
@@ -216,7 +226,7 @@ const Login: React.FC = () => {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full bg-[#005d52] text-white py-3 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 hover:bg-[#004a42] transition-all disabled:opacity-70"
+              className="outline-none w-full bg-[#005d52] text-white py-3 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 hover:bg-[#004a42] transition-all disabled:opacity-70"
             >
               {isSubmitting ? (
                 <Loader2 className="animate-spin" size={18} />
