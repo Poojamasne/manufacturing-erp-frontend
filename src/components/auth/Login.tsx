@@ -9,7 +9,7 @@ import {
   Loader2,
   AlertCircle,
   CheckCircle2,
-  
+
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
@@ -38,14 +38,58 @@ const Login: React.FC = () => {
 
   const emailStatus = useMemo(() => {
     if (!email) return { error: null, isValid: false };
-    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!regex.test(email)) return { error: "Invalid email format", isValid: false };
+
+    // spaces
+    if (email.includes(" ")) {
+      return { error: "Spaces are not allowed", isValid: false };
+    }
+
+    // multiple @
+    const atParts = email.split("@");
+    if (atParts.length !== 2) {
+      return { error: "Only one @ allowed", isValid: false };
+    }
+
+    const [username, domain] = atParts;
+
+    // missing parts
+    if (!username) return { error: "Enter username before @", isValid: false };
+    if (!domain) return { error: "Enter domain after @", isValid: false };
+
+    // double dots
+    if (email.includes("..")) {
+      return { error: "Consecutive dots (..) not allowed", isValid: false };
+    }
+
+    // dot at start/end
+    if (email.startsWith(".") || email.endsWith(".")) {
+      return { error: "Dot cannot be at start or end", isValid: false };
+    }
+
+    // domain format
+    const domainParts = domain.split(".");
+    if (domainParts.length < 2) {
+      return { error: "Invalid domain format", isValid: false };
+    }
+
+    // allowed domains
+    const validDomains = ["com", "org", "co", "in"];
+    const extension = domainParts[domainParts.length - 1];
+
+    if (!validDomains.includes(extension)) {
+      return { error: "Only .com, .org, .co, .in allowed", isValid: false };
+    }
+
     return { error: null, isValid: true };
   }, [email]);
 
   const passwordStatus = useMemo(() => {
     if (!password) return { error: null, isValid: false };
-    if (password.length < 6) return { error: "Minimum 6 characters", isValid: false };
+
+    if (password.length < 6) {
+      return { error: "Minimum 6 characters required", isValid: false };
+    }
+
     return { error: null, isValid: true };
   }, [password]);
 
@@ -56,7 +100,6 @@ const Login: React.FC = () => {
     setIsSubmitting(true);
     setAuthError("");
 
-    setTimeout(() => {
       const user = USERS.find((u) => u.email === email && u.password === password);
       if (user) {
         localStorage.setItem("user", JSON.stringify(user));
@@ -67,10 +110,9 @@ const Login: React.FC = () => {
         setAuthError("Unauthorized: Invalid credentials");
       }
       setIsSubmitting(false);
-    }, 1000);
   };
 
- return (
+  return (
     <div className="min-h-screen flex items-center justify-center bg-[#f4f7f6] px-4">
       <div className="w-full max-w-4xl bg-white rounded-2xl shadow-xl border border-gray-200 flex flex-col md:flex-row overflow-hidden">
 
@@ -94,13 +136,13 @@ const Login: React.FC = () => {
 
         {/* RIGHT PANEL */}
         <div className="w-full md:w-1/2 p-6 sm:p-8 lg:p-10 flex flex-col justify-center">
-          
+
           {/* HEADER */}
           <div className="mb-8 flex flex-col items-center md:items-start">
             {/* LOGO CONTAINER */}
             <div className="mb-6">
               <img
-                src="/logo.svg" 
+                src="/logo.svg"
                 alt="Zonixtec Logo"
                 className="h-12 w-auto object-contain"
               />
