@@ -228,7 +228,7 @@ const OrderList: React.FC = () => {
                                     <th className="p-4 text-[10px] font-bold text-gray-800 uppercase tracking-widest border-b border-gray-100 border-r">
                                         Order ID
                                     </th>
-                                    <th className="p-4 text-[10px] font-bold text-gray-800 uppercase tracking-widest border-b border-gray-100 border-">
+                                    <th className="p-4 text-[10px] font-bold text-gray-800 uppercase tracking-widest border-b border-gray-100 border-r">
                                         Order Date
                                     </th>
                                     <th className="p-4 text-[10px] font-bold text-gray-800 uppercase tracking-widest border-b border-gray-100 border-r ">
@@ -251,16 +251,16 @@ const OrderList: React.FC = () => {
                                         <td className="p-4 text-center border-r border-gray-100">
                                             <input type="checkbox" className="accent-[#005d52] w-4 h-4 cursor-pointer" checked={selectedIds.includes(o.id)} onChange={() => setSelectedIds(prev => prev.includes(o.id) ? prev.filter(i => i !== o.id) : [...prev, o.id])} />
                                         </td>
-                                        <td className="p-4 text-xs font-bold text-[#005d52] border-r">
+                                        <td className="p-4 text-xs font-bold text-[#005d52] border-r border-gray-100">
                                             {o.id}
                                         </td>
-                                        <td className="p-4 text-xs text-gray-500 whitespace-nowrap border-r ">
+                                        <td className="p-4 text-xs text-gray-500 whitespace-nowrap border-r border-gray-100">
                                             {o.date}
                                         </td>
                                         <td className="p-4 text-xs text-gray-800 border-r border-gray-100">
                                             {o.customer}
                                         </td>
-                                        <td className="p-4 text-xs text-gray-800 font-bold border-r border-gray-100">
+                                        <td className="p-4 text-xs text-gray-800  border-r border-gray-100">
                                             {o.amount}
                                         </td>
                                         <td className="p-4 border-r border-gray-100">
