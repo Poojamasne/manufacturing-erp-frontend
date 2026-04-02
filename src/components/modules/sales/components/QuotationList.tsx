@@ -240,25 +240,25 @@ const QuotationList: React.FC = () => {
                         <table className="w-full text-left border-collapse">
                             <thead>
                                 <tr className="bg-gray-50/50">
-                                    <th className="w-12 p-4 text-center border-b border-gray-100 border-r border-gray-100">
+                                    <th className="w-12 p-4 text-center border-b border-gray-100 border-r">
                                         <input type="checkbox" className="accent-[#005d52] w-4 h-4 cursor-pointer" checked={selectedIds.length === paginatedQuotations.length && paginatedQuotations.length > 0} onChange={toggleSelectAll} />
                                     </th>
-                                    <th className="p-4 text-[10px] font-bold text-gray-800 uppercase tracking-widest border-b border-gray-100 border-r border-gray-100">
+                                    <th className="p-4 text-[10px] font-bold text-gray-800 uppercase tracking-widest border-b border-gray-100 border-r">
                                         Quote ID
                                     </th>
-                                    <th className="p-4 text-[10px] font-bold text-gray-800 uppercase tracking-widest border-b border-gray-100 border-r border-gray-100">
+                                    <th className="p-4 text-[10px] font-bold text-gray-800 uppercase tracking-widest border-b border-gray-100 border-r">
                                         Date Created
                                     </th>
-                                    <th className="p-4 text-[10px] font-bold text-gray-800 uppercase tracking-widest border-b border-gray-100 border-r border-gray-100">
+                                    <th className="p-4 text-[10px] font-bold text-gray-800 uppercase tracking-widest border-b border-gray-100 border-r ">
                                         Valid Until
                                     </th>
-                                    <th className="p-4 text-[10px] font-bold text-gray-800 uppercase tracking-widest border-b border-gray-100 border-r border-gray-100">
+                                    <th className="p-4 text-[10px] font-bold text-gray-800 uppercase tracking-widest border-b border-gray-100 border-r ">
                                         Company
                                     </th>
-                                    <th className="p-4 text-[10px] font-bold text-gray-800 uppercase tracking-widest border-b border-gray-100 border-r border-gray-100">
+                                    <th className="p-4 text-[10px] font-bold text-gray-800 uppercase tracking-widest border-b border-gray-100 border-r ">
                                         Total Amount
                                     </th>
-                                    <th className="p-4 text-[10px] font-bold text-gray-800 uppercase tracking-widest border-b border-gray-100 border-r border-gray-100">
+                                    <th className="p-4 text-[10px] font-bold text-gray-800 uppercase tracking-widest border-b border-gray-100 border-r">
                                         Status
                                     </th>
                                     <th className="p-4 text-[10px] font-bold text-gray-800 uppercase tracking-widest border-b border-gray-100 text-center">

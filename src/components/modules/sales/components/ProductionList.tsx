@@ -244,28 +244,28 @@ const ProductionList: React.FC = () => {
                         <table className="w-full text-left border-collapse">
                             <thead>
                                 <tr className="bg-gray-50/50">
-                                    <th className="w-12 p-4 text-center border-b border-gray-100 border-r border-gray-100">
+                                    <th className="w-12 p-4 text-center border-b border-gray-100 border-r">
                                         <input type="checkbox" className="accent-[#005d52] w-4 h-4" checked={selectedIds.length === paginatedJobs.length && paginatedJobs.length > 0} onChange={toggleSelectAll} />
                                     </th>
-                                    <th className="p-4 text-[10px] font-bold text-gray-800 uppercase tracking-wider border-b border-gray-100 border-r border-gray-100">
+                                    <th className="p-4 text-[10px] font-bold text-gray-800 uppercase tracking-wider border-b border-gray-100 border-r ">
                                         Job ID
                                     </th>
-                                    <th className="p-4 text-[10px] font-bold text-gray-800 uppercase tracking-wider border-b border-gray-100 border-r border-gray-100">
+                                    <th className="p-4 text-[10px] font-bold text-gray-800 uppercase tracking-wider border-b border-gray-100 border-r ">
                                         Order Ref
                                     </th>
-                                    <th className="p-4 text-[10px] font-bold text-gray-800 uppercase tracking-wider border-b border-gray-100 border-r border-gray-100">
+                                    <th className="p-4 text-[10px] font-bold text-gray-800 uppercase tracking-wider border-b border-gray-100 border-r ">
                                         Product
                                     </th>
-                                    <th className="p-4 text-[10px] font-bold text-gray-800 uppercase tracking-wider border-b border-gray-100 border-r border-gray-100">
+                                    <th className="p-4 text-[10px] font-bold text-gray-800 uppercase tracking-wider border-b border-gray-100 border-">
                                         Qty
                                     </th>
-                                    <th className="p-4 text-[10px] font-bold text-gray-800 uppercase tracking-wider border-b border-gray-100 border-r border-gray-100">
+                                    <th className="p-4 text-[10px] font-bold text-gray-800 uppercase tracking-wider border-b border-gray-100 border-r ">
                                         Stage
                                     </th>
-                                    <th className="p-4 text-[10px] font-bold text-gray-800 uppercase tracking-wider border-b border-gray-100 border-r border-gray-100">
+                                    <th className="p-4 text-[10px] font-bold text-gray-800 uppercase tracking-wider border-b border-gray-100 border-r ">
                                         Status
                                     </th>
-                                    <th className="p-4 text-[10px] font-bold text-gray-800 uppercase tracking-wider border-b border-gray-100 border-r border-gray-100">
+                                    <th className="p-4 text-[10px] font-bold text-gray-800 uppercase tracking-wider border-b border-gray-100 border-r">
                                         Updated
                                     </th>
                                     <th className="p-4 text-[10px] font-bold text-gray-800 uppercase tracking-wider border-b border-gray-100 text-center ">

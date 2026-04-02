@@ -233,25 +233,25 @@ const OpportunityList: React.FC = () => {
                         <table className="w-full text-left border-collapse">
                             <thead>
                                 <tr className="bg-gray-50/50">
-                                    <th className="w-12 p-4 text-center border-b border-gray-100 border-r border-gray-100">
+                                    <th className="w-12 p-4 text-center border-b border-gray-100 border-r">
                                         <input type="checkbox" className="accent-[#005d52] w-4 h-4" checked={selectedIds.length === paginatedOpportunities.length && paginatedOpportunities.length > 0} onChange={toggleSelectAll} />
                                     </th>
-                                    <th className="p-4 text-[10px] font-bold text-gray-800 uppercase tracking-wider border-b border-gray-100 border-r border-gray-100">
+                                    <th className="p-4 text-[10px] font-bold text-gray-800 uppercase tracking-wider border-b border-gray-100 border-r ">
                                         Opp ID
                                     </th>
-                                    <th className="p-4 text-[10px] font-bold text-gray-800 uppercase tracking-wider border-b border-gray-100 border-r border-gray-100">
+                                    <th className="p-4 text-[10px] font-bold text-gray-800 uppercase tracking-wider border-b border-gray-100 border-r ">
                                         Date Created
                                     </th>
-                                    <th className="p-4 text-[10px] font-bold text-gray-800 uppercase tracking-wider border-b border-gray-100 border-r border-gray-100">
+                                    <th className="p-4 text-[10px] font-bold text-gray-800 uppercase tracking-wider border-b border-gray-100 border-r">
                                         Company Name
                                     </th>
-                                    <th className="p-4 text-[10px] font-bold text-gray-800 uppercase tracking-wider border-b border-gray-100 border-r border-gray-100">
+                                    <th className="p-4 text-[10px] font-bold text-gray-800 uppercase tracking-wider border-b border-gray-100 border-r ">
                                         Est. Value
                                     </th>
-                                    <th className="p-4 text-[10px] font-bold text-gray-800 uppercase tracking-wider border-b border-gray-100 border-r border-gray-100">
+                                    <th className="p-4 text-[10px] font-bold text-gray-800 uppercase tracking-wider border-b border-gray-100 border-r ">
                                         Priority
                                     </th>
-                                    <th className="p-4 text-[10px] font-bold text-gray-800 uppercase tracking-wider border-b border-gray-100 border-r border-gray-100">
+                                    <th className="p-4 text-[10px] font-bold text-gray-800 uppercase tracking-wider border-b border-gray-100 border-r ">
                                         Exp. Close Date
                                     </th>
                                     <th className="p-4 text-[10px] font-bold text-gray-800 uppercase tracking-wider border-b border-gray-100 text-center">

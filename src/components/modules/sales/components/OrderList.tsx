@@ -222,22 +222,22 @@ const OrderList: React.FC = () => {
                         <table className="w-full text-left border-collapse">
                             <thead>
                                 <tr className="bg-gray-50/50">
-                                    <th className="w-12 p-4 text-center border-b border-gray-100 border-r border-gray-100">
+                                    <th className="w-12 p-4 text-center border-b border-gray-100 border-r">
                                         <input type="checkbox" className="accent-[#005d52] w-4 h-4 cursor-pointer" checked={selectedIds.length === paginatedOrders.length && paginatedOrders.length > 0} onChange={toggleSelectAll} />
                                     </th>
-                                    <th className="p-4 text-[10px] font-bold text-gray-800 uppercase tracking-widest border-b border-gray-100 border-r border-gray-100">
+                                    <th className="p-4 text-[10px] font-bold text-gray-800 uppercase tracking-widest border-b border-gray-100 border-r">
                                         Order ID
                                     </th>
-                                    <th className="p-4 text-[10px] font-bold text-gray-800 uppercase tracking-widest border-b border-gray-100 border-r border-gray-100">
+                                    <th className="p-4 text-[10px] font-bold text-gray-800 uppercase tracking-widest border-b border-gray-100 border-">
                                         Order Date
                                     </th>
-                                    <th className="p-4 text-[10px] font-bold text-gray-800 uppercase tracking-widest border-b border-gray-100 border-r border-gray-100">
+                                    <th className="p-4 text-[10px] font-bold text-gray-800 uppercase tracking-widest border-b border-gray-100 border-r ">
                                         Customer
                                     </th>
-                                    <th className="p-4 text-[10px] font-bold text-gray-800 uppercase tracking-widest border-b border-gray-100 border-r border-gray-100">
+                                    <th className="p-4 text-[10px] font-bold text-gray-800 uppercase tracking-widest border-b border-gray-100 border-r ">
                                         Total Amount
                                     </th>
-                                    <th className="p-4 text-[10px] font-bold text-gray-800 uppercase tracking-widest border-b border-gray-100 border-r border-gray-100">
+                                    <th className="p-4 text-[10px] font-bold text-gray-800 uppercase tracking-widest border-b border-gray-100 border-r ">
                                         Status
                                     </th>
                                     <th className="p-4 text-[10px] font-bold text-gray-800 uppercase tracking-widest border-b border-gray-100 text-center">
@@ -251,10 +251,10 @@ const OrderList: React.FC = () => {
                                         <td className="p-4 text-center border-r border-gray-100">
                                             <input type="checkbox" className="accent-[#005d52] w-4 h-4 cursor-pointer" checked={selectedIds.includes(o.id)} onChange={() => setSelectedIds(prev => prev.includes(o.id) ? prev.filter(i => i !== o.id) : [...prev, o.id])} />
                                         </td>
-                                        <td className="p-4 text-xs font-bold text-[#005d52] border-r border-gray-100">
+                                        <td className="p-4 text-xs font-bold text-[#005d52] border-r">
                                             {o.id}
                                         </td>
-                                        <td className="p-4 text-xs text-gray-500 whitespace-nowrap border-r border-gray-100">
+                                        <td className="p-4 text-xs text-gray-500 whitespace-nowrap border-r ">
                                             {o.date}
                                         </td>
                                         <td className="p-4 text-xs text-gray-800 border-r border-gray-100">
