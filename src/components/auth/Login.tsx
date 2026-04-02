@@ -162,7 +162,7 @@ const Login: React.FC = () => {
             <div>
               <label className="text-xs text-gray-400 font-semibold uppercase">Email</label>
               <div className="relative mt-1">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-300" size={16} />
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
                 <input
                   type="email"
                   className="w-full pl-10 pr-3 py-3 rounded-xl border border-gray-200 text-sm outline-none focus:border-[#005d52] transition-colors"
@@ -185,7 +185,7 @@ const Login: React.FC = () => {
                 <button type="button" className="text-xs text-[#005d52] hover:underline">Forgot?</button>
               </div>
               <div className="relative mt-1">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-300" size={16} />
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
                 <input
                   type={showPassword ? "text" : "password"}
                   className="w-full pl-10 pr-10 py-3 rounded-xl border border-gray-200 text-sm outline-none focus:border-[#005d52] transition-colors"
@@ -222,7 +222,7 @@ const Login: React.FC = () => {
               {isSubmitting ? (
                 <Loader2 className="animate-spin" size={18} />
               ) : (
-                <>Login <ArrowRight size={16} /></>
+                <>Login</>
               )}
             </button>
           </form>
