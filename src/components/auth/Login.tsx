@@ -127,8 +127,9 @@ const Login: React.FC = () => {
               Manufacturing ERP System
             </h1>
             <div className="space-y-3 text-sm text-[#d1e9e7]">
-              <div className="flex items-center gap-2"><CheckCircle2 size={14} /> Real-time Tracking</div>
-              <div className="flex items-center gap-2"><CheckCircle2 size={14} /> Workforce Management</div>
+              <div className="flex items-center gap-2"><CheckCircle2 size={14} /> Streamlined Business Processes</div>
+              <div className="flex items-center gap-2"><CheckCircle2 size={14} /> Production & Inventory Control</div>
+              <div className="flex items-center gap-2"><CheckCircle2 size={14} /> Analytics for Operational Efficiency</div>
               <div className="flex items-center gap-2"><CheckCircle2 size={14} /> Analytics Dashboard</div>
             </div>
           </div>
