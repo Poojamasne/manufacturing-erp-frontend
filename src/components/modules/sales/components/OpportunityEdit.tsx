@@ -391,7 +391,7 @@ interface FormFieldProps {
 
 const FormField: React.FC<FormFieldProps> = ({
     label,
-    name,
+    
     value,
     onChange,
     isEditing,

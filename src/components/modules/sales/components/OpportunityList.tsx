@@ -5,7 +5,7 @@ import {
     Trash2,
     ChevronLeft,
     ChevronRight,
-    ChevronsUpDown,
+
     Calendar as CalendarIcon,
     Eye,
     FileEdit,

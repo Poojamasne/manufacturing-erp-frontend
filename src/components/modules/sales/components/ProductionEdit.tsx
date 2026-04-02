@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { 
-    ChevronLeft, Save, X, Calendar, 
+    ChevronLeft, Save,  Calendar, 
     Box, Settings, AlertCircle, CheckCircle,
-    Clock, Truck, Package, ClipboardList,
-    ArrowRight, User, Building2, Phone, Mail
+    Clock,  Package, ClipboardList,
+    User, Building2, 
 } from 'lucide-react';
 
 type ProdStatus = "In Progress" | "On Hold" | "Completed" | "Delayed";
@@ -80,13 +80,8 @@ const ProductionEdit: React.FC = () => {
 
     const [errors, setErrors] = useState<Record<string, string>>({});
 
-    const stages: Stage[] = ["Raw Materials", "Cutting", "Assembly", "Quality Check", "Packaging"];
     const statuses: ProdStatus[] = ["In Progress", "On Hold", "Completed", "Delayed"];
 
-    const getStageProgress = () => {
-        const currentIndex = stages.indexOf(job.stage);
-        return (currentIndex / (stages.length - 1)) * 100;
-    };
 
     const getStatusColor = (status: string) => {
         switch(status) {

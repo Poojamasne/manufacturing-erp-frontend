@@ -1,10 +1,10 @@
 ﻿import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
-    ChevronLeft, Save, X, Plus, Trash2, 
-    IndianRupee, Calendar, Building2, User, 
-    Phone, Mail, FileText, Tag, Percent, 
-    Truck, Send, Eye, Printer, Download
+    ChevronLeft, Save, Plus, Trash2, 
+    IndianRupee, Building2, User, 
+    Phone, Mail, FileText, 
+    Printer, 
 } from 'lucide-react';
 
 interface LineItem {
