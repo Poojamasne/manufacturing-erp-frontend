@@ -59,9 +59,9 @@ const DATA_STORE: Record<Exclude<TimeRange, "Custom">, any> = {
     sources: [{ name: "Trade Fair", value: 40 }, { name: "Referral", value: 30 }, { name: "Web", value: 20 }, { name: "Direct", value: 10 }],
     kpis: { rev: "₹12.4L", leads: "42", conv: "9.5%", avg: "₹0.8L" },
     products: [
-        { name: "Fridge", target: 100, sold: 85, prod: 110 },
-        { name: "AC", target: 80, sold: 95, prod: 90 },
-        { name: "Wash", target: 60, sold: 40, prod: 55 }
+      { name: "Fridge", target: 100, sold: 85, prod: 110 },
+      { name: "AC", target: 80, sold: 95, prod: 90 },
+      { name: "Wash", target: 60, sold: 40, prod: 55 }
     ],
     leaderboard: [{ name: "Sneha Patil", leads: 12, conversion: "10%", revenue: "₹2.1L" }, { name: "Rahul Deshpande", leads: 8, conversion: "12%", revenue: "₹3.4L" }]
   },
@@ -70,9 +70,9 @@ const DATA_STORE: Record<Exclude<TimeRange, "Custom">, any> = {
     sources: [{ name: "Trade Fair", value: 120 }, { name: "Referral", value: 80 }, { name: "Web", value: 60 }, { name: "Direct", value: 40 }],
     kpis: { rev: "₹48.2L", leads: "233", conv: "14.2%", avg: "₹1.4L" },
     products: [
-        { name: "Fridge", target: 400, sold: 380, prod: 420 },
-        { name: "AC", target: 350, sold: 410, prod: 380 },
-        { name: "Wash", target: 250, sold: 200, prod: 240 }
+      { name: "Fridge", target: 400, sold: 380, prod: 420 },
+      { name: "AC", target: 350, sold: 410, prod: 380 },
+      { name: "Wash", target: 250, sold: 200, prod: 240 }
     ],
     leaderboard: [{ name: "Sneha Patil", leads: 45, conversion: "12%", revenue: "₹8.4L" }, { name: "Rahul Deshpande", leads: 38, conversion: "15%", revenue: "₹12.2L" }]
   },
@@ -81,9 +81,9 @@ const DATA_STORE: Record<Exclude<TimeRange, "Custom">, any> = {
     sources: [{ name: "Trade Fair", value: 350 }, { name: "Referral", value: 210 }, { name: "Web", value: 140 }, { name: "Direct", value: 100 }],
     kpis: { rev: "₹1.2Cr", leads: "680", conv: "12.8%", avg: "₹1.9L" },
     products: [
-        { name: "Fridge", target: 1200, sold: 1150, prod: 1300 },
-        { name: "AC", target: 1000, sold: 1250, prod: 1100 },
-        { name: "Wash", target: 800, sold: 720, prod: 850 }
+      { name: "Fridge", target: 1200, sold: 1150, prod: 1300 },
+      { name: "AC", target: 1000, sold: 1250, prod: 1100 },
+      { name: "Wash", target: 800, sold: 720, prod: 850 }
     ],
     leaderboard: [{ name: "Priya Mehta", leads: 120, conversion: "20%", revenue: "₹45.2L" }, { name: "Rahul Deshpande", leads: 95, conversion: "18%", revenue: "₹38.1L" }]
   },
@@ -92,9 +92,9 @@ const DATA_STORE: Record<Exclude<TimeRange, "Custom">, any> = {
     sources: [{ name: "Trade Fair", value: 1500 }, { name: "Referral", value: 1000 }, { name: "Web", value: 500 }, { name: "Direct", value: 300 }],
     kpis: { rev: "₹4.8Cr", leads: "2.4K", conv: "15.4%", avg: "₹2.2L" },
     products: [
-        { name: "Fridge", target: 5000, sold: 4800, prod: 5200 },
-        { name: "AC", target: 4500, sold: 5100, prod: 4800 },
-        { name: "Wash", target: 3500, sold: 3100, prod: 3600 }
+      { name: "Fridge", target: 5000, sold: 4800, prod: 5200 },
+      { name: "AC", target: 4500, sold: 5100, prod: 4800 },
+      { name: "Wash", target: 3500, sold: 3100, prod: 3600 }
     ],
     leaderboard: [{ name: "Rahul Deshpande", leads: 420, conversion: "16%", revenue: "₹1.4Cr" }, { name: "Sneha Patil", leads: 380, conversion: "14%", revenue: "₹1.1Cr" }]
   }
@@ -152,7 +152,7 @@ const ReportsAndAnalytics: FC = () => {
                   {r}
                 </button>
               ))}
-              <button 
+              <button
                 onClick={() => setIsCalendarOpen(!isCalendarOpen)}
                 className={`px-5 py-2 text-xs font-bold rounded-xl transition-all flex items-center gap-2 ${range === "Custom" ? "bg-[#d1e9e7] text-[#005d52] shadow-sm" : "text-gray-400 hover:text-gray-600"}`}
               >
@@ -162,7 +162,7 @@ const ReportsAndAnalytics: FC = () => {
 
             {/* Calendar Popup */}
             {isCalendarOpen && (
-              <div ref={calendarRef} className="absolute top-full mt-3 left-0 xl:left-auto xl:right-0 z-50 bg-white p-6 rounded-[2.5rem] shadow-2xl border border-gray-50 min-w-[300px] animate-in zoom-in-95 duration-200">
+              <div ref={calendarRef} className="absolute top-full mt-3 left-0 xl:left-auto xl:right-0 z-50 bg-white p-6 rounded-[2.5rem] shadow-2xl border border-gray-50 min-w-75 animate-in zoom-in-95 duration-200">
                 <div className="flex justify-between items-center mb-5">
                   <h4 className="text-sm font-bold text-gray-800">Custom Range</h4>
                   <button onClick={() => setIsCalendarOpen(false)} className="text-gray-400 hover:text-red-500"><X size={18} /></button>
@@ -170,18 +170,18 @@ const ReportsAndAnalytics: FC = () => {
                 <div className="space-y-4">
                   <div className="space-y-1">
                     <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">From</label>
-                    <input type="date" className="w-full bg-gray-50 border-none rounded-xl p-3 text-sm text-[#005d52] outline-none" value={customRange.start} onChange={(e) => setCustomRange({...customRange, start: e.target.value})} />
+                    <input type="date" className="w-full bg-gray-50 border-none rounded-xl p-3 text-sm text-[#005d52] outline-none" value={customRange.start} onChange={(e) => setCustomRange({ ...customRange, start: e.target.value })} />
                   </div>
                   <div className="space-y-1">
                     <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">To</label>
-                    <input type="date" className="w-full bg-gray-50 border-none rounded-xl p-3 text-sm text-[#005d52] outline-none" value={customRange.end} onChange={(e) => setCustomRange({...customRange, end: e.target.value})} />
+                    <input type="date" className="w-full bg-gray-50 border-none rounded-xl p-3 text-sm text-[#005d52] outline-none" value={customRange.end} onChange={(e) => setCustomRange({ ...customRange, end: e.target.value })} />
                   </div>
                   <button onClick={() => { setRange("Custom"); setIsCalendarOpen(false); }} className="w-full py-3 bg-[#005d52] text-white rounded-xl font-bold text-xs shadow-lg">Apply Range</button>
                 </div>
               </div>
             )}
           </div>
-          
+
           <div className="bg-[#005d52] text-white px-5 py-2 rounded-full text-[11px] font-bold shadow-md">
             <TrendingUp size={14} className="inline mr-2" />
             {range === "Custom" ? `${customRange.start || '...'} to ${customRange.end || '...'}` : `Performance: ${range}`}
@@ -204,15 +204,15 @@ const ReportsAndAnalytics: FC = () => {
               <p className="text-sm text-gray-400 font-normal">Target vs Sold Units vs Actual Production</p>
             </div>
             <div className="flex flex-wrap gap-4">
-               <div className="flex items-center gap-2 text-[10px] font-bold text-gray-400 uppercase tracking-widest">
-                  <div className="w-2.5 h-2.5 rounded-full" style={{backgroundColor: THEME.target}} /> Target
-                </div>
-                <div className="flex items-center gap-2 text-[10px] font-bold text-gray-400 uppercase tracking-widest">
-                  <div className="w-2.5 h-2.5 rounded-full" style={{backgroundColor: THEME.primary}} /> Sold
-                </div>
-                <div className="flex items-center gap-2 text-[10px] font-bold text-gray-400 uppercase tracking-widest">
-                  <div className="w-2.5 h-2.5 rounded-full" style={{backgroundColor: THEME.production}} /> Production
-                </div>
+              <div className="flex items-center gap-2 text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: THEME.target }} /> Target
+              </div>
+              <div className="flex items-center gap-2 text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: THEME.primary }} /> Sold
+              </div>
+              <div className="flex items-center gap-2 text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: THEME.production }} /> Production
+              </div>
             </div>
           </div>
           <div className="h-80 w-full">
@@ -261,7 +261,7 @@ const ReportsAndAnalytics: FC = () => {
                   <PieChart>
                     <Pie data={currentData.sources} innerRadius={60} outerRadius={80} paddingAngle={8} dataKey="value" cornerRadius={6}>
                       {currentData.sources.map((_: any, index: number) => (
-                        <Cell key={`cell-${index}`} tabIndex={-1} style={{outline:"none"}} fill={THEME.chart[index % THEME.chart.length]} />
+                        <Cell key={`cell-${index}`} tabIndex={-1} style={{ outline: "none" }} fill={THEME.chart[index % THEME.chart.length]} />
                       ))}
                     </Pie>
                     <Tooltip />
@@ -286,8 +286,8 @@ const ReportsAndAnalytics: FC = () => {
         {/* Leaderboard */}
         <div className="bg-white rounded-[2.5rem] border border-gray-50 shadow-sm overflow-hidden mb-10">
           <div className="p-8 border-b border-gray-50 flex justify-between items-center">
-              <h3 className="font-bold text-lg text-gray-800 italic">Performance Leaderboard</h3>
-              <span className="text-[10px] font-bold text-[#005d52] uppercase tracking-widest">Sales Rep Ranking</span>
+            <h3 className="font-bold text-lg text-gray-800">Performance Leaderboard</h3>
+            <span className="text-[10px] font-bold text-[#005d52] uppercase tracking-widest">Sales Rep Ranking</span>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
@@ -321,7 +321,7 @@ const ReportsAndAnalytics: FC = () => {
     </div>
   );
 };
- 
+
 // --- Stat Card Sub-Component ---
 const StatCard: FC<StatCardProps> = ({ label, value, trend, svg, isNeg }) => (
   <div className="bg-white rounded-[28px] p-6 border border-gray-50 hover:border-[#005d52]/30 transition-all group shadow-sm">
@@ -329,12 +329,15 @@ const StatCard: FC<StatCardProps> = ({ label, value, trend, svg, isNeg }) => (
       <div className="p-3 bg-[#f4f7f6] rounded-2xl text-[#005d52] group-hover:bg-[#005d52] group-hover:text-white transition-all duration-300 shadow-sm">
         <img
           src={svg}
-          className="h-5 w-5 transition-all duration-300 
-              saturate-100 
-             invert-23 sepia-21 hue-rotate-120 brightness-90
-             group-hover:invert group-hover:brightness-0"
           alt=""
-        />            </div>
+          className="w-6 h-6 transition-all duration-300 
+             
+             /* default → green */
+             [filter:invert(23%)_sepia(21%)_saturate(1100%)_hue-rotate(120deg)_brightness(90%)]
+             
+             /* hover → reset + white */
+             group-hover:[filter:brightness(0)_invert(1)]"
+        />           </div>
       <div className={`flex items-center gap-1 text-[11px] font-bold px-2 py-1 rounded-full ${isNeg ? 'bg-red-50 text-red-500' : 'bg-green-50 text-green-600'}`}>
         {isNeg ? <ArrowDownRight size={14} /> : <ArrowUpRight size={14} />} {trend}
       </div>
