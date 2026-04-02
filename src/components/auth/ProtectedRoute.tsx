@@ -6,6 +6,7 @@ interface ProtectedRouteProps {
 }
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ requiredRole }) => {
+  console.log("Checking access for role:", requiredRole);
   const [isAllowed, setIsAllowed] = useState<boolean | null>(null);
   const location = useLocation();
 
@@ -15,7 +16,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ requiredRole }) => {
 
     setIsAllowed(!!token && role === requiredRole);
   }, [location, requiredRole]);
-
+  console.log("Access check result:", isAllowed);
   if (isAllowed === null) return <div>Checking access...</div>;
 
   return isAllowed ? <Outlet /> : <Navigate to="/" replace />;
