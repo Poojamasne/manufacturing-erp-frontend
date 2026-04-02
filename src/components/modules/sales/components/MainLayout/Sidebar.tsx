@@ -32,7 +32,7 @@ const Sidebar: React.FC = () => {
         {/* Dashboard */}
         <button
           onClick={() => navigate("/sales/dashboard")}
-          className={`w-full flex items-center gap-3 px-4 py-3 cursor-pointer rounded-xl transition-all duration-200 ${isActive("/sales/dashboard")
+          className={`outline-none w-full flex items-center gap-3 px-4 py-3 cursor-pointer rounded-xl transition-all duration-200 ${isActive("/sales/dashboard")
             ? "bg-[#005d52] text-white shadow-md"
             : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
             }`}
@@ -48,7 +48,7 @@ const Sidebar: React.FC = () => {
         {/* Lead */}
         <button
           onClick={() => navigate("/sales/leads")}
-          className={`w-full flex items-center gap-3 px-4 cursor-pointer py-3 rounded-xl transition-all duration-200 ${isActive("/sales/leads")
+          className={`outline-none w-full flex items-center gap-3 px-4 cursor-pointer py-3 rounded-xl transition-all duration-200 ${isActive("/sales/leads")
             ? "bg-[#005d52] text-white shadow-md"
             : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
             }`}
@@ -64,7 +64,7 @@ const Sidebar: React.FC = () => {
         {/* Employees */}
         <button
           onClick={() => navigate("/sales/employees")}
-          className={`w-full flex items-center gap-3 px-4 cursor-pointer py-3 rounded-xl transition-all duration-200 ${isActive("/sales/employees")
+          className={`outline-none w-full flex items-center gap-3 px-4 cursor-pointer py-3 rounded-xl transition-all duration-200 ${isActive("/sales/employees")
             ? "bg-[#005d52] text-white shadow-md"
             : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
             }`}
@@ -80,7 +80,7 @@ const Sidebar: React.FC = () => {
         {/* Opportunities */}
         <button
           onClick={() => navigate("/sales/opportunities")}
-          className={`w-full flex items-center gap-3 px-4 hover:cursor-pointer py-3 rounded-xl transition-all duration-200 ${isActive("/sales/opportunities")
+          className={`outline-none w-full flex items-center gap-3 px-4 hover:cursor-pointer py-3 rounded-xl transition-all duration-200 ${isActive("/sales/opportunities")
             ? "bg-[#005d52] text-white shadow-md"
             : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
             }`}
@@ -96,7 +96,7 @@ const Sidebar: React.FC = () => {
         {/* Quotation */}
         <button
           onClick={() => navigate("/sales/quotation")}
-          className={`w-full flex items-center gap-3 px-4 hover:cursor-pointer py-3 rounded-xl transition-all duration-200 ${isActive("/sales/quotation")
+          className={`outline-none w-full flex items-center gap-3 px-4 hover:cursor-pointer py-3 rounded-xl transition-all duration-200 ${isActive("/sales/quotation")
             ? "bg-[#005d52] text-white shadow-md"
             : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
             }`}
@@ -112,7 +112,7 @@ const Sidebar: React.FC = () => {
         {/* Orders */}
         <button
           onClick={() => navigate("/sales/orders")}
-          className={`w-full flex items-center gap-3 px-4 hover:cursor-pointer py-3 rounded-xl transition-all duration-200 ${isActive("/sales/orders")
+          className={`outline-none w-full flex items-center gap-3 px-4 hover:cursor-pointer py-3 rounded-xl transition-all duration-200 ${isActive("/sales/orders")
 
             ? "bg-[#005d52] text-white shadow-md"
             : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
@@ -129,7 +129,7 @@ const Sidebar: React.FC = () => {
         {/* Production */}
         <button
           onClick={() => navigate("/sales/production")}
-          className={`w-full flex items-center gap-3 px-4 hover:cursor-pointer py-3 rounded-xl transition-all duration-200 ${isActive("/sales/production")
+          className={`outline-none w-full flex items-center gap-3 px-4 hover:cursor-pointer py-3 rounded-xl transition-all duration-200 ${isActive("/sales/production")
             ? "bg-[#005d52] text-white shadow-md"
             : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
             }`}
@@ -145,7 +145,7 @@ const Sidebar: React.FC = () => {
         {/* Reports */}
         <button
           onClick={() => navigate("/sales/reports")}
-          className={`w-full flex items-center gap-3 px-4 hover:cursor-pointer py-3 rounded-xl transition-all duration-200 ${isActive("/sales/reports")
+          className={`outline-none w-full flex items-center gap-3 px-4 hover:cursor-pointer py-3 rounded-xl transition-all duration-200 ${isActive("/sales/reports")
             ? "bg-[#005d52] text-white shadow-md"
             : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
             }`}

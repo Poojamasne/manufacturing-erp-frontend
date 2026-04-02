@@ -172,7 +172,7 @@ const LeadList: React.FC = () => {
                             onClick={() => setIsCalendarOpen(!isCalendarOpen)}
                             className={`px-5 py-2 text-xs font-bold rounded-xl transition-all flex items-center gap-2 ${activeTab === "Custom" ? "bg-[#d1e9e7] text-[#005d52] shadow-sm" : "text-gray-400 hover:text-gray-600"}`}
                         >
-                            <CalendarIcon size={14} /> Custom Range
+                            <CalendarIcon size={14} /> Custom
                         </button>
                     </div>
 
@@ -359,7 +359,9 @@ const LeadList: React.FC = () => {
                                         </td>
 
                                         <td className="p-3">
-                                            <div className="flex gap-0.5 justify-end">
+                                            <div
+                                            onClick={()=>navigate("/sales/lead-view/id")}
+                                            className="flex gap-0.5 justify-end">
                                                 <button title="View" className="p-1.5 hover:bg-teal-50 text-gray-400 hover:text-[#005d52] rounded-md transition-all">
                                                     <Eye size={15} />
                                                 </button>
