@@ -134,7 +134,7 @@ const OpportunityList: React.FC = () => {
                                 className={`px-5 py-2 text-xs font-bold rounded-xl transition-all ${activeTab === tab ? "bg-[#d1e9e7] text-[#005d52] shadow-sm" : "text-gray-400 hover:text-gray-600"}`}
                             >
                                 {tab}
-                            </button>
+                            </button> 
                         ))}
                         <button
                             onClick={() => setIsCalendarOpen(!isCalendarOpen)}
