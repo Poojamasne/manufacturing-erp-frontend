@@ -17,8 +17,7 @@ import {
 import {
   Download,
   Calendar,
-  ArrowUpRight,
-  ArrowDownRight,
+
   X,
   TrendingUp,
 } from "lucide-react";
