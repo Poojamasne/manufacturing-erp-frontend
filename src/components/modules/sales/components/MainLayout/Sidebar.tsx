@@ -1,13 +1,15 @@
 import { useNavigate, useLocation, Link } from "react-router-dom";
-
+import { logout } from "../../ModuleStateFiles/AuthSlice";
+import { useAppDispatch } from "../../hooks/hooks";
 const Sidebar: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-
+  const dispatch = useAppDispatch();
   const isActive = (path: string) => location.pathname.startsWith(path);
 
   const handleLogout = () => {
-    localStorage.clear();
+    dispatch(logout());
+    // navigate to login page after logout
     navigate("/");
   };
 

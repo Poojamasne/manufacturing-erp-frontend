@@ -33,7 +33,18 @@ import EditLeadForm from "./components/modules/sales/components/EditLeadForm";
 import AddSalesEmployee from "./components/modules/sales/components/AddSalesEmployee";
 import ViewSalesEmployee from "./components/modules/sales/components/ViewSalesEmployee";
 import EditSalesEmployee from "./components/modules/sales/components/EditSalesEmployee";
+import { Toaster } from "react-hot-toast";
 
+let currentPath = window.location.pathname;
+
+const checkPath = (path: string) => {
+  if (currentPath === "/") {
+    return 30;
+  }
+  else {
+    return 85;
+  }
+}
 /* Global Suspense Wrapper */
 const withSuspense = (Component: React.ReactNode) => (
   <Suspense
@@ -65,7 +76,7 @@ function App() {
     // Sales Module
     {
       path: "/sales",
-      element: <ProtectedRoute requiredRole="sales_manager" />,
+      element: <ProtectedRoute requiredRole="Sales Manager" />,
       children: [
         {
           element: <MainLayout />,
@@ -145,15 +156,15 @@ function App() {
             {
               path: "employees",
               element: <SalesEmployees />,
-            }, 
+            },
             {
               path: "employees/add-employee",
               element: <AddSalesEmployee />,
-            }, 
+            },
             {
               path: "employees/edit-employee/:id",
               element: <EditSalesEmployee />,
-            }, 
+            },
             {
               path: "employees/view-employee/:id",
               element: <ViewSalesEmployee />,
@@ -178,19 +189,27 @@ function App() {
     },
   ]);
 
- return (
-  <Suspense
-    fallback={
-      <div className="h-screen w-full flex items-center justify-center">
-        <div className="text-xl text-green-400">
-          Loading App...
+  return (
+    <Suspense
+      fallback={
+        <div className="h-screen w-full flex items-center justify-center">
+          <div className="text-xl text-green-400">
+            Loading App...
+          </div>
         </div>
-      </div>
-    }
-  >
-    <RouterProvider router={router} />
-  </Suspense>
-);
+      }
+    >
+      <Toaster
+        position="top-right"
+        reverseOrder={false}
+        containerStyle={{
+          top: 85,
+        }}
+      />
+
+      <RouterProvider router={router} />
+    </Suspense>
+  );
 }
 
 export default App;
