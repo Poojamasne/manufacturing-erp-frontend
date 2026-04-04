@@ -128,16 +128,6 @@ const OrderView: React.FC = () => {
         return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(amount);
     };
 
-    // Parse amount string to number (e.g., "₹ 25.5L" -> 2550000)
-    const parseAmountToNumber = (amountStr: string): number => {
-        const match = amountStr.match(/[\d.]+/);
-        if (!match) return 0;
-        const value = parseFloat(match[0]);
-        if (amountStr.includes('L')) return value * 100000;
-        if (amountStr.includes('Cr')) return value * 10000000;
-        return value;
-    };
-
     if (!order) {
         return (
             <div className="min-h-screen bg-[#f4f7f6] p-4 sm:p-6 lg:p-8 font-sans text-gray-900">
