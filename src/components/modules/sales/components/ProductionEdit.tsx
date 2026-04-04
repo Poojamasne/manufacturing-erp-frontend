@@ -472,7 +472,7 @@ const ProductionEdit: React.FC = () => {
                                 <thead className="bg-gray-50">
                                     <tr>
                                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Material Name</th>
-                                        <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Quantity</th>
+                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Quantity</th>
                                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Unit</th>
                                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
                                     </tr>
@@ -493,7 +493,7 @@ const ProductionEdit: React.FC = () => {
                                                     type="number"
                                                     value={material.quantity}
                                                     onChange={(e) => updateMaterial(idx, 'quantity', parseFloat(e.target.value))}
-                                                    className="w-24 px-2 py-1 border border-gray-300 rounded text-sm text-right"
+                                                    className="w-24 px-2 py-1 border border-gray-300 rounded text-sm text-left"
                                                 />
                                             </td>
                                             <td className="px-4 py-3">
@@ -524,66 +524,67 @@ const ProductionEdit: React.FC = () => {
                 )}
 
                 {/* Quality Control Tab */}
-                {activeTab === 'quality' && (
-                    <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-                        <div className="p-6 border-b border-gray-100">
-                            <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-                                <CheckCircle size={20} className="text-[#005d52]" />
-                                Quality Control Checks
-                            </h2>
-                        </div>
-                        <div className="overflow-x-auto">
-                            <table className="w-full">
-                                <thead className="bg-gray-50">
-                                    <tr>
-                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Check Point</th>
-                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
-                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Inspector</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-gray-100">
-                                    {job.qualityChecks?.map((check, idx) => (
-                                        <tr key={idx} className="hover:bg-gray-50">
-                                            <td className="px-4 py-3 font-medium text-gray-900">
-                                                {check.checkPoint}
-                                            </td>
-                                            <td className="px-4 py-3">
-                                                <select
-                                                    value={check.status}
-                                                    onChange={(e) => updateQualityCheck(idx, 'status', e.target.value as any)}
-                                                    className="px-2 py-1 border border-gray-300 rounded text-sm"
-                                                >
-                                                    <option value="Pending">Pending</option>
-                                                    <option value="Passed">Passed</option>
-                                                    <option value="Failed">Failed</option>
-                                                </select>
-                                             </td>
-                                            <td className="px-4 py-3">
-                                                <input
-                                                    type="date"
-                                                    value={check.date}
-                                                    onChange={(e) => updateQualityCheck(idx, 'date', e.target.value)}
-                                                    className="px-2 py-1 border border-gray-300 rounded text-sm"
-                                                    disabled={check.status === 'Pending'}
-                                                />
-                                             </td>
-                                            <td className="px-4 py-3">
-                                                <input
-                                                    type="text"
-                                                    value={check.inspector}
-                                                    onChange={(e) => updateQualityCheck(idx, 'inspector', e.target.value)}
-                                                    className="px-2 py-1 border border-gray-300 rounded text-sm"
-                                                    disabled={check.status === 'Pending'}
-                                                />
-                                             </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                )}
+{/* Quality Control Tab */}
+{activeTab === 'quality' && (
+    <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+        <div className="p-6 border-b border-gray-100">
+            <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                <CheckCircle size={20} className="text-[#005d52]" />
+                Quality Control Checks
+            </h2>
+        </div>
+        <div className="overflow-x-auto">
+            <table className="w-full">
+                <thead className="bg-gray-50">
+                    <tr>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Check Point</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Inspector</th>
+                    </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                    {job.qualityChecks?.map((check, idx) => (
+                        <tr key={idx} className="hover:bg-gray-50">
+                            <td className="px-4 py-3 font-medium text-gray-900">
+                                {check.checkPoint}
+                            </td>
+                            <td className="px-4 py-3">
+                                <select
+                                    value={check.status}
+                                    onChange={(e) => updateQualityCheck(idx, 'status', e.target.value as any)}
+                                    className="px-2 py-1 border border-gray-300 rounded text-sm focus:ring-1 focus:ring-[#005d52] outline-none"
+                                >
+                                    <option value="Pending">Pending</option>
+                                    <option value="Passed">Passed</option>
+                                    <option value="Failed">Failed</option>
+                                </select>
+                             </td>
+                            <td className="px-4 py-3">
+                                <input
+                                    type="date"
+                                    value={check.date}
+                                    onChange={(e) => updateQualityCheck(idx, 'date', e.target.value)}
+                                    className="px-2 py-1 border border-gray-300 rounded text-sm focus:ring-1 focus:ring-[#005d52] outline-none cursor-pointer"
+                                    // Removed disabled attribute so you can add dates to pending items
+                                />
+                             </td>
+                            <td className="px-4 py-3">
+                                <input
+                                    type="text"
+                                    placeholder="Inspector Name"
+                                    value={check.inspector}
+                                    onChange={(e) => updateQualityCheck(idx, 'inspector', e.target.value)}
+                                    className="px-2 py-1 border border-gray-300 rounded text-sm focus:ring-1 focus:ring-[#005d52] outline-none"
+                                />
+                             </td>
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
+        </div>
+    </div>
+)}
 
                 {/* Notes Tab */}
                 {activeTab === 'notes' && (
