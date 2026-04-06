@@ -10,11 +10,10 @@ import {
   Eye,
   FileEdit,
   Trash2,
-  AlertCircle,
   MoreHorizontal
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { getEmployees, clearSalesErrors } from "../ModuleStateFiles/EmployeeSlice";
+import { getEmployees, clearSalesErrors, deleteEmployee } from "../ModuleStateFiles/EmployeeSlice";
 import { useAppDispatch, useAppSelector } from "../../../common/ReduxMainHooks";
 import type { RootState } from "../../../../ApplicationState/Store";
 
@@ -34,12 +33,12 @@ const SalesEmployees: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
 
-  const { employees, loading, error } = useAppSelector((state: RootState) => state.SalesEmployee);
+  const { employees, loading } = useAppSelector((state: RootState) => state.SalesEmployee);
 
   // Filter & Search States
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState<"Active" | "All">("Active");
-  
+
   // Professional Pagination States
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10); // Matches Leads Module
@@ -95,13 +94,11 @@ const SalesEmployees: React.FC = () => {
   };
 
   const handleDelete = (id: string) => {
-    if (window.confirm("Are you sure you want to delete this employee?")) {
-      console.log("Delete employee:", id);
-    }
-  };
+    dispatch(deleteEmployee(id, navigate) as any);
+  }
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] p-4 sm:p-6 lg:p-8 font-sans text-slate-900">
+    <div className="min-h-screen bg-[#f4f7f6] p-4 sm:p-6 lg:p-8 font-sans text-slate-900">
 
       {/* Header Section */}
       <div className="max-w-7xl mx-auto mb-10 flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
@@ -148,16 +145,8 @@ const SalesEmployees: React.FC = () => {
         </div>
       </div>
 
-      {/* ERROR MESSAGE */}
-      {error && (
-        <div className="max-w-7xl mx-auto mb-6 p-4 bg-rose-50 border border-rose-100 rounded-2xl flex items-center gap-3 text-rose-600 animate-in fade-in slide-in-from-top-1">
-          <AlertCircle size={20} />
-          <p className="text-sm font-bold uppercase tracking-tight">{error}</p>
-        </div>
-      )}
-
       {/* Table Container */}
-      <div className="max-w-7xl mx-auto bg-white rounded-[2.5rem] shadow-2xl shadow-slate-200/60 border border-slate-100 overflow-hidden relative">
+      <div className="max-w-7xl mx-auto bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden relative">
 
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
@@ -210,21 +199,21 @@ const SalesEmployees: React.FC = () => {
 
                   <td className="px-6 py-5 text-center">
                     <span className="text-[13px] text-slate-800 text-center whitespace-nowrap">
-                        {emp?.created_at ? new Date(emp.created_at).toLocaleDateString("en-GB", {day: '2-digit', month: 'short', year: 'numeric'}) : "N/A"}
+                      {emp?.created_at ? new Date(emp.created_at).toLocaleDateString("en-GB", { day: '2-digit', month: 'short', year: 'numeric' }) : "N/A"}
                     </span>
                   </td>
 
                   <td className="px-6 py-5">
                     <div className="flex justify-center gap-2">
-                        <button onClick={() => navigate(`/sales/employees/view-employee/${emp?.id}`)} className="outline-none p-2 hover:bg-white hover:shadow-md text-slate-400 hover:text-[#005d52] rounded-xl transition-all">
-                            <Eye size={16} />
-                        </button>
-                        <button onClick={() => navigate(`/sales/employees/edit-employee/${emp?.id}`)} className="outline-none p-2 hover:bg-white hover:shadow-md text-slate-400 hover:text-blue-600 rounded-xl transition-all">
-                            <FileEdit size={16} />
-                        </button>
-                        <button onClick={() => handleDelete(emp?.id)} className="outline-none p-2 hover:bg-white hover:shadow-md text-slate-400 hover:text-rose-600 rounded-xl transition-all">
-                            <Trash2 size={16} />
-                        </button>
+                      <button onClick={() => navigate(`/sales/employees/view-employee/${emp?.id}`)} className="outline-none p-2 hover:bg-white hover:shadow-md text-slate-400 hover:text-[#005d52] rounded-xl transition-all">
+                        <Eye size={16} />
+                      </button>
+                      <button onClick={() => navigate(`/sales/employees/edit-employee/${emp?.id}`)} className="outline-none p-2 hover:bg-white hover:shadow-md text-slate-400 hover:text-blue-600 rounded-xl transition-all">
+                        <FileEdit size={16} />
+                      </button>
+                      <button onClick={() => handleDelete(emp?.id)} className="outline-none p-2 hover:bg-white hover:shadow-md text-slate-400 hover:text-rose-600 rounded-xl transition-all">
+                        <Trash2 size={16} />
+                      </button>
                     </div>
                   </td>
                 </tr>
@@ -235,78 +224,77 @@ const SalesEmployees: React.FC = () => {
           {/* EMPTY STATE */}
           {!loading && filteredEmployees.length === 0 && (
             <div className="py-32 flex flex-col items-center justify-center text-center">
-                <div className="p-6 bg-slate-50 rounded-full mb-4">
-                    <Search className="text-slate-200" size={40} />
-                </div>
-                <h3 className="text-lg font-bold text-slate-800">No Workforce Found</h3>
-                <p className="text-slate-400 text-sm max-w-xs">We couldn't find any employees matching your criteria.</p>
+              <div className="p-6 bg-slate-50 rounded-full mb-4">
+                <Search className="text-slate-200" size={40} />
+              </div>
+              <h3 className="text-lg font-bold text-slate-800">No Workforce Found</h3>
+              <p className="text-slate-400 text-sm max-w-xs">We couldn't find any employees matching your criteria.</p>
             </div>
           )}
         </div>
 
         {/* --- CONSISTENT ERP PAGINATION FOOTER --- */}
         <footer className="p-6 bg-slate-50/50 border-t border-slate-100 flex flex-col md:flex-row justify-between items-center gap-6">
-            
-            {/* Left: Rows Per Page & Stats */}
-            <div className="flex items-center gap-6">
-                <div className="flex items-center gap-3">
-                    <span className="text-[11px] font-bold text-slate-800 uppercase tracking-widest">Display</span>
-                    <select 
-                        value={itemsPerPage}
-                        onChange={(e) => setItemsPerPage(Number(e.target.value))}
-                        className="bg-white border border-slate-200 text-sm font-bold text-[#005d52] py-1.5 px-3 rounded-xl outline-none focus:ring-2 focus:ring-teal-500/20 cursor-pointer"
-                    >
-                        {[10, 25, 50].map(val => (
-                            <option key={val} value={val}>{val} Rows</option>
-                        ))}
-                    </select>
-                </div>
-                <div className="h-4 w-px bg-slate-200 hidden sm:block" />
-                <div className="text-[11px] font-bold text-slate-800 uppercase tracking-widest">
-                    Showing <span className="text-slate-900">{paginatedData.length > 0 ? (currentPage - 1) * itemsPerPage + 1 : 0}</span> to <span className="text-slate-900">{Math.min(currentPage * itemsPerPage, filteredEmployees.length)}</span> of <span className="text-slate-900">{filteredEmployees.length}</span> Employees
-                </div>
+
+          {/* Left: Rows Per Page & Stats */}
+          <div className="flex items-center gap-6">
+            <div className="flex items-center gap-3">
+              <span className="text-[11px] font-bold text-slate-800 uppercase tracking-widest">Display</span>
+              <select
+                value={itemsPerPage}
+                onChange={(e) => setItemsPerPage(Number(e.target.value))}
+                className="bg-white border border-slate-200 text-sm font-bold text-[#005d52] py-1.5 px-3 rounded-xl outline-none focus:ring-2 focus:ring-teal-500/20 cursor-pointer"
+              >
+                {[10, 25, 50].map(val => (
+                  <option key={val} value={val}>{val} Rows</option>
+                ))}
+              </select>
+            </div>
+            <div className="h-4 w-px bg-slate-200 hidden sm:block" />
+            <div className="text-[11px] font-bold text-slate-800 uppercase tracking-widest">
+              Showing <span className="text-slate-900">{paginatedData.length > 0 ? (currentPage - 1) * itemsPerPage + 1 : 0}</span> to <span className="text-slate-900">{Math.min(currentPage * itemsPerPage, filteredEmployees.length)}</span> of <span className="text-slate-900">{filteredEmployees.length}</span> Employees
+            </div>
+          </div>
+
+          {/* Right: Smart Navigation */}
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+              disabled={currentPage === 1}
+              className="p-2.5 rounded-xl border border-slate-200 bg-white text-slate-500 hover:text-[#005d52] hover:border-teal-200 disabled:opacity-30 disabled:pointer-events-none transition-all shadow-sm"
+            >
+              <ChevronLeft size={18} strokeWidth={2.5} />
+            </button>
+
+            <div className="flex items-center gap-1.5">
+              {getPageNumbers().map((page, index) => (
+                page === "..." ? (
+                  <span key={`dots-${index}`} className="px-2 text-slate-300">
+                    <MoreHorizontal size={14} />
+                  </span>
+                ) : (
+                  <button
+                    key={page}
+                    onClick={() => setCurrentPage(page as number)}
+                    className={`min-w-10 h-10 rounded-xl text-xs font-bold transition-all duration-200 ${currentPage === page
+                        ? "bg-[#005d52] text-white shadow-lg shadow-teal-900/20 scale-105"
+                        : "bg-white text-slate-500 border border-slate-200 hover:border-slate-300 hover:text-slate-800 shadow-sm"
+                      }`}
+                  >
+                    {page}
+                  </button>
+                )
+              ))}
             </div>
 
-            {/* Right: Smart Navigation */}
-            <div className="flex items-center gap-2">
-                <button 
-                    onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-                    disabled={currentPage === 1}
-                    className="p-2.5 rounded-xl border border-slate-200 bg-white text-slate-500 hover:text-[#005d52] hover:border-teal-200 disabled:opacity-30 disabled:pointer-events-none transition-all shadow-sm"
-                >
-                    <ChevronLeft size={18} strokeWidth={2.5} />
-                </button>
-
-                <div className="flex items-center gap-1.5">
-                    {getPageNumbers().map((page, index) => (
-                        page === "..." ? (
-                            <span key={`dots-${index}`} className="px-2 text-slate-300">
-                                <MoreHorizontal size={14} />
-                            </span>
-                        ) : (
-                            <button
-                                key={page}
-                                onClick={() => setCurrentPage(page as number)}
-                                className={`min-w-10 h-10 rounded-xl text-xs font-bold transition-all duration-200 ${
-                                    currentPage === page
-                                    ? "bg-[#005d52] text-white shadow-lg shadow-teal-900/20 scale-105"
-                                    : "bg-white text-slate-500 border border-slate-200 hover:border-slate-300 hover:text-slate-800 shadow-sm"
-                                }`}
-                            >
-                                {page}
-                            </button>
-                        )
-                    ))}
-                </div>
-
-                <button 
-                    onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-                    disabled={currentPage === totalPages || totalPages === 0}
-                    className="p-2.5 rounded-xl border border-slate-200 bg-white text-slate-500 hover:text-[#005d52] hover:border-teal-200 disabled:opacity-30 disabled:pointer-events-none transition-all shadow-sm"
-                >
-                    <ChevronRight size={18} strokeWidth={2.5} />
-                </button>
-            </div>
+            <button
+              onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+              disabled={currentPage === totalPages || totalPages === 0}
+              className="p-2.5 rounded-xl border border-slate-200 bg-white text-slate-500 hover:text-[#005d52] hover:border-teal-200 disabled:opacity-30 disabled:pointer-events-none transition-all shadow-sm"
+            >
+              <ChevronRight size={18} strokeWidth={2.5} />
+            </button>
+          </div>
         </footer>
       </div>
     </div>

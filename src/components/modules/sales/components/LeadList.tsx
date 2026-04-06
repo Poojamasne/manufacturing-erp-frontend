@@ -150,9 +150,7 @@ const LeadList: React.FC = () => {
     };
 
     const handleDelete = (id: number) => {
-        if (window.confirm("Are you sure you want to delete this lead?")) {
-            dispatch(deleteLead(id));
-        }
+        dispatch(deleteLead(id));
     };
 
     // --- Dynamic Styles ---
@@ -178,7 +176,7 @@ const LeadList: React.FC = () => {
     };
 
     return (
-        <div className="min-h-screen bg-[#F8FAFC] p-4 sm:p-6 lg:p-8 text-slate-900 font-sans">
+        <div className="min-h-screen bg-[#f4f7f6] p-4 sm:p-6 lg:p-8 text-slate-900 font-sans">
             <div className="max-w-7xl mx-auto">
 
                 {/* --- Header Section --- */}
@@ -239,7 +237,7 @@ const LeadList: React.FC = () => {
                 </section>
 
                 {/* --- Main Data Container --- */}
-                <div className="bg-white rounded-[2.5rem] shadow-2xl shadow-slate-200/60 border border-slate-100 overflow-hidden">
+                <div className="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
 
                     {/* Toolbar */}
                     <div className="p-6 flex flex-col lg:flex-row justify-between items-center gap-4 border-b border-slate-50">
@@ -401,8 +399,8 @@ const LeadList: React.FC = () => {
                                             key={page}
                                             onClick={() => setCurrentPage(page as number)}
                                             className={`outline-none min-w-10 h-10 rounded-xl text-xs font-bold transition-all duration-200 ${currentPage === page
-                                                    ? "bg-[#005d52] text-white shadow-lg shadow-teal-900/20 scale-105"
-                                                    : "bg-white text-slate-500 border border-slate-200 hover:border-slate-300 hover:text-slate-800 shadow-sm"
+                                                ? "bg-[#005d52] text-white shadow-lg shadow-teal-900/20 scale-105"
+                                                : "bg-white text-slate-500 border border-slate-200 hover:border-slate-300 hover:text-slate-800 shadow-sm"
                                                 }`}
                                         >
                                             {page}

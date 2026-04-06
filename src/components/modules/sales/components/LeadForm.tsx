@@ -176,10 +176,10 @@ const LeadForm: React.FC = () => {
                 {/* Header Section */}
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
                     <div>
-                        <div className="flex items-center gap-2 text-slate-400 mb-1 text-sm font-medium">
-                            <button type="button" onClick={() => navigate("/sales/leads")} className="hover:text-[#005d52] transition-colors">Leads</button>
+                        <div className="flex items-center gap-2 text-gray-400 mb-1">
+                            <button onClick={() => navigate("/sales/leads")} className="hover:text-[#005d52] transition-colors">Leads</button>
                             <ChevronRight size={14} />
-                            <span className="text-slate-600 font-bold uppercase text-[10px] tracking-widest">New Lead Entry</span>
+                            <span className="text-gray-800 font-medium">New Lead</span>
                         </div>
                         <h1 className="text-3xl font-black text-slate-900 tracking-tight">Create Lead</h1>
                     </div>

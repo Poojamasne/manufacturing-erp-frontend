@@ -297,33 +297,28 @@ export const editLead = (id: number, payload: any, navigate: NavigateFunction) =
     }
 };
 
-// Delete LEAD
 export const deleteLead = (id: number) => async (dispatch: AppDispatch, getState: () => RootState) => {
     dispatch(request());
+
     try {
-        Swal.fire({
+        const result = await Swal.fire({
             title: "Are you sure?",
             text: "You won't be able to revert this!",
             icon: "warning",
+            iconColor: "#005d52",
             showCancelButton: true,
-            confirmButtonColor: "#3085d6",
-            cancelButtonColor: "#d33",
+            confirmButtonColor: "#005d52",
+            cancelButtonColor: "#eb0000",
             confirmButtonText: "Yes, delete it!"
-        }).then((result) => {
-            if (result.isConfirmed) Swal.fire({
-                title: "Deleted!",
-                text: "Your file has been deleted.",
-                icon: "success"
-            });
         });
 
+        if (!result.isConfirmed) return;
+
+        // Loader
         Swal.fire({
             title: "Deleting Lead...",
-            text: "Please wait while we delete the lead.",
+            text: "Please wait...",
             allowOutsideClick: false,
-            customClass: {
-                loader: 'lead-loader'
-            },
             didOpen: () => {
                 Swal.showLoading();
             }
@@ -337,9 +332,13 @@ export const deleteLead = (id: number) => async (dispatch: AppDispatch, getState
                 headers: { Authorization: `Bearer ${token}` },
             }
         );
+
         dispatch(deleteLeadSuccess(data));
-        dispatch(getLeads()); // refresh list after deletion
+        dispatch(getLeads());
+
+
         toast.success("Lead deleted successfully!");
+
         Swal.fire({
             icon: "success",
             iconColor: "#005d52",
@@ -348,13 +347,13 @@ export const deleteLead = (id: number) => async (dispatch: AppDispatch, getState
             timer: 1500,
             showConfirmButton: false,
         });
+
         Swal.close();
     } catch (error: any) {
         Swal.close();
         handleError(error, dispatch);
     }
 };
-
 
 // COMMON ERROR HANDLER
 const handleError = (error: any, dispatch: any) => {

@@ -226,7 +226,7 @@ const LeadView: React.FC = () => {
                             <section className="space-y-6">
                                 <div className="flex items-center gap-2 mb-2">
                                     <div className="p-2 bg-[#d1e9e7] text-[#005d52] rounded-lg"><MapPin size={20} /></div>
-                                    <h3 className="font-bold text-lg text-gray-800">Deployment Site</h3>
+                                    <h3 className="font-bold text-lg text-gray-800">Delivery Site</h3>
                                 </div>
                                 <div className="p-6 border border-gray-100 rounded-3xl text-sm text-gray-600 leading-relaxed min-h-35 flex items-center italic">
                                     {lead.address ? `${lead.address}, ${lead.city}, ${lead.state}` : `Details not provided. Defaulting to ${lead.city}`}
