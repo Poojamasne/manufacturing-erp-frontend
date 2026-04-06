@@ -74,7 +74,7 @@ export const getEmployeesForLead = () => async (dispatch: AppDispatch, getState:
         const token = getState().auth.token || localStorage.getItem("token");
         console.log("Token Before get Employee Request", token);
         const { data } = await axios.get(
-            `${import.meta.env.VITE_API_BASE_URL}/sales/employees?search=Sales`,
+            `${import.meta.env.VITE_API_BASE_URL}/sales/employees`,
             {
                 headers: {
                     Authorization: `Bearer ${token}`,

@@ -109,9 +109,9 @@ const Login: React.FC = () => {
           <form onSubmit={handleSubmit} className="space-y-5">
             {/* EMAIL */}
             <div>
-              <label className="text-xs text-gray-400 font-semibold uppercase">Email</label>
+              <label className="text-xs text-gray-600 font-semibold uppercase">Email</label>
               <div className="relative mt-1">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" size={16} />
                 <input
                   type="email"
                   disabled={loading}
@@ -135,10 +135,10 @@ const Login: React.FC = () => {
             {/* PASSWORD */}
             <div>
               <div className="flex justify-between">
-                <label className="text-xs text-gray-400 font-semibold uppercase">Password</label>
+                <label className="text-xs text-gray-600 font-semibold uppercase">Password</label>
               </div>
               <div className="relative mt-1">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" size={16} />
                 <input
                   type={showPassword ? "text" : "password"}
                   disabled={loading}
@@ -186,7 +186,7 @@ const Login: React.FC = () => {
             </button>
           </form>
 
-          <div className="mt-8 text-center text-[10px] text-gray-400 uppercase tracking-widest">
+          <div className="mt-8 text-center text-[10px] text-gray-500 uppercase tracking-widest">
             Zonixtec ERP System • {new Date().getFullYear()}
           </div>
         </div>

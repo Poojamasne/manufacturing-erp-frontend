@@ -1,13 +1,13 @@
 import React, { useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { 
-  Mail, Phone, Calendar, TrendingUp, BarChart3, 
-  MapPin, Settings, MoreVertical, Activity, 
-  ChevronRight, ShieldCheck, Award, Target 
+import {
+  Mail, Phone, Calendar, TrendingUp, BarChart3,
+  MapPin, Activity,
+  ChevronRight, ShieldCheck, Award, Target
 } from "lucide-react";
-import { 
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, 
-  Tooltip, ResponsiveContainer, Cell, AreaChart, Area 
+import {
+  BarChart, Bar, XAxis, YAxis, CartesianGrid,
+  Tooltip, ResponsiveContainer, Cell, AreaChart, Area
 } from "recharts";
 
 // Redux & State
@@ -38,7 +38,7 @@ const ViewSalesEmployee: React.FC = () => {
   return (
     <div className="min-h-screen bg-[#f8fafc] p-6 lg:p-10 font-sans text-slate-900">
       <div className="max-w-7xl mx-auto space-y-8">
-        
+
         {/* BREADCRUMBS & ACTIONS */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
@@ -49,14 +49,11 @@ const ViewSalesEmployee: React.FC = () => {
             </div>
             <h1 className="text-2xl font-bold text-slate-900">Profile Overview</h1>
           </div>
-          <div className="flex gap-2">
-            <button className="p-2.5 bg-white border border-slate-200 rounded-lg text-slate-500 hover:bg-slate-50 transition-all"><Settings size={18}/></button>
-            <button className="p-2.5 bg-white border border-slate-200 rounded-lg text-slate-500 hover:bg-slate-50 transition-all"><MoreVertical size={18}/></button>
-          </div>
+
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-          
+
           {/* LEFT: PROFILE CARD */}
           <div className="lg:col-span-4 space-y-6">
             <div className="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden">
@@ -75,10 +72,10 @@ const ViewSalesEmployee: React.FC = () => {
                 <p className="text-xs font-bold text-[#005d52] uppercase tracking-wider mt-1">{employee.designation}</p>
 
                 <div className="mt-8 space-y-4 text-left">
-                  <InfoRow icon={<Mail size={16}/>} label="Email Address" value={employee.email} />
-                  <InfoRow icon={<Phone size={16}/>} label="Phone Number" value={employee.phone} />
-                  <InfoRow icon={<ShieldCheck size={16}/>} label="Employee ID" value={employee.user_id} />
-                  <InfoRow icon={<MapPin size={16}/>} label="System Role" value={employee.role} className="capitalize" />
+                  <InfoRow icon={<Mail size={16} />} label="Email Address" value={employee.email} />
+                  <InfoRow icon={<Phone size={16} />} label="Phone Number" value={employee.phone} />
+                  <InfoRow icon={<ShieldCheck size={16} />} label="Employee ID" value={employee.user_id} />
+                  <InfoRow icon={<MapPin size={16} />} label="System Role" value={employee.role} className="capitalize" />
                 </div>
               </div>
             </div>
@@ -97,12 +94,12 @@ const ViewSalesEmployee: React.FC = () => {
 
           {/* RIGHT: PERFORMANCE & ANALYTICS */}
           <div className="lg:col-span-8 space-y-6">
-            
+
             {/* KPI GRID */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <StatCard label="Active Leads" value="48" icon={<Activity size={18}/>} trend="+12%" positive />
-              <StatCard label="Conversions" value="12" icon={<Target size={18}/>} trend="+2.4%" positive />
-              <StatCard label="Revenue" value="₹12.4L" icon={<BarChart3 size={18}/>} trend="Target: 15L" />
+              <StatCard label="Active Leads" value="48" icon={<Activity size={18} />} trend="+12%" positive />
+              <StatCard label="Conversions" value="12" icon={<Target size={18} />} trend="+2.4%" positive />
+              <StatCard label="Revenue" value="₹12.4L" icon={<BarChart3 size={18} />} trend="Target: 15L" />
             </div>
 
             {/* CHART */}
@@ -115,9 +112,9 @@ const ViewSalesEmployee: React.FC = () => {
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={MOCK_CHART_DATA}>
                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                    <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fontSize: 10, fill: '#94a3b8'}} dy={10} />
-                    <YAxis axisLine={false} tickLine={false} tick={{fontSize: 10, fill: '#94a3b8'}} />
-                    <Tooltip cursor={{fill: '#f8fafc'}} contentStyle={{borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)'}} />
+                    <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#94a3b8' }} dy={10} />
+                    <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#94a3b8' }} />
+                    <Tooltip cursor={{ fill: '#f8fafc' }} contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }} />
                     <Bar dataKey="sales" radius={[4, 4, 0, 0]} barSize={30}>
                       {MOCK_CHART_DATA.map((_, i) => (
                         <Cell key={i} fill={i === MOCK_CHART_DATA.length - 1 ? "#005d52" : "#d1e9e7"} />
@@ -129,9 +126,9 @@ const ViewSalesEmployee: React.FC = () => {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-               <div className="bg-white rounded-3xl border border-slate-100 p-6 shadow-sm">
+              <div className="bg-white rounded-3xl border border-slate-100 p-6 shadow-sm">
                 <h3 className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2">
-                  <Award size={14} className="text-[#005d52]"/> Competencies
+                  <Award size={14} className="text-[#005d52]" /> Competencies
                 </h3>
                 <div className="flex flex-wrap gap-2">
                   {["CRM Specialist", "Account Management", "Negotiation"].map(tag => (
@@ -142,7 +139,7 @@ const ViewSalesEmployee: React.FC = () => {
 
               <div className="bg-white rounded-3xl border border-slate-100 p-6 shadow-sm">
                 <h3 className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2 flex items-center gap-2">
-                  <TrendingUp size={14} className="text-blue-500"/> Growth Velocity
+                  <TrendingUp size={14} className="text-blue-500" /> Growth Velocity
                 </h3>
                 <div className="h-20 w-full">
                   <ResponsiveContainer width="100%" height="100%">

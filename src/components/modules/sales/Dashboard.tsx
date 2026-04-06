@@ -9,7 +9,7 @@ import {
   CartesianGrid,
   Cell,
 } from "recharts";
-import { Calendar as CalendarIcon, X, Loader2 } from "lucide-react";
+import { Calendar as CalendarIcon, X } from "lucide-react";
 import { getDashboardData } from "../sales/ModuleStateFiles/DashboardSlice"; // Adjust path
 import { useAppDispatch, useAppSelector } from "../../common/ReduxMainHooks";
 import type { RootState } from "../../../ApplicationState/Store";
@@ -49,7 +49,7 @@ const StatCard = ({ title, value, svg }: StatCardProps) => (
 export const Dashboard = () => {
   const dispatch = useAppDispatch();
   
-  const { salesByCategory, pipeline, loading } = useAppSelector((state: RootState) => state.SalesDashboard);
+  const { salesByCategory, pipeline } = useAppSelector((state: RootState) => state.SalesDashboard);
 
   const [filter, setFilter] = useState<FilterType>("Weekly");
   const [customRange, setCustomRange] = useState({ start: "", end: new Date().toISOString().split("T")[0] });
@@ -78,14 +78,14 @@ export const Dashboard = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#f4f7f6] p-4 sm:p-6 lg:p-8 font-sans text-gray-900">
+    <div className="min-h-screen bg-[#f4f7f6] p-4 sm:p-6 lg:p-8 font-sans text-gray-800">
       <div className="max-w-7xl mx-auto">
         
         {/* HEADER & TIME FILTERS */}
         <div className="mb-10 flex flex-col xl:flex-row xl:items-end justify-between gap-6">
           <div>
-            <h1 className="text-2xl font-bold text-gray-800 tracking-tight">Dashboard</h1>
-            <p className="text-sm text-gray-400 mt-1 font-normal">Full customer pipeline overview</p>
+            <h1 className="text-3xl font-extrabold text-slate-800 tracking-tight">Dashboard</h1>
+            <p className="text-sm text-gray-500 mt-1 font-medium">Full customer pipeline overview</p>
             <div className="flex items-center gap-2 mt-4">
               <div className="flex items-center gap-2 bg-[#005d52] text-white px-4 py-3 rounded-2xl text-[11px] font-bold shadow-lg shadow-teal-900/10">
                 <CalendarIcon size={13} />
@@ -93,7 +93,7 @@ export const Dashboard = () => {
                   (customRange.start ? `${customRange.start} to ${customRange.end}` : "Custom Selection") 
                   : `${filter} Overview`}
               </div>
-              {loading && <Loader2 className="animate-spin text-[#005d52]" size={20} />}
+              {/* {loading && <Loader2 className="animate-spin text-[#005d52]" size={20} />} */}
             </div>
           </div>
 
