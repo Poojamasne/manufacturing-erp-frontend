@@ -8,9 +8,9 @@ import type { RootState } from "../../../../ApplicationState/Store";
 
 // --- Updated Types based on JSON ---
 interface Product {
-    id: number;
+    id: string;
     product_name: string;
-    quantity: number;
+    quantity: string;
     total_price: string;
     variant: string | null;
     unit_price: string;
@@ -72,7 +72,7 @@ const LeadView: React.FC = () => {
     // --- Totals Calculation ---
     const totals = useMemo(() => {
         if (!lead?.products) return { qty: 0, val: 0 };
-        const qty = lead.products.reduce((acc: number, p: Product) => acc + p.quantity, 0);
+        const qty = lead.products.reduce((acc: number, p: Product) => acc + parseInt(p.quantity), 0);
         const val = lead.products.reduce((acc: number, p: Product) => acc + parseFloat(p.total_price), 0);
         return { qty, val };
     }, [lead]);
