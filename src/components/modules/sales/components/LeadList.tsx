@@ -278,11 +278,10 @@ const LeadList: React.FC = () => {
 
                     {/* Table Area */}
                     <div className="w-full overflow-x-auto lg:overflow-visible border-t border-gray-100">
-                        <table className="w-full text-left border-separate border-spacing-0 table-auto">
-
+                        <table className="w-full text-left border-collapse table-auto">
                             <thead>
-                                <tr className="bg-gray-50/50">
-                                    <th className="w-12 p-3 text-center border-b border-r border-gray-100">
+                                <tr className="bg-gray-50/80">
+                                    <th className="w-12 p-3 text-center border-b border-r border-gray-200">
                                         <input
                                             type="checkbox"
                                             className="accent-[#005d52] w-4 h-4 cursor-pointer"
@@ -291,21 +290,20 @@ const LeadList: React.FC = () => {
                                         />
                                     </th>
 
-                                    <th className="px-2 py-3 text-[13px] font-bold border-b border-r border-gray-100 whitespace-nowrap">ID</th>
-                                    <th className="px-2 py-3 text-[13px] font-bold border-b border-r border-gray-100 whitespace-nowrap">CREATED</th>
-                                    <th className="px-2 py-3 text-[13px] font-bold border-b border-r border-gray-100">Company</th>
-                                    <th className="px-2 py-3 text-[13px] font-bold border-b border-r border-gray-100">PRODUCT</th>
-                                    <th className="px-2 py-3 text-[13px] font-bold border-b border-r border-gray-100 text-center">QTY</th>
-                                    <th className="px-2 py-3 text-[13px] font-bold border-b border-r border-gray-100 text-center">Status</th>
-                                    <th className="px-2 py-3 text-[13px] font-bold border-b border-gray-100 text-center">Actions</th>
+                                    <th className="px-3 py-3 text-[13px] font-bold border-b border-r border-gray-200 whitespace-nowrap text-gray-700">ID</th>
+                                    <th className="px-3 py-3 text-[13px] font-bold border-b border-r border-gray-200 whitespace-nowrap text-gray-700">CREATED</th>
+                                    <th className="px-3 py-3 text-[13px] font-bold border-b border-r border-gray-200 text-gray-700">Company</th>
+                                    <th className="px- py-3 text-[13px] font-bold border-b border-r border-gray-200 text-gray-700">PRODUCT</th>
+                                    <th className="px- py-3 text-[13px] font-bold border-b border-r border-gray-200 text-center text-gray-700">QTY</th>
+                                    <th className="px-3 py-3 text-[13px] font-bold border-b border-r border-gray-200 text-center text-gray-700">Status</th>
+                                    <th className="px-3 py-3 text-[13px] font-bold border-b border-gray-200 text-center text-gray-700">Actions</th>
                                 </tr>
                             </thead>
 
-                            <tbody className="divide-y divide-gray-50">
+                            <tbody className="divide-y divide-gray-200">
                                 {paginatedLeads.map((lead) => (
-                                    <tr key={lead.id} className="hover:bg-[#f8faf9]/80">
-
-                                        <td className="p-3 text-center border-r border-gray-100">
+                                    <tr key={lead.id} className="hover:bg-[#f8faf9]/80 transition-colors">
+                                        <td className="p-3 text-center border-r border-gray-200">
                                             <input
                                                 type="checkbox"
                                                 className="accent-[#005d52] w-4 h-4 cursor-pointer"
@@ -320,60 +318,67 @@ const LeadList: React.FC = () => {
                                             />
                                         </td>
 
-                                        <td className="px-2 text-[13px] font-bold text-[#005d52] border-r border-gray-100 whitespace-nowrap">
+                                        <td className="px-3 py-2 text-[13px] font-bold text-[#005d52] border-r border-gray-200 whitespace-nowrap">
                                             {lead.lead_id}
                                         </td>
 
-                                        <td className="px-2 text-[13px] border-r border-gray-100 whitespace-nowrap">
+                                        <td className="px-3 py-2 text-[13px] border-r border-gray-200 whitespace-nowrap text-gray-600">
                                             {formatDate(lead.created_at)}
                                         </td>
 
-                                        <td className="px-2 text-[13px] border-r border-gray-100 truncate max-w-[160px]" title={lead.company_name}>
+                                        <td className="px-3 py-2 text-[13px] border-r border-gray-200 truncate max-w-[160px] text-gray-800" title={lead.company_name}>
                                             {lead.company_name}
                                         </td>
 
-                                        <td className="px-2 text-[13px] border-r border-gray-100 truncate max-w-[160px]">
-                                            {lead.products && lead.products.length > 0
-                                                ? lead.products.map((p, i) => (
-                                                    <div key={i}>{p.product_name}</div>
+                                        <td className="px- py-2 text-[13px] text-center border-r border-gray-200 max-w-[180px] text-gray-800">
+                                            {lead.products && lead.products.length > 0 ? (
+                                                lead.products.map((p, i) => (
+                                                    <div key={i} className="flex justify-between border-b text-center border-gray-300 last:border-0 py-1">
+                                                        <span className="truncate text-center">{i + 1}. {p.product_name}</span>
+                                                    </div>
                                                 ))
-                                                : "-"
-                                            }
+                                            ) : (
+                                                <span className="text-gray-400">-</span>
+                                            )}
                                         </td>
 
-                                        <td className="px-2 text-center border-r border-gray-100">
-                                            {lead.product_count}
+                                        <td className="py-2 text-[12px] text-center border-r border-gray-200 text-gray-800">
+                                            {lead.products && lead.products.length > 0 ? (
+                                                lead.products.map((p, i) => (
+                                                    <div key={i} className="border-b border-gray-300 last:border-0 py-1">
+                                                        {p.quantity}
+                                                    </div>
+                                                ))
+                                            ) : (
+                                                "-"
+                                            )}
                                         </td>
 
-                                        <td className="px-2 text-center border-r border-gray-100">
+                                        <td className="px-3 py-2 text-center border-r border-gray-200">
                                             <span className={getStatusStyle(lead.status)}>
                                                 {lead.status}
                                             </span>
                                         </td>
 
-                                        <td className="px-2">
+                                        <td className="px-3 py-2">
                                             <div className="flex justify-center gap-1 flex-nowrap">
                                                 <button onClick={() => navigate("/sales/leads/view-lead/" + lead.id)}
-                                                    className="p-1.5 hover:bg-teal-50 text-gray-800 hover:text-[#005d52] rounded-md transition-all">
-                                                    <Eye size={14} />
+                                                    className="p-2 hover:bg-teal-50 text-gray-500 hover:text-[#005d52] rounded-lg transition-all">
+                                                    <Eye size={15} />
                                                 </button>
                                                 <button onClick={() => navigate("/sales/leads/edit-lead/" + lead.id)}
-                                                    className="p-1.5 hover:bg-teal-50 text-gray-800 hover:text-blue-600 rounded-md transition-all">
-                                                    <FileEdit size={14} />
+                                                    className="p-2 hover:bg-teal-50 text-gray-500 hover:text-blue-600 rounded-lg transition-all">
+                                                    <FileEdit size={15} />
                                                 </button>
-                                                <button className="p-1.5 hover:bg-teal-50 text-gray-800 hover:text-red-500 rounded-md transition-all"
-                                                >
-                                                    <Trash2 size={14} />
+                                                <button className="p-2 hover:bg-red-50 text-gray-500 hover:text-red-500 rounded-lg transition-all">
+                                                    <Trash2 size={15} />
                                                 </button>
                                             </div>
                                         </td>
-
                                     </tr>
                                 ))}
                             </tbody>
-
                         </table>
-
                         {!loading && filteredLeads.length === 0 && (
                             <div className="py-20 text-center">
                                 <div className="inline-flex p-5 bg-gray-50 rounded-full mb-3">
