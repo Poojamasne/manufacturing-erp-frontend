@@ -42,7 +42,7 @@ const SalesEmployees: React.FC = () => {
   // Professional Pagination States
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10); // Matches Leads Module
-
+  setItemsPerPage(10)
   useEffect(() => {
     dispatch(getEmployees());
     return () => {
@@ -238,7 +238,7 @@ const SalesEmployees: React.FC = () => {
 
           {/* Left: Rows Per Page & Stats */}
           <div className="flex items-center gap-6">
-           
+
             <div className="text-[11px] font-bold text-slate-800 uppercase tracking-widest">
               Showing <span className="text-slate-900">{paginatedData.length > 0 ? (currentPage - 1) * itemsPerPage + 1 : 0}</span> to <span className="text-slate-900">{Math.min(currentPage * itemsPerPage, filteredEmployees.length)}</span> of <span className="text-slate-900">{filteredEmployees.length}</span> Employees
             </div>
@@ -265,8 +265,8 @@ const SalesEmployees: React.FC = () => {
                     key={page}
                     onClick={() => setCurrentPage(page as number)}
                     className={`min-w-10 h-10 rounded-xl text-xs font-bold transition-all duration-200 ${currentPage === page
-                        ? "bg-[#005d52] text-white shadow-lg shadow-teal-900/20 scale-105"
-                        : "bg-white text-slate-500 border border-slate-200 hover:border-slate-300 hover:text-slate-800 shadow-sm"
+                      ? "bg-[#005d52] text-white shadow-lg shadow-teal-900/20 scale-105"
+                      : "bg-white text-slate-500 border border-slate-200 hover:border-slate-300 hover:text-slate-800 shadow-sm"
                       }`}
                   >
                     {page}

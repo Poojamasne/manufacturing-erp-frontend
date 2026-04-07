@@ -25,7 +25,6 @@ type FilterType = "Weekly" | "Monthly" | "Quarterly" | "Yearly" | "Custom";
 const COLORS = ["#005d52", "#1a7a6f", "#4fb29b", "#7bc7b5", "#f08552", "#b0d9d9", "#cbd5e1"];
 
 // Keeping mock stats for now as requested
-const MOCK_STATS = { leads: 156, won: 42, revenue: "2.4M", rate: "18%" };
 
 const StatCard = ({ title, value, svg }: StatCardProps) => (
   <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm transition-all hover:shadow-md">

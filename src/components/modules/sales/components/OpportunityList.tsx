@@ -55,7 +55,7 @@ const OpportunityList: React.FC = () => {
     // Professional Pagination States
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(10);
-
+    setItemsPerPage(10)
     // UI States
     const [openDropdown, setOpenDropdown] = useState<string | null>(null);
     const [isCalendarOpen, setIsCalendarOpen] = useState(false);
@@ -304,7 +304,7 @@ const OpportunityList: React.FC = () => {
                     {/* --- Professional Pagination Footer --- */}
                     <footer className="p-6 bg-slate-50/50 border-t border-slate-100 flex flex-col md:flex-row justify-between items-center gap-6">
                         <div className="flex items-center gap-6">
-                            
+
                             <div className="text-[11px] font-bold text-slate-800 uppercase tracking-widest">
                                 Showing <span className="text-slate-800">{paginatedData.length > 0 ? (currentPage - 1) * itemsPerPage + 1 : 0}</span> to <span className="text-slate-900">{Math.min(currentPage * itemsPerPage, filteredOps.length)}</span> of <span className="text-slate-900">{filteredOps.length}</span> Opportunities
                             </div>

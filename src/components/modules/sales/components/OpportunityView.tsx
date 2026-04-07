@@ -230,7 +230,7 @@ const OpportunityView: React.FC = () => {
                                     <MapPin size={16} className="text-[#005d52]" />
                                     <h3 className="font-black text-slate-800 uppercase tracking-widest text-xs">Business Location</h3>
                                 </div>
-                                <div className="p-8 bg-slate-50/50 rounded-[2rem] text-xs text-slate-500 font-medium leading-relaxed italic border border-slate-100 min-h-[100px] flex items-center">
+                                <div className="p-8 bg-slate-50/50 rounded-4xl text-xs text-slate-500 font-medium leading-relaxed italic border border-slate-100 min-h-25 flex items-center">
                                     Address details are currently linked to Lead Reference #{opportunity?.lead_id}. Primary region information pending from account manager.
                                 </div>
                             </section>

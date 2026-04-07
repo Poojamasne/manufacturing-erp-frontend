@@ -60,7 +60,7 @@ const LeadList: React.FC = () => {
     // Professional Pagination States
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(10);
-
+    setItemsPerPage(10); // Reset to 10 on every render to prevent stale state issues with pagination when filters change
     // UI States
     const [openDropdown, setOpenDropdown] = useState<string | null>(null);
     const [isCalendarOpen, setIsCalendarOpen] = useState(false);
@@ -363,7 +363,7 @@ const LeadList: React.FC = () => {
 
                         {/* Left: Rows Per Page */}
                         <div className="flex items-center gap-6">
-                           
+
                             <div className="text-[11px] text-slate-800 font-bold uppercase tracking-widest">
                                 Showing <span className="text-slate-800">{paginatedLeads.length > 0 ? (currentPage - 1) * itemsPerPage + 1 : 0}</span> to <span className="text-slate-900">{Math.min(currentPage * itemsPerPage, filteredLeads.length)}</span> of <span className="text-slate-900">{filteredLeads.length}</span> Results
                             </div>
