@@ -210,7 +210,7 @@ const LeadList: React.FC = () => {
                             onClick={() => setIsCalendarOpen(!isCalendarOpen)}
                             className={`outline-none px-5 py-3 text-xs font-bold rounded-2xl transition-all flex items-center gap-2 ${activeTab === "Custom" ? "bg-[#005d52] text-white shadow-md" : " text-slate-400 hover:text-slate-600 hover:bg-slate-50"}`}
                         >
-                            <CalendarIcon size={14} /> Custom Range
+                            <CalendarIcon size={14} /> Custom
                         </button>
                     </div>
 
@@ -313,7 +313,7 @@ const LeadList: React.FC = () => {
                                         <td className="p-5 text-center">
                                             <input type="checkbox" className="accent-[#005d52] w-4 h-4 cursor-pointer" checked={selectedIds.includes(lead.id)} onChange={() => setSelectedIds(prev => prev.includes(lead.id) ? prev.filter(i => i !== lead.id) : [...prev, lead.id])} />
                                         </td>
-                                        <td className="px-4 py-4 text-[13px] font-bold text-[#005d52] text-center">{lead.lead_id}</td>
+                                        <td className="px-4 py-4 text-[13px] text-slate-800 text-center">{lead.lead_id}</td>
                                         <td className="px-4 py-4 text-[13px] text-slate-800 whitespace-nowrap text-center">
                                             {new Date(lead.created_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
                                         </td>

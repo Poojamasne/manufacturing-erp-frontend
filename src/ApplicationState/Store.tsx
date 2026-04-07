@@ -4,6 +4,7 @@ import salesEmployeeReducer from "../components/modules/sales/ModuleStateFiles/E
 import salesLeadReducer from "../components/modules/sales/ModuleStateFiles/LeadSlice";
 import dashboardReducer from "../components/modules/sales/ModuleStateFiles/DashboardSlice";
 import SalesProductReducer from "../components/modules/sales/ModuleStateFiles/ProductSlice";
+import OpportunitiesReducer from "../components/modules/sales/ModuleStateFiles/OpportunitySlice";
 const store = configureStore({
     reducer: {
         // global Login reducer
@@ -13,6 +14,7 @@ const store = configureStore({
         SalesLeads: salesLeadReducer,
         SalesDashboard: dashboardReducer,
         SalesProduct: SalesProductReducer,
+        SalesOpportunity: OpportunitiesReducer,
     },
 });
 

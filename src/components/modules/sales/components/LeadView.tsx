@@ -1,5 +1,5 @@
 import React, { useMemo, useEffect } from 'react';
-import { ChevronRight, Calendar, Building2, Package, MapPin, Edit3, Download, Loader2 } from 'lucide-react';
+import { ChevronRight, Calendar, Building2, Package, MapPin, Edit3, Download, Loader2, IndianRupee } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 // 1. Redux Imports
 import { useAppDispatch, useAppSelector } from "../../../common/ReduxMainHooks";
@@ -106,9 +106,11 @@ const LeadView: React.FC = () => {
                         <h1 className="text-2xl font-bold text-gray-800">Lead Intelligence Detail</h1>
                     </div>
                     <div className="flex gap-3">
-                        <button className="flex items-center gap-2 bg-white text-gray-600 px-5 py-2.5 rounded-full font-bold text-sm border border-gray-200 shadow-sm hover:bg-gray-50 transition-all">
-                            <Download size={18} /> Export
-                        </button>
+                        {lead.status === "Won" && (
+                            <button className="flex items-center gap-2 bg-white text-gray-600 px-5 py-2.5 rounded-full font-bold text-sm border border-gray-200 shadow-sm hover:bg-gray-50 transition-all">
+                                <IndianRupee size={18} /> Create Opportunity
+                            </button>
+                        )}
                         <button
                             onClick={() => navigate(`/sales/leads/edit-lead/${lead.id}`)}
                             className="flex items-center gap-2 bg-[#005d52] text-white px-6 py-2.5 rounded-full font-bold text-sm shadow-lg shadow-teal-900/20 hover:bg-[#004a41] transition-all">

@@ -1,7 +1,7 @@
 ﻿import React, { useState, useMemo, useEffect } from "react";
-import { 
-    ChevronRight, Building2, Package, FileText, Plus, 
-    ChevronDown, Trash2, Save, MapPin, AlertCircle 
+import {
+    ChevronRight, Building2, Package, FileText, Plus,
+    ChevronDown, Trash2, Save, MapPin, AlertCircle
 } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 
@@ -50,6 +50,7 @@ interface LeadFormData {
     gst_number: string;
     lead_source: string;
     priority: string;
+    status: string;
     expected_close_date: string;
     followup_date: string;
     notes: string;
@@ -64,7 +65,7 @@ const EditLead: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
-    
+
     // Select data from Redux
     const { products } = useAppSelector((state: RootState) => state.SalesProduct) as { products: Product[] };
     const { employees } = useAppSelector((state: RootState) => state.SalesEmployee) as { employees: Employee[] | null };
@@ -74,7 +75,7 @@ const EditLead: React.FC = () => {
         company_name: "", contact_person: "", phone: "", email: "",
         address: "", city: "", state: "", gst_number: "",
         lead_source: "", priority: "Medium", expected_close_date: "",
-        followup_date: "", notes: "", assigned_to: "",
+        followup_date: "", notes: "", assigned_to: "", status: "New",
     });
 
     const [productRows, setProductRows] = useState<ProductRow[]>([]);
@@ -109,6 +110,7 @@ const EditLead: React.FC = () => {
                 gst_number: lead.gst_number || "",
                 lead_source: lead.lead_source || "",
                 priority: lead.priority || "Medium",
+                status: lead.status || "New",
                 expected_close_date: formatDate(lead.expected_close_date),
                 followup_date: formatDate(lead.followup_date),
                 notes: lead.notes || "",
@@ -143,7 +145,7 @@ const EditLead: React.FC = () => {
         if (!formData.contact_person.trim()) newErrors.contact_person = "Required";
         if (!/^\d{10}$/.test(formData.phone)) newErrors.phone = "Invalid Phone";
         if (!formData.assigned_to) newErrors.assigned_to = "Required";
-        
+
         productRows.forEach((row) => {
             if (!row.product_id) newErrors[`prod_${row.id}`] = "Required";
             if (!row.variant_id) newErrors[`var_${row.id}`] = "Required";
@@ -155,14 +157,14 @@ const EditLead: React.FC = () => {
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
-        setFormData(prev => ({ 
-            ...prev, 
-            [name]: name === "assigned_to" ? (value === "" ? "" : Number(value)) : value 
+        setFormData(prev => ({
+            ...prev,
+            [name]: name === "assigned_to" ? (value === "" ? "" : Number(value)) : value
         }));
     };
 
     const handleProductSelect = (id: number, pId: string) => {
-        setProductRows(prev => prev.map(row => 
+        setProductRows(prev => prev.map(row =>
             row.id === id ? { ...row, product_id: pId, variant_id: "", unit_price: 0 } : row
         ));
     };
@@ -172,7 +174,7 @@ const EditLead: React.FC = () => {
         const variantData = productData?.variants.find(v => v.variant_id === Number(vId));
         const price = variantData ? Number(variantData.unit_price) : 0;
 
-        setProductRows(prev => prev.map(row => 
+        setProductRows(prev => prev.map(row =>
             row.id === id ? { ...row, variant_id: vId, unit_price: price } : row
         ));
     };
@@ -202,7 +204,7 @@ const EditLead: React.FC = () => {
     return (
         <div className="min-h-screen bg-[#f8fafc] p-4 sm:p-6 lg:p-8 font-sans text-slate-900">
             <div className="max-w-6xl mx-auto">
-                
+
                 {/* Header */}
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
                     <div>
@@ -224,46 +226,46 @@ const EditLead: React.FC = () => {
                 <div className="space-y-6">
                     {/* Section 1: Company Info */}
                     <div className="bg-white rounded-4xl p-6 sm:p-8 border border-slate-100 shadow-sm">
-                        <SectionTitle icon={<Building2 size={20}/>} title="Customer Information" />
+                        <SectionTitle icon={<Building2 size={20} />} title="Customer Information" />
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                             <FormInput label="Company Name" name="company_name" value={formData.company_name} onChange={handleInputChange} required error={errors.company_name} />
                             <FormInput label="Contact Person" name="contact_person" value={formData.contact_person} onChange={handleInputChange} required error={errors.contact_person} />
                             <FormInput label="Phone Number" name="phone" value={formData.phone} onChange={handleInputChange} required error={errors.phone} />
                             <FormInput label="Email Address" name="email" value={formData.email} onChange={handleInputChange} error={errors.email} />
                             <FormInput label="GST Number" name="gst_number" value={formData.gst_number} onChange={handleInputChange} />
-                            <FormSelect 
-                                label="Lead Source" name="lead_source" value={formData.lead_source} onChange={handleInputChange} 
-                                options={["Website", "Trade Show", "Referral", "Cold Call", "Existing Client"].map(o => ({l: o, v: o}))} 
+                            <FormSelect
+                                label="Lead Source" name="lead_source" value={formData.lead_source} onChange={handleInputChange}
+                                options={["Website", "Trade Show", "Referral", "Cold Call", "Existing Client"].map(o => ({ l: o, v: o }))}
                             />
                         </div>
                     </div>
 
                     {/* Section 2: Products Table */}
                     <div className="bg-white rounded-4xl p-6 sm:p-8 border border-slate-100 shadow-sm">
-                        <SectionTitle icon={<Package size={20}/>} title="Product Requirement" />
+                        <SectionTitle icon={<Package size={20} />} title="Product Requirement" />
                         <div className="space-y-4">
                             {productRows.map((row) => {
                                 const selectedProd = products.find(p => p.product_id === Number(row.product_id));
                                 return (
                                     <div key={row.id} className={`grid grid-cols-1 md:grid-cols-12 gap-4 p-5 rounded-2xl border items-end bg-slate-50/50 border-slate-100`}>
                                         <div className="md:col-span-4">
-                                            <FormSelect 
+                                            <FormSelect
                                                 label="Product" value={row.product_id} required
                                                 error={errors[`prod_${row.id}`]}
-                                                onChange={(e:any) => handleProductSelect(row.id, e.target.value)}
+                                                onChange={(e: any) => handleProductSelect(row.id, e.target.value)}
                                                 options={products.map(p => ({ l: p.product_name, v: String(p.product_id) }))}
                                             />
                                         </div>
                                         <div className="md:col-span-3">
-                                            <FormSelect 
+                                            <FormSelect
                                                 label="Variant" value={row.variant_id} required
                                                 disabled={!row.product_id} error={errors[`var_${row.id}`]}
-                                                onChange={(e:any) => handleVariantSelect(row.id, e.target.value, row.product_id)}
+                                                onChange={(e: any) => handleVariantSelect(row.id, e.target.value, row.product_id)}
                                                 options={selectedProd?.variants.map(v => ({ l: v.variant_name, v: String(v.variant_id) })) || []}
                                             />
                                         </div>
                                         <div className="md:col-span-2">
-                                            <FormInput label="Qty" type="number" value={row.quantity} required onChange={(e:any) => setProductRows(prev => prev.map(r => r.id === row.id ? {...r, quantity: Number(e.target.value)} : r))} />
+                                            <FormInput label="Qty" type="number" value={row.quantity} required onChange={(e: any) => setProductRows(prev => prev.map(r => r.id === row.id ? { ...r, quantity: Number(e.target.value) } : r))} />
                                         </div>
                                         <div className="md:col-span-2">
                                             <div className="flex flex-col gap-1.5 px-1">
@@ -297,13 +299,14 @@ const EditLead: React.FC = () => {
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         {/* Section 3: Assignment */}
                         <div className="bg-white rounded-4xl p-6 sm:p-8 border border-slate-100 shadow-sm">
-                            <SectionTitle icon={<FileText size={20}/>} title="Logistics & Ownership" />
+                            <SectionTitle icon={<FileText size={20} />} title="Logistics & Ownership" />
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                                <FormSelect 
+                                <FormSelect
                                     label="Assign Employee" name="assigned_to" value={formData.assigned_to} onChange={handleInputChange} required error={errors.assigned_to}
-                                    options={employees?.map(emp => ({ l: `${emp.name} (${emp.designation})`, v: emp.id })) || []} 
+                                    options={employees?.map(emp => ({ l: `${emp.name} (${emp.designation})`, v: emp.id })) || []}
                                 />
-                                <FormSelect label="Priority" name="priority" value={formData.priority} onChange={handleInputChange} options={[{l: "High", v: "High"}, {l: "Medium", v: "Medium"}, {l: "Low", v: "Low"}]} />
+                                <FormSelect label="Status" name="status" value={formData?.status} onChange={handleInputChange} options={[{ l: "New", v: "New" }, { l: "Contacted", v: "Contacted" }, { l: "Not Contacted", v: "Not Contacted" }, { l: "Won", v: "Won" },  { l: "Qualified", v: "Qualified" }, { l: "Quotation", v: "Quotation" }, { l: "Negotiation", v: "Negotiation" },{l: "Lost", v: "Lost"}]} />
+                                <FormSelect label="Priority" name="priority" value={formData.priority} onChange={handleInputChange} options={[{ l: "High", v: "High" }, { l: "Medium", v: "Medium" }, { l: "Low", v: "Low" }]} />
                                 <FormInput label="Follow-up Date" name="followup_date" type="date" value={formData.followup_date} onChange={handleInputChange} />
                                 <FormInput label="Closing Date (Est)" name="expected_close_date" type="date" value={formData.expected_close_date} onChange={handleInputChange} />
                             </div>
@@ -311,12 +314,12 @@ const EditLead: React.FC = () => {
 
                         {/* Section 4: Location */}
                         <div className="bg-white rounded-4xl p-6 sm:p-8 border border-slate-100 shadow-sm">
-                            <SectionTitle icon={<MapPin size={20}/>} title="Location Details" />
+                            <SectionTitle icon={<MapPin size={20} />} title="Location Details" />
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-5">
                                 <FormInput label="City" name="city" value={formData.city} onChange={handleInputChange} />
                                 <FormInput label="State" name="state" value={formData.state} onChange={handleInputChange} />
                             </div>
-                            <textarea name="address" value={formData.address} onChange={handleInputChange} rows={4} className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 text-sm focus:border-[#005d52] outline-none transition-all resize-none font-bold" placeholder="Full Address..."/>
+                            <textarea name="address" value={formData.address} onChange={handleInputChange} rows={4} className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 text-sm focus:border-[#005d52] outline-none transition-all resize-none font-bold" placeholder="Full Address..." />
                         </div>
                     </div>
                 </div>
@@ -338,8 +341,8 @@ const FormInput: React.FC<any> = ({ label, error, required, ...props }) => (
         <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">{label} {required && <span className="text-red-500">*</span>}</label>
         <div className="relative group">
             <input {...props}
-            {...("type" in props && props.type === "number" ? { min: 1 } : {})}
-            className={`w-full bg-slate-50 border ${error ? 'border-red-300 ring-4 ring-red-50' : 'border-slate-200'} rounded-xl px-4 py-3 text-sm focus:border-[#005d52] outline-none transition-all font-bold placeholder:font-normal`} />
+                {...("type" in props && props.type === "number" ? { min: 1 } : {})}
+                className={`w-full bg-slate-50 border ${error ? 'border-red-300 ring-4 ring-red-50' : 'border-slate-200'} rounded-xl px-4 py-3 text-sm focus:border-[#005d52] outline-none transition-all font-bold placeholder:font-normal`} />
             {error && <AlertCircle className="absolute right-3 top-1/2 -translate-y-1/2 text-red-400 animate-pulse" size={16} />}
         </div>
         {error && <p className="text-[10px] text-red-500 font-bold uppercase px-1">{error}</p>}
