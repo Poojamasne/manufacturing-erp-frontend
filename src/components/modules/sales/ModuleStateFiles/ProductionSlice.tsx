@@ -3,8 +3,27 @@ import axios from "axios";
 import type { AppDispatch, RootState } from "../../../../ApplicationState/Store";
 import Swal from "sweetalert2";
 
+// Define the ProductionJob interface
+interface ProductionJob {
+    id: number;
+    job_id: string;
+    product_name: string;
+    status: string;
+    order_id: string;
+    quantity: number;
+    stage: string;
+    assigned_to: string;
+    created_at: string;
+    updated_at: string;
+    started_at: string | null;
+    completed_at: string | null;
+    customer_name: string;
+    assigned_to_name: string;
+    notes: string;
+}
+
 const initialState = {
-    productions: [],
+    productions: [] as ProductionJob[],
     production: {
         "id": "",
         "job_id": "",
@@ -23,7 +42,7 @@ const initialState = {
         "notes": ""
     },
     loading: false,
-    error: null,
+    error: null as string | null,
     pagination: {
         page: 1,
         limit: 10,
@@ -58,7 +77,7 @@ const SalesProduction = createSlice({
             state.loading = false;
             const updatedData = action.payload?.data;
             if (updatedData) {
-                const index = state.productions.findIndex((p: any) => p.id === updatedData.id);
+                const index = state.productions.findIndex((p: ProductionJob) => p.id === updatedData.id);
                 if (index !== -1) {
                     state.productions[index] = updatedData;
                 }
@@ -70,7 +89,7 @@ const SalesProduction = createSlice({
         deleteSalesProductionSuccess: (state, action) => {
             state.loading = false;
             const deletedId = action.payload;
-            state.productions = state.productions.filter((p: any) => p.id !== deletedId);
+            state.productions = state.productions.filter((p: ProductionJob) => p.id !== deletedId);
             if (state.production?.id === deletedId) {
                 state.production = initialState.production;
             }
@@ -102,10 +121,9 @@ export const {
 export default SalesProduction.reducer;
 
 // GET production jobs with filters and pagination
-// In getProductions thunk, add stage parameter
 export const getProductions = (params?: { 
     status?: string; 
-    stage?: string;     // Add this line
+    stage?: string;
     search?: string; 
     page?: number; 
     limit?: number;
@@ -120,7 +138,7 @@ export const getProductions = (params?: {
         
         const queryParams = new URLSearchParams();
         if (params?.status && params.status !== 'All') queryParams.append('status', params.status);
-        if (params?.stage && params.stage !== 'All') queryParams.append('stage', params.stage);  // Add this line
+        if (params?.stage && params.stage !== 'All') queryParams.append('stage', params.stage);
         if (params?.search) queryParams.append('search', params.search);
         if (params?.page) queryParams.append('page', params.page.toString());
         if (params?.limit) queryParams.append('limit', params.limit.toString());

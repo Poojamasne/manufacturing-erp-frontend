@@ -73,13 +73,6 @@ const ProductionEdit: React.FC = () => {
     }
   }, [production]);
 
-  const statuses: ProdStatus[] = [
-    "Pending",
-    "In Progress",
-    "On Hold",
-    "Completed",
-    "Delayed",
-  ];
   const stages: Stage[] = [
     "Raw Materials",
     "Cutting",
@@ -90,6 +83,8 @@ const ProductionEdit: React.FC = () => {
 
   const getStatusColor = (status: string) => {
     switch (status) {
+      case "Pending":
+        return "bg-gray-100 text-gray-700 border-gray-200";
       case "In Progress":
         return "bg-blue-100 text-blue-700 border-blue-200";
       case "On Hold":
@@ -125,9 +120,13 @@ const ProductionEdit: React.FC = () => {
         notes: formData.notes || null,
       };
 
-      await dispatch(updateProduction(id!, updateData));
+      await dispatch(updateProduction(id!, updateData)).unwrap();
       setShowSuccess(true);
       setTimeout(() => setShowSuccess(false), 3000);
+      // Refresh the page after successful update
+      setTimeout(() => {
+        navigate("/sales/production");
+      }, 2000);
     } catch (error) {
       console.error("Save failed:", error);
     } finally {
@@ -136,7 +135,7 @@ const ProductionEdit: React.FC = () => {
   };
 
   const updateFormData = (field: string, value: any) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
+    setFormData((prev: any) => ({ ...prev, [field]: value }));
     if (errors[field]) {
       const { [field]: _, ...rest } = errors;
       setErrors(rest);
