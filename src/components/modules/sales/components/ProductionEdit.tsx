@@ -125,7 +125,7 @@ const ProductionEdit: React.FC = () => {
         notes: formData.notes || null,
       };
 
-      await dispatch(updateProduction(id!, updateData)).unwrap();
+      await dispatch(updateProduction(id!, updateData));
       setShowSuccess(true);
       setTimeout(() => setShowSuccess(false), 3000);
     } catch (error) {
