@@ -355,39 +355,103 @@ export const deleteLead = (id: number) => async (dispatch: AppDispatch, getState
     }
 };
 
-// COMMON ERROR HANDLER
+// COMMON ERROR HANDLER - IMPROVED VERSION WITH USER-FRIENDLY MESSAGES
 const handleError = (error: any, dispatch: any) => {
     const status = error.response?.status;
-    const message =
-        error.response?.data?.message || "Something went wrong";
+    let message = error.response?.data?.message || "Something went wrong";
+    
+    // ✅ Check for variant-related errors and make them user-friendly
+    if (message.includes("Variant with ID")) {
+        // Extract variant name from message if possible
+        const variantMatch = message.match(/Variant with ID (.+?) not found/);
+        const variantName = variantMatch ? variantMatch[1] : "selected";
+        message = `The variant "${variantName}" is no longer available in the system.\n\nPlease remove this product row and re-add it with a valid variant selection.`;
+    }
+    
+    // ✅ Check for product-related errors
+    else if (message.includes("Product with ID")) {
+        const productMatch = message.match(/Product with ID (.+?) not found/);
+        const productName = productMatch ? productMatch[1] : "selected";
+        message = `The product "${productName}" is no longer available in the system.\n\nPlease remove this product row and select a valid product.`;
+    }
+    
+    // ✅ Check for duplicate entry errors
+    else if (message.includes("Duplicate entry")) {
+        message = "A lead with this information already exists. Please check for duplicates.";
+    }
+    
+    // ✅ Check for validation errors
+    else if (message.includes("validation failed")) {
+        message = "Please check all required fields are filled correctly.";
+    }
 
     switch (status) {
         case 400:
-            Swal.fire("Error", message || "Invalid request", "error");
+            Swal.fire({
+                title: "Validation Error",
+                html: message.replace(/\n/g, '<br/>'),
+                icon: "error",
+                confirmButtonColor: "#005d52",
+                confirmButtonText: "OK, I'll fix it"
+            });
             break;
 
         case 401:
-            Swal.fire("Error", "Unauthorized - Login again", "error");
+            Swal.fire({
+                title: "Session Expired",
+                text: "Your session has expired. Please login again to continue.",
+                icon: "error",
+                confirmButtonColor: "#005d52",
+                confirmButtonText: "Login Again"
+            }).then(() => {
+                // Optional: Redirect to login page
+                window.location.href = "/";
+            });
             break;
 
         case 403:
-            Swal.fire("Error", "Access denied", "error");
+            Swal.fire({
+                title: "Access Denied",
+                text: "You don't have permission to perform this action.",
+                icon: "error",
+                confirmButtonColor: "#005d52"
+            });
             break;
 
         case 404:
-            Swal.fire("Error", "Data not found", "error");
+            Swal.fire({
+                title: "Not Found",
+                text: message,
+                icon: "error",
+                confirmButtonColor: "#005d52"
+            });
             break;
 
         case 409:
-            Swal.fire("Error", message || "Conflict", "error");
+            Swal.fire({
+                title: "Conflict Error",
+                text: message,
+                icon: "error",
+                confirmButtonColor: "#005d52"
+            });
             break;
 
         case 500:
-            Swal.fire("Error", "Server error", "error");
+            Swal.fire({
+                title: "Server Error",
+                text: "Something went wrong on our server. Please try again later.",
+                icon: "error",
+                confirmButtonColor: "#005d52"
+            });
             break;
 
         default:
-            Swal.fire("Error", message, "error");
+            Swal.fire({
+                title: "Error",
+                html: message.replace(/\n/g, '<br/>'),
+                icon: "error",
+                confirmButtonColor: "#005d52"
+            });
     }
 
     dispatch(failure(message));

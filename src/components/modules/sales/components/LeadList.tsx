@@ -59,7 +59,7 @@ const LeadList: React.FC = () => {
 
     // Professional Pagination States
     const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 10;
+    const itemsPerPage = 5;
 
     // UI States
     const [openDropdown, setOpenDropdown] = useState<string | null>(null);
@@ -85,15 +85,15 @@ const LeadList: React.FC = () => {
     // Reset page to 1 when filters change
     useEffect(() => {
         setCurrentPage(1);
-    }, [searchQuery, priorityFilter, statusFilter, activeTab, itemsPerPage]);
+    }, [searchQuery, priorityFilter, statusFilter, activeTab]);
 
     // --- Filtering Logic ---
     const filteredLeads = useMemo(() => {
-        if (!leads) return [];
+        if (!leads || leads.length === 0) return [];
         return leads.filter((lead) => {
             const matchesSearch =
-                lead.company_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                lead.lead_id.toLowerCase().includes(searchQuery.toLowerCase());
+                lead.company_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                lead.lead_id?.toLowerCase().includes(searchQuery.toLowerCase());
 
             const matchesPriority = priorityFilter === "All" || lead.priority === priorityFilter;
             const matchesStatus = statusFilter === "All" || lead.status === statusFilter;
@@ -124,7 +124,9 @@ const LeadList: React.FC = () => {
 
     // --- Pagination Helpers ---
     const totalPages = Math.ceil(filteredLeads.length / itemsPerPage);
-    const paginatedLeads = filteredLeads.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const paginatedLeads = filteredLeads.slice(startIndex, endIndex);
 
     const getPageNumbers = () => {
         const pages = [];
@@ -145,12 +147,40 @@ const LeadList: React.FC = () => {
         return pages;
     };
 
+    const goToPage = (page: number) => {
+        if (page >= 1 && page <= totalPages) {
+            setCurrentPage(page);
+        }
+    };
+
+    const handlePrevPage = () => {
+        if (currentPage > 1) {
+            setCurrentPage(currentPage - 1);
+        }
+    };
+
+    const handleNextPage = () => {
+        if (currentPage < totalPages) {
+            setCurrentPage(currentPage + 1);
+        }
+    };
+
     const toggleSelectAll = () => {
-        setSelectedIds(selectedIds.length === paginatedLeads.length ? [] : paginatedLeads.map(l => l.id));
+        if (selectedIds.length === paginatedLeads.length && paginatedLeads.length > 0) {
+            setSelectedIds([]);
+        } else {
+            setSelectedIds(paginatedLeads.map(l => l.id));
+        }
     };
 
     const handleDelete = (id: number) => {
         dispatch(deleteLead(id));
+    };
+
+    const handleBulkDelete = () => {
+        if (selectedIds.length === 0) return;
+        selectedIds.forEach(id => handleDelete(id));
+        setSelectedIds([]);
     };
 
     // --- Dynamic Styles ---
@@ -200,7 +230,10 @@ const LeadList: React.FC = () => {
                         {(["Weekly", "Monthly", "Quarterly", "Yearly", "All Time"] as TimeTab[]).map((tab) => (
                             <button
                                 key={tab}
-                                onClick={() => setActiveTab(tab)}
+                                onClick={() => {
+                                    setActiveTab(tab);
+                                    setCurrentPage(1);
+                                }}
                                 className={`outline-none px-5 py-2 text-xs font-bold rounded-xl transition-all ${activeTab === tab ? "bg-[#005d52] text-white shadow-md" : "text-slate-400 hover:text-slate-600 hover:bg-slate-50"}`}
                             >
                                 {tab}
@@ -213,7 +246,6 @@ const LeadList: React.FC = () => {
                             <CalendarIcon size={14} /> Custom
                         </button>
                     </div>
-
 
                     {isCalendarOpen && (
                         <div ref={calendarRef} className="absolute top-full mt-3 left-0 md:left-auto md:right-100 z-50 bg-white p-6 rounded-3xl shadow-2xl border border-slate-100 min-w-[320px] animate-in slide-in-from-top-2">
@@ -230,7 +262,7 @@ const LeadList: React.FC = () => {
                                     <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">End Date</label>
                                     <input type="date" value={customRange.end} onChange={(e) => setCustomRange({ ...customRange, end: e.target.value })} className="w-full p-3 bg-slate-50 border-none rounded-xl text-sm outline-none focus:ring-2 focus:ring-teal-500/20" />
                                 </div>
-                                <button onClick={() => { setActiveTab("Custom"); setIsCalendarOpen(false); }} className="w-full py-3.5 bg-[#005d52] text-white rounded-xl font-bold text-xs shadow-lg shadow-teal-900/10">Apply Selection</button>
+                                <button onClick={() => { setActiveTab("Custom"); setIsCalendarOpen(false); setCurrentPage(1); }} className="w-full py-3.5 bg-[#005d52] text-white rounded-xl font-bold text-xs shadow-lg shadow-teal-900/10">Apply Selection</button>
                             </div>
                         </div>
                     )}
@@ -248,7 +280,10 @@ const LeadList: React.FC = () => {
                                 placeholder="Search leads by ID, company..."
                                 className="w-full pl-12 pr-4 py-3.5 bg-slate-50 border-transparent rounded-2xl focus:bg-white focus:ring-4 focus:ring-teal-500/5 text-sm outline-none transition-all placeholder:text-slate-400"
                                 value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
+                                onChange={(e) => {
+                                    setSearchQuery(e.target.value);
+                                    setCurrentPage(1);
+                                }}
                             />
                         </div>
 
@@ -270,7 +305,11 @@ const LeadList: React.FC = () => {
                                             {f.options.map(opt => (
                                                 <button
                                                     key={opt}
-                                                    onClick={() => { f.setter(opt); setOpenDropdown(null); }}
+                                                    onClick={() => { 
+                                                        f.setter(opt); 
+                                                        setOpenDropdown(null);
+                                                        setCurrentPage(1);
+                                                    }}
                                                     className={`outline-none w-full text-left px-4 py-2 text-[13px] hover:bg-slate-50 ${f.value === opt ? "text-[#005d52] font-bold bg-teal-50/50" : "text-slate-600"}`}
                                                 >
                                                     {opt}
@@ -283,7 +322,7 @@ const LeadList: React.FC = () => {
                             <button
                                 disabled={selectedIds.length === 0}
                                 className="p-3 bg-rose-50 text-rose-500 rounded-xl hover:bg-rose-100 disabled:opacity-20 transition-colors"
-                                onClick={() => selectedIds.forEach(id => handleDelete(id))}
+                                onClick={handleBulkDelete}
                             >
                                 <Trash2 size={20} />
                             </button>
@@ -356,34 +395,47 @@ const LeadList: React.FC = () => {
                     </div>
 
                     {/* --- Professional Pagination Footer --- */}
-                    <footer className="p-6 bg-slate-50/50 border-t border-slate-100 flex flex-col md:flex-row justify-between items-center gap-6">
-                        <div className="flex items-center gap-6">
-
-                            <div className="text-[11px] font-bold text-slate-800 uppercase tracking-widest">
-                                Showing <span className="text-slate-900">{filteredLeads.length > 0 ? (currentPage - 1) * itemsPerPage + 1 : 0}</span> to <span className="text-slate-900">{Math.min(currentPage * itemsPerPage, filteredLeads.length)}</span> of <span className="text-slate-900">{filteredLeads.length}</span> Leads
-                            </div>
-                        </div>
-
-                        <div className="flex items-center gap-2">
-                            <button onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1} className="p-2.5 rounded-xl border border-slate-200 bg-white text-slate-500 hover:text-[#005d52] disabled:opacity-30 transition-all">
-                                <ChevronLeft size={18} strokeWidth={2.5} />
-                            </button>
-
-                            <div className="flex items-center gap-1.5">
-                                {getPageNumbers().map((page, i) => (
-                                    page === "..." ? <span key={i} className="px-2 text-slate-300"><MoreHorizontal size={14} /></span> : (
-                                        <button key={i} onClick={() => setCurrentPage(page as number)} className={`min-w-10 h-10 rounded-xl text-xs font-bold transition-all ${currentPage === page ? "bg-[#005d52] text-white shadow-lg shadow-teal-900/20 scale-105" : "bg-white text-slate-500 border border-slate-200"}`}>
-                                            {page}
-                                        </button>
-                                    )
-                                ))}
+                    {totalPages > 0 && (
+                        <footer className="p-6 bg-slate-50/50 border-t border-slate-100 flex flex-col md:flex-row justify-between items-center gap-6">
+                            <div className="flex items-center gap-6">
+                                <div className="text-[11px] font-bold text-slate-800 uppercase tracking-widest">
+                                    Showing <span className="text-slate-900">{filteredLeads.length > 0 ? startIndex + 1 : 0}</span> to <span className="text-slate-900">{Math.min(endIndex, filteredLeads.length)}</span> of <span className="text-slate-900">{filteredLeads.length}</span> Leads
+                                </div>
                             </div>
 
-                            <button onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages || totalPages === 0} className="p-2.5 rounded-xl border border-slate-200 bg-white text-slate-500 hover:text-[#005d52] disabled:opacity-30 transition-all">
-                                <ChevronRight size={18} strokeWidth={2.5} />
-                            </button>
-                        </div>
-                    </footer>
+                            <div className="flex items-center gap-2">
+                                <button 
+                                    onClick={handlePrevPage} 
+                                    disabled={currentPage === 1} 
+                                    className="p-2.5 rounded-xl border border-slate-200 bg-white text-slate-500 hover:text-[#005d52] disabled:opacity-30 transition-all"
+                                >
+                                    <ChevronLeft size={18} strokeWidth={2.5} />
+                                </button>
+
+                                <div className="flex items-center gap-1.5">
+                                    {getPageNumbers().map((page, i) => (
+                                        page === "..." ? 
+                                            <span key={i} className="px-2 text-slate-300"><MoreHorizontal size={14} /></span> : 
+                                            <button 
+                                                key={i} 
+                                                onClick={() => goToPage(page as number)} 
+                                                className={`min-w-10 h-10 rounded-xl text-xs font-bold transition-all ${currentPage === page ? "bg-[#005d52] text-white shadow-lg shadow-teal-900/20 scale-105" : "bg-white text-slate-500 border border-slate-200"}`}
+                                            >
+                                                {page}
+                                            </button>
+                                    ))}
+                                </div>
+
+                                <button 
+                                    onClick={handleNextPage} 
+                                    disabled={currentPage === totalPages || totalPages === 0} 
+                                    className="p-2.5 rounded-xl border border-slate-200 bg-white text-slate-500 hover:text-[#005d52] disabled:opacity-30 transition-all"
+                                >
+                                    <ChevronRight size={18} strokeWidth={2.5} />
+                                </button>
+                            </div>
+                        </footer>
+                    )}
                 </div>
             </div>
         </div>

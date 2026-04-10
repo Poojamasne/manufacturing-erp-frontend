@@ -6,7 +6,6 @@ import { useAppDispatch, useAppSelector } from "../../../common/ReduxMainHooks";
 import { getLead, clearErrors } from "../ModuleStateFiles/LeadSlice";
 import type { RootState } from "../../../../ApplicationState/Store";
 
-// --- Updated Types based on JSON ---
 interface Product {
     id: string;
     product_name: string;
