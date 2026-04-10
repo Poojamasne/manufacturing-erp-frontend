@@ -172,8 +172,7 @@ const OpportunityEdit: React.FC = () => {
         }
     };
 
-    const handleVariantChange = (rowId: number, event: React.ChangeEvent<HTMLSelectElement>) => {
-        const variantId = event.target.value;
+    const handleVariantChange = (rowId: number, variantId: string) => {
         const row = productRows.find(r => r.id === rowId);
         if (row && variantId) {
             const selectedProduct = products.find(p => p.product_id === Number(row.product_id));
@@ -192,8 +191,7 @@ const OpportunityEdit: React.FC = () => {
         }
     };
 
-    const handleQuantityChange = (rowId: number, event: React.ChangeEvent<HTMLInputElement>) => {
-        const quantity = Number(event.target.value);
+    const handleQuantityChange = (rowId: number, quantity: number) => {
         setProductRows(prev => prev.map(row => row.id === rowId ? { ...row, quantity } : row));
     };
 
@@ -308,7 +306,7 @@ const OpportunityEdit: React.FC = () => {
                                                 name={`variant_${row.id}`}
                                                 value={row.variant_id} 
                                                 required
-                                                onChange={(e) => handleVariantChange(row.id, e)}
+                                                onChange={(e) => handleVariantChange(row.id, e.target.value)}
                                                 options={variantList.map(v => ({ l: v.variant_name, v: String(v.variant_id) }))}
                                                 disabled={!row.product_id}
                                             />
@@ -320,7 +318,7 @@ const OpportunityEdit: React.FC = () => {
                                                 type="number" 
                                                 value={row.quantity} 
                                                 required
-                                                onChange={(e) => handleQuantityChange(row.id, e)} 
+                                                onChange={(e) => handleQuantityChange(row.id, Number(e.target.value))} 
                                             />
                                         </div>
                                         <div className="md:col-span-2">
