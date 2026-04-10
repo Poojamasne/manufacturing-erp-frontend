@@ -20,12 +20,6 @@ import {
 } from "../ModuleStateFiles/ProductionSlice";
 import type { RootState } from "../../../../ApplicationState/Store";
 
-type ProdStatus =
-  | "Pending"
-  | "In Progress"
-  | "On Hold"
-  | "Completed"
-  | "Delayed";
 type Stage =
   | "Raw Materials"
   | "Cutting"
@@ -120,13 +114,15 @@ const ProductionEdit: React.FC = () => {
         notes: formData.notes || null,
       };
 
-      await dispatch(updateProduction(id!, updateData)).unwrap();
-      setShowSuccess(true);
-      setTimeout(() => setShowSuccess(false), 3000);
-      // Refresh the page after successful update
-      setTimeout(() => {
-        navigate("/sales/production");
-      }, 2000);
+      // Remove .unwrap() and handle the promise directly
+      const result = await dispatch(updateProduction(id!, updateData));
+      if (result.meta.requestStatus === 'fulfilled') {
+        setShowSuccess(true);
+        setTimeout(() => setShowSuccess(false), 3000);
+        setTimeout(() => {
+          navigate("/sales/production");
+        }, 2000);
+      }
     } catch (error) {
       console.error("Save failed:", error);
     } finally {
