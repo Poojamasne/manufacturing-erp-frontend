@@ -56,7 +56,6 @@ const OrderList: React.FC = () => {
     }, []);
 
     useEffect(() => {
-        setCurrentPage(1);
     }, [searchQuery, statusFilter, activeTab]);
 
     const filteredOrders = useMemo(() => {
@@ -129,7 +128,7 @@ const OrderList: React.FC = () => {
         });
         
         if (result.isConfirmed) {
-            await dispatch(deleteOrder(orderId)).unwrap();
+            await dispatch(deleteOrder(orderId));
             // Remove from selectedIds if present
             setSelectedIds(prev => prev.filter(id => id !== orderId));
         }
@@ -150,7 +149,7 @@ const OrderList: React.FC = () => {
         
         if (result.isConfirmed) {
             for (const id of selectedIds) {
-                await dispatch(deleteOrder(id)).unwrap();
+                await dispatch(deleteOrder(id));
             }
             setSelectedIds([]);
         }

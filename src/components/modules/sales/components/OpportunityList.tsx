@@ -96,7 +96,6 @@ const OpportunityList: React.FC = () => {
 
     // Reset page to 1 when filters change
     useEffect(() => {
-        setCurrentPage(1);
     }, [searchQuery, statusFilter, activeTab]);
 
     // --- Filtering Logic - Only show leads with Opportunity statuses ---
