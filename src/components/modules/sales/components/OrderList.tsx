@@ -1,7 +1,7 @@
-import React, { useState, useMemo, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import {
     Plus, ChevronDown, Search, Trash2, ChevronLeft, ChevronRight, 
-    Calendar as CalendarIcon, Eye, Download, X, MoreHorizontal, ShoppingCart, IndianRupee
+    Calendar as CalendarIcon, Eye, Download, X, MoreHorizontal, ShoppingCart, IndianRupee, Loader2
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { getOrders, clearSalesErrors, deleteOrder } from "../ModuleStateFiles/OrderSlice";
@@ -28,7 +28,7 @@ const OrderList: React.FC = () => {
     const dispatch = useAppDispatch();
     const calendarRef = useRef<HTMLDivElement>(null);
 
-    const { orders, loading } = useAppSelector((state: RootState) => state.SalesOrder);
+    const { orders, loading, pagination } = useAppSelector((state: RootState) => state.SalesOrder);
 
     const [searchQuery, setSearchQuery] = useState<string>("");
     const [activeTab, setActiveTab] = useState<TimeTab>("All Time");
@@ -39,11 +39,42 @@ const OrderList: React.FC = () => {
     const [isStatusOpen, setIsStatusOpen] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 10;
+    const [debouncedSearch, setDebouncedSearch] = useState("");
+
+    // Debounce search
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setDebouncedSearch(searchQuery);
+        }, 500);
+        return () => clearTimeout(timer);
+    }, [searchQuery]);
+
+    // Fetch orders with filters
+    const fetchOrders = useCallback(() => {
+        const params: any = {
+            page: currentPage,
+            limit: itemsPerPage
+        };
+        
+        if (statusFilter !== 'All') params.status = statusFilter;
+        if (debouncedSearch) params.search = debouncedSearch;
+        if (activeTab !== 'All Time') params.dateRange = activeTab;
+        if (activeTab === 'Custom' && customRange.start && customRange.end) {
+            params.startDate = customRange.start;
+            params.endDate = customRange.end;
+        }
+        
+        dispatch(getOrders(params));
+    }, [dispatch, currentPage, statusFilter, debouncedSearch, activeTab, customRange]);
 
     useEffect(() => {
-        dispatch(getOrders());
+        fetchOrders();
         return () => { dispatch(clearSalesErrors()); };
-    }, [dispatch]);
+    }, [fetchOrders]);
+
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [statusFilter, debouncedSearch, activeTab]);
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -55,43 +86,7 @@ const OrderList: React.FC = () => {
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, []);
 
-    useEffect(() => {
-    }, [searchQuery, statusFilter, activeTab]);
-
-    const filteredOrders = useMemo(() => {
-        if (!orders) return [];
-        return (orders as Order[]).filter((o) => {
-            const matchesSearch = o.customer_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                o.order_id.toLowerCase().includes(searchQuery.toLowerCase());
-            
-            const matchesStatus = statusFilter === "All" || o.status === statusFilter;
-
-            let matchesTime = true;
-            const orderDate = new Date(o.order_date || new Date());
-            const now = new Date();
-
-            if (activeTab === "Custom") {
-                const start = customRange.start ? new Date(customRange.start) : null;
-                const end = customRange.end ? new Date(customRange.end) : null;
-                if (start) matchesTime = matchesTime && orderDate >= start;
-                if (end) {
-                    const endOfRange = new Date(end);
-                    endOfRange.setHours(23, 59, 59);
-                    matchesTime = matchesTime && orderDate <= endOfRange;
-                }
-            } else if (activeTab !== "All Time") {
-                const diffInDays = (now.getTime() - orderDate.getTime()) / (1000 * 60 * 60 * 24);
-                if (activeTab === "Weekly") matchesTime = diffInDays <= 7 && diffInDays >= 0;
-                if (activeTab === "Monthly") matchesTime = orderDate.getMonth() === now.getMonth() && orderDate.getFullYear() === now.getFullYear();
-                if (activeTab === "Yearly") matchesTime = orderDate.getFullYear() === now.getFullYear();
-            }
-
-            return matchesSearch && matchesStatus && matchesTime;
-        });
-    }, [orders, searchQuery, statusFilter, activeTab, customRange]);
-
-    const totalPages = Math.ceil(filteredOrders.length / itemsPerPage);
-    const paginatedOrders = filteredOrders.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+    const totalPages = pagination?.pages || 0;
 
     const getPageNumbers = () => {
         const pages = [];
@@ -111,11 +106,10 @@ const OrderList: React.FC = () => {
     };
 
     const toggleSelectAll = () => {
-        if (selectedIds.length === paginatedOrders.length) setSelectedIds([]);
-        else setSelectedIds(paginatedOrders.map(o => o.id));
+        if (selectedIds.length === orders.length) setSelectedIds([]);
+        else setSelectedIds(orders.map((o: Order) => o.id));
     };
 
-    // ✅ Single Delete Handler
     const handleDeleteOrder = async (orderId: string, orderRef: string) => {
         const result = await Swal.fire({
             title: 'Delete Order?',
@@ -129,12 +123,11 @@ const OrderList: React.FC = () => {
         
         if (result.isConfirmed) {
             await dispatch(deleteOrder(orderId));
-            // Remove from selectedIds if present
             setSelectedIds(prev => prev.filter(id => id !== orderId));
+            fetchOrders();
         }
     };
 
-    // ✅ Bulk Delete Handler
     const handleBulkDelete = async () => {
         if (selectedIds.length === 0) return;
         
@@ -152,6 +145,7 @@ const OrderList: React.FC = () => {
                 await dispatch(deleteOrder(id));
             }
             setSelectedIds([]);
+            fetchOrders();
         }
     };
 
@@ -165,6 +159,17 @@ const OrderList: React.FC = () => {
             default: return base + "bg-slate-50 text-slate-400 border-slate-100";
         }
     };
+
+    if (loading && orders.length === 0) {
+        return (
+            <div className="min-h-screen bg-[#F8FAFC] flex items-center justify-center">
+                <div className="text-center">
+                    <Loader2 className="animate-spin text-[#005d52] mx-auto mb-4" size={48} />
+                    <p className="text-sm font-medium text-gray-500">Loading orders...</p>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen bg-[#F8FAFC] p-4 sm:p-6 lg:p-8 font-sans text-slate-900">
@@ -210,7 +215,7 @@ const OrderList: React.FC = () => {
                             <div className="space-y-4">
                                 <input type="date" value={customRange.start} onChange={(e) => setCustomRange({ ...customRange, start: e.target.value })} className="w-full p-3 bg-slate-50 border-none rounded-xl text-sm outline-none focus:ring-2 focus:ring-teal-500/20" />
                                 <input type="date" value={customRange.end} onChange={(e) => setCustomRange({ ...customRange, end: e.target.value })} className="w-full p-3 bg-slate-50 border-none rounded-xl text-sm outline-none focus:ring-2 focus:ring-teal-500/20" />
-                                <button onClick={() => { setActiveTab("Custom"); setIsCalendarOpen(false); }} className="w-full py-3.5 bg-[#005d52] text-white rounded-xl font-bold text-xs">Apply Selection</button>
+                                <button onClick={() => { setActiveTab("Custom"); setIsCalendarOpen(false); fetchOrders(); }} className="w-full py-3.5 bg-[#005d52] text-white rounded-xl font-bold text-xs">Apply Selection</button>
                             </div>
                         </div>
                     )}
@@ -241,7 +246,7 @@ const OrderList: React.FC = () => {
                                 {isStatusOpen && (
                                     <div className="absolute right-0 mt-2 w-full bg-white border border-slate-100 rounded-2xl shadow-2xl z-50 py-2">
                                         {(["All", "Pending", "Processing", "Delivered", "Cancelled"] as Status[]).map(s => (
-                                            <button key={s} onClick={() => { setStatusFilter(s); setIsStatusOpen(false); }} className={`w-full text-left px-4 py-2.5 text-[13px] hover:bg-slate-50 ${statusFilter === s ? "text-[#005d52] font-bold" : "text-slate-600"}`}>
+                                            <button key={s} onClick={() => { setStatusFilter(s); setIsStatusOpen(false); fetchOrders(); }} className={`w-full text-left px-4 py-2.5 text-[13px] hover:bg-slate-50 ${statusFilter === s ? "text-[#005d52] font-bold" : "text-slate-600"}`}>
                                                 {s}
                                             </button>
                                         ))}
@@ -249,7 +254,6 @@ const OrderList: React.FC = () => {
                                 )}
                             </div>
 
-                            {/* ✅ Bulk Delete Button with handler */}
                             <button 
                                 onClick={handleBulkDelete}
                                 disabled={selectedIds.length === 0} 
@@ -265,7 +269,7 @@ const OrderList: React.FC = () => {
                             <thead>
                                 <tr className="bg-slate-50/50">
                                     <th className="w-16 p-5 text-center border-b border-r border-slate-100">
-                                        <input type="checkbox" className="accent-[#005d52] w-4 h-4 cursor-pointer" checked={selectedIds.length === paginatedOrders.length && paginatedOrders.length > 0} onChange={toggleSelectAll} />
+                                        <input type="checkbox" className="accent-[#005d52] w-4 h-4 cursor-pointer" checked={selectedIds.length === orders.length && orders.length > 0} onChange={toggleSelectAll} />
                                     </th>
                                     <th className="px-4 py-5 text-[11px] font-black text-slate-400 uppercase tracking-widest border-b border-r border-slate-100 text-center">Reference ID</th>
                                     <th className="px-4 py-5 text-[11px] font-black text-slate-400 uppercase tracking-widest border-b border-r border-slate-100">Order Date</th>
@@ -276,7 +280,7 @@ const OrderList: React.FC = () => {
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-50">
-                                {paginatedOrders.map((o) => (
+                                {orders.map((o: Order) => (
                                     <tr key={o.id} className="group hover:bg-teal-50/20 transition-colors">
                                         <td className="p-5 text-center border-r border-slate-50">
                                             <input type="checkbox" className="accent-[#005d52] w-4 h-4 cursor-pointer" checked={selectedIds.includes(o.id)} onChange={() => setSelectedIds(prev => prev.includes(o.id) ? prev.filter(i => i !== o.id) : [...prev, o.id])} />
@@ -299,7 +303,6 @@ const OrderList: React.FC = () => {
                                             <div className="flex justify-center gap-1">
                                                 <button title="View" onClick={() => navigate(`/sales/orders/order-view/${o.id}`)} className="p-2 hover:bg-white hover:shadow-md text-slate-400 hover:text-[#005d52] rounded-xl transition-all"><Eye size={16} /></button>
                                                 <button title="Download" className="p-2 hover:bg-white hover:shadow-md text-slate-400 hover:text-blue-600 rounded-xl transition-all"><Download size={16} /></button>
-                                                {/* ✅ Delete button with handler */}
                                                 <button 
                                                     title="Delete" 
                                                     onClick={() => handleDeleteOrder(o.id, o.order_id)}
@@ -313,7 +316,7 @@ const OrderList: React.FC = () => {
                                 ))}
                             </tbody>
                         </table>
-                        {!loading && filteredOrders.length === 0 && (
+                        {!loading && orders.length === 0 && (
                             <div className="py-32 flex flex-col items-center justify-center text-center">
                                 <div className="p-6 bg-slate-50 rounded-full mb-4">
                                     <ShoppingCart className="text-slate-200" size={40} />
@@ -324,28 +327,30 @@ const OrderList: React.FC = () => {
                         )}
                     </div>
 
-                    <footer className="p-6 bg-slate-50/50 border-t border-slate-100 flex flex-col md:flex-row justify-between items-center gap-6">
-                        <div className="text-[11px] font-bold text-slate-800 uppercase tracking-widest">
-                            Showing <span className="text-slate-900">{paginatedOrders.length > 0 ? (currentPage - 1) * itemsPerPage + 1 : 0} - {Math.min(currentPage * itemsPerPage, filteredOrders.length)}</span> of <span className="text-slate-900">{filteredOrders.length}</span> Results
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <button onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1} className="p-2.5 rounded-xl border border-slate-200 bg-white text-slate-500 hover:text-[#005d52] disabled:opacity-30 transition-all shadow-sm">
-                                <ChevronLeft size={18} strokeWidth={2.5} />
-                            </button>
-                            <div className="flex items-center gap-1.5">
-                                {getPageNumbers().map((page, i) => (
-                                    page === "..." ? <span key={i} className="px-2 text-slate-300"><MoreHorizontal size={14} /></span> : (
-                                        <button key={i} onClick={() => setCurrentPage(page as number)} className={`min-w-10 h-10 rounded-xl text-xs font-bold transition-all ${currentPage === page ? "bg-[#005d52] text-white shadow-lg shadow-teal-900/20 scale-105" : "bg-white text-slate-500 border border-slate-200 hover:border-slate-300 shadow-sm"}`}>
-                                            {page}
-                                        </button>
-                                    )
-                                ))}
+                    {totalPages > 0 && (
+                        <footer className="p-6 bg-slate-50/50 border-t border-slate-100 flex flex-col md:flex-row justify-between items-center gap-6">
+                            <div className="text-[11px] font-bold text-slate-800 uppercase tracking-widest">
+                                Showing <span className="text-slate-900">{orders.length > 0 ? (currentPage - 1) * itemsPerPage + 1 : 0} - {Math.min(currentPage * itemsPerPage, pagination?.total || 0)}</span> of <span className="text-slate-900">{pagination?.total || 0}</span> Results
                             </div>
-                            <button onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages || totalPages === 0} className="p-2.5 rounded-xl border border-slate-200 bg-white text-slate-500 hover:text-[#005d52] disabled:opacity-30 transition-all shadow-sm">
-                                <ChevronRight size={18} strokeWidth={2.5} />
-                            </button>
-                        </div>
-                    </footer>
+                            <div className="flex items-center gap-2">
+                                <button onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1} className="p-2.5 rounded-xl border border-slate-200 bg-white text-slate-500 hover:text-[#005d52] disabled:opacity-30 transition-all shadow-sm">
+                                    <ChevronLeft size={18} strokeWidth={2.5} />
+                                </button>
+                                <div className="flex items-center gap-1.5">
+                                    {getPageNumbers().map((page, i) => (
+                                        page === "..." ? <span key={i} className="px-2 text-slate-300"><MoreHorizontal size={14} /></span> : (
+                                            <button key={i} onClick={() => setCurrentPage(page as number)} className={`min-w-10 h-10 rounded-xl text-xs font-bold transition-all ${currentPage === page ? "bg-[#005d52] text-white shadow-lg shadow-teal-900/20 scale-105" : "bg-white text-slate-500 border border-slate-200 hover:border-slate-300 shadow-sm"}`}>
+                                                {page}
+                                            </button>
+                                        )
+                                    ))}
+                                </div>
+                                <button onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages || totalPages === 0} className="p-2.5 rounded-xl border border-slate-200 bg-white text-slate-500 hover:text-[#005d52] disabled:opacity-30 transition-all shadow-sm">
+                                    <ChevronRight size={18} strokeWidth={2.5} />
+                                </button>
+                            </div>
+                        </footer>
+                    )}
                 </div>
             </div>
         </div>
