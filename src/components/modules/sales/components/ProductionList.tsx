@@ -18,7 +18,8 @@ import { useAppDispatch, useAppSelector } from "../../../common/ReduxMainHooks";
 import type { RootState } from "../../../../ApplicationState/Store";
 
 // --- Types ---
-type ProdStatus = "In Progress" | "On Hold" | "Completed" | "Delayed" | "All";
+type ProdStatus = "Pending" | "In Progress" | "On Hold" | "Completed" | "Delayed" | "All";
+type Stage = "Pending" |"Raw Materials" | "Cutting" | "Assembly" | "Quality Check" | "Packaging" | "All";
 type TimeTab = "Weekly" | "Monthly" | "Quarterly" | "Yearly" | "All Time" | "Custom";
 
 interface ProductionJob {
@@ -44,13 +45,21 @@ const ProductionList: React.FC = () => {
     const [searchQuery, setSearchQuery] = useState("");
     const [activeTab, setActiveTab] = useState<TimeTab>("All Time");
     const [statusFilter, setStatusFilter] = useState<ProdStatus>("All");
+    const [stageFilter, setStageFilter] = useState<Stage>("All");
     const [customRange, setCustomRange] = useState({ start: "", end: new Date().toISOString().split("T")[0] });
     const [selectedIds, setSelectedIds] = useState<number[]>([]);
     const [isCalendarOpen, setIsCalendarOpen] = useState(false);
     const [isStatusOpen, setIsStatusOpen] = useState(false);
+    const [isStageOpen, setIsStageOpen] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 10;
     const [debouncedSearch, setDebouncedSearch] = useState("");
+
+    // Status options
+    const statusOptions = ["All", "Pending", "In Progress", "On Hold", "Completed", "Delayed"];
+    
+    // Stage options
+    const stageOptions: Stage[] = ["All", "Pending","Raw Materials", "Cutting", "Assembly", "Quality Check", "Packaging"];
 
     // Debounce search
     useEffect(() => {
@@ -68,6 +77,7 @@ const ProductionList: React.FC = () => {
         };
         
         if (statusFilter !== 'All') params.status = statusFilter;
+        if (stageFilter !== 'All') params.stage = stageFilter;
         if (debouncedSearch) params.search = debouncedSearch;
         if (activeTab !== 'All Time') params.dateRange = activeTab;
         if (activeTab === 'Custom' && customRange.start && customRange.end) {
@@ -77,7 +87,7 @@ const ProductionList: React.FC = () => {
         
         console.log("Fetching with params:", params);
         dispatch(getProductions(params));
-    }, [dispatch, currentPage, statusFilter, debouncedSearch, activeTab, customRange]);
+    }, [dispatch, currentPage, statusFilter, stageFilter, debouncedSearch, activeTab, customRange]);
 
     useEffect(() => {
         fetchProductions();
@@ -86,7 +96,7 @@ const ProductionList: React.FC = () => {
 
     useEffect(() => {
         setCurrentPage(1);
-    }, [statusFilter, debouncedSearch, activeTab]);
+    }, [statusFilter, stageFilter, debouncedSearch, activeTab]);
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -139,6 +149,7 @@ const ProductionList: React.FC = () => {
     const getStatusStyle = (st: string) => {
         const base = "px-3 py-1 rounded-lg border text-[10px] font-black uppercase tracking-widest ";
         switch (st) {
+            case "Pending": return base + "bg-gray-50 text-gray-600 border-gray-200";
             case "In Progress": return base + "bg-blue-50 text-blue-600 border-blue-100";
             case "Completed": return base + "bg-emerald-50 text-emerald-600 border-emerald-100";
             case "Delayed": return base + "bg-rose-50 text-rose-600 border-rose-100";
@@ -228,16 +239,18 @@ const ProductionList: React.FC = () => {
                         </div>
 
                         <div className="flex flex-wrap items-center justify-end gap-3 w-full lg:w-auto">
+                            {/* Status Filter */}
                             <div className="relative min-w-35">
                                 <button
                                     onClick={() => setIsStatusOpen(!isStatusOpen)}
                                     className={`w-full flex items-center justify-between gap-2 px-4 py-3 rounded-xl border text-[13px] font-bold ${statusFilter !== "All" ? "bg-teal-50 border-teal-200 text-[#005d52]" : "bg-white border-slate-200 text-slate-600"}`}
                                 >
-                                    {statusFilter === "All" ? "Status" : statusFilter} <ChevronDown size={14} className={isStatusOpen ? 'rotate-180 transition-transform' : 'transition-transform'} />
+                                    {statusFilter === "All" ? "Status" : statusFilter} 
+                                    <ChevronDown size={14} className={isStatusOpen ? 'rotate-180 transition-transform' : 'transition-transform'} />
                                 </button>
                                 {isStatusOpen && (
                                     <div className="absolute right-0 mt-2 w-full bg-white border border-slate-100 rounded-2xl shadow-2xl z-50 py-2">
-                                        {["All", "In Progress", "On Hold", "Completed", "Delayed"].map(opt => (
+                                        {statusOptions.map(opt => (
                                             <button
                                                 key={opt}
                                                 onClick={() => { setStatusFilter(opt as ProdStatus); setIsStatusOpen(false); fetchProductions(); }}
@@ -249,6 +262,31 @@ const ProductionList: React.FC = () => {
                                     </div>
                                 )}
                             </div>
+
+                            {/* Stage Filter */}
+                            <div className="relative min-w-35">
+                                <button
+                                    onClick={() => setIsStageOpen(!isStageOpen)}
+                                    className={`w-full flex items-center justify-between gap-2 px-4 py-3 rounded-xl border text-[13px] font-bold ${stageFilter !== "All" ? "bg-teal-50 border-teal-200 text-[#005d52]" : "bg-white border-slate-200 text-slate-600"}`}
+                                >
+                                    {stageFilter === "All" ? "Stage" : stageFilter} 
+                                    <ChevronDown size={14} className={isStageOpen ? 'rotate-180 transition-transform' : 'transition-transform'} />
+                                </button>
+                                {isStageOpen && (
+                                    <div className="absolute right-0 mt-2 w-full bg-white border border-slate-100 rounded-2xl shadow-2xl z-50 py-2">
+                                        {stageOptions.map(opt => (
+                                            <button
+                                                key={opt}
+                                                onClick={() => { setStageFilter(opt); setIsStageOpen(false); fetchProductions(); }}
+                                                className={`w-full text-left px-4 py-2.5 text-[13px] hover:bg-slate-50 ${stageFilter === opt ? "text-[#005d52] font-bold bg-teal-50/50" : "text-slate-600"}`}
+                                            >
+                                                {opt}
+                                            </button>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+
                             <button 
                                 onClick={handleBulkDelete}
                                 disabled={selectedIds.length === 0} 

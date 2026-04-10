@@ -102,8 +102,10 @@ export const {
 export default SalesProduction.reducer;
 
 // GET production jobs with filters and pagination
+// In getProductions thunk, add stage parameter
 export const getProductions = (params?: { 
     status?: string; 
+    stage?: string;     // Add this line
     search?: string; 
     page?: number; 
     limit?: number;
@@ -118,6 +120,7 @@ export const getProductions = (params?: {
         
         const queryParams = new URLSearchParams();
         if (params?.status && params.status !== 'All') queryParams.append('status', params.status);
+        if (params?.stage && params.stage !== 'All') queryParams.append('stage', params.stage);  // Add this line
         if (params?.search) queryParams.append('search', params.search);
         if (params?.page) queryParams.append('page', params.page.toString());
         if (params?.limit) queryParams.append('limit', params.limit.toString());
