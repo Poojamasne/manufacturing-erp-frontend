@@ -8,6 +8,7 @@ import OpportunitiesReducer from "../components/modules/sales/ModuleStateFiles/O
 import QuotationReducer from "../components/modules/sales/ModuleStateFiles/QuotationSlice";
 import OrderReducer from "../components/modules/sales/ModuleStateFiles/OrderSlice";
 import ProductionReducer from "../components/modules/sales/ModuleStateFiles/ProductionSlice";
+import ReportReducer from "../components/modules/sales/ModuleStateFiles/ReportSlice";
 
 const store = configureStore({
     reducer: {
@@ -22,6 +23,7 @@ const store = configureStore({
         SalesQuotation: QuotationReducer,
         SalesOrder: OrderReducer,
         SalesProduction: ProductionReducer,
+        SalesReport: ReportReducer, 
     },
 });
 

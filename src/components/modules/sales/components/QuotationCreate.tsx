@@ -1,12 +1,16 @@
-﻿import React, { useState } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
     ChevronLeft, Save, Plus, Trash2, 
     IndianRupee, Building2, User, 
     Phone, Mail, FileText, 
-    Printer, 
+    Printer, Loader2
 } from 'lucide-react';
+import { useAppDispatch, useAppSelector } from '../../../common/ReduxMainHooks';
+import { createQuotation, clearSalesErrors } from '../ModuleStateFiles/QuotationSlice';
+import type { RootState } from '../../../../ApplicationState/Store';
 
+// --- Types ---
 interface LineItem {
     id: string;
     product: string;
@@ -38,8 +42,91 @@ interface QuotationFormData {
     termsAndConditions: string;
 }
 
+interface FormFieldProps {
+    label: string; 
+    value: string; 
+    onChange: (value: string) => void; 
+    error?: string; 
+    icon?: React.ReactNode;
+    type?: string; 
+    options?: string[]; 
+    placeholder?: string; 
+    rows?: number; 
+    required?: boolean;
+}
+
+// --- Helper function to generate a random ID (pure, called once)
+const generateQuotationNumber = (): string => {
+    // This runs only once when the component initializes, not on every render
+    const year = new Date().getFullYear();
+    const random = Math.floor(Math.random() * 1000);
+    return `QT-${year}-${random}`;
+};
+
+// --- Helper function to get today's date (pure, called once)
+const getTodayDate = (): string => {
+    return new Date().toISOString().split('T')[0];
+};
+
+// --- Helper function to get future date (pure, called once)
+const getFutureDate = (daysToAdd: number): string => {
+    const date = new Date();
+    date.setDate(date.getDate() + daysToAdd);
+    return date.toISOString().split('T')[0];
+};
+
+// --- FormField Component (moved outside to avoid re-renders)
+const FormField: React.FC<FormFieldProps> = ({ 
+    label, 
+    value, 
+    onChange, 
+    error, 
+    icon, 
+    type = 'text', 
+    options, 
+    placeholder, 
+    rows = 3, 
+    required = false 
+}) => (
+    <div className="flex flex-col gap-1.5">
+        <label className={`text-xs font-bold uppercase tracking-wider flex items-center gap-1 ${error ? 'text-red-500' : 'text-gray-400'}`}>
+            {icon} {label} {required && <span className="text-red-500">*</span>}
+        </label>
+        {type === 'select' && options ? (
+            <select
+                value={value}
+                onChange={(e) => onChange(e.target.value)}
+                className={`w-full px-3 py-2 bg-white border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#005d52] text-sm ${error ? 'border-red-500 bg-red-50' : 'border-gray-200'}`}
+            >
+                {options.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+            </select>
+        ) : type === 'textarea' ? (
+            <textarea
+                value={value}
+                onChange={(e) => onChange(e.target.value)}
+                rows={rows}
+                placeholder={placeholder}
+                className={`w-full px-3 py-2 bg-white border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#005d52] text-sm resize-none ${error ? 'border-red-500 bg-red-50' : 'border-gray-200'}`}
+            />
+        ) : (
+            <input
+                type={type}
+                value={value}
+                onChange={(e) => onChange(e.target.value)}
+                placeholder={placeholder}
+                className={`w-full px-3 py-2 bg-white border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#005d52] text-sm ${error ? 'border-red-500 bg-red-50' : 'border-gray-200'}`}
+            />
+        )}
+        {error && <div className="text-[10px] font-bold text-red-500 uppercase mt-0.5">{error}</div>}
+    </div>
+);
+
+// --- Main Component ---
 const QuotationCreate: React.FC = () => {
     const navigate = useNavigate();
+    const dispatch = useAppDispatch();
+    const { loading } = useAppSelector((state: RootState) => state.SalesQuotation);
+    
     const [activeSection, setActiveSection] = useState('customer');
     const [lineItems, setLineItems] = useState<LineItem[]>([
         {
@@ -54,6 +141,7 @@ const QuotationCreate: React.FC = () => {
         }
     ]);
     
+    // Initialize form data with pure values (only once)
     const [formData, setFormData] = useState<QuotationFormData>({
         customerType: 'Business',
         companyName: '',
@@ -63,9 +151,9 @@ const QuotationCreate: React.FC = () => {
         billingAddress: '',
         shippingAddress: '',
         gstNumber: '',
-        quotationNumber: `QT-${new Date().getFullYear()}-${Math.floor(Math.random() * 1000)}`,
-        quotationDate: new Date().toISOString().split('T')[0],
-        validUntil: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+        quotationNumber: generateQuotationNumber(),
+        quotationDate: getTodayDate(),
+        validUntil: getFutureDate(30),
         referenceNumber: '',
         paymentTerms: 'Net 30',
         deliveryTerms: 'FOB',
@@ -75,6 +163,14 @@ const QuotationCreate: React.FC = () => {
     });
 
     const [errors, setErrors] = useState<Partial<Record<keyof QuotationFormData, string>> & { lineItems?: string }>({});
+    const [submitError, setSubmitError] = useState<string | null>(null);
+
+    // Clear errors on unmount
+    useEffect(() => {
+        return () => {
+            dispatch(clearSalesErrors());
+        };
+    }, [dispatch]);
 
     const calculateLineTotal = (item: LineItem): number => {
         const subtotal = item.quantity * item.unitPrice;
@@ -84,7 +180,7 @@ const QuotationCreate: React.FC = () => {
         return afterDiscount + taxAmount;
     };
 
-    const updateLineItem = (id: string, field: keyof LineItem, value: any) => {
+    const updateLineItem = (id: string, field: keyof LineItem, value: number | string) => {
         setLineItems(prev => prev.map(item => {
             if (item.id === id) {
                 const updated = { ...item, [field]: value };
@@ -131,52 +227,120 @@ const QuotationCreate: React.FC = () => {
 
     const totals = getTotals();
 
-    const handleSubmit = () => {
-        const newErrors: any = {};
-        
-        // --- CUSTOMER VALIDATION ---
-        if (!formData.companyName.trim()) newErrors.companyName = 'Company name is required';
-        
-        if (!formData.email.trim()) {
-            newErrors.email = 'Email is required';
-        } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-            newErrors.email = 'Invalid email format';
-        }
-        
-        if (!formData.phone.trim()) {
-            newErrors.phone = 'Phone is required';
-        } else if (!/^\d{10,}$/.test(formData.phone.replace(/[\s-]/g, ''))) {
-            newErrors.phone = 'Invalid phone number';
-        }
+    const handleSubmit = async () => {
+    const newErrors: Partial<Record<keyof QuotationFormData, string>> & { lineItems?: string } = {};
+    
+    // --- CUSTOMER VALIDATION ---
+    if (!formData.companyName.trim()) newErrors.companyName = 'Company name is required';
+    
+    if (!formData.email.trim()) {
+        newErrors.email = 'Email is required';
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+        newErrors.email = 'Invalid email format';
+    }
+    
+    if (!formData.phone.trim()) {
+        newErrors.phone = 'Phone is required';
+    } else if (!/^\d{10,}$/.test(formData.phone.replace(/[\s-]/g, ''))) {
+        newErrors.phone = 'Invalid phone number';
+    }
 
-        if (!formData.billingAddress.trim()) newErrors.billingAddress = 'Billing address is required';
+    if (!formData.billingAddress.trim()) newErrors.billingAddress = 'Billing address is required';
 
-        if (formData.customerType === 'Business' && !formData.gstNumber.trim()) {
-            newErrors.gstNumber = 'GST number is required for business';
-        }
+    if (formData.customerType === 'Business' && !formData.gstNumber.trim()) {
+        newErrors.gstNumber = 'GST number is required for business';
+    }
 
-        // --- LINE ITEMS VALIDATION ---
-        if (lineItems.some(item => !item.product.trim())) {
-            newErrors.lineItems = 'Please ensure all products have names';
+    // --- LINE ITEMS VALIDATION ---
+    if (lineItems.some(item => !item.product.trim())) {
+        newErrors.lineItems = 'Please ensure all products have names';
+    }
+    
+    if (Object.keys(newErrors).length > 0) {
+        setErrors(newErrors);
+        if (newErrors.companyName || newErrors.email || newErrors.phone || newErrors.billingAddress || newErrors.gstNumber) {
+            setActiveSection('customer');
+        } else if (newErrors.lineItems) {
+            setActiveSection('items');
         }
-        
-        if (Object.keys(newErrors).length > 0) {
-            setErrors(newErrors);
-            
-            // Logic to switch tab automatically to show the user where the error is
-            if (newErrors.companyName || newErrors.email || newErrors.phone || newErrors.billingAddress || newErrors.gstNumber) {
-                setActiveSection('customer');
-            } else if (newErrors.lineItems) {
-                setActiveSection('items');
-            }
-            return;
-        }
-        
-        setErrors({});
-        console.log('Saving quotation:', { ...formData, lineItems, totals });
-        alert('Quotation created successfully!');
-        navigate('/sales/quotation');
+        return;
+    }
+    
+    setErrors({});
+    setSubmitError(null);
+    
+    // Prepare data for API
+    interface QuotationItemPayload {
+        product_name: string;
+        description: string | null;
+        quantity: number;
+        unit_price: number;
+        discount: number;
+        tax: number;
+    }
+
+    interface QuotationPayload {
+        company_name: string;
+        contact_person: string | null;
+        email: string;
+        phone: string;
+        billing_address: string;
+        shipping_address: string | null;
+        gst_number: string | null;
+        quotation_date: string;
+        valid_until: string;
+        payment_terms: string;
+        delivery_terms: string;
+        currency: string;
+        discount: number;
+        tax: number;
+        notes: string | null;
+        terms_conditions: string;
+        items: QuotationItemPayload[];
+    }
+
+    const quotationData: QuotationPayload = {
+        company_name: formData.companyName,
+        contact_person: formData.contactPerson || null,
+        email: formData.email,
+        phone: formData.phone,
+        billing_address: formData.billingAddress,
+        shipping_address: formData.shippingAddress || null,
+        gst_number: formData.customerType === 'Business' ? formData.gstNumber : null,
+        quotation_date: formData.quotationDate,
+        valid_until: formData.validUntil,
+        payment_terms: formData.paymentTerms,
+        delivery_terms: formData.deliveryTerms,
+        currency: formData.currency,
+        discount: totals.totalDiscount,
+        tax: totals.totalTax,
+        notes: formData.notes || null,
+        terms_conditions: formData.termsAndConditions,
+        items: lineItems.map(item => ({
+            product_name: item.product,
+            description: item.description || null,
+            quantity: item.quantity,
+            unit_price: item.unitPrice,
+            discount: item.discount,
+            tax: item.tax
+        }))
     };
+    
+    try {
+        // Call the API - success message will show automatically from the thunk
+        await dispatch(createQuotation(quotationData));
+        // Navigate after a short delay to ensure success message is seen
+        setTimeout(() => {
+            navigate('/sales/quotation');
+        }, 2000);
+    } catch (err) {
+        setSubmitError(
+            typeof err === "string"
+                ? err
+                : err?.message || "Failed to create quotation"
+        );
+    }
+};
 
     const sections = [
         { id: 'customer', label: 'Customer Details', icon: Building2 },
@@ -212,12 +376,21 @@ const QuotationCreate: React.FC = () => {
                         </button>
                         <button 
                             onClick={handleSubmit}
-                            className="flex-1 lg:flex-initial flex items-center justify-center gap-2 bg-[#005d52] text-white px-6 py-2.5 rounded-xl font-bold text-sm shadow-lg shadow-teal-900/20 hover:bg-[#004a41] transition-all"
+                            disabled={loading}
+                            className="flex-1 lg:flex-initial flex items-center justify-center gap-2 bg-[#005d52] text-white px-6 py-2.5 rounded-xl font-bold text-sm shadow-lg shadow-teal-900/20 hover:bg-[#004a41] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                            <Save size={18} /> Save Quotation
+                            {loading ? <Loader2 size={18} className="animate-spin" /> : <Save size={18} />}
+                            {loading ? 'Saving...' : 'Save Quotation'}
                         </button>
                     </div>
                 </div>
+
+                {/* Error Message */}
+                {submitError && (
+                    <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl text-red-600 text-sm">
+                        {submitError}
+                    </div>
+                )}
 
                 {/* Navigation Tabs */}
                 <div className="bg-white rounded-2xl p-2 mb-6 shadow-sm border border-gray-100">
@@ -258,10 +431,10 @@ const QuotationCreate: React.FC = () => {
                                     <div>
                                         <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Customer Type</label>
                                         <div className="flex gap-3">
-                                            {['Business', 'Individual'].map(type => (
+                                            {(['Business', 'Individual'] as const).map(type => (
                                                 <button
                                                     key={type}
-                                                    onClick={() => setFormData({...formData, customerType: type as any})}
+                                                    onClick={() => setFormData({...formData, customerType: type})}
                                                     className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                                                         formData.customerType === type ? 'bg-[#005d52] text-white' : 'bg-gray-100 text-gray-600'
                                                     }`}
@@ -453,7 +626,7 @@ const QuotationCreate: React.FC = () => {
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <FormField label="Payment Terms" value={formData.paymentTerms} onChange={(val) => setFormData({...formData, paymentTerms: val})} type="select" options={['Net 15', 'Net 30', 'Net 45', 'Net 60', 'Due on Receipt', '50% Advance', '100% Advance']} />
                                     <FormField label="Delivery Terms" value={formData.deliveryTerms} onChange={(val) => setFormData({...formData, deliveryTerms: val})} type="select" options={['FOB', 'CIF', 'Ex-Works', 'COD', 'Free Delivery']} />
-                                    <FormField label="Currency" value={formData.currency} onChange={(val) => setFormData({...formData, currency: val as any})} type="select" options={['INR', 'USD', 'EUR']} />
+                                    <FormField label="Currency" value={formData.currency} onChange={(val) => setFormData({...formData, currency: val as 'INR' | 'USD' | 'EUR'})} type="select" options={['INR', 'USD', 'EUR']} />
                                 </div>
                                 <FormField label="Additional Notes" type="textarea" rows={3} value={formData.notes} onChange={(val) => setFormData({...formData, notes: val})} />
                                 <FormField label="Terms & Conditions" type="textarea" rows={5} value={formData.termsAndConditions} onChange={(val) => setFormData({...formData, termsAndConditions: val})} />
@@ -501,72 +674,16 @@ const QuotationCreate: React.FC = () => {
                     </button>
                     <button 
                         onClick={handleSubmit}
-                        className="flex items-center justify-center gap-2 bg-[#005d52] text-white px-6 py-3 rounded-xl font-bold text-sm shadow-lg shadow-teal-900/20 hover:bg-[#004a41] transition-all"
+                        disabled={loading}
+                        className="flex items-center justify-center gap-2 bg-[#005d52] text-white px-6 py-3 rounded-xl font-bold text-sm shadow-lg shadow-teal-900/20 hover:bg-[#004a41] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                        <Save size={18} /> Save Quotation
+                        {loading ? <Loader2 size={18} className="animate-spin" /> : <Save size={18} />}
+                        {loading ? 'Saving...' : 'Save Quotation'}
                     </button>
                 </div>
             </div>
         </div>
     );
 };
-
-interface FormFieldProps {
-    label: string; 
-    value: string; 
-    onChange: (value: string) => void; 
-    error?: string; 
-    icon?: React.ReactNode;
-    type?: string; 
-    options?: string[]; 
-    placeholder?: string; 
-    rows?: number; 
-    required?: boolean;
-}
-
-const FormField: React.FC<FormFieldProps> = ({ 
-    label, 
-    value, 
-    onChange, 
-    error, 
-    icon, 
-    type = 'text', 
-    options, 
-    placeholder, 
-    rows = 3, 
-    required = false 
-}) => (
-    <div className="flex flex-col gap-1.5">
-        <label className={`text-xs font-bold uppercase tracking-wider flex items-center gap-1 ${error ? 'text-red-500' : 'text-gray-400'}`}>
-            {icon} {label} {required && <span className="text-red-500">*</span>}
-        </label>
-        {type === 'select' && options ? (
-            <select
-                value={value}
-                onChange={(e) => onChange(e.target.value)}
-                className={`w-full px-3 py-2 bg-white border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#005d52] text-sm ${error ? 'border-red-500 bg-red-50' : 'border-gray-200'}`}
-            >
-                {options.map(opt => <option key={opt} value={opt}>{opt}</option>)}
-            </select>
-        ) : type === 'textarea' ? (
-            <textarea
-                value={value}
-                onChange={(e) => onChange(e.target.value)}
-                rows={rows}
-                placeholder={placeholder}
-                className={`w-full px-3 py-2 bg-white border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#005d52] text-sm resize-none ${error ? 'border-red-500 bg-red-50' : 'border-gray-200'}`}
-            />
-        ) : (
-            <input
-                type={type}
-                value={value}
-                onChange={(e) => onChange(e.target.value)}
-                placeholder={placeholder}
-                className={`w-full px-3 py-2 bg-white border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#005d52] text-sm ${error ? 'border-red-500 bg-red-50' : 'border-gray-200'}`}
-            />
-        )}
-        {error && <div className="text-[10px] font-bold text-red-500 uppercase mt-0.5">{error}</div>}
-    </div>
-);
 
 export default QuotationCreate;

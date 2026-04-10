@@ -9,28 +9,25 @@ import {
     Calendar as CalendarIcon,
     Eye,
     X,
-    Download,
     MoreHorizontal,
     FileText,
-    IndianRupee
+    Loader2
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-// --- Redux Imports ---
-import { getQuotations, clearSalesErrors } from "../ModuleStateFiles/QuotationSlice";
+import { getQuotations, deleteQuotation, bulkDeleteQuotations, clearSalesErrors } from "../ModuleStateFiles/QuotationSlice";
 import { useAppDispatch, useAppSelector } from "../../../common/ReduxMainHooks";
 import type { RootState } from "../../../../ApplicationState/Store";
 
-// --- Types ---
 type TimeTab = "Weekly" | "Monthly" | "Quarterly" | "Yearly" | "All Time" | "Custom";
 type Status = "Draft" | "Sent" | "Accepted" | "Rejected" | "Expired" | "All";
 
 interface Quotation {
-    id: string;
+    id: number;
     quote_id: string;
     company_name: string;
-    quotation_date: string;
-    valid_until: string;
-    total: string;
+    quotation_date: string | null;
+    valid_until: string | null;
+    total: string | number;
     status: string;
     created_by_name: string;
 }
@@ -40,30 +37,33 @@ const QuotationList: React.FC = () => {
     const dispatch = useAppDispatch();
     const calendarRef = useRef<HTMLDivElement>(null);
 
-    // Redux State
-    const { quotations, loading } = useAppSelector((state: RootState) => state.SalesQuotation);
+    const { quotations, loading, error } = useAppSelector((state: RootState) => state.SalesQuotation);
 
-    // Search & Filter States
     const [searchQuery, setSearchQuery] = useState<string>("");
     const [activeTab, setActiveTab] = useState<TimeTab>("All Time");
     const [statusFilter, setStatusFilter] = useState<Status>("All");
     const [customRange, setCustomRange] = useState({ start: "", end: new Date().toISOString().split("T")[0] });
-
-    // UI Logic States
-    const [selectedIds, setSelectedIds] = useState<string[]>([]);
+    const [selectedIds, setSelectedIds] = useState<number[]>([]);
     const [isCalendarOpen, setIsCalendarOpen] = useState(false);
     const [isStatusOpen, setIsStatusOpen] = useState(false);
-
-    // Professional Pagination States
+    const [deleting, setDeleting] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 10;
 
-    useEffect(() => {
-        dispatch(getQuotations());
-        return () => { dispatch(clearSalesErrors()); };
-    }, [dispatch]);
+    const fetchQuotations = () => {
+        dispatch(getQuotations({
+            status: statusFilter !== 'All' ? statusFilter : undefined,
+            search: searchQuery || undefined,
+            page: currentPage,
+            limit: itemsPerPage
+        }));
+    };
 
-    // Close calendar on outside click
+    useEffect(() => {
+        fetchQuotations();
+        return () => { dispatch(clearSalesErrors()); };
+    }, [dispatch, currentPage, statusFilter, searchQuery]);
+
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
             if (calendarRef.current && !calendarRef.current.contains(event.target as Node)) {
@@ -74,23 +74,51 @@ const QuotationList: React.FC = () => {
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, []);
 
-    // Reset pagination on filter change
     useEffect(() => {
         setCurrentPage(1);
-    }, [searchQuery, statusFilter, activeTab, itemsPerPage]);
+    }, [searchQuery, statusFilter, activeTab]);
 
-    // --- Filtering Logic ---
+    const handleDelete = async (id: number) => {
+        setDeleting(true);
+        try {
+            await dispatch(deleteQuotation(id.toString()));
+            fetchQuotations();
+            setSelectedIds(prev => prev.filter(pid => pid !== id));
+        } catch (err) {
+            console.error('Delete failed:', err);
+        } finally {
+            setDeleting(false);
+        }
+    };
+
+    const handleBulkDelete = async () => {
+        if (selectedIds.length === 0) return;
+        setDeleting(true);
+        try {
+            await dispatch(bulkDeleteQuotations(selectedIds.map(id => id.toString())));
+            setSelectedIds([]);
+            fetchQuotations();
+        } catch (err) {
+            console.error('Bulk delete failed:', err);
+        } finally {
+            setDeleting(false);
+        }
+    };
+
+    const quotationsArray = Array.isArray(quotations) ? quotations : [];
+    
     const filteredQuotations = useMemo(() => {
-        if (!quotations) return [];
-        return (quotations as Quotation[]).filter((qt) => {
+        if (quotationsArray.length === 0) return [];
+        
+        return quotationsArray.filter((qt: Quotation) => {
             const matchesSearch =
-                qt.company_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                qt.quote_id.toLowerCase().includes(searchQuery.toLowerCase());
+                qt.company_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                qt.quote_id?.toLowerCase().includes(searchQuery.toLowerCase());
 
             const matchesStatus = statusFilter === "All" || qt.status === statusFilter;
 
             let matchesTime = true;
-            const quoteDate = new Date(qt.quotation_date || new Date());
+            const quoteDate = qt.quotation_date ? new Date(qt.quotation_date) : new Date();
             const now = new Date();
 
             if (activeTab === "Custom") {
@@ -111,14 +139,13 @@ const QuotationList: React.FC = () => {
 
             return matchesSearch && matchesStatus && matchesTime;
         });
-    }, [quotations, searchQuery, statusFilter, activeTab, customRange]);
+    }, [quotationsArray, searchQuery, statusFilter, activeTab, customRange]);
 
-    // --- Pagination Logic ---
     const totalPages = Math.ceil(filteredQuotations.length / itemsPerPage);
     const paginatedQuotations = filteredQuotations.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
     const getPageNumbers = () => {
-        const pages = [];
+        const pages: (number | string)[] = [];
         const maxVisible = 5;
         if (totalPages <= maxVisible) {
             for (let i = 1; i <= totalPages; i++) pages.push(i);
@@ -149,13 +176,68 @@ const QuotationList: React.FC = () => {
             case "Expired": return base + "bg-amber-50 text-amber-600 border-amber-100";
             default: return base + "bg-slate-50 text-slate-400 border-slate-100";
         }
+    };
+
+    const formatDate = (dateStr: string | null) => {
+        if (!dateStr) return "N/A";
+        return new Date(dateStr).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+    };
+
+    const formatCurrency = (amount: string | number | undefined | null) => {
+    if (amount === undefined || amount === null) return "₹0";
+
+    const num = typeof amount === "string" ? parseFloat(amount) : amount;
+
+    if (isNaN(num)) return "₹0";
+
+    return `₹${num.toLocaleString("en-IN")}`;
+};
+
+    // CRITICAL FIX: Safe error message extraction
+    const getSafeErrorMessage = (): string | null => {
+        if (!error) return null;
+        if (typeof error === 'string') return error;
+        if (error && typeof error === 'object') {
+            // Try to get message property safely
+            const errObj = error as Record<string, unknown>;
+            if (errObj.message && typeof errObj.message === 'string') return errObj.message;
+        }
+        return 'An unexpected error occurred';
+    };
+
+    const errorMessage = getSafeErrorMessage();
+
+    // Loading state
+    if (loading && quotationsArray.length === 0) {
+        return (
+            <div className="min-h-screen bg-[#F8FAFC] flex items-center justify-center">
+                <Loader2 size={48} className="animate-spin text-[#005d52]" />
+            </div>
+        );
+    }
+
+    // Error state - SAFELY render error as string (NOT the error object)
+    if (errorMessage) {
+        return (
+            <div className="min-h-screen bg-[#F8FAFC] flex items-center justify-center p-8">
+                <div className="bg-red-50 border border-red-200 rounded-2xl p-8 max-w-md text-center">
+                    <div className="text-red-500 text-6xl mb-4">⚠️</div>
+                    <h2 className="text-xl font-bold text-red-700 mb-2">Error Loading Quotations</h2>
+                    <p className="text-red-600 break-words">{errorMessage}</p>
+                    <button
+                        onClick={() => fetchQuotations()}
+                        className="mt-6 px-6 py-2 bg-[#005d52] text-white rounded-xl hover:bg-[#004a41] transition-colors"
+                    >
+                        Try Again
+                    </button>
+                </div>
+            </div>
+        );
     }
 
     return (
         <div className="min-h-screen bg-[#F8FAFC] p-4 sm:p-6 lg:p-8 font-sans text-slate-900">
             <div className="max-w-7xl mx-auto">
-
-                {/* Header */}
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-10 gap-6">
                     <div>
                         <h1 className="text-3xl font-extrabold text-slate-800 tracking-tight flex items-center gap-3">
@@ -171,7 +253,6 @@ const QuotationList: React.FC = () => {
                     </button>
                 </div>
 
-                {/* Tabs & Filters */}
                 <section className="relative mb-8 flex flex-wrap items-center gap-3">
                     <div className="flex p-1.5 bg-white rounded-2xl border border-slate-200 shadow-sm">
                         {(["Weekly", "Monthly", "Quarterly", "Yearly", "All Time"] as TimeTab[]).map((tab) => (
@@ -193,24 +274,21 @@ const QuotationList: React.FC = () => {
                     </button>
 
                     {isCalendarOpen && (
-                        <div ref={calendarRef} className="absolute top-full mt-3 left-0 z-50 bg-white p-6 rounded-3xl shadow-2xl border border-slate-100 min-w-[320px] animate-in fade-in zoom-in-95">
+                        <div ref={calendarRef} className="absolute top-full mt-3 left-0 z-50 bg-white p-6 rounded-3xl shadow-2xl border border-slate-100 min-w-[320px]">
                             <div className="flex justify-between items-center mb-4">
                                 <h4 className="text-sm font-bold text-slate-800">Date Range</h4>
                                 <button onClick={() => setIsCalendarOpen(false)}><X size={18} className="text-slate-400" /></button>
                             </div>
                             <div className="space-y-4">
-                                <input type="date" value={customRange.start} onChange={(e) => setCustomRange({ ...customRange, start: e.target.value })} className="w-full p-3 bg-slate-50 border-none rounded-xl text-sm outline-none focus:ring-2 focus:ring-teal-500/20" />
-                                <input type="date" value={customRange.end} onChange={(e) => setCustomRange({ ...customRange, end: e.target.value })} className="w-full p-3 bg-slate-50 border-none rounded-xl text-sm outline-none focus:ring-2 focus:ring-teal-500/20" />
-                                <button onClick={() => { setActiveTab("Custom"); setIsCalendarOpen(false); }} className="w-full py-3.5 bg-[#005d52] text-white rounded-xl font-bold text-xs shadow-lg">Apply Selection</button>
+                                <input type="date" value={customRange.start} onChange={(e) => setCustomRange({ ...customRange, start: e.target.value })} className="w-full p-3 bg-slate-50 border rounded-xl text-sm" />
+                                <input type="date" value={customRange.end} onChange={(e) => setCustomRange({ ...customRange, end: e.target.value })} className="w-full p-3 bg-slate-50 border rounded-xl text-sm" />
+                                <button onClick={() => { setActiveTab("Custom"); setIsCalendarOpen(false); }} className="w-full py-3.5 bg-[#005d52] text-white rounded-xl font-bold text-xs">Apply Selection</button>
                             </div>
                         </div>
                     )}
                 </section>
 
-                {/* Table Data Container */}
                 <div className="bg-white rounded-[2.5rem] shadow-2xl shadow-slate-200/60 border border-slate-100 overflow-hidden">
-
-                    {/* Toolbar */}
                     <div className="p-6 flex flex-col lg:flex-row justify-between items-center gap-4 border-b border-slate-50">
                         <div className="relative w-full lg:w-96">
                             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" size={18} />
@@ -219,7 +297,7 @@ const QuotationList: React.FC = () => {
                                 placeholder="Search quote ID or company..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                className="w-full pl-12 pr-4 py-3.5 bg-slate-50 border-transparent rounded-2xl focus:bg-white focus:ring-4 focus:ring-teal-500/5 text-sm outline-none transition-all placeholder:text-slate-400"
+                                className="w-full pl-12 pr-4 py-3.5 bg-slate-50 border-transparent rounded-2xl focus:bg-white focus:ring-4 focus:ring-teal-500/5 text-sm outline-none"
                             />
                         </div>
 
@@ -230,7 +308,7 @@ const QuotationList: React.FC = () => {
                                     className={`w-full flex items-center justify-between gap-2 px-4 py-3 rounded-xl border text-[13px] font-bold ${statusFilter !== "All" ? "bg-teal-50 border-teal-200 text-[#005d52]" : "bg-white border-slate-200 text-slate-600"}`}
                                 >
                                     {statusFilter === "All" ? "Status" : statusFilter}
-                                    <ChevronDown size={14} className={isStatusOpen ? 'rotate-180 transition-transform' : 'transition-transform'} />
+                                    <ChevronDown size={14} className={isStatusOpen ? 'rotate-180' : ''} />
                                 </button>
                                 {isStatusOpen && (
                                     <div className="absolute right-0 mt-2 w-full bg-white border border-slate-100 rounded-2xl shadow-2xl z-50 py-2">
@@ -243,99 +321,98 @@ const QuotationList: React.FC = () => {
                                 )}
                             </div>
 
-                            <button disabled={selectedIds.length === 0} className="p-3 bg-rose-50 text-rose-500 rounded-xl disabled:opacity-20 transition-colors">
-                                <Trash2 size={20} />
+                            <button 
+                                onClick={handleBulkDelete}
+                                disabled={selectedIds.length === 0 || deleting}
+                                className="p-3 bg-rose-50 text-rose-500 rounded-xl disabled:opacity-20"
+                            >
+                                {deleting ? <Loader2 size={20} className="animate-spin" /> : <Trash2 size={20} />}
                             </button>
                         </div>
                     </div>
 
-                    {/* Table Area */}
                     <div className="overflow-x-auto">
                         <table className="w-full text-left border-collapse">
                             <thead>
                                 <tr className="bg-slate-50/50">
                                     <th className="w-16 p-5 text-center border-b border-slate-100 border-r">
-                                        <input type="checkbox" className="accent-[#005d52] w-4 h-4 cursor-pointer" checked={selectedIds.length === paginatedQuotations.length && paginatedQuotations.length > 0} onChange={toggleSelectAll} />
+                                        <input type="checkbox" className="accent-[#005d52] w-4 h-4" checked={selectedIds.length === paginatedQuotations.length && paginatedQuotations.length > 0} onChange={toggleSelectAll} />
                                     </th>
                                     <th className="px-6 py-5 text-[13px] text-slate-800 uppercase tracking-widest border-b border-slate-100 text-center">Quote ID</th>
                                     <th className="px-6 py-5 text-[13px] text-slate-800 uppercase tracking-widest border-b border-slate-100 text-center">Date Issued</th>
                                     <th className="px-6 py-5 text-[13px] text-slate-800 uppercase tracking-widest border-b border-slate-100 text-center">Expiry Date</th>
                                     <th className="px-6 py-5 text-[13px] text-slate-800 uppercase tracking-widest border-b border-slate-100 text-center">Company Name</th>
                                     <th className="px-6 py-5 text-[13px] text-slate-800 uppercase tracking-widest border-b border-slate-100 text-center">Total Amount</th>
-                                    <th className="px-6 py-5 text-[13px] text-slate-800 uppercase tracking-widest border-b border-slate-100 text-center ">Status</th>
+                                    <th className="px-6 py-5 text-[13px] text-slate-800 uppercase tracking-widest border-b border-slate-100 text-center">Status</th>
                                     <th className="px-6 py-5 text-[13px] text-slate-800 uppercase tracking-widest border-b border-slate-100 text-center">Actions</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-50">
-                                {paginatedQuotations.map((qt) => (
-                                    <tr key={qt.id} className="group hover:bg-teal-50/20 transition-colors">
-                                        <td className="p-5 text-center border-r border-slate-50">
-                                            <input type="checkbox" className="accent-[#005d52] w-4 h-4 cursor-pointer" checked={selectedIds.includes(qt.id)} onChange={() => setSelectedIds(prev => prev.includes(qt.id) ? prev.filter(i => i !== qt.id) : [...prev, qt.id])} />
-                                        </td>
-                                        <td className="px-4 py-5 text-[13px] text-slate-800 border-r border-slate-50 text-center">{qt.quote_id}</td>
-                                        <td className="px-4 py-5 text-[13px] text-slate-800 border-r border-slate-50">
-                                            {new Date(qt.quotation_date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
-                                        </td>
-                                        <td className="px-4 py-5 text-[13px] text-slate-800 border-r border-slate-50">
-                                            {new Date(qt.valid_until).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
-                                        </td>
-                                        <td className="px-4 py-5 text-[13px] text-slate-800 border-r border-slate-50">{qt.company_name}</td>
-                                        <td className="px-4 py-5 text-[14px] font-bold text-slate-800 border-r border-slate-50 text-center flex items-center justify-center gap-1">
-                                            <IndianRupee size={14} className="text-slate-800" />
-                                            {Number(qt.total).toLocaleString('en-IN')}
-                                        </td>
-                                        <td className="px-4 py-5 border-r border-slate-50 text-center">
-                                            <span className={getStatusStyle(qt.status)}>{qt.status}</span>
-                                        </td>
-                                        <td className="px-4 py-5">
-                                            <div className="flex justify-center gap-1">
-                                                <button onClick={() => navigate(`/sales/quotation/quotation-view/${qt.id}`)} className="p-2 hover:bg-white hover:shadow-md text-slate-400 hover:text-[#005d52] rounded-xl transition-all"><Eye size={16} /></button>
-                                                <button className="p-2 hover:bg-white hover:shadow-md text-slate-400 hover:text-blue-600 rounded-xl transition-all"><Download size={16} /></button>
-                                                <button className="p-2 hover:bg-white hover:shadow-md text-slate-400 hover:text-rose-600 rounded-xl transition-all"><Trash2 size={16} /></button>
+                                {paginatedQuotations.length > 0 ? (
+                                    paginatedQuotations.map((qt) => (
+                                        <tr key={qt.id} className="group hover:bg-teal-50/20 transition-colors">
+                                            <td className="p-5 text-center border-r border-slate-50">
+                                                <input type="checkbox" className="accent-[#005d52] w-4 h-4" checked={selectedIds.includes(qt.id)} onChange={() => setSelectedIds(prev => prev.includes(qt.id) ? prev.filter(i => i !== qt.id) : [...prev, qt.id])} />
+                                            </td>
+                                            <td className="px-4 py-5 text-[13px] text-slate-800 border-r border-slate-50 text-center">{qt.quote_id}</td>
+                                            <td className="px-4 py-5 text-[13px] text-slate-800 border-r border-slate-50">{formatDate(qt.quotation_date)}</td>
+                                            <td className="px-4 py-5 text-[13px] text-slate-800 border-r border-slate-50">{formatDate(qt.valid_until)}</td>
+                                            <td className="px-4 py-5 text-[13px] text-slate-800 border-r border-slate-50">{qt.company_name}</td>
+                                            <td className="px-4 py-5 text-[14px] font-bold text-slate-800 border-r border-slate-50 text-center">{formatCurrency(qt.total || 0)}</td>
+                                            <td className="px-4 py-5 border-r border-slate-50 text-center">
+                                                <span className={getStatusStyle(qt.status)}>{qt.status}</span>
+                                            </td>
+                                            <td className="px-4 py-5">
+                                                <div className="flex justify-center gap-1">
+                                                    <button onClick={() => navigate(`/sales/quotation/quotation-view/${qt.id}`)} className="p-2 hover:bg-white hover:shadow-md text-slate-400 hover:text-[#005d52] rounded-xl">
+                                                        <Eye size={16} />
+                                                    </button>
+                                                    <button onClick={() => handleDelete(qt.id)} disabled={deleting} className="p-2 hover:bg-white hover:shadow-md text-slate-400 hover:text-rose-600 rounded-xl">
+                                                        <Trash2 size={16} />
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))
+                                ) : (
+                                    <tr>
+                                        <td colSpan={8} className="py-32 text-center">
+                                            <div className="flex flex-col items-center justify-center">
+                                                <div className="p-6 bg-slate-50 rounded-full mb-4">
+                                                    <FileText className="text-slate-200" size={40} />
+                                                </div>
+                                                <h3 className="text-lg font-bold text-slate-800">No Proposals Found</h3>
+                                                <p className="text-slate-400 text-sm max-w-xs">Try adjusting your filters or search query.</p>
                                             </div>
                                         </td>
                                     </tr>
-                                ))}
+                                )}
                             </tbody>
                         </table>
-                        {!loading && filteredQuotations.length === 0 && (
-                            <div className="py-32 flex flex-col items-center justify-center text-center">
-                                <div className="p-6 bg-slate-50 rounded-full mb-4">
-                                    <FileText className="text-slate-200" size={40} />
-                                </div>
-                                <h3 className="text-lg font-bold text-slate-800">No Proposals Found</h3>
-                                <p className="text-slate-400 text-sm max-w-xs">Try adjusting your filters or search query.</p>
-                            </div>
-                        )}
                     </div>
 
-                    {/* --- Professional Pagination Footer --- */}
-                    <footer className="p-6 bg-slate-50/50 border-t border-slate-100 flex flex-col md:flex-row justify-between items-center gap-6">
-                        <div className="flex items-center gap-6">
+                    {totalPages > 1 && (
+                        <footer className="p-6 bg-slate-50/50 border-t border-slate-100 flex flex-col md:flex-row justify-between items-center gap-6">
                             <div className="text-[11px] font-bold text-slate-800 uppercase tracking-widest">
-                                Showing <span className="text-slate-900">{paginatedQuotations.length > 0 ? (currentPage - 1) * itemsPerPage + 1 : 0} - {Math.min(currentPage * itemsPerPage, filteredQuotations.length)}</span> of <span className="text-slate-900">{filteredQuotations.length}</span> Results
+                                Showing {(currentPage - 1) * itemsPerPage + 1} - {Math.min(currentPage * itemsPerPage, filteredQuotations.length)} of {filteredQuotations.length} Results
                             </div>
-                        </div>
-
-                        <div className="flex items-center gap-2">
-                            <button onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1} className="p-2.5 rounded-xl border border-slate-200 bg-white text-slate-500 hover:text-[#005d52] disabled:opacity-30 transition-all shadow-sm">
-                                <ChevronLeft size={18} strokeWidth={2.5} />
-                            </button>
-                            <div className="flex items-center gap-1.5">
+                            <div className="flex items-center gap-2">
+                                <button onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1} className="p-2.5 rounded-xl border border-slate-200 bg-white text-slate-500 hover:text-[#005d52] disabled:opacity-30">
+                                    <ChevronLeft size={18} />
+                                </button>
                                 {getPageNumbers().map((page, i) => (
-                                    page === "..." ? <span key={i} className="px-2 text-slate-300"><MoreHorizontal size={14} /></span> : (
-                                        <button key={i} onClick={() => setCurrentPage(page as number)} className={`min-w-10 h-10 rounded-xl text-xs font-bold transition-all ${currentPage === page ? "bg-[#005d52] text-white shadow-lg shadow-teal-900/20 scale-105" : "bg-white text-slate-500 border border-slate-200 hover:border-slate-300 shadow-sm"}`}>
+                                    page === "..." ? 
+                                        <span key={i} className="px-2 text-slate-300"><MoreHorizontal size={14} /></span> : 
+                                        <button key={i} onClick={() => setCurrentPage(page as number)} className={`min-w-10 h-10 rounded-xl text-xs font-bold transition-all ${currentPage === page ? "bg-[#005d52] text-white" : "bg-white text-slate-500 border border-slate-200"}`}>
                                             {page}
                                         </button>
-                                    )
                                 ))}
+                                <button onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages} className="p-2.5 rounded-xl border border-slate-200 bg-white text-slate-500 hover:text-[#005d52] disabled:opacity-30">
+                                    <ChevronRight size={18} />
+                                </button>
                             </div>
-
-                            <button onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages || totalPages === 0} className="p-2.5 rounded-xl border border-slate-200 bg-white text-slate-500 hover:text-[#005d52] disabled:opacity-30 transition-all shadow-sm">
-                                <ChevronRight size={18} strokeWidth={2.5} />
-                            </button>
-                        </div>
-                    </footer>
+                        </footer>
+                    )}
                 </div>
             </div>
         </div>

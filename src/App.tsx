@@ -21,6 +21,7 @@ import QuotationPage from "./pages/sales/QuotationPage";
 import QuotationView from "./components/modules/sales/components/QuotationView";
 import OrdersPage from "./pages/sales/OrdersPage";
 import OrderView from "./components/modules/sales/components/OrderView";
+import OrderCreate from "./components/modules/sales/components/OrderCreate";
 import SalesProductionPage from "./pages/sales/SalesProductionPage";
 import OpportunityView from "./components/modules/sales/components/OpportunityView";
 import LeadForm from "./components/modules/sales/components/LeadForm";
@@ -126,6 +127,10 @@ function App() {
             {
               path: "orders/order-view/:id",
               element: <OrderView />,
+            },
+            {
+              path: "orders/create",
+              element: <OrderCreate />,
             },
             {
               path: "production",

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { 
     ChevronRight, 
     Building2, 
@@ -12,13 +12,12 @@ import {
     User, 
     MapPin, 
     Package,
-    } from 'lucide-react';
+} from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
-// @ts-ignore
 import html2pdf from 'html2pdf.js';
+import Swal from 'sweetalert2';
 
-// --- Redux Imports ---
-import { getOrder, clearSalesErrors } from "../ModuleStateFiles/OrderSlice";
+import { getOrder, clearSalesErrors, updateOrderStatus } from "../ModuleStateFiles/OrderSlice";
 import { useAppDispatch, useAppSelector } from "../../../common/ReduxMainHooks";
 import type { RootState } from "../../../../ApplicationState/Store";
 
@@ -26,8 +25,8 @@ const OrderView: React.FC = () => {
     const navigate = useNavigate();
     const { id } = useParams();
     const dispatch = useAppDispatch();
+    const [isUpdating, setIsUpdating] = useState(false);
 
-    // Redux State
     const { order, loading } = useAppSelector((state: RootState) => state.SalesOrder);
 
     useEffect(() => {
@@ -37,7 +36,22 @@ const OrderView: React.FC = () => {
         return () => { dispatch(clearSalesErrors()); };
     }, [dispatch, id]);
 
-    // Helper: Currency Formatter
+    // ✅ Status Update Handler
+    const handleStatusUpdate = async (newStatus: string) => {
+        if (!id || newStatus === order?.status) return;
+        
+        setIsUpdating(true);
+        try {
+            await dispatch(updateOrderStatus(id, newStatus)).unwrap();
+            // Refresh order details
+            dispatch(getOrder(id));
+        } catch (error) {
+            console.error("Status update failed:", error);
+        } finally {
+            setIsUpdating(false);
+        }
+    };
+
     const formatINR = (amount: string | number) => {
         const val = typeof amount === 'string' ? parseFloat(amount) : amount;
         return new Intl.NumberFormat('en-IN', { 
@@ -47,7 +61,6 @@ const OrderView: React.FC = () => {
         }).format(val || 0);
     };
 
-    // Helper: Date Formatter
     const formatDate = (dateStr: string | null) => {
         if (!dateStr) return "N/A";
         return new Date(dateStr).toLocaleDateString('en-GB', { 
@@ -57,7 +70,6 @@ const OrderView: React.FC = () => {
         });
     };
 
-    // Pipeline Stage Logic
     const getOrderStages = (status: string) => {
         const stages = [
             { name: 'Order Placed', completed: true },
@@ -121,7 +133,6 @@ const OrderView: React.FC = () => {
         <div className="min-h-screen bg-[#F8FAFC] p-4 md:p-10 font-sans text-slate-900">
             <div className="max-w-5xl mx-auto">
                 
-                {/* Header & Nav */}
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-6">
                     <div>
                         <div className="flex items-center gap-2 text-slate-400 mb-2 text-[10px] font-black uppercase tracking-widest">
@@ -146,23 +157,36 @@ const OrderView: React.FC = () => {
                         <button onClick={handleExport} className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-white text-slate-600 px-6 py-3.5 rounded-2xl font-bold text-xs border border-slate-200 shadow-sm hover:bg-slate-50 transition-all">
                             <Download size={16} /> Export PDF
                         </button>
-                        <button 
-                            onClick={() => navigate(`/sales/orders/edit/${id}`)}
-                            className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-[#005d52] text-white px-8 py-3.5 rounded-2xl font-bold text-xs shadow-xl shadow-teal-900/20 hover:bg-[#004a41] transition-all"
-                        >
-                            <Edit3 size={16} /> Update Status
-                        </button>
+                        
+                        {/* ✅ Status Update Dropdown */}
+                        <div className="relative">
+                            <select
+                                value={order?.status || 'Pending'}
+                                onChange={(e) => handleStatusUpdate(e.target.value)}
+                                disabled={isUpdating}
+                                className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-[#005d52] text-white px-6 py-3.5 rounded-2xl font-bold text-xs shadow-xl shadow-teal-900/20 hover:bg-[#004a41] transition-all disabled:opacity-50 cursor-pointer appearance-none pr-10"
+                            >
+                                <option value="Pending">Pending</option>
+                                <option value="Processing">Processing</option>
+                                <option value="Delivered">Delivered</option>
+                                <option value="Cancelled">Cancelled</option>
+                            </select>
+                            <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
+                                {isUpdating ? (
+                                    <Loader2 size={14} className="animate-spin text-white" />
+                                ) : (
+                                    <ChevronRight size={14} className="text-white rotate-90" />
+                                )}
+                            </div>
+                        </div>
                     </div>
                 </div>
 
                 <div id="order-pdf-content" className="bg-white rounded-[2.5rem] shadow-2xl shadow-slate-200/40 border border-slate-100 overflow-hidden">
                     
-                    {/* Pipeline Visualizer */}
                     <div className="bg-slate-50/80 p-10 border-b border-slate-100">
                         <div className="relative max-w-2xl mx-auto">
-                            {/* Track */}
                             <div className="absolute top-5 left-0 w-full h-1 bg-slate-200 rounded-full z-0" />
-                            {/* Active Fill */}
                             <div 
                                 className={`absolute top-5 left-0 h-1 transition-all duration-1000 z-0 rounded-full ${order?.status === 'Cancelled' ? 'bg-rose-500' : 'bg-[#005d52]'}`} 
                                 style={{ width: `${getProgressPercentage(order?.status || 'Pending')}%` }} 
@@ -190,9 +214,7 @@ const OrderView: React.FC = () => {
                     </div>
 
                     <div className="p-10 md:p-14 space-y-14">
-
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-                            {/* Customer Info */}
                             <div className="bg-slate-50/50 p-8 rounded-4xl border border-slate-100">
                                 <div className="flex items-center gap-3 mb-8">
                                     <div className="p-2 bg-teal-50 text-[#005d52] rounded-xl border border-teal-100"><Building2 size={18}/></div>
@@ -212,7 +234,6 @@ const OrderView: React.FC = () => {
                                 </div>
                             </div>
 
-                            {/* Logistics Details */}
                             <div className="bg-slate-50/50 p-8 rounded-4xl border border-slate-100">
                                 <div className="flex items-center gap-3 mb-8">
                                     <div className="p-2 bg-teal-50 text-[#005d52] rounded-xl border border-teal-100"><Truck size={18}/></div>
@@ -227,7 +248,6 @@ const OrderView: React.FC = () => {
                             </div>
                         </div>
 
-                        {/* Line Items */}
                         <div className="space-y-8">
                             <div className="flex items-center gap-3">
                                 <div className="p-2 bg-teal-50 text-[#005d52] rounded-xl border border-teal-100"><List size={18}/></div>
@@ -270,7 +290,6 @@ const OrderView: React.FC = () => {
                             </div>
                         </div>
 
-                        {/* Internal Notes */}
                         <div className="bg-[#fafffe] border-l-4 border-[#005d52] p-8 rounded-r-3xl shadow-sm">
                             <div className="flex items-start gap-4">
                                 <div className="p-2 bg-white rounded-lg shadow-sm border border-teal-50">
@@ -292,7 +311,6 @@ const OrderView: React.FC = () => {
                                 </div>
                             </div>
                         </div>
-
                     </div>
 
                     <div className="p-10 bg-slate-50 border-t border-slate-100 text-center">
@@ -306,7 +324,6 @@ const OrderView: React.FC = () => {
     );
 };
 
-// --- Helper Item ---
 const DetailItem: React.FC<{ label: string; value: string | null; isStatus?: boolean }> = ({ 
     label, value, isStatus 
 }) => (

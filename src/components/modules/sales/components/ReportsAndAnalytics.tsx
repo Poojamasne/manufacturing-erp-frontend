@@ -1,4 +1,4 @@
-﻿import { useState, useMemo, useRef, useEffect } from "react";
+﻿import { useState, useRef, useEffect, useCallback } from "react";
 import type { FC } from "react";
 import {
   AreaChart,
@@ -14,7 +14,10 @@ import {
   BarChart,
   Bar,
 } from "recharts";
-import { Download, Calendar, X, TrendingUp } from "lucide-react";
+import { Download, Calendar, X, TrendingUp, Loader2 } from "lucide-react";
+import { useAppDispatch, useAppSelector } from "../../../common/ReduxMainHooks";
+import { fetchReportData, exportReportCSV, clearReportErrors } from "../ModuleStateFiles/ReportSlice";
+import type { RootState } from "../../../../ApplicationState/Store";
 
 // --- Types ---
 type TimeRange = "Weekly" | "Monthly" | "Quarterly" | "Yearly" | "Custom";
@@ -42,129 +45,11 @@ const THEME = {
   chart: ["#005d52", "#4fb29b", "#b0d9d9", "#f08552"],
 };
 
-// --- Mock Data Store ---
-const DATA_STORE: Record<Exclude<TimeRange, "Custom">, any> = {
-  Weekly: {
-    revenue: [
-      { name: "Mon", val: 1.2 },
-      { name: "Tue", val: 2.1 },
-      { name: "Wed", val: 1.8 },
-      { name: "Thu", val: 3.4 },
-      { name: "Fri", val: 2.9 },
-      { name: "Sat", val: 4.1 },
-      { name: "Sun", val: 3.2 },
-    ],
-    sources: [
-      { name: "Trade Fair", value: 40 },
-      { name: "Referral", value: 30 },
-      { name: "Web", value: 20 },
-      { name: "Direct", value: 10 },
-    ],
-    kpis: { rev: "₹12.4L", leads: "42", conv: "9.5%", avg: "₹0.8L" },
-    products: [
-      { name: "Fridge", target: 100, sold: 85, prod: 110 },
-      { name: "AC", target: 80, sold: 95, prod: 90 },
-      { name: "Washing Machine", target: 60, sold: 40, prod: 55 },
-    ],
-    leaderboard: [
-      { name: "Sneha Patil", leads: 12, conversion: "10%", revenue: "₹2.1L" },
-      {
-        name: "Rahul Deshpande",
-        leads: 8,
-        conversion: "12%",
-        revenue: "₹3.4L",
-      },
-    ],
-  },
-  Monthly: {
-    revenue: [
-      { name: "W1", val: 10 },
-      { name: "W2", val: 18 },
-      { name: "W3", val: 14 },
-      { name: "W4", val: 22 },
-    ],
-    sources: [
-      { name: "Trade Fair", value: 120 },
-      { name: "Referral", value: 80 },
-      { name: "Web", value: 60 },
-      { name: "Direct", value: 40 },
-    ],
-    kpis: { rev: "₹48.2L", leads: "233", conv: "14.2%", avg: "₹1.4L" },
-    products: [
-      { name: "Fridge", target: 400, sold: 380, prod: 420 },
-      { name: "AC", target: 350, sold: 410, prod: 380 },
-      { name: "Washing Machine", target: 250, sold: 200, prod: 240 },
-    ],
-    leaderboard: [
-      { name: "Sneha Patil", leads: 45, conversion: "12%", revenue: "₹8.4L" },
-      {
-        name: "Rahul Deshpande",
-        leads: 38,
-        conversion: "15%",
-        revenue: "₹12.2L",
-      },
-    ],
-  },
-  Quarterly: {
-    revenue: [
-      { name: "Jan", val: 35 },
-      { name: "Feb", val: 42 },
-      { name: "Mar", val: 51 },
-    ],
-    sources: [
-      { name: "Trade Fair", value: 350 },
-      { name: "Referral", value: 210 },
-      { name: "Web", value: 140 },
-      { name: "Direct", value: 100 },
-    ],
-    kpis: { rev: "₹1.2Cr", leads: "680", conv: "12.8%", avg: "₹1.9L" },
-    products: [
-      { name: "Fridge", target: 1200, sold: 1150, prod: 1300 },
-      { name: "AC", target: 1000, sold: 1250, prod: 1100 },
-      { name: "Washing Machine", target: 800, sold: 720, prod: 850 },
-    ],
-    leaderboard: [
-      { name: "Priya Mehta", leads: 120, conversion: "20%", revenue: "₹45.2L" },
-      {
-        name: "Rahul Deshpande",
-        leads: 95,
-        conversion: "18%",
-        revenue: "₹38.1L",
-      },
-    ],
-  },
-  Yearly: {
-    revenue: [
-      { name: "2023", val: 120 },
-      { name: "2024", val: 240 },
-      { name: "2025", val: 310 },
-    ],
-    sources: [
-      { name: "Trade Fair", value: 1500 },
-      { name: "Referral", value: 1000 },
-      { name: "Web", value: 500 },
-      { name: "Direct", value: 300 },
-    ],
-    kpis: { rev: "₹4.8Cr", leads: "2.4K", conv: "15.4%", avg: "₹2.2L" },
-    products: [
-      { name: "Fridge", target: 5000, sold: 4800, prod: 5200 },
-      { name: "AC", target: 4500, sold: 5100, prod: 4800 },
-      { name: "Washing Machine", target: 3500, sold: 3100, prod: 3600 },
-    ],
-    leaderboard: [
-      {
-        name: "Rahul Deshpande",
-        leads: 420,
-        conversion: "16%",
-        revenue: "₹1.4Cr",
-      },
-      { name: "Sneha Patil", leads: 380, conversion: "14%", revenue: "₹1.1Cr" },
-    ],
-  },
-};
-
 const ReportsAndAnalytics: FC = () => {
-  const [range, setRange] = useState<TimeRange>("Monthly");
+  const dispatch = useAppDispatch();
+  const { data, loading } = useAppSelector((state: RootState) => state.SalesReport);
+  
+  const [range, setRange] = useState<TimeRange>("Yearly");
   const [customRange, setCustomRange] = useState({
     start: "",
     end: new Date().toISOString().split("T")[0],
@@ -172,10 +57,31 @@ const ReportsAndAnalytics: FC = () => {
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const calendarRef = useRef<HTMLDivElement>(null);
 
-  const currentData = useMemo(
-    () => (range === "Custom" ? DATA_STORE.Quarterly : DATA_STORE[range]),
-    [range],
-  );
+  // ✅ Fetch data when range changes
+  const loadReportData = useCallback(() => {
+    console.log("Fetching data for range:", range);
+    if (range === "Custom" && customRange.start && customRange.end) {
+      dispatch(fetchReportData({ 
+        range, 
+        startDate: customRange.start, 
+        endDate: customRange.end 
+      }));
+    } else if (range !== "Custom") {
+      dispatch(fetchReportData({ range }));
+    }
+  }, [dispatch, range, customRange.start, customRange.end]);
+
+  // ✅ Call API when range changes
+  useEffect(() => {
+    loadReportData();
+  }, [loadReportData]);
+
+  // ✅ Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      dispatch(clearReportErrors());
+    };
+  }, [dispatch]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -191,8 +97,49 @@ const ReportsAndAnalytics: FC = () => {
   }, []);
 
   const handleExport = () => {
-    alert(`Exporting ${range} data...`);
+    if (range === "Custom" && customRange.start && customRange.end) {
+      dispatch(exportReportCSV({ 
+        range, 
+        startDate: customRange.start, 
+        endDate: customRange.end 
+      }));
+    } else {
+      dispatch(exportReportCSV({ range }));
+    }
   };
+
+  const handleRangeChange = (newRange: TimeRange) => {
+    console.log("Changing range to:", newRange);
+    setRange(newRange);
+    setIsCalendarOpen(false);
+  };
+
+  const handleCustomApply = () => {
+    if (customRange.start && customRange.end) {
+      setRange("Custom");
+      setIsCalendarOpen(false);
+    }
+  };
+
+  // ✅ Use API data directly (no mock data fallback)
+  const currentData = {
+    revenue: data?.revenue?.length > 0 ? data.revenue : [{ name: "No Data", val: 0 }],
+    sources: data?.sources?.length > 0 ? data.sources : [{ name: "No Data", value: 100 }],
+    kpis: data?.kpis || { rev: "₹0", leads: "0", conv: "0%", avg: "₹0" },
+    products: data?.products?.length > 0 ? data.products : [{ name: "No Data", sold: 0, target: 0, prod: 0 }],
+    leaderboard: data?.leaderboard?.length > 0 ? data.leaderboard : [{ name: "No Data", leads: 0, conversion: "0%", revenue: "₹0" }]
+  };
+
+  if (loading && !data?.revenue?.length) {
+    return (
+      <div className="min-h-screen bg-[#f4f7f6] flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="animate-spin text-[#005d52] mx-auto mb-4" size={48} />
+          <p className="text-sm font-medium text-gray-500">Loading report data...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#f4f7f6] p-4 sm:p-6 lg:p-8 font-sans text-gray-900">
@@ -204,16 +151,17 @@ const ReportsAndAnalytics: FC = () => {
               Reports & Analytics
             </h1>
             <p className="text-sm text-gray-500 mt-1 font-medium">
-              {" "}
-              Advanced business intelligence insights .
+              Advanced business intelligence insights
             </p>
           </div>
           <div className="flex gap-3 w-full sm:w-auto">
             <button
               onClick={handleExport}
-              className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-3 bg-[#005d52] border border-gray-200 rounded-2xl text-xs font-bold text-white hover:bg-[#005d52]/95 transition-all"
+              disabled={loading}
+              className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-3 bg-[#005d52] border border-gray-200 rounded-2xl text-xs font-bold text-white hover:bg-[#005d52]/95 transition-all disabled:opacity-50"
             >
-              <Download size={16} /> Export CSV
+              {loading ? <Loader2 size={16} className="animate-spin" /> : <Download size={16} />} 
+              Export CSV
             </button>
           </div>
         </div>
@@ -222,15 +170,10 @@ const ReportsAndAnalytics: FC = () => {
         <div className="flex flex-col xl:flex-row items-center justify-between gap-6 mb-10">
           <div className="relative">
             <div className="flex gap-2 p-1.5 bg-white/60 backdrop-blur-md rounded-2xl border border-white shadow-sm w-fit">
-              {(
-                ["Weekly", "Monthly", "Quarterly", "Yearly"] as TimeRange[]
-              ).map((r) => (
+              {(["Weekly", "Monthly", "Quarterly", "Yearly"] as TimeRange[]).map((r) => (
                 <button
                   key={r}
-                  onClick={() => {
-                    setRange(r);
-                    setIsCalendarOpen(false);
-                  }}
+                  onClick={() => handleRangeChange(r)}
                   className={`px-6 py-2 text-xs font-bold rounded-xl transition-all duration-300 ${range === r ? "bg-[#d1e9e7] text-[#005d52] shadow-sm" : "text-gray-400 hover:text-gray-600"}`}
                 >
                   {r}
@@ -292,10 +235,7 @@ const ReportsAndAnalytics: FC = () => {
                     />
                   </div>
                   <button
-                    onClick={() => {
-                      setRange("Custom");
-                      setIsCalendarOpen(false);
-                    }}
+                    onClick={handleCustomApply}
                     className="w-full py-3 bg-[#005d52] text-white rounded-xl font-bold text-xs shadow-lg"
                   >
                     Apply Range
@@ -456,6 +396,7 @@ const ReportsAndAnalytics: FC = () => {
                     tick={{ fill: "#7e899c", fontSize: 10, fontWeight: 500 }}
                   />
                   <Tooltip
+                    formatter={(value) => [`₹${Number(value).toLocaleString('en-IN')}`, 'Revenue']}
                     contentStyle={{
                       borderRadius: "16px",
                       border: "none",
@@ -489,6 +430,7 @@ const ReportsAndAnalytics: FC = () => {
                       paddingAngle={8}
                       dataKey="value"
                       cornerRadius={6}
+                      label={({ percent }) => `${(percent * 100).toFixed(0)}%`}
                     >
                       {currentData.sources.map((_: any, index: number) => (
                         <Cell
@@ -610,12 +552,9 @@ const StatCard: FC<StatCardProps> = ({ title, value, svg }) => (
   <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm transition-all hover:shadow-md group">
     <div className="flex flex-col gap-3">
       <div className="flex items-center justify-between">
-        {/* Label with tracking and muted gray */}
         <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">
           {title}
         </p>
-
-        {/* Light green background container */}
         <div className="p-2.5 rounded-xl bg-[#e6f4f2] flex items-center justify-center border border-teal-50/50">
           <img
             src={svg}
@@ -628,8 +567,6 @@ const StatCard: FC<StatCardProps> = ({ title, value, svg }) => (
           />
         </div>
       </div>
-
-      {/* Main Value */}
       <h3 className="text-2xl font-black text-gray-900 tracking-tight">
         {value}
       </h3>

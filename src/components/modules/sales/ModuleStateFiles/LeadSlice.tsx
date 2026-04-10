@@ -88,7 +88,7 @@ const leadSlice = createSlice({
             state.lead = action.payload?.data || action.payload;
         },
         // DELETE LEAD
-        deleteLeadSuccess: (state, _action) => {
+        deleteLeadSuccess: (state, ) => {
             state.loading = false;
             state.lead = {
                 "id": "",

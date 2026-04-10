@@ -4,10 +4,10 @@ import {
     Calendar as CalendarIcon, Eye, Download, X, MoreHorizontal, ShoppingCart, IndianRupee
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-// --- Redux Imports ---
-import { getOrders, clearSalesErrors } from "../ModuleStateFiles/OrderSlice";
+import { getOrders, clearSalesErrors, deleteOrder } from "../ModuleStateFiles/OrderSlice";
 import { useAppDispatch, useAppSelector } from "../../../common/ReduxMainHooks";
 import type { RootState } from "../../../../ApplicationState/Store";
+import Swal from "sweetalert2";
 
 // --- Types ---
 type TimeTab = "Weekly" | "Monthly" | "Quarterly" | "Yearly" | "All Time" | "Custom";
@@ -28,21 +28,15 @@ const OrderList: React.FC = () => {
     const dispatch = useAppDispatch();
     const calendarRef = useRef<HTMLDivElement>(null);
 
-    // Redux State
     const { orders, loading } = useAppSelector((state: RootState) => state.SalesOrder);
 
-    // Filter & Search States
     const [searchQuery, setSearchQuery] = useState<string>("");
     const [activeTab, setActiveTab] = useState<TimeTab>("All Time");
     const [statusFilter, setStatusFilter] = useState<Status>("All");
     const [customRange, setCustomRange] = useState({ start: "", end: new Date().toISOString().split("T")[0] });
-
-    // UI States
     const [selectedIds, setSelectedIds] = useState<string[]>([]);
     const [isCalendarOpen, setIsCalendarOpen] = useState(false);
     const [isStatusOpen, setIsStatusOpen] = useState(false);
-
-    // Professional Pagination States
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 10;
 
@@ -51,7 +45,6 @@ const OrderList: React.FC = () => {
         return () => { dispatch(clearSalesErrors()); };
     }, [dispatch]);
 
-    // Close calendar on outside click
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
             if (calendarRef.current && !calendarRef.current.contains(event.target as Node)) {
@@ -62,12 +55,10 @@ const OrderList: React.FC = () => {
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, []);
 
-    // Reset pagination on filter change
     useEffect(() => {
         setCurrentPage(1);
-    }, [searchQuery, statusFilter, activeTab, itemsPerPage]);
+    }, [searchQuery, statusFilter, activeTab]);
 
-    // --- Filtering Logic ---
     const filteredOrders = useMemo(() => {
         if (!orders) return [];
         return (orders as Order[]).filter((o) => {
@@ -100,7 +91,6 @@ const OrderList: React.FC = () => {
         });
     }, [orders, searchQuery, statusFilter, activeTab, customRange]);
 
-    // --- Professional Pagination Logic ---
     const totalPages = Math.ceil(filteredOrders.length / itemsPerPage);
     const paginatedOrders = filteredOrders.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
@@ -126,6 +116,46 @@ const OrderList: React.FC = () => {
         else setSelectedIds(paginatedOrders.map(o => o.id));
     };
 
+    // ✅ Single Delete Handler
+    const handleDeleteOrder = async (orderId: string, orderRef: string) => {
+        const result = await Swal.fire({
+            title: 'Delete Order?',
+            html: `Are you sure you want to delete order <strong>${orderRef}</strong>?<br>This action cannot be undone!`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, delete it!'
+        });
+        
+        if (result.isConfirmed) {
+            await dispatch(deleteOrder(orderId)).unwrap();
+            // Remove from selectedIds if present
+            setSelectedIds(prev => prev.filter(id => id !== orderId));
+        }
+    };
+
+    // ✅ Bulk Delete Handler
+    const handleBulkDelete = async () => {
+        if (selectedIds.length === 0) return;
+        
+        const result = await Swal.fire({
+            title: `Delete ${selectedIds.length} orders?`,
+            text: "This action cannot be undone!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            confirmButtonText: `Yes, delete ${selectedIds.length} order${selectedIds.length > 1 ? 's' : ''}`
+        });
+        
+        if (result.isConfirmed) {
+            for (const id of selectedIds) {
+                await dispatch(deleteOrder(id)).unwrap();
+            }
+            setSelectedIds([]);
+        }
+    };
+
     const getStatusStyle = (st: string) => {
         const base = "px-3 py-1 rounded-lg border text-[10px] font-black uppercase tracking-widest ";
         switch (st) {
@@ -135,13 +165,11 @@ const OrderList: React.FC = () => {
             case "Cancelled": return base + "bg-rose-50 text-rose-600 border-rose-100";
             default: return base + "bg-slate-50 text-slate-400 border-slate-100";
         }
-    }
+    };
 
     return (
         <div className="min-h-screen bg-[#F8FAFC] p-4 sm:p-6 lg:p-8 font-sans text-slate-900">
             <div className="max-w-7xl mx-auto">
-
-                {/* Header */}
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-10 gap-6">
                     <div>
                         <h1 className="text-3xl font-extrabold text-slate-800 tracking-tight flex items-center gap-3">
@@ -154,7 +182,6 @@ const OrderList: React.FC = () => {
                     </button>
                 </div>
 
-                {/* Tabs & Date Filters */}
                 <section className="relative mb-8 flex flex-wrap items-center gap-3">
                     <div className="flex p-1.5 bg-white rounded-2xl border border-slate-200 shadow-sm">
                         {(["Weekly", "Monthly", "Quarterly", "Yearly", "All Time"] as TimeTab[]).map((tab) => (
@@ -190,10 +217,7 @@ const OrderList: React.FC = () => {
                     )}
                 </section>
 
-                {/* Main Table Container */}
                 <div className="bg-white rounded-[2.5rem] shadow-2xl shadow-slate-200/60 border border-slate-100 overflow-hidden">
-
-                    {/* Toolbar */}
                     <div className="p-6 flex flex-col lg:flex-row justify-between items-center gap-4 border-b border-slate-50">
                         <div className="relative w-full lg:w-96">
                             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" size={18} />
@@ -226,13 +250,17 @@ const OrderList: React.FC = () => {
                                 )}
                             </div>
 
-                            <button disabled={selectedIds.length === 0} className="p-3 bg-rose-50 text-rose-500 rounded-xl disabled:opacity-20 transition-colors">
+                            {/* ✅ Bulk Delete Button with handler */}
+                            <button 
+                                onClick={handleBulkDelete}
+                                disabled={selectedIds.length === 0} 
+                                className="p-3 bg-rose-50 text-rose-500 rounded-xl disabled:opacity-20 transition-colors hover:bg-rose-100"
+                            >
                                 <Trash2 size={20} />
                             </button>
                         </div>
                     </div>
 
-                    {/* Table Area */}
                     <div className="overflow-x-auto">
                         <table className="w-full text-left border-collapse">
                             <thead>
@@ -272,7 +300,14 @@ const OrderList: React.FC = () => {
                                             <div className="flex justify-center gap-1">
                                                 <button title="View" onClick={() => navigate(`/sales/orders/order-view/${o.id}`)} className="p-2 hover:bg-white hover:shadow-md text-slate-400 hover:text-[#005d52] rounded-xl transition-all"><Eye size={16} /></button>
                                                 <button title="Download" className="p-2 hover:bg-white hover:shadow-md text-slate-400 hover:text-blue-600 rounded-xl transition-all"><Download size={16} /></button>
-                                                <button title="Delete" className="p-2 hover:bg-white hover:shadow-md text-slate-400 hover:text-rose-600 rounded-xl transition-all"><Trash2 size={16} /></button>
+                                                {/* ✅ Delete button with handler */}
+                                                <button 
+                                                    title="Delete" 
+                                                    onClick={() => handleDeleteOrder(o.id, o.order_id)}
+                                                    className="p-2 hover:bg-white hover:shadow-md text-slate-400 hover:text-rose-600 rounded-xl transition-all"
+                                                >
+                                                    <Trash2 size={16} />
+                                                </button>
                                             </div>
                                         </td>
                                     </tr>
@@ -290,20 +325,14 @@ const OrderList: React.FC = () => {
                         )}
                     </div>
 
-                    {/* --- Professional Pagination Footer --- */}
                     <footer className="p-6 bg-slate-50/50 border-t border-slate-100 flex flex-col md:flex-row justify-between items-center gap-6">
-                        <div className="flex items-center gap-6">
-                           
-                            <div className="text-[11px] font-bold text-slate-800 uppercase tracking-widest">
-                                Showing <span className="text-slate-900">{paginatedOrders.length > 0 ? (currentPage - 1) * itemsPerPage + 1 : 0} - {Math.min(currentPage * itemsPerPage, filteredOrders.length)}</span> of <span className="text-slate-900">{filteredOrders.length}</span> Results
-                            </div>
+                        <div className="text-[11px] font-bold text-slate-800 uppercase tracking-widest">
+                            Showing <span className="text-slate-900">{paginatedOrders.length > 0 ? (currentPage - 1) * itemsPerPage + 1 : 0} - {Math.min(currentPage * itemsPerPage, filteredOrders.length)}</span> of <span className="text-slate-900">{filteredOrders.length}</span> Results
                         </div>
-
                         <div className="flex items-center gap-2">
                             <button onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1} className="p-2.5 rounded-xl border border-slate-200 bg-white text-slate-500 hover:text-[#005d52] disabled:opacity-30 transition-all shadow-sm">
                                 <ChevronLeft size={18} strokeWidth={2.5} />
                             </button>
-
                             <div className="flex items-center gap-1.5">
                                 {getPageNumbers().map((page, i) => (
                                     page === "..." ? <span key={i} className="px-2 text-slate-300"><MoreHorizontal size={14} /></span> : (
@@ -313,7 +342,6 @@ const OrderList: React.FC = () => {
                                     )
                                 ))}
                             </div>
-
                             <button onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages || totalPages === 0} className="p-2.5 rounded-xl border border-slate-200 bg-white text-slate-500 hover:text-[#005d52] disabled:opacity-30 transition-all shadow-sm">
                                 <ChevronRight size={18} strokeWidth={2.5} />
                             </button>
