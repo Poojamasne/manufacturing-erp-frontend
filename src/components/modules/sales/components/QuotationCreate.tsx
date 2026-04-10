@@ -337,7 +337,7 @@ const QuotationCreate: React.FC = () => {
         setSubmitError(
             typeof err === "string"
                 ? err
-                : err?.message || "Failed to create quotation"
+                : (err as any)?.message || "Failed to create quotation"
         );
     }
 };

@@ -8,14 +8,12 @@ import {
     Clock, 
     Loader2, 
     Download, 
-    Edit3, 
     User, 
     MapPin, 
     Package,
 } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import html2pdf from 'html2pdf.js';
-import Swal from 'sweetalert2';
 
 import { getOrder, clearSalesErrors, updateOrderStatus } from "../ModuleStateFiles/OrderSlice";
 import { useAppDispatch, useAppSelector } from "../../../common/ReduxMainHooks";
@@ -42,7 +40,7 @@ const OrderView: React.FC = () => {
         
         setIsUpdating(true);
         try {
-            await dispatch(updateOrderStatus(id, newStatus)).unwrap();
+            await dispatch(updateOrderStatus(id, newStatus));
             // Refresh order details
             dispatch(getOrder(id));
         } catch (error) {
