@@ -1,374 +1,368 @@
-import React, { useState } from 'react';
-import { ChevronRight, Calendar, Building2, MapPin, Edit3, Save, X, IndianRupee, User, Phone, Mail, Globe, AlertCircle, Users, FileText } from 'lucide-react';
-import { useNavigate, useParams } from 'react-router-dom';
+import React, { useState, useMemo, useEffect } from "react";
+import { ChevronRight, Building2, Package, FileText, Plus, ChevronDown, Trash2, Save, MapPin, AlertCircle, Loader2 } from "lucide-react";
+import { useNavigate, useParams } from "react-router-dom";
+import { useAppDispatch, useAppSelector } from "../../../common/ReduxMainHooks";
+import { getProductsForLead } from "../ModuleStateFiles/ProductSlice";
+import { getEmployeesForLead } from "../ModuleStateFiles/EmployeeSlice";
+import { getLead, editLead, clearErrors } from "../ModuleStateFiles/LeadSlice";
+import type { RootState } from "../../../../ApplicationState/Store";
 
-interface OpportunityFormData {
-    // Customer Details
-    companyName: string;
-    contactPerson: string;
-    designation: string;
-    phoneNumber: string;
-    emailAddress: string;
-    leadSource: string;
-    
-    // Deal Details
-    expectedValue: string;
-    expectedCloseDate: string;
-    assignedTo: string;
-    assignedTeam: string;
-    
-    // Status & Priority
-    priority: 'High' | 'Medium' | 'Low';
-    stage: 'Discovery' | 'Proposal' | 'Negotiation' | 'Closed Won' | 'Closed Lost';
-    
-    // Additional Info
-    address: string;
-    city: string;
-    state: string;
-    pincode: string;
-    internalNotes: string;
+interface Variant { 
+    variant_id: number; 
+    variant_name: string; 
+    unit_price: string; 
 }
+interface Product { 
+    product_id: number; 
+    product_name: string; 
+    variants: Variant[]; 
+}
+interface Employee { 
+    id: number; 
+    name: string; 
+    designation: string; 
+}
+interface ProductRow { 
+    id: number; 
+    product_id: string; 
+    variant_id: string;
+    variant_name: string;
+    quantity: number; 
+    unit_price: number; 
+}
+
+interface FormData {
+    company_name: string; 
+    contact_person: string; 
+    phone: string; 
+    email: string;
+    address: string; 
+    city: string; 
+    state: string; 
+    gst_number: string;
+    lead_source: string; 
+    priority: string; 
+    expected_close_date: string;
+    followup_date: string; 
+    notes: string; 
+    assigned_to: number; 
+    status: string;
+}
+
+const statusOptions = ["Qualified", "In Progress", "Quotation", "Won", "Lost"];
 
 const OpportunityEdit: React.FC = () => {
     const navigate = useNavigate();
     const { id } = useParams();
+    const dispatch = useAppDispatch();
+    const { products } = useAppSelector((state: RootState) => state.SalesProduct) as { products: Product[] };
+    const { employees } = useAppSelector((state: RootState) => state.SalesEmployee) as { employees: Employee[] | null };
+    const { lead, loading } = useAppSelector((state: RootState) => state.SalesLeads);
 
-    const [isEditing, setIsEditing] = useState(true); // Start in edit mode
-    const [formData, setFormData] = useState<OpportunityFormData>({
-        companyName: "Rajesh Electronics",
-        contactPerson: "Rakesh Patil",
-        designation: "CEO",
-        phoneNumber: "+91 98692 26825",
-        emailAddress: "rajeshelectronics@gmail.com",
-        leadSource: "Dealer",
-        expectedValue: "₹ 25,50,000",
-        expectedCloseDate: "2026-03-31",
-        assignedTo: "Rahul Patil",
-        assignedTeam: "Sales Team A",
-        priority: "High",
-        stage: "Proposal",
-        address: "Plot No. 45, MIDC Area",
-        city: "Navi Mumbai",
-        state: "Maharashtra",
-        pincode: "400708",
-        internalNotes: "Dealer contacted us for a large order. Proposal has been sent on 21st March. Evaluating competitor offers but leaning towards us due to service guarantees. Needs follow-up before end of month."
+    const [formData, setFormData] = useState<FormData>({
+        company_name: "", contact_person: "", phone: "", email: "", address: "", city: "", state: "", gst_number: "",
+        lead_source: "", priority: "Medium", expected_close_date: "", followup_date: "", notes: "", assigned_to: 0, status: ""
     });
+    const [productRows, setProductRows] = useState<ProductRow[]>([]);
+    const [errors, setErrors] = useState<Record<string, string>>({});
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [loadingLead, setLoadingLead] = useState(true);
+    const [initialized, setInitialized] = useState(false);
 
-    const [errors, setErrors] = useState<Partial<Record<keyof OpportunityFormData, string>>>({});
+    useEffect(() => {
+        dispatch(getProductsForLead());
+        dispatch(getEmployeesForLead());
+        if (id) {
+            dispatch(getLead(Number(id))).then(() => setLoadingLead(false));
+        }
+        return () => { dispatch(clearErrors()); };
+    }, [dispatch, id]);
 
-    const validateForm = (): boolean => {
-        const newErrors: Partial<Record<keyof OpportunityFormData, string>> = {};
-        
-        if (!formData.companyName.trim()) newErrors.companyName = "Company name is required";
-        if (!formData.contactPerson.trim()) newErrors.contactPerson = "Contact person is required";
-        if (!formData.emailAddress.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) newErrors.emailAddress = "Valid email is required";
-        if (!formData.phoneNumber.trim()) newErrors.phoneNumber = "Phone number is required";
-        if (!formData.expectedValue.trim()) newErrors.expectedValue = "Expected value is required";
-        if (!formData.expectedCloseDate) newErrors.expectedCloseDate = "Expected close date is required";
-        
+    // Separate useEffect to populate form without causing the warning
+    useEffect(() => {
+        if (lead && lead.id && !initialized) {
+            setFormData({
+                company_name: lead.company_name || "", 
+                contact_person: lead.contact_person || "", 
+                phone: lead.phone || "", 
+                email: lead.email || "",
+                address: lead.address || "", 
+                city: lead.city || "", 
+                state: lead.state || "", 
+                gst_number: lead.gst_number || "",
+                lead_source: lead.lead_source || "", 
+                priority: lead.priority || "Medium",
+                expected_close_date: lead.expected_close_date ? lead.expected_close_date.split('T')[0] : "",
+                followup_date: lead.followup_date ? lead.followup_date.split('T')[0] : "", 
+                notes: lead.notes || "",
+                assigned_to: lead.assigned_to || 0, 
+                status: lead.status || "Qualified"
+            });
+            
+            if (lead.products && lead.products.length > 0) {
+                const rows = lead.products.map((p: any, i: number) => ({
+                    id: Date.now() + i, 
+                    product_id: p.product_id?.toString() || "", 
+                    variant_id: p.variant_id?.toString() || "",
+                    variant_name: p.variant || p.variant_name || "Standard",
+                    quantity: parseInt(p.quantity) || 1, 
+                    unit_price: parseFloat(p.unit_price) || 0
+                }));
+                setProductRows(rows);
+            } else {
+                setProductRows([{ id: Date.now(), product_id: "", variant_id: "", variant_name: "", quantity: 1, unit_price: 0 }]);
+            }
+            setInitialized(true);
+        }
+    }, [lead, initialized]);
+
+    const summary = useMemo(() => {
+        const qty = productRows.reduce((acc, curr) => acc + (curr.quantity || 0), 0);
+        const val = productRows.reduce((acc, curr) => acc + ((curr.quantity || 0) * (curr.unit_price || 0)), 0);
+        return { totalQty: qty, totalValue: val };
+    }, [productRows]);
+
+    const validate = (): boolean => {
+        const newErrors: Record<string, string> = {};
+        if (!formData.company_name.trim()) newErrors.company_name = "Company name is required";
+        if (!formData.contact_person.trim()) newErrors.contact_person = "Contact person is required";
+        if (!/^\d{10}$/.test(formData.phone)) newErrors.phone = "Enter a valid 10-digit number";
+        if (!formData.lead_source) newErrors.lead_source = "Select lead source";
+        if (!formData.assigned_to) newErrors.assigned_to = "Assign to an employee";
+        productRows.forEach((row) => { 
+            if (!row.product_id) newErrors[`prod_${row.id}`] = "Select product"; 
+        });
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
 
-    const handleSave = () => {
-        if (validateForm()) {
-            console.log("Saving opportunity data:", formData);
-            setIsEditing(false);
-            // Here you would typically make an API call to save the data
-            alert("Opportunity saved successfully!");
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({ 
+            ...prev, 
+            [name]: name === "assigned_to" ? (value === "" ? 0 : Number(value)) : value 
+        }));
+        if (errors[name]) { 
+            const updated = { ...errors }; 
+            delete updated[name]; 
+            setErrors(updated); 
         }
     };
 
-    const handleCancel = () => {
-        navigate(-1);
-    };
-
-    const handleInputChange = (field: keyof OpportunityFormData, value: any) => {
-        setFormData(prev => ({ ...prev, [field]: value }));
-        if (errors[field]) {
-            setErrors(prev => ({ ...prev, [field]: undefined }));
+    const handleProductSelect = (rowId: number, pId: string) => {
+        const selectedProduct = products.find(p => p.product_id === Number(pId));
+        const firstVariant = selectedProduct?.variants[0];
+        const variantId = firstVariant?.variant_id?.toString() || "";
+        const variantName = firstVariant?.variant_name || "Standard";
+        const price = firstVariant?.unit_price ? Number(firstVariant.unit_price) : 0;
+        
+        setProductRows(prev => prev.map(row => 
+            row.id === rowId ? { 
+                ...row, 
+                product_id: pId, 
+                variant_id: variantId,
+                variant_name: variantName,
+                unit_price: price 
+            } : row
+        ));
+        if (errors[`prod_${rowId}`]) { 
+            const updated = { ...errors }; 
+            delete updated[`prod_${rowId}`]; 
+            setErrors(updated); 
         }
     };
 
-    const opportunityStages = [
-        { name: 'Discovery', completed: formData.stage === 'Discovery' || ['Proposal', 'Negotiation', 'Closed Won'].includes(formData.stage) },
-        { name: 'Proposal', completed: formData.stage === 'Proposal' || ['Negotiation', 'Closed Won'].includes(formData.stage) },
-        { name: 'Negotiation', completed: formData.stage === 'Negotiation' || formData.stage === 'Closed Won' },
-        { name: 'Closed Won', completed: formData.stage === 'Closed Won' },
-    ];
-
-    const getProgressPercentage = () => {
-        const stages = ['Discovery', 'Proposal', 'Negotiation', 'Closed Won'];
-        const currentIndex = stages.indexOf(formData.stage);
-        if (currentIndex === -1) return 0;
-        return (currentIndex / (stages.length - 1)) * 100;
+    const handleVariantChange = (rowId: number, variantId: string, productId: string) => {
+        const selectedProduct = products.find(p => p.product_id === Number(productId));
+        const selectedVariant = selectedProduct?.variants.find(v => v.variant_id === Number(variantId));
+        
+        if (selectedVariant) {
+            setProductRows(prev => prev.map(row => 
+                row.id === rowId ? { 
+                    ...row, 
+                    variant_id: String(selectedVariant.variant_id),
+                    variant_name: selectedVariant.variant_name,
+                    unit_price: Number(selectedVariant.unit_price)
+                } : row
+            ));
+        }
     };
+
+    const handleQuantityChange = (rowId: number, quantity: number) => {
+        setProductRows(prev => prev.map(row => row.id === rowId ? { ...row, quantity } : row));
+    };
+
+    const addLineItem = () => setProductRows([...productRows, { id: Date.now(), product_id: "", variant_id: "", variant_name: "", quantity: 1, unit_price: 0 }]);
+    const removeLineItem = (rowId: number) => { if (productRows.length > 1) setProductRows(prev => prev.filter(row => row.id !== rowId)); };
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!validate()) return;
+        setIsSubmitting(true);
+        
+        const payload = {
+            company_name: formData.company_name,
+            contact_person: formData.contact_person,
+            phone: formData.phone,
+            email: formData.email,
+            address: formData.address,
+            city: formData.city,
+            state: formData.state,
+            gst_number: formData.gst_number,
+            lead_source: formData.lead_source,
+            priority: formData.priority,
+            status: formData.status,
+            expected_close_date: formData.expected_close_date,
+            followup_date: formData.followup_date,
+            notes: formData.notes,
+            assigned_to: formData.assigned_to,
+            products: productRows
+                .filter(p => p.product_id !== "")
+                .map(p => ({ 
+                    product_id: p.product_id, 
+                    variant_id: p.variant_id,
+                    quantity: p.quantity, 
+                    unit_price: p.unit_price 
+                }))
+        };
+        
+        console.log("Submitting payload:", payload);
+        dispatch(editLead(Number(id), payload, navigate));
+    };
+
+    if (loadingLead) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-[#f4f7f6]">
+                <Loader2 className="animate-spin text-[#005d52]" size={40} />
+            </div>
+        );
+    }
 
     return (
-        <div className="min-h-screen bg-[#f4f7f6] p-4 sm:p-6 lg:p-8 font-sans text-gray-900">
+        <div className="min-h-screen bg-[#f8fafc] p-4 sm:p-6 lg:p-8">
             <div className="max-w-6xl mx-auto">
-                
-                {/* Header & Navigation */}
-                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
+                {/* Header */}
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
                     <div>
                         <div className="flex items-center gap-2 text-gray-400 mb-1">
-                            <button onClick={() => navigate(-1)} className="hover:text-[#005d52] transition-colors">Opportunities</button>
+                            <button onClick={() => navigate("/sales/opportunities")} className="hover:text-[#005d52]">Opportunities</button>
                             <ChevronRight size={14} />
-                            <span className="text-gray-800 font-medium">{id || 'OP001'}</span>
+                            <span>Edit Opportunity</span>
                         </div>
-                        <h1 className="text-2xl font-bold text-gray-800">
-                            {isEditing ? 'Edit Opportunity' : 'View Opportunity Details'}
-                        </h1>
+                        <h1 className="text-3xl font-black text-slate-900">Edit Opportunity</h1>
+                        <p className="text-sm text-gray-500 mt-1">Update details for {lead?.company_name}</p>
                     </div>
                     <div className="flex gap-3">
-                        {isEditing ? (
-                            <>
-                                <button 
-                                    onClick={handleCancel}
-                                    className="flex items-center gap-2 bg-white text-gray-600 px-6 py-2.5 rounded-full font-bold text-sm border border-gray-200 transition-all hover:bg-gray-50"
-                                >
-                                    <X size={18} /> Cancel
-                                </button>
-                                <button 
-                                    onClick={handleSave}
-                                    className="flex items-center gap-2 bg-[#005d52] text-white px-6 py-2.5 rounded-full font-bold text-sm shadow-lg shadow-teal-900/20 hover:bg-[#004a41] transition-all"
-                                >
-                                    <Save size={18} /> Save Changes
-                                </button>
-                            </>
-                        ) : (
-                            <button 
-                                className="flex items-center gap-2 bg-[#005d52] text-white px-6 py-2.5 rounded-full font-bold text-sm shadow-lg shadow-teal-900/20 hover:bg-[#004a41] transition-all"
-                                onClick={() => setIsEditing(true)}
-                            >
-                                <Edit3 size={18} /> Edit
-                            </button>
-                        )}
+                        <button type="button" onClick={() => navigate("/sales/opportunities")} className="px-6 py-3 rounded-xl font-bold text-sm bg-white border border-slate-200 hover:bg-slate-50">Cancel</button>
+                        <button type="button" onClick={handleSubmit} disabled={isSubmitting} className="px-8 py-3 rounded-xl font-bold text-sm text-white bg-[#005d52] hover:bg-[#004a41] disabled:opacity-70 flex items-center gap-2">
+                            {isSubmitting ? "Saving..." : <><Save size={18} /> Update Opportunity</>}
+                        </button>
                     </div>
                 </div>
 
-                {/* Main Form Card */}
-                <div className="bg-white rounded-4xl shadow-sm border border-gray-100 overflow-hidden">
-                    
-                    {/* Pipeline Visualizer */}
-                    <div className="bg-gradient-to-r from-gray-50 to-white p-8 border-b border-gray-100">
-                        <div className="flex justify-between items-start relative max-w-3xl mx-auto">
-                            <div className="absolute top-4 left-0 w-full h-0.5 bg-gray-200 z-0" />
-                            <div 
-                                className="absolute top-4 left-0 h-0.5 bg-[#005d52] z-0 transition-all duration-300"
-                                style={{ width: `${getProgressPercentage()}%` }}
-                            />
-
-                            {opportunityStages.map((stage, index) => (
-                                <div key={index} className="relative z-10 flex flex-col items-center group">
-                                    <div 
-                                        className={`w-8 h-8 rounded-full border-4 border-white shadow-sm flex items-center justify-center transition-all ${
-                                            stage.completed ? 'bg-[#005d52] scale-110' : 'bg-gray-200'
-                                        }`}
-                                    />
-                                    <span className={`mt-3 text-[10px] font-bold uppercase tracking-wider ${
-                                        stage.completed ? 'text-[#005d52]' : 'text-gray-400'
-                                    }`}>
-                                        {stage.name}
-                                    </span>
-                                </div>
-                            ))}
+                <div className="space-y-6">
+                    {/* Customer Info */}
+                    <div className="bg-white rounded-4xl p-6 sm:p-8 border shadow-sm">
+                        <SectionTitle icon={<Building2 size={20} />} title="Customer Information" />
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            <FormInput label="Company Name" name="company_name" value={formData.company_name} onChange={handleInputChange} required error={errors.company_name} />
+                            <FormInput label="Contact Person" name="contact_person" value={formData.contact_person} onChange={handleInputChange} required error={errors.contact_person} />
+                            <FormInput label="Phone" name="phone" value={formData.phone} onChange={handleInputChange} required error={errors.phone} />
+                            <FormInput label="Email" name="email" value={formData.email} onChange={handleInputChange} error={errors.email} />
+                            <FormInput label="GST Number" name="gst_number" value={formData.gst_number} onChange={handleInputChange} />
+                            <FormSelect label="Lead Source" name="lead_source" value={formData.lead_source} onChange={handleInputChange} required error={errors.lead_source}
+                                options={["Website", "Trade Show", "Referral", "Cold Call", "Existing Client"].map(o => ({ l: o, v: o }))} />
+                            <FormSelect label="Status" name="status" value={formData.status} onChange={handleInputChange} required
+                                options={statusOptions.map(o => ({ l: o, v: o }))} />
                         </div>
                     </div>
 
-                    <div className="p-8 lg:p-12 space-y-12">
-                        
-                        {/* Section 1: Customer Info */}
-                        <section>
-                            <div className="flex items-center gap-2 mb-8">
-                                <div className="p-2 bg-[#d1e9e7] text-[#005d52] rounded-lg"><Building2 size={20}/></div>
-                                <h3 className="font-bold text-lg text-gray-800">Customer Details</h3>
-                            </div>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                                <FormField
-                                    label="Company Name *"
-                                    name="companyName"
-                                    value={formData.companyName}
-                                    onChange={(val) => handleInputChange('companyName', val)}
-                                    isEditing={isEditing}
-                                    error={errors.companyName}
-                                    icon={<Building2 size={16} />}
-                                />
-                                <FormField
-                                    label="Contact Person *"
-                                    name="contactPerson"
-                                    value={formData.contactPerson}
-                                    onChange={(val) => handleInputChange('contactPerson', val)}
-                                    isEditing={isEditing}
-                                    error={errors.contactPerson}
-                                    icon={<User size={16} />}
-                                />
-                                <FormField
-                                    label="Designation"
-                                    name="designation"
-                                    value={formData.designation}
-                                    onChange={(val) => handleInputChange('designation', val)}
-                                    isEditing={isEditing}
-                                    icon={<Users size={16} />}
-                                />
-                                <FormField
-                                    label="Phone Number *"
-                                    name="phoneNumber"
-                                    value={formData.phoneNumber}
-                                    onChange={(val) => handleInputChange('phoneNumber', val)}
-                                    isEditing={isEditing}
-                                    error={errors.phoneNumber}
-                                    icon={<Phone size={16} />}
-                                />
-                                <FormField
-                                    label="Email Address *"
-                                    name="emailAddress"
-                                    value={formData.emailAddress}
-                                    onChange={(val) => handleInputChange('emailAddress', val)}
-                                    isEditing={isEditing}
-                                    error={errors.emailAddress}
-                                    icon={<Mail size={16} />}
-                                    type="email"
-                                />
-                                <FormField
-                                    label="Lead Source"
-                                    name="leadSource"
-                                    value={formData.leadSource}
-                                    onChange={(val) => handleInputChange('leadSource', val)}
-                                    isEditing={isEditing}
-                                    icon={<Globe size={16} />}
-                                    type="select"
-                                    options={['Dealer', 'Referral', 'Website', 'Cold Call', 'Conference', 'Partner']}
-                                />
-                            </div>
-                        </section>
+                    {/* Products */}
+                    <div className="bg-white rounded-4xl p-6 sm:p-8 border shadow-sm">
+                        <SectionTitle icon={<Package size={20} />} title="Products" />
+                        <div className="space-y-4">
+                            {productRows.map((row) => {
+                                const selectedProduct = products.find(p => p.product_id === Number(row.product_id));
+                                const variantList = selectedProduct?.variants || [];
+                                return (
+                                    <div key={row.id} className="grid grid-cols-1 md:grid-cols-12 gap-4 p-5 rounded-2xl border bg-slate-50/50">
+                                        <div className="md:col-span-4">
+                                            <FormSelect 
+                                                label="Product" 
+                                                value={row.product_id} 
+                                                required 
+                                                error={errors[`prod_${row.id}`]}
+                                                onChange={(e) => handleProductSelect(row.id, e.target.value)}
+                                                options={products.map(p => ({ l: p.product_name, v: String(p.product_id) }))} 
+                                            />
+                                        </div>
+                                        <div className="md:col-span-3">
+                                            <FormSelect 
+                                                label="Variant" 
+                                                value={row.variant_id} 
+                                                required
+                                                onChange={(e) => handleVariantChange(row.id, e.target.value, row.product_id)}
+                                                options={variantList.map(v => ({ l: v.variant_name, v: String(v.variant_id) }))}
+                                                disabled={!row.product_id}
+                                            />
+                                        </div>
+                                        <div className="md:col-span-2">
+                                            <FormInput 
+                                                label="Quantity" 
+                                                type="number" 
+                                                value={row.quantity} 
+                                                required
+                                                onChange={(e) => handleQuantityChange(row.id, Number(e.target.value))} 
+                                            />
+                                        </div>
+                                        <div className="md:col-span-2">
+                                            <div className="flex flex-col gap-1.5">
+                                                <span className="text-[10px] font-black text-slate-400 uppercase">Unit Price</span>
+                                                <div className="h-12 flex items-center bg-white px-4 rounded-xl border text-sm font-bold text-[#005d52]">
+                                                    ₹{row.unit_price.toLocaleString()}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="md:col-span-1 flex justify-center items-end pb-2">
+                                            <button type="button" onClick={() => removeLineItem(row.id)} className="p-2 text-slate-300 hover:text-red-500">
+                                                <Trash2 size={20} />
+                                            </button>
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                            <button type="button" onClick={addLineItem} className="flex items-center gap-2 text-[#005d52] font-black text-xs uppercase px-4 py-2 hover:bg-teal-50 rounded-xl">
+                                <Plus size={16} /> Add Product
+                            </button>
+                        </div>
+                        <div className="mt-8 bg-[#005d52] rounded-2xl p-6 text-white flex justify-between">
+                            <div><p className="text-[10px] uppercase opacity-70">Total Items</p><p className="text-2xl font-black">{summary.totalQty} Units</p></div>
+                            <div><p className="text-[10px] uppercase opacity-70">Deal Value</p><p className="text-2xl font-black">₹{summary.totalValue.toLocaleString()}</p></div>
+                        </div>
+                    </div>
 
-                        {/* Section 2: Deal Info */}
-                        <section>
-                            <div className="flex items-center gap-2 mb-6">
-                                <div className="p-2 bg-[#d1e9e7] text-[#005d52] rounded-lg"><IndianRupee size={20}/></div>
-                                <h3 className="font-bold text-lg text-gray-800">Deal Summary</h3>
+                    {/* Assignment & Location */}
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div className="bg-white rounded-4xl p-6 sm:p-8 border shadow-sm">
+                            <SectionTitle icon={<FileText size={20} />} title="Assignment" />
+                            <div className="space-y-5">
+                                <FormSelect label="Assign To" name="assigned_to" value={formData.assigned_to} onChange={handleInputChange} required error={errors.assigned_to}
+                                    options={employees?.map(emp => ({ l: `${emp.name} (${emp.designation})`, v: emp.id })) || []} />
+                                <FormSelect label="Priority" name="priority" value={formData.priority} onChange={handleInputChange}
+                                    options={[{ l: "High", v: "High" }, { l: "Medium", v: "Medium" }, { l: "Low", v: "Low" }]} />
+                                <FormInput label="Follow-up Date" name="followup_date" type="date" value={formData.followup_date} onChange={handleInputChange} />
+                                <FormInput label="Expected Closure" name="expected_close_date" type="date" value={formData.expected_close_date} onChange={handleInputChange} />
+                                <FormInput label="Notes" name="notes" value={formData.notes} onChange={handleInputChange} placeholder="Internal notes..." />
                             </div>
-                            
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                <FormField
-                                    label="Expected Value *"
-                                    name="expectedValue"
-                                    value={formData.expectedValue}
-                                    onChange={(val) => handleInputChange('expectedValue', val)}
-                                    isEditing={isEditing}
-                                    error={errors.expectedValue}
-                                    icon={<IndianRupee size={16} />}
-                                />
-                                <FormField
-                                    label="Expected Close Date *"
-                                    name="expectedCloseDate"
-                                    value={formData.expectedCloseDate}
-                                    onChange={(val) => handleInputChange('expectedCloseDate', val)}
-                                    isEditing={isEditing}
-                                    error={errors.expectedCloseDate}
-                                    type="date"
-                                    icon={<Calendar size={16} />}
-                                />
-                                <FormField
-                                    label="Assigned To"
-                                    name="assignedTo"
-                                    value={formData.assignedTo}
-                                    onChange={(val) => handleInputChange('assignedTo', val)}
-                                    isEditing={isEditing}
-                                    icon={<User size={16} />}
-                                    type="select"
-                                    options={['Rahul Patil', 'Priya Sharma', 'Amit Kumar', 'Neha Gupta']}
-                                />
-                                <FormField
-                                    label="Assigned Team"
-                                    name="assignedTeam"
-                                    value={formData.assignedTeam}
-                                    onChange={(val) => handleInputChange('assignedTeam', val)}
-                                    isEditing={isEditing}
-                                    icon={<Users size={16} />}
-                                />
-                                <FormField
-                                    label="Priority"
-                                    name="priority"
-                                    value={formData.priority}
-                                    onChange={(val) => handleInputChange('priority', val as 'High' | 'Medium' | 'Low')}
-                                    isEditing={isEditing}
-                                    type="select"
-                                    options={['High', 'Medium', 'Low']}
-                                />
-                                <FormField
-                                    label="Stage"
-                                    name="stage"
-                                    value={formData.stage}
-                                    onChange={(val) => handleInputChange('stage', val)}
-                                    isEditing={isEditing}
-                                    type="select"
-                                    options={['Discovery', 'Proposal', 'Negotiation', 'Closed Won', 'Closed Lost']}
-                                />
+                        </div>
+                        <div className="bg-white rounded-4xl p-6 sm:p-8 border shadow-sm">
+                            <SectionTitle icon={<MapPin size={20} />} title="Location" />
+                            <div className="space-y-5">
+                                <FormInput label="City" name="city" value={formData.city} onChange={handleInputChange} />
+                                <FormInput label="State" name="state" value={formData.state} onChange={handleInputChange} />
+                                <textarea name="address" value={formData.address} onChange={handleInputChange} rows={4} className="w-full bg-slate-50 border rounded-2xl p-4 text-sm focus:border-[#005d52] outline-none" placeholder="Full address..." />
                             </div>
-                        </section>
-
-                        {/* Section 3: Location */}
-                        <section>
-                            <div className="flex items-center gap-2 mb-6">
-                                <div className="p-2 bg-[#d1e9e7] text-[#005d52] rounded-lg"><MapPin size={20}/></div>
-                                <h3 className="font-bold text-lg text-gray-800">Location</h3>
-                            </div>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                                <FormField
-                                    label="Address"
-                                    name="address"
-                                    value={formData.address}
-                                    onChange={(val) => handleInputChange('address', val)}
-                                    isEditing={isEditing}
-                                />
-                                <FormField
-                                    label="City"
-                                    name="city"
-                                    value={formData.city}
-                                    onChange={(val) => handleInputChange('city', val)}
-                                    isEditing={isEditing}
-                                />
-                                <FormField
-                                    label="State"
-                                    name="state"
-                                    value={formData.state}
-                                    onChange={(val) => handleInputChange('state', val)}
-                                    isEditing={isEditing}
-                                />
-                                <FormField
-                                    label="Pincode"
-                                    name="pincode"
-                                    value={formData.pincode}
-                                    onChange={(val) => handleInputChange('pincode', val)}
-                                    isEditing={isEditing}
-                                />
-                            </div>
-                        </section>
-
-                        {/* Section 4: Internal Notes */}
-                        <section>
-                            <div className="flex items-center gap-2 mb-6">
-                                <div className="p-2 bg-[#d1e9e7] text-[#005d52] rounded-lg"><FileText size={20}/></div>
-                                <h3 className="font-bold text-lg text-gray-800">Internal Notes</h3>
-                            </div>
-                            {isEditing ? (
-                                <textarea
-                                    value={formData.internalNotes}
-                                    onChange={(e) => handleInputChange('internalNotes', e.target.value)}
-                                    rows={5}
-                                    className="w-full p-4 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#005d52] focus:border-transparent resize-none"
-                                    placeholder="Add internal notes here..."
-                                />
-                            ) : (
-                                <div className="bg-[#f1f8f7] border-l-4 border-[#005d52] p-6 rounded-r-2xl">
-                                    <p className="text-sm text-gray-700 italic leading-loose">
-                                        "{formData.internalNotes}"
-                                    </p>
-                                </div>
-                            )}
-                        </section>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -376,71 +370,34 @@ const OpportunityEdit: React.FC = () => {
     );
 };
 
-// --- Form Field Component ---
-interface FormFieldProps {
-    label: string;
-    name: string;
-    value: string;
-    onChange: (value: string) => void;
-    isEditing: boolean;
-    error?: string;
-    icon?: React.ReactNode;
-    type?: string;
-    options?: string[];
-}
+const SectionTitle: React.FC<{ icon: React.ReactNode; title: string }> = ({ icon, title }) => (
+    <div className="flex items-center gap-3 mb-8">
+        <div className="p-2.5 bg-teal-50 text-[#005d52] rounded-xl">{icon}</div>
+        <h3 className="font-bold text-xl">{title}</h3>
+    </div>
+);
 
-const FormField: React.FC<FormFieldProps> = ({
-    label,
-    
-    value,
-    onChange,
-    isEditing,
-    error,
-    icon,
-    type = 'text',
-    options
-}) => (
+const FormInput: React.FC<{ label: string; name: string; value: any; onChange: any; error?: string; required?: boolean; type?: string; placeholder?: string }> = 
+({ label, error, required, ...props }) => (
     <div className="flex flex-col gap-1.5">
-        <label className="text-xs font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1">
-            {icon}
-            {label}
-        </label>
-        {isEditing ? (
-            <>
-                {type === 'select' && options ? (
-                    <select
-                        value={value}
-                        onChange={(e) => onChange(e.target.value)}
-                        className={`w-full px-3 py-2 bg-white border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#005d52] focus:border-transparent text-sm ${
-                            error ? 'border-red-500' : 'border-gray-200'
-                        }`}
-                    >
-                        {options.map(opt => (
-                            <option key={opt} value={opt}>{opt}</option>
-                        ))}
-                    </select>
-                ) : (
-                    <input
-                        type={type}
-                        value={value}
-                        onChange={(e) => onChange(e.target.value)}
-                        className={`w-full px-3 py-2 bg-white border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#005d52] focus:border-transparent text-sm ${
-                            error ? 'border-red-500' : 'border-gray-200'
-                        }`}
-                    />
-                )}
-                {error && (
-                    <div className="flex items-center gap-1 text-xs text-red-500 mt-1">
-                        <AlertCircle size={12} />
-                        <span>{error}</span>
-                    </div>
-                )}
-            </>
-        ) : (
-            <p className={`text-sm font-medium ${error ? 'text-red-500' : 'text-gray-700'}`}>
-                {value || '-'}
-            </p>
-        )}
+        <label className="text-[10px] font-black text-slate-400 uppercase">{label} {required && <span className="text-red-500">*</span>}</label>
+        <input {...props} className={`w-full bg-slate-50 border ${error ? 'border-red-300' : 'border-slate-200'} rounded-xl px-4 py-3 text-sm outline-none focus:border-[#005d52]`} />
+        {error && <p className="text-[10px] text-red-500">{error}</p>}
+    </div>
+);
+
+const FormSelect: React.FC<{ label: string; name?: string; value: any; onChange: any; options: { l: string; v: string | number }[]; error?: string; required?: boolean; disabled?: boolean }> = 
+({ label, options, error, required, disabled, ...props }) => (
+    <div className="flex flex-col gap-1.5">
+        <label className="text-[10px] font-black text-slate-400 uppercase">{label} {required && <span className="text-red-500">*</span>}</label>
+        <div className="relative">
+            <select {...props} disabled={disabled} className={`w-full bg-slate-50 border ${error ? 'border-red-300' : 'border-slate-200'} rounded-xl px-4 py-3 text-sm appearance-none outline-none focus:border-[#005d52] cursor-pointer ${disabled ? 'opacity-60 cursor-not-allowed' : ''}`}>
+                <option value="">Select {label}</option>
+                {options.map(o => <option key={o.v} value={o.v}>{o.l}</option>)}
+            </select>
+            <ChevronDown size={14} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+        </div>
+        {error && <p className="text-[10px] text-red-500">{error}</p>}
     </div>
 );
 
