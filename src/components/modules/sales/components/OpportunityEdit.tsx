@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from "react";
-import { ChevronRight, Building2, Package, FileText, Plus, ChevronDown, Trash2, Save, MapPin, AlertCircle, Loader2 } from "lucide-react";
+import { ChevronRight, Building2, Package, FileText, Plus, ChevronDown, Trash2, Save, MapPin, Loader2 } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../../common/ReduxMainHooks";
 import { getProductsForLead } from "../ModuleStateFiles/ProductSlice";
@@ -57,7 +57,7 @@ const OpportunityEdit: React.FC = () => {
     const dispatch = useAppDispatch();
     const { products } = useAppSelector((state: RootState) => state.SalesProduct) as { products: Product[] };
     const { employees } = useAppSelector((state: RootState) => state.SalesEmployee) as { employees: Employee[] | null };
-    const { lead, loading } = useAppSelector((state: RootState) => state.SalesLeads);
+    const { lead } = useAppSelector((state: RootState) => state.SalesLeads);
 
     const [formData, setFormData] = useState<FormData>({
         company_name: "", contact_person: "", phone: "", email: "", address: "", city: "", state: "", gst_number: "",
@@ -95,7 +95,7 @@ const OpportunityEdit: React.FC = () => {
                 expected_close_date: lead.expected_close_date ? lead.expected_close_date.split('T')[0] : "",
                 followup_date: lead.followup_date ? lead.followup_date.split('T')[0] : "", 
                 notes: lead.notes || "",
-                assigned_to: lead.assigned_to || 0, 
+                assigned_to: typeof lead.assigned_to === 'number' ? lead.assigned_to : Number(lead.assigned_to) || 0, 
                 status: lead.status || "Qualified"
             });
             
@@ -105,8 +105,8 @@ const OpportunityEdit: React.FC = () => {
                     product_id: p.product_id?.toString() || "", 
                     variant_id: p.variant_id?.toString() || "",
                     variant_name: p.variant || p.variant_name || "Standard",
-                    quantity: parseInt(p.quantity) || 1, 
-                    unit_price: parseFloat(p.unit_price) || 0
+                    quantity: typeof p.quantity === 'number' ? p.quantity : parseInt(p.quantity) || 1, 
+                    unit_price: typeof p.unit_price === 'number' ? p.unit_price : parseFloat(p.unit_price) || 0
                 }));
                 setProductRows(rows);
             } else {
@@ -172,23 +172,28 @@ const OpportunityEdit: React.FC = () => {
         }
     };
 
-    const handleVariantChange = (rowId: number, variantId: string, productId: string) => {
-        const selectedProduct = products.find(p => p.product_id === Number(productId));
-        const selectedVariant = selectedProduct?.variants.find(v => v.variant_id === Number(variantId));
-        
-        if (selectedVariant) {
-            setProductRows(prev => prev.map(row => 
-                row.id === rowId ? { 
-                    ...row, 
-                    variant_id: String(selectedVariant.variant_id),
-                    variant_name: selectedVariant.variant_name,
-                    unit_price: Number(selectedVariant.unit_price)
-                } : row
-            ));
+    const handleVariantChange = (rowId: number, event: React.ChangeEvent<HTMLSelectElement>) => {
+        const variantId = event.target.value;
+        const row = productRows.find(r => r.id === rowId);
+        if (row && variantId) {
+            const selectedProduct = products.find(p => p.product_id === Number(row.product_id));
+            const selectedVariant = selectedProduct?.variants.find(v => v.variant_id === Number(variantId));
+            
+            if (selectedVariant) {
+                setProductRows(prev => prev.map(r => 
+                    r.id === rowId ? { 
+                        ...r, 
+                        variant_id: String(selectedVariant.variant_id),
+                        variant_name: selectedVariant.variant_name,
+                        unit_price: Number(selectedVariant.unit_price)
+                    } : r
+                ));
+            }
         }
     };
 
-    const handleQuantityChange = (rowId: number, quantity: number) => {
+    const handleQuantityChange = (rowId: number, event: React.ChangeEvent<HTMLInputElement>) => {
+        const quantity = Number(event.target.value);
         setProductRows(prev => prev.map(row => row.id === rowId ? { ...row, quantity } : row));
     };
 
@@ -289,6 +294,7 @@ const OpportunityEdit: React.FC = () => {
                                         <div className="md:col-span-4">
                                             <FormSelect 
                                                 label="Product" 
+                                                name={`product_${row.id}`}
                                                 value={row.product_id} 
                                                 required 
                                                 error={errors[`prod_${row.id}`]}
@@ -299,9 +305,10 @@ const OpportunityEdit: React.FC = () => {
                                         <div className="md:col-span-3">
                                             <FormSelect 
                                                 label="Variant" 
+                                                name={`variant_${row.id}`}
                                                 value={row.variant_id} 
                                                 required
-                                                onChange={(e) => handleVariantChange(row.id, e.target.value, row.product_id)}
+                                                onChange={(e) => handleVariantChange(row.id, e)}
                                                 options={variantList.map(v => ({ l: v.variant_name, v: String(v.variant_id) }))}
                                                 disabled={!row.product_id}
                                             />
@@ -309,10 +316,11 @@ const OpportunityEdit: React.FC = () => {
                                         <div className="md:col-span-2">
                                             <FormInput 
                                                 label="Quantity" 
+                                                name={`quantity_${row.id}`}
                                                 type="number" 
                                                 value={row.quantity} 
                                                 required
-                                                onChange={(e) => handleQuantityChange(row.id, Number(e.target.value))} 
+                                                onChange={(e) => handleQuantityChange(row.id, e)} 
                                             />
                                         </div>
                                         <div className="md:col-span-2">
@@ -377,8 +385,18 @@ const SectionTitle: React.FC<{ icon: React.ReactNode; title: string }> = ({ icon
     </div>
 );
 
-const FormInput: React.FC<{ label: string; name: string; value: any; onChange: any; error?: string; required?: boolean; type?: string; placeholder?: string }> = 
-({ label, error, required, ...props }) => (
+interface FormInputProps {
+    label: string;
+    name: string;
+    value: string | number;
+    onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => void;
+    error?: string;
+    required?: boolean;
+    type?: string;
+    placeholder?: string;
+}
+
+const FormInput: React.FC<FormInputProps> = ({ label, error, required, ...props }) => (
     <div className="flex flex-col gap-1.5">
         <label className="text-[10px] font-black text-slate-400 uppercase">{label} {required && <span className="text-red-500">*</span>}</label>
         <input {...props} className={`w-full bg-slate-50 border ${error ? 'border-red-300' : 'border-slate-200'} rounded-xl px-4 py-3 text-sm outline-none focus:border-[#005d52]`} />
@@ -386,8 +404,18 @@ const FormInput: React.FC<{ label: string; name: string; value: any; onChange: a
     </div>
 );
 
-const FormSelect: React.FC<{ label: string; name?: string; value: any; onChange: any; options: { l: string; v: string | number }[]; error?: string; required?: boolean; disabled?: boolean }> = 
-({ label, options, error, required, disabled, ...props }) => (
+interface FormSelectProps {
+    label: string;
+    name: string;
+    value: string | number;
+    onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
+    options: { l: string; v: string | number }[];
+    error?: string;
+    required?: boolean;
+    disabled?: boolean;
+}
+
+const FormSelect: React.FC<FormSelectProps> = ({ label, options, error, required, disabled, ...props }) => (
     <div className="flex flex-col gap-1.5">
         <label className="text-[10px] font-black text-slate-400 uppercase">{label} {required && <span className="text-red-500">*</span>}</label>
         <div className="relative">
