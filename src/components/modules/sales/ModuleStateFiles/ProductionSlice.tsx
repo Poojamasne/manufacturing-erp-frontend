@@ -19,10 +19,17 @@ const initialState = {
         "started_at": "",
         "completed_at": "",
         "customer_name": "",
-        "assigned_to_name": ""
+        "assigned_to_name": "",
+        "notes": ""
     },
     loading: false,
     error: null,
+    pagination: {
+        page: 1,
+        limit: 10,
+        total: 0,
+        pages: 0
+    }
 };
 
 const SalesProduction = createSlice({
@@ -36,35 +43,44 @@ const SalesProduction = createSlice({
 
         getSalesProductionSuccess: (state, action) => {
             state.loading = false;
-            state.productions = action.payload?.data || null;
+            state.productions = Array.isArray(action.payload?.data) ? action.payload.data : [];
+            state.pagination = action.payload?.pagination || { page: 1, limit: 10, total: 0, pages: 0 };
             state.error = null;
         },
 
         getSalesSingleProductionSuccess: (state, action) => {
             state.loading = false;
-            state.production = action.payload?.data || null;
+            state.production = action.payload?.data || initialState.production;
+            state.error = null;
+        },
+
+        updateSalesProductionSuccess: (state, action) => {
+            state.loading = false;
+            const updatedData = action.payload?.data;
+            if (updatedData) {
+                const index = state.productions.findIndex((p: any) => p.id === updatedData.id);
+                if (index !== -1) {
+                    state.productions[index] = updatedData;
+                }
+                state.production = updatedData;
+            }
+            state.error = null;
+        },
+
+        deleteSalesProductionSuccess: (state, action) => {
+            state.loading = false;
+            const deletedId = action.payload;
+            state.productions = state.productions.filter((p: any) => p.id !== deletedId);
+            if (state.production?.id === deletedId) {
+                state.production = initialState.production;
+            }
             state.error = null;
         },
 
         getSalesProductionFailure: (state, action) => {
             state.loading = false;
-            state.error = action.payload;
-            // state.production: {
-            //     "id": "",
-            //     "job_id": "",
-            //     "product_name": "",
-            //     "status": "",
-            //     "order_id": "",
-            //     "quantity": "",
-            //     "stage": "",
-            //     "assigned_to": "",
-            //     "created_at": "",
-            //     "updated_at": "",
-            //     "started_at": "",
-            //     "completed_at": "",
-            //     "customer_name": "",
-            //     "assigned_to_name": ""
-            // };
+            const payload = action.payload;
+            state.error = typeof payload === "string" ? payload : payload?.message || "Something went wrong";
         },
 
         clearSalesErrors: (state) => {
@@ -77,97 +93,61 @@ export const {
     getSalesProductionRequest,
     getSalesProductionSuccess,
     getSalesSingleProductionSuccess,
+    updateSalesProductionSuccess,
+    deleteSalesProductionSuccess,
     getSalesProductionFailure,
     clearSalesErrors,
 } = SalesProduction.actions;
 
 export default SalesProduction.reducer;
 
-// GET production's THUNK
-export const getProductions = () => async (dispatch: AppDispatch, getState: () => RootState) => {
+// GET production jobs with filters and pagination
+export const getProductions = (params?: { 
+    status?: string; 
+    search?: string; 
+    page?: number; 
+    limit?: number;
+    dateRange?: string;
+    startDate?: string;
+    endDate?: string;
+}) => async (dispatch: AppDispatch, getState: () => RootState) => {
     dispatch(getSalesProductionRequest());
+    
     try {
-        Swal.fire({
-            title: "Loading Productions...",
-            text: "Please wait while we fetch the data.",
-            allowOutsideClick: false,
-            customClass: {
-                loader: 'lead-loader'
-            },
-            didOpen: () => {
-                Swal.showLoading();
-            }
-        });
         const token = getState().auth.token || localStorage.getItem("token");
-        console.log("Token Before get Employee Request", token);
-        const { data } = await axios.get(
-            `${import.meta.env.VITE_API_BASE_URL}/sales/production/jobs`,
-            {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            }
-        );
-        console.log("Opportunities response data:", data);
-        // SUCCESS
+        
+        const queryParams = new URLSearchParams();
+        if (params?.status && params.status !== 'All') queryParams.append('status', params.status);
+        if (params?.search) queryParams.append('search', params.search);
+        if (params?.page) queryParams.append('page', params.page.toString());
+        if (params?.limit) queryParams.append('limit', params.limit.toString());
+        if (params?.dateRange && params.dateRange !== 'All Time') queryParams.append('dateRange', params.dateRange);
+        if (params?.startDate) queryParams.append('startDate', params.startDate);
+        if (params?.endDate) queryParams.append('endDate', params.endDate);
+        
+        const url = `${import.meta.env.VITE_API_BASE_URL}/sales/production/jobs${queryParams.toString() ? `?${queryParams}` : ''}`;
+        
+        console.log("Fetching productions from:", url);
+        
+        const { data } = await axios.get(url, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        
         dispatch(getSalesProductionSuccess(data));
-        console.log("Productions data after getProductions:", data);
-        Swal.close();
     } catch (error: any) {
-        Swal.close();
-
-        const status = error.response?.status;
-        const message =
-            error.response?.data?.message || "Something went wrong";
-
-        switch (status) {
-            case 400:
-                dispatch(getSalesProductionFailure(message || "Invalid request"));
-                break;
-
-            case 401: // invalid token or not logged in
-                dispatch(getSalesProductionFailure(message || "Please provide a valid token"));
-                break;
-
-            case 403: // role mismatch or insufficient permissions
-                dispatch(getSalesProductionFailure(message || "Unauthorized access"));
-                break;
-
-            case 404:
-                dispatch(getSalesProductionFailure(message || "No Sales Orders found"));
-                break;
-
-            case 409: //optional (not needed here)
-                dispatch(getSalesProductionFailure(message || "Conflict error"));
-                break;
-
-            case 500:
-                dispatch(getSalesProductionFailure("Server error"));
-                break;
-
-            default:
-                dispatch(getSalesProductionFailure(message));
-        }
+        const message = error.response?.data?.message || "Something went wrong";
+        dispatch(getSalesProductionFailure(message));
     }
 };
 
-// GET PRODUCTION THUNK
+// GET single production job
 export const getProduction = (id: string) => async (dispatch: AppDispatch, getState: () => RootState) => {
     dispatch(getSalesProductionRequest());
+    
     try {
-        Swal.fire({
-            title: "Loading Production Details...",
-            text: "Please wait while we fetch the data.",
-            allowOutsideClick: false,
-            customClass: {
-                loader: 'lead-loader'
-            },
-            didOpen: () => {
-                Swal.showLoading();
-            }
-        });
         const token = getState().auth.token || localStorage.getItem("token");
-        console.log("Token Before get Employee Request", token);
         const { data } = await axios.get(
             `${import.meta.env.VITE_API_BASE_URL}/sales/production/jobs/${id}`,
             {
@@ -176,44 +156,131 @@ export const getProduction = (id: string) => async (dispatch: AppDispatch, getSt
                 },
             }
         );
-        console.log("Productions response data:", data);
-        // SUCCESS
+        
         dispatch(getSalesSingleProductionSuccess(data));
-        console.log("Productions data after getProductions:", data);
+    } catch (error: any) {
+        const message = error.response?.data?.message || "Something went wrong";
+        dispatch(getSalesProductionFailure(message));
+    }
+};
+
+// UPDATE production job
+export const updateProduction = (id: string, updateData: any) => async (dispatch: AppDispatch, getState: () => RootState) => {
+    dispatch(getSalesProductionRequest());
+    
+    try {
+        Swal.fire({
+            title: "Updating Production Job...",
+            text: "Please wait...",
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+        
+        const token = getState().auth.token || localStorage.getItem("token");
+        
+        const { data } = await axios.put(
+            `${import.meta.env.VITE_API_BASE_URL}/sales/production/jobs/${id}`,
+            updateData,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+            }
+        );
+        
         Swal.close();
+        
+        await Swal.fire({
+            icon: 'success',
+            title: 'Updated!',
+            text: 'Production job updated successfully',
+            timer: 1500,
+            showConfirmButton: false
+        });
+        
+        dispatch(updateSalesProductionSuccess(data));
+        dispatch(getProductions());
+        
+        return data;
     } catch (error: any) {
         Swal.close();
-        const status = error.response?.status;
-        const message =
-            error.response?.data?.message || "Something went wrong";
+        const message = error.response?.data?.message || "Something went wrong";
+        await Swal.fire({
+            icon: 'error',
+            title: 'Update Failed',
+            text: message,
+            confirmButtonColor: '#d33'
+        });
+        dispatch(getSalesProductionFailure(message));
+        throw error;
+    }
+};
 
-        switch (status) {
-            case 400:
-                dispatch(getSalesProductionFailure(message || "Invalid request"));
-                break;
-
-            case 401: // invalid token or not logged in
-                dispatch(getSalesProductionFailure(message || "Please provide a valid token"));
-                break;
-
-            case 403: // role mismatch or insufficient permissions
-                dispatch(getSalesProductionFailure(message || "Unauthorized access"));
-                break;
-
-            case 404:
-                dispatch(getSalesProductionFailure(message || "No Sales Orders found"));
-                break;
-
-            case 409: //optional (not needed here)
-                dispatch(getSalesProductionFailure(message || "Conflict error"));
-                break;
-
-            case 500:
-                dispatch(getSalesProductionFailure("Server error"));
-                break;
-
-            default:
-                dispatch(getSalesProductionFailure(message));
+// DELETE production job
+export const deleteProduction = (id: string) => async (dispatch: AppDispatch, getState: () => RootState) => {
+    dispatch(getSalesProductionRequest());
+    
+    try {
+        const confirmResult = await Swal.fire({
+            title: 'Delete Production Job?',
+            text: "This action cannot be undone!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, delete it!'
+        });
+        
+        if (!confirmResult.isConfirmed) {
+            dispatch(getSalesProductionFailure("Delete cancelled"));
+            return;
         }
+        
+        Swal.fire({
+            title: "Deleting...",
+            text: "Please wait",
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+        
+        const token = getState().auth.token || localStorage.getItem("token");
+        
+        await axios.delete(
+            `${import.meta.env.VITE_API_BASE_URL}/sales/production/jobs/${id}`,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            }
+        );
+        
+        Swal.close();
+        
+        await Swal.fire({
+            icon: 'success',
+            title: 'Deleted!',
+            text: 'Production job has been deleted successfully.',
+            timer: 2000,
+            showConfirmButton: false
+        });
+        
+        dispatch(deleteSalesProductionSuccess(parseInt(id)));
+        dispatch(getProductions());
+        
+    } catch (error: any) {
+        Swal.close();
+        const message = error.response?.data?.message || "Something went wrong";
+        await Swal.fire({
+            icon: 'error',
+            title: 'Delete Failed',
+            text: message,
+            confirmButtonColor: '#d33'
+        });
+        dispatch(getSalesProductionFailure(message));
     }
 };
