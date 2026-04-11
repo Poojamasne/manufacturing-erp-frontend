@@ -46,7 +46,7 @@ const ProductionList: React.FC = () => {
     const [activeTab, setActiveTab] = useState<TimeTab>("All Time");
     const [statusFilter, setStatusFilter] = useState<ProdStatus>("All");
     const [stageFilter, setStageFilter] = useState<Stage>("All");
-    const [customRange, setCustomRange] = useState({ start: "", end: new Date().toISOString().split("T")[0] });
+    const [customRange, setCustomRange] = useState({ start: "", end: "" });
     const [selectedIds, setSelectedIds] = useState<number[]>([]);
     const [isCalendarOpen, setIsCalendarOpen] = useState(false);
     const [isStatusOpen, setIsStatusOpen] = useState(false);
