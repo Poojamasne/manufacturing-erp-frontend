@@ -62,9 +62,15 @@ export const Dashboard = () => {
   const calendarRef = useRef<HTMLDivElement>(null);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 640);
 
+  // Only fetch data when filter changes, but skip the initial "Custom" selection that hasn't applied a range yet
+  const [shouldFetch, setShouldFetch] = useState(true);
+
   useEffect(() => {
-    dispatch(getDashboardData());
-  }, [dispatch, filter]);
+    if (shouldFetch) {
+      dispatch(getDashboardData());
+    }
+    setShouldFetch(true);
+  }, [dispatch, filter, shouldFetch]);
 
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 640);
@@ -82,60 +88,96 @@ export const Dashboard = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // Handle custom range application
+  const handleApplyCustomRange = () => {
+    if (!customRange.start || !customRange.end) {
+      alert("Please select date range");
+      return;
+    }
+    setIsCalendarOpen(false);
+    // Trigger data fetch with custom range
+    setShouldFetch(true);
+    // Keep filter as "Custom"
+    setFilter("Custom");
+  };
+
+  // Handle filter change
+  const handleFilterChange = (value: FilterType) => {
+    if (value === "Custom") {
+      setFilter("Custom");
+      setIsCalendarOpen(true);
+      setShouldFetch(false); // Prevent data fetch until range is applied
+    } else {
+      setFilter(value);
+      setIsCalendarOpen(false);
+      setShouldFetch(true); // Fetch data for the selected non-custom filter
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[#f4f7f6] p-4 sm:p-6 lg:p-8 font-sans text-gray-800">
       <div className="max-w-7xl mx-auto">
 
         {/* HEADER & TIME FILTERS */}
-        <div className="mb-10 flex flex-col xl:flex-row xl:items-end justify-between gap-6">
+        <div className="mb-10 flex flex-col xl:flex-row xl:items-center justify-between gap-6">
+  
+          {/* LEFT */}
           <div>
-            <h1 className="text-3xl font-extrabold text-slate-800 tracking-tight">Dashboard</h1>
-            <p className="text-sm text-gray-500 mt-1 font-medium">Full customer pipeline overview</p>
-            <div className="flex items-center gap-2 mt-4">
-              <div className="flex items-center gap-2 bg-[#005d52] text-white px-4 py-3 rounded-2xl text-[11px] font-bold shadow-lg shadow-teal-900/10">
-                <CalendarIcon size={13} />
-                {filter === "Custom" ?
-                  (customRange.start ? `${customRange.start} to ${customRange.end}` : "Custom Selection")
-                  : `${filter} Overview`}
-              </div>
-              {/* {loading && <Loader2 className="animate-spin text-[#005d52]" size={20} />} */}
-            </div>
+            <h1 className="text-3xl font-extrabold text-slate-800 tracking-tight">
+              Dashboard
+            </h1>
+            <p className="text-sm text-gray-500 mt-1 font-medium">
+              Full customer pipeline overview
+            </p>
           </div>
 
+          {/* RIGHT - DROPDOWN */}
           <div className="relative">
-            <div className="flex flex-wrap items-center gap-2 p-1.5 bg-white/60 backdrop-blur-md rounded-2xl border border-white w-fit shadow-sm">
-              {(["Weekly", "Monthly", "Quarterly", "Yearly"] as FilterType[]).map((f) => (
-                <button
-                  key={f}
-                  onClick={() => { setFilter(f); setIsCalendarOpen(false); }}
-                  className={`px-5 py-2 text-xs font-bold rounded-xl transition-all duration-300 ${filter === f ? "bg-[#d1e9e7] text-[#005d52] shadow-sm" : "text-gray-400 hover:text-gray-700"
-                    }`}
-                >
-                  {f}
-                </button>
-              ))}
-              <button
-                onClick={() => setIsCalendarOpen(!isCalendarOpen)}
-                className={`px-5 py-2 text-xs font-bold rounded-xl transition-all flex items-center gap-2 ${filter === "Custom" ? "bg-[#d1e9e7] text-[#005d52] shadow-sm" : "text-gray-400 hover:text-gray-700"
-                  }`}
-              >
-                <CalendarIcon size={14} /> Custom
-              </button>
-            </div>
+            <select
+              value={filter}
+              onChange={(e) => handleFilterChange(e.target.value as FilterType)}
+              className="px-4 py-2 rounded-xl border border-slate-200 bg-white text-sm font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-[#005d52]/20"
+            >
+              <option value="Weekly">Weekly</option>
+              <option value="Monthly">Monthly</option>
+              <option value="Quarterly">Quarterly</option>
+              <option value="Yearly">Yearly</option>
+              <option value="Custom">Custom</option>
+            </select>
 
-            {isCalendarOpen && (
-              <div ref={calendarRef} className="absolute top-full mt-3 right-0 z-50 bg-white p-6 rounded-[2.5rem] shadow-2xl border border-gray-50 w-70 sm:w-85 animate-in zoom-in-95 fade-in duration-200 origin-top-right">
-                <div className="flex justify-between items-center mb-5">
-                  <h4 className="text-sm font-bold text-gray-800">Select Date Range</h4>
-                  <button onClick={() => setIsCalendarOpen(false)} className="text-gray-400 hover:text-red-500 transition-colors">
-                    <X size={18} />
-                  </button>
-                </div>
-                <div className="space-y-4">
-                  <input type="date" className="w-full bg-gray-50 border-none rounded-xl p-3 text-sm" value={customRange.start} onChange={(e) => setCustomRange({ ...customRange, start: e.target.value })} />
-                  <input type="date" className="w-full bg-gray-50 border-none rounded-xl p-3 text-sm" value={customRange.end} onChange={(e) => setCustomRange({ ...customRange, end: e.target.value })} />
-                  <button onClick={() => { if (customRange.start) setFilter("Custom"); setIsCalendarOpen(false); }} className="w-full py-3 bg-[#005d52] text-white rounded-xl font-bold text-xs shadow-lg">
-                    Apply Range
+            {/* Custom Date Range Popup */}
+            {isCalendarOpen && filter === "Custom" && (
+              <div 
+                ref={calendarRef}
+                className="absolute right-0 mt-3 bg-white p-6 rounded-2xl shadow-xl border z-50 w-72"
+              >
+                <div className="space-y-3">
+                  <input
+                    type="date"
+                    value={customRange.start}
+                    onChange={(e) =>
+                      setCustomRange({ ...customRange, start: e.target.value })
+                    }
+                    className="w-full p-2 border rounded-lg"
+                    placeholder="Start Date"
+                  />
+
+                  <input
+                    type="date"
+                    value={customRange.end}
+                    min={customRange.start}
+                    onChange={(e) =>
+                      setCustomRange({ ...customRange, end: e.target.value })
+                    }
+                    className="w-full p-2 border rounded-lg"
+                    placeholder="End Date"
+                  />
+
+                  <button
+                    onClick={handleApplyCustomRange}
+                    className="w-full bg-[#005d52] text-white py-2 rounded-lg text-sm hover:bg-[#004a40] transition-colors"
+                  >
+                    Apply
                   </button>
                 </div>
               </div>
@@ -166,7 +208,7 @@ export const Dashboard = () => {
                   <YAxis axisLine={false} tickLine={false} tick={{ fill: '#7e899c', fontSize: 10 }} />
                   <Tooltip cursor={{ fill: '#f8fafc' }} contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }} />
                   <Bar dataKey="count" radius={[8, 8, 0, 0]} barSize={isMobile ? 28 : 35}>
-                    {pipeline.map((_, index) => (
+                    {pipeline?.map((_, index) => (
                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                     ))}
                   </Bar>
