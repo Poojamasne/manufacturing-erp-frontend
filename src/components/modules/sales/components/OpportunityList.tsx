@@ -61,7 +61,7 @@ const OpportunityList: React.FC = () => {
 
     // Professional Pagination States
     const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 10;
+    const itemsPerPage = 5;
 
     // UI States
     const [openDropdown, setOpenDropdown] = useState<string | null>(null);

@@ -253,8 +253,16 @@ const QuotationCreate: React.FC = () => {
 
     // --- LINE ITEMS VALIDATION ---
     if (lineItems.some(item => !item.product.trim())) {
-        newErrors.lineItems = 'Please ensure all products have names';
-    }
+    newErrors.lineItems = 'Please ensure all products have names';
+}
+
+if (lineItems.some(item => item.unitPrice <= 0)) {
+    newErrors.lineItems = 'Unit price must be greater than 0';
+}
+
+if (lineItems.some(item => item.quantity <= 0)) {
+    newErrors.lineItems = 'Quantity must be greater than 0';
+}
     
     if (Object.keys(newErrors).length > 0) {
         setErrors(newErrors);
@@ -337,7 +345,7 @@ const QuotationCreate: React.FC = () => {
         setSubmitError(
             typeof err === "string"
                 ? err
-                : err?.message || "Failed to create quotation"
+                : (err as any)?.message || "Failed to create quotation"
         );
     }
 };
@@ -567,12 +575,16 @@ const QuotationCreate: React.FC = () => {
                                                 </td>
                                                 <td className="p-4">
                                                     <input
-                                                        type="number"
-                                                        value={item.unitPrice}
-                                                        onChange={(e) => updateLineItem(item.id, 'unitPrice', parseFloat(e.target.value) || 0)}
-                                                        className="w-32 px-3 py-2 border border-gray-200 rounded-lg text-sm text-right focus:outline-none focus:ring-2 focus:ring-[#005d52]"
-                                                        step="any"
-                                                    />
+  type="number"
+  min={1}   
+  value={item.unitPrice}
+  onChange={(e) =>
+    updateLineItem(item.id, 'unitPrice', parseFloat(e.target.value) || 0)
+  }
+  className={`w-32 px-3 py-2 border rounded-lg text-sm text-right focus:outline-none focus:ring-2 focus:ring-[#005d52] ${
+    item.unitPrice <= 0 ? 'border-red-500 bg-red-50' : 'border-gray-200'
+  }`}
+/>
                                                 </td>
                                                 <td className="p-4">
                                                     <input

@@ -34,6 +34,12 @@ const initialState = {
     },
     loading: false,
     error: null,
+    pagination: {
+        page: 1,
+        limit: 10,
+        total: 0,
+        pages: 0
+    }
 };
 
 const SalesOrder = createSlice({
@@ -47,9 +53,8 @@ const SalesOrder = createSlice({
 
         getSalesOrdersSuccess: (state, action) => {
             state.loading = false;
-            state.orders = Array.isArray(action.payload?.data)
-    ? action.payload.data
-    : [];
+            state.orders = Array.isArray(action.payload?.data) ? action.payload.data : [];
+            state.pagination = action.payload?.pagination || { page: 1, limit: 10, total: 0, pages: 0 };
             state.error = null;
         },
 
@@ -60,15 +65,10 @@ const SalesOrder = createSlice({
         },
 
         getSalesOrderFailure: (state, action) => {
-    state.loading = false;
-
-    const payload = action.payload;
-
-    state.error =
-        typeof payload === "string"
-            ? payload
-            : payload?.message || "Something went wrong";
-},
+            state.loading = false;
+            const payload = action.payload;
+            state.error = typeof payload === "string" ? payload : payload?.message || "Something went wrong";
+        },
 
         clearSalesErrors: (state) => {
             state.error = null;
@@ -86,36 +86,41 @@ export const {
 
 export default SalesOrder.reducer;
 
-// GET order's THUNK
-export const getOrders = () => async (dispatch: AppDispatch, _getState: () => RootState) => {
+// GET order's THUNK with filters and pagination
+export const getOrders = (params?: { 
+    status?: string; 
+    search?: string; 
+    page?: number; 
+    limit?: number;
+    dateRange?: string;
+    startDate?: string;
+    endDate?: string;
+}) => async (dispatch: AppDispatch, _getState: () => RootState) => {
     dispatch(getSalesOrderRequest());
-    let loadingSwal: any = null;
+    
     try {
-        loadingSwal = Swal.fire({
-            title: "Loading Orders...",
-            text: "Please wait while we fetch the data.",
-            allowOutsideClick: false,
-            didOpen: () => {
-                Swal.showLoading();
-            }
+        const token = _getState().auth.token || localStorage.getItem("token");
+        
+        // Build query parameters
+        const queryParams = new URLSearchParams();
+        if (params?.status && params.status !== 'All') queryParams.append('status', params.status);
+        if (params?.search) queryParams.append('search', params.search);
+        if (params?.page) queryParams.append('page', params.page.toString());
+        if (params?.limit) queryParams.append('limit', params.limit.toString());
+        if (params?.dateRange && params.dateRange !== 'All Time') queryParams.append('dateRange', params.dateRange);
+        if (params?.startDate) queryParams.append('startDate', params.startDate);
+        if (params?.endDate) queryParams.append('endDate', params.endDate);
+        
+        const url = `${import.meta.env.VITE_API_BASE_URL}/sales/orders${queryParams.toString() ? `?${queryParams}` : ''}`;
+        
+        const { data } = await axios.get(url, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
         });
         
-        const token = _getState().auth.token || localStorage.getItem("token");
-        const { data } = await axios.get(
-            `${import.meta.env.VITE_API_BASE_URL}/sales/orders`,
-            {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            }
-        );
-        
-        await loadingSwal;
-        Swal.close();
         dispatch(getSalesOrdersSuccess(data));
     } catch (error: any) {
-        if (loadingSwal) await loadingSwal;
-        Swal.close();
         const status = error.response?.status;
         const message = error.response?.data?.message || "Something went wrong";
 
@@ -147,17 +152,8 @@ export const getOrders = () => async (dispatch: AppDispatch, _getState: () => Ro
 // GET ORDER THUNK
 export const getOrder = (id: string) => async (dispatch: AppDispatch, _getState: () => RootState) => {
     dispatch(getSalesOrderRequest());
-    let loadingSwal: any = null;
+    
     try {
-        loadingSwal = Swal.fire({
-            title: "Loading Order Details...",
-            text: "Please wait while we fetch the data.",
-            allowOutsideClick: false,
-            didOpen: () => {
-                Swal.showLoading();
-            }
-        });
-        
         const token = _getState().auth.token || localStorage.getItem("token");
         const { data } = await axios.get(
             `${import.meta.env.VITE_API_BASE_URL}/sales/orders/${id}`,
@@ -168,12 +164,8 @@ export const getOrder = (id: string) => async (dispatch: AppDispatch, _getState:
             }
         );
         
-        await loadingSwal;
-        Swal.close();
         dispatch(getSalesSingleOrderSuccess(data));
     } catch (error: any) {
-        if (loadingSwal) await loadingSwal;
-        Swal.close();
         const status = error.response?.status;
         const message = error.response?.data?.message || "Something went wrong";
 
@@ -202,12 +194,11 @@ export const getOrder = (id: string) => async (dispatch: AppDispatch, _getState:
     }
 };
 
-// --- CREATE ORDER THUNK (COMPLETELY FIXED) ---
+// --- CREATE ORDER THUNK ---
 export const createOrder = (orderData: any) => async (dispatch: AppDispatch, _getState: () => RootState) => {
     dispatch(getSalesOrderRequest());
     
     try {
-        // Show creating loader
         Swal.fire({
             title: "Creating Order...",
             text: "Please wait while we create the order.",
@@ -230,10 +221,8 @@ export const createOrder = (orderData: any) => async (dispatch: AppDispatch, _ge
             }
         );
         
-        // Close the creating loader
         Swal.close();
         
-        // Show success message
         await Swal.fire({
             icon: 'success',
             title: 'Success!',
@@ -256,12 +245,11 @@ export const createOrder = (orderData: any) => async (dispatch: AppDispatch, _ge
     }
 };
 
-// --- UPDATE ORDER THUNK (COMPLETELY FIXED) ---
+// --- UPDATE ORDER THUNK ---
 export const updateOrder = (id: string, updateData: { status?: string; shipping_address?: string; notes?: string }) => async (dispatch: AppDispatch, _getState: () => RootState) => {
     dispatch(getSalesOrderRequest());
     
     try {
-        // Show updating loader
         Swal.fire({
             title: "Updating Order...",
             text: "Please wait...",
@@ -282,10 +270,8 @@ export const updateOrder = (id: string, updateData: { status?: string; shipping_
             }
         );
         
-        // Close the updating loader
         Swal.close();
         
-        // Show success message
         await Swal.fire({
             icon: 'success',
             title: 'Updated!',
@@ -311,7 +297,7 @@ export const updateOrder = (id: string, updateData: { status?: string; shipping_
     }
 };
 
-// --- DELETE ORDER THUNK (COMPLETELY FIXED) ---
+// --- DELETE ORDER THUNK ---
 export const deleteOrder = (id: string) => async (dispatch: AppDispatch, _getState: () => RootState) => {
     dispatch(getSalesOrderRequest());
     
@@ -331,7 +317,6 @@ export const deleteOrder = (id: string) => async (dispatch: AppDispatch, _getSta
             return;
         }
         
-        // Show deleting loader
         Swal.fire({
             title: "Deleting...",
             text: "Please wait",
@@ -352,10 +337,8 @@ export const deleteOrder = (id: string) => async (dispatch: AppDispatch, _getSta
             }
         );
         
-        // Close the deleting loader
         Swal.close();
         
-        // Show success message
         await Swal.fire({
             icon: 'success',
             title: 'Deleted!',
@@ -364,7 +347,6 @@ export const deleteOrder = (id: string) => async (dispatch: AppDispatch, _getSta
             showConfirmButton: false
         });
         
-        // Refresh the orders list
         dispatch(getOrders());
         
     } catch (error: any) {

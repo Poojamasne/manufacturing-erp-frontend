@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { 
     ChevronRight, 
     Building2, 
-    Edit3, 
     Download, 
     List, 
     Calendar, 
@@ -68,7 +67,7 @@ const QuotationView: React.FC = () => {
         if (!id) return;
         setUpdatingStatus(true);
         try {
-            await dispatch(updateQuotationStatus({ id, status: newStatus })).unwrap();
+            await dispatch(updateQuotationStatus({ id, status: newStatus }));
             dispatch(getQuotation(id));
         } catch (err) {
             console.error('Status update failed:', err);
@@ -105,16 +104,7 @@ const QuotationView: React.FC = () => {
     }
 };
 
-    const getStatusStyle = (status: string) => {
-        const base = "px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest border ";
-        switch (status) {
-            case 'Accepted': return base + 'bg-emerald-50 text-emerald-700 border-emerald-100';
-            case 'Sent': return base + 'bg-blue-50 text-blue-700 border-blue-100';
-            case 'Rejected': return base + 'bg-rose-50 text-rose-700 border-rose-100';
-            case 'Expired': return base + 'bg-amber-50 text-amber-700 border-amber-100';
-            default: return base + 'bg-slate-50 text-slate-500 border-slate-200';
-        }
-    };
+  
 
     const handleExport = () => {
         const element = document.getElementById('quotation-pdf-content');

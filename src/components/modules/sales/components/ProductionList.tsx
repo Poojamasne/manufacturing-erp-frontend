@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import {
     Search,
     ChevronDown,
@@ -10,15 +10,16 @@ import {
     X,
     MoreHorizontal,
     Settings,
+    Loader2
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-// --- Redux Imports ---
-import { getProductions, clearSalesErrors } from "../ModuleStateFiles/ProductionSlice";
+import { getProductions, deleteProduction, clearSalesErrors } from "../ModuleStateFiles/ProductionSlice";
 import { useAppDispatch, useAppSelector } from "../../../common/ReduxMainHooks";
 import type { RootState } from "../../../../ApplicationState/Store";
 
 // --- Types ---
-type ProdStatus = "In Progress" | "On Hold" | "Completed" | "Delayed" | "All";
+type ProdStatus = "Pending" | "In Progress" | "On Hold" | "Completed" | "Delayed" | "All";
+type Stage = "Pending" |"Raw Materials" | "Cutting" | "Assembly" | "Quality Check" | "Packaging" | "All";
 type TimeTab = "Weekly" | "Monthly" | "Quarterly" | "Yearly" | "All Time" | "Custom";
 
 interface ProductionJob {
@@ -39,30 +40,64 @@ const ProductionList: React.FC = () => {
     const dispatch = useAppDispatch();
     const calendarRef = useRef<HTMLDivElement>(null);
 
-    // Redux State
-    const { productions, loading } = useAppSelector((state: RootState) => state.SalesProduction);
+    const { productions, loading, pagination } = useAppSelector((state: RootState) => state.SalesProduction);
 
-    // Filter & Search States
     const [searchQuery, setSearchQuery] = useState("");
     const [activeTab, setActiveTab] = useState<TimeTab>("All Time");
     const [statusFilter, setStatusFilter] = useState<ProdStatus>("All");
-    const [customRange, setCustomRange] = useState({ start: "", end: new Date().toISOString().split("T")[0] });
-
-    // UI Logic States
+    const [stageFilter, setStageFilter] = useState<Stage>("All");
+    const [customRange, setCustomRange] = useState({ start: "", end: "" });
     const [selectedIds, setSelectedIds] = useState<number[]>([]);
     const [isCalendarOpen, setIsCalendarOpen] = useState(false);
     const [isStatusOpen, setIsStatusOpen] = useState(false);
-
-    // Professional Pagination States
+    const [isStageOpen, setIsStageOpen] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 10;
+    const [debouncedSearch, setDebouncedSearch] = useState("");
+
+    // Status options
+    const statusOptions = ["All", "Pending", "In Progress", "On Hold", "Completed", "Delayed"];
+    
+    // Stage options
+    const stageOptions: Stage[] = ["All", "Pending","Raw Materials", "Cutting", "Assembly", "Quality Check", "Packaging"];
+
+    // Debounce search
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setDebouncedSearch(searchQuery);
+        }, 500);
+        return () => clearTimeout(timer);
+    }, [searchQuery]);
+
+    // Fetch productions with filters
+    const fetchProductions = useCallback(() => {
+        const params: any = {
+            page: currentPage,
+            limit: itemsPerPage
+        };
+        
+        if (statusFilter !== 'All') params.status = statusFilter;
+        if (stageFilter !== 'All') params.stage = stageFilter;
+        if (debouncedSearch) params.search = debouncedSearch;
+        if (activeTab !== 'All Time') params.dateRange = activeTab;
+        if (activeTab === 'Custom' && customRange.start && customRange.end) {
+            params.startDate = customRange.start;
+            params.endDate = customRange.end;
+        }
+        
+        console.log("Fetching with params:", params);
+        dispatch(getProductions(params));
+    }, [dispatch, currentPage, statusFilter, stageFilter, debouncedSearch, activeTab, customRange]);
 
     useEffect(() => {
-        dispatch(getProductions());
+        fetchProductions();
         return () => { dispatch(clearSalesErrors()); };
-    }, [dispatch]);
+    }, [fetchProductions]);
 
-    // Close calendar on outside click
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [statusFilter, stageFilter, debouncedSearch, activeTab]);
+
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
             if (calendarRef.current && !calendarRef.current.contains(event.target as Node)) {
@@ -73,50 +108,7 @@ const ProductionList: React.FC = () => {
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, []);
 
-    // Reset pagination on filter change
-    useEffect(() => {
-        setCurrentPage(1);
-    }, [searchQuery, statusFilter, activeTab, itemsPerPage]);
-
-    // --- Filtering Logic ---
-    const filteredJobs = useMemo(() => {
-        if (!productions) return [];
-        return (productions as ProductionJob[]).filter((j) => {
-            const matchesSearch =
-                j.job_id.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                j.product_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                j.order_id.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                j.customer_name?.toLowerCase().includes(searchQuery.toLowerCase());
-
-            const matchesStatus = statusFilter === "All" || j.status === statusFilter;
-
-            let matchesTime = true;
-            const updatedDate = new Date(j.updated_at || new Date());
-            const now = new Date();
-
-            if (activeTab === "Custom") {
-                const start = customRange.start ? new Date(customRange.start) : null;
-                const end = customRange.end ? new Date(customRange.end) : null;
-                if (start) matchesTime = matchesTime && updatedDate >= start;
-                if (end) {
-                    const endOfRange = new Date(end);
-                    endOfRange.setHours(23, 59, 59);
-                    matchesTime = matchesTime && updatedDate <= endOfRange;
-                }
-            } else if (activeTab !== "All Time") {
-                const diffInDays = (now.getTime() - updatedDate.getTime()) / (1000 * 60 * 60 * 24);
-                if (activeTab === "Weekly") matchesTime = diffInDays <= 7 && diffInDays >= 0;
-                if (activeTab === "Monthly") matchesTime = updatedDate.getMonth() === now.getMonth() && updatedDate.getFullYear() === now.getFullYear();
-                if (activeTab === "Yearly") matchesTime = updatedDate.getFullYear() === now.getFullYear();
-            }
-
-            return matchesSearch && matchesStatus && matchesTime;
-        });
-    }, [productions, searchQuery, statusFilter, activeTab, customRange]);
-
-    // --- Pagination Logic ---
-    const totalPages = Math.ceil(filteredJobs.length / itemsPerPage);
-    const paginatedJobs = filteredJobs.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+    const totalPages = pagination?.pages || 0;
 
     const getPageNumbers = () => {
         const pages = [];
@@ -136,14 +128,28 @@ const ProductionList: React.FC = () => {
     };
 
     const toggleSelectAll = () => {
-        if (selectedIds.length === paginatedJobs.length) setSelectedIds([]);
-        else setSelectedIds(paginatedJobs.map(j => j.id));
+        if (selectedIds.length === productions.length) setSelectedIds([]);
+        else setSelectedIds(productions.map((j: ProductionJob) => j.id));
     };
 
-    // --- Dynamic Styling ---
+    const handleDelete = async (id: number) => {
+        await dispatch(deleteProduction(id.toString()));
+        fetchProductions();
+    };
+
+    const handleBulkDelete = async () => {
+        if (selectedIds.length === 0) return;
+        for (const id of selectedIds) {
+            await dispatch(deleteProduction(id.toString()));
+        }
+        setSelectedIds([]);
+        fetchProductions();
+    };
+
     const getStatusStyle = (st: string) => {
         const base = "px-3 py-1 rounded-lg border text-[10px] font-black uppercase tracking-widest ";
         switch (st) {
+            case "Pending": return base + "bg-gray-50 text-gray-600 border-gray-200";
             case "In Progress": return base + "bg-blue-50 text-blue-600 border-blue-100";
             case "Completed": return base + "bg-emerald-50 text-emerald-600 border-emerald-100";
             case "Delayed": return base + "bg-rose-50 text-rose-600 border-rose-100";
@@ -164,11 +170,17 @@ const ProductionList: React.FC = () => {
         }
     }
 
+    if (loading && productions.length === 0) {
+        return (
+            <div className="min-h-screen bg-[#F8FAFC] flex items-center justify-center">
+                <Loader2 className="animate-spin text-[#005d52]" size={48} />
+            </div>
+        );
+    }
+
     return (
         <div className="min-h-screen bg-[#F8FAFC] p-4 sm:p-6 lg:p-8 font-sans text-slate-900">
             <div className="max-w-7xl mx-auto">
-
-                {/* Header */}
                 <header className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 mb-10">
                     <div>
                         <h1 className="text-3xl font-extrabold text-slate-800 tracking-tight flex items-center gap-3">
@@ -178,7 +190,6 @@ const ProductionList: React.FC = () => {
                     </div>
                 </header>
 
-                {/* Filters */}
                 <section className="relative mb-8 flex flex-wrap items-center gap-3">
                     <div className="flex p-1.5 bg-white rounded-2xl border border-slate-200 shadow-sm">
                         {(["Weekly", "Monthly", "Quarterly", "Yearly", "All Time"] as TimeTab[]).map((tab) => (
@@ -208,16 +219,13 @@ const ProductionList: React.FC = () => {
                             <div className="space-y-4">
                                 <input type="date" value={customRange.start} onChange={(e) => setCustomRange({ ...customRange, start: e.target.value })} className="w-full p-3 bg-slate-50 border-none rounded-xl text-sm outline-none focus:ring-2 focus:ring-teal-500/20" />
                                 <input type="date" value={customRange.end} onChange={(e) => setCustomRange({ ...customRange, end: e.target.value })} className="w-full p-3 bg-slate-50 border-none rounded-xl text-sm outline-none focus:ring-2 focus:ring-teal-500/20" />
-                                <button onClick={() => { setActiveTab("Custom"); setIsCalendarOpen(false); }} className="w-full py-3.5 bg-[#005d52] text-white rounded-xl font-bold text-xs shadow-lg">Apply Selection</button>
+                                <button onClick={() => { setActiveTab("Custom"); setIsCalendarOpen(false); fetchProductions(); }} className="w-full py-3.5 bg-[#005d52] text-white rounded-xl font-bold text-xs shadow-lg">Apply Selection</button>
                             </div>
                         </div>
                     )}
                 </section>
 
-                {/* Main Table Area */}
                 <div className="bg-white rounded-[2.5rem] shadow-2xl shadow-slate-200/60 border border-slate-100 overflow-hidden">
-
-                    {/* Toolbar */}
                     <div className="p-6 flex flex-col lg:flex-row justify-between items-center gap-4 border-b border-slate-50">
                         <div className="relative w-full lg:w-96">
                             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" size={18} />
@@ -231,19 +239,21 @@ const ProductionList: React.FC = () => {
                         </div>
 
                         <div className="flex flex-wrap items-center justify-end gap-3 w-full lg:w-auto">
+                            {/* Status Filter */}
                             <div className="relative min-w-35">
                                 <button
                                     onClick={() => setIsStatusOpen(!isStatusOpen)}
                                     className={`w-full flex items-center justify-between gap-2 px-4 py-3 rounded-xl border text-[13px] font-bold ${statusFilter !== "All" ? "bg-teal-50 border-teal-200 text-[#005d52]" : "bg-white border-slate-200 text-slate-600"}`}
                                 >
-                                    {statusFilter === "All" ? "Status" : statusFilter} <ChevronDown size={14} className={isStatusOpen ? 'rotate-180 transition-transform' : 'transition-transform'} />
+                                    {statusFilter === "All" ? "Status" : statusFilter} 
+                                    <ChevronDown size={14} className={isStatusOpen ? 'rotate-180 transition-transform' : 'transition-transform'} />
                                 </button>
                                 {isStatusOpen && (
                                     <div className="absolute right-0 mt-2 w-full bg-white border border-slate-100 rounded-2xl shadow-2xl z-50 py-2">
-                                        {["All", "In Progress", "On Hold", "Completed", "Delayed"].map(opt => (
+                                        {statusOptions.map(opt => (
                                             <button
                                                 key={opt}
-                                                onClick={() => { setStatusFilter(opt as ProdStatus); setIsStatusOpen(false); }}
+                                                onClick={() => { setStatusFilter(opt as ProdStatus); setIsStatusOpen(false); fetchProductions(); }}
                                                 className={`w-full text-left px-4 py-2.5 text-[13px] hover:bg-slate-50 ${statusFilter === opt ? "text-[#005d52] font-bold bg-teal-50/50" : "text-slate-600"}`}
                                             >
                                                 {opt}
@@ -252,19 +262,47 @@ const ProductionList: React.FC = () => {
                                     </div>
                                 )}
                             </div>
-                            <button disabled={selectedIds.length === 0} className="p-3 bg-rose-50 text-rose-500 rounded-xl disabled:opacity-20 transition-colors">
+
+                            {/* Stage Filter */}
+                            <div className="relative min-w-35">
+                                <button
+                                    onClick={() => setIsStageOpen(!isStageOpen)}
+                                    className={`w-full flex items-center justify-between gap-2 px-4 py-3 rounded-xl border text-[13px] font-bold ${stageFilter !== "All" ? "bg-teal-50 border-teal-200 text-[#005d52]" : "bg-white border-slate-200 text-slate-600"}`}
+                                >
+                                    {stageFilter === "All" ? "Stage" : stageFilter} 
+                                    <ChevronDown size={14} className={isStageOpen ? 'rotate-180 transition-transform' : 'transition-transform'} />
+                                </button>
+                                {isStageOpen && (
+                                    <div className="absolute right-0 mt-2 w-full bg-white border border-slate-100 rounded-2xl shadow-2xl z-50 py-2">
+                                        {stageOptions.map(opt => (
+                                            <button
+                                                key={opt}
+                                                onClick={() => { setStageFilter(opt); setIsStageOpen(false); fetchProductions(); }}
+                                                className={`w-full text-left px-4 py-2.5 text-[13px] hover:bg-slate-50 ${stageFilter === opt ? "text-[#005d52] font-bold bg-teal-50/50" : "text-slate-600"}`}
+                                            >
+                                                {opt}
+                                            </button>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+
+                            <button 
+                                onClick={handleBulkDelete}
+                                disabled={selectedIds.length === 0} 
+                                className="p-3 bg-rose-50 text-rose-500 rounded-xl disabled:opacity-20 transition-colors hover:bg-rose-100"
+                            >
                                 <Trash2 size={20} />
                             </button>
                         </div>
                     </div>
 
-                    {/* Table Area */}
                     <div className="w-full overflow-x-auto">
                         <table className="w-full text-left border-collapse">
                             <thead>
                                 <tr className="bg-slate-50/50">
-                                    <th className="w-16 p-5 text-center border-b  border-r border-slate-100">
-                                        <input type="checkbox" className="accent-[#005d52] w-4 h-4 cursor-pointer" checked={selectedIds.length === paginatedJobs.length && paginatedJobs.length > 0} onChange={toggleSelectAll} />
+                                    <th className="w-16 p-5 text-center border-b border-r border-slate-100">
+                                        <input type="checkbox" className="accent-[#005d52] w-4 h-4 cursor-pointer" checked={selectedIds.length === productions.length && productions.length > 0} onChange={toggleSelectAll} />
                                     </th>
                                     <th className="px-4 py-5 text-[13px] text-slate-800 uppercase tracking-widest border-b border-r border-slate-100 text-center">Job ID</th>
                                     <th className="px-4 py-5 text-[13px] text-slate-800 uppercase tracking-widest border-b border-r border-slate-100">Order ID</th>
@@ -277,14 +315,13 @@ const ProductionList: React.FC = () => {
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-50">
-                                {paginatedJobs.map((j) => (
+                                {productions.map((j: ProductionJob) => (
                                     <tr key={j.id} className="group hover:bg-teal-50/20 transition-colors">
                                         <td className="p-5 text-center border-r border-slate-50">
                                             <input type="checkbox" className="accent-[#005d52] w-4 h-4 cursor-pointer" checked={selectedIds.includes(j.id)} onChange={() => setSelectedIds(prev => prev.includes(j.id) ? prev.filter(i => i !== j.id) : [...prev, j.id])} />
                                         </td>
                                         <td className="px-4 py-5 text-[13px] text-slate-800 border-r border-slate-50 text-center">{j.job_id}</td>
-                                        <td className="px-4 py-5 text-[13px] text-slate-800 border-r border-slate-50 text-center">{j.order_id}</td>
-                                        
+                                        <td className="px-4 py-5 text-[13px] text-slate-800 border-r border-slate-50 text-center">{j.order_id || '-'}</td>
                                         <td className="px-4 py-5 text-[13px] font-bold text-slate-900 border-r border-slate-50 truncate max-w-45" title={j.product_name}>
                                             {j.product_name}
                                         </td>
@@ -292,14 +329,10 @@ const ProductionList: React.FC = () => {
                                             {j.quantity}
                                         </td>
                                         <td className="px-4 py-5 border-r border-slate-50 text-center">
-                                            <span className={getStageStyle(j.stage)}>
-                                                {j.stage}
-                                            </span>
+                                            <span className={getStageStyle(j.stage)}>{j.stage}</span>
                                         </td>
                                         <td className="px-4 py-5 border-r border-slate-50 text-center">
-                                            <span className={getStatusStyle(j.status)}>
-                                                {j.status}
-                                            </span>
+                                            <span className={getStatusStyle(j.status)}>{j.status}</span>
                                         </td>
                                         <td className="px-4 py-5 text-[12px] text-slate-800 whitespace-nowrap border-r border-slate-50">
                                             {new Date(j.updated_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}
@@ -309,10 +342,7 @@ const ProductionList: React.FC = () => {
                                                 <button title="Edit Production" className="p-2 hover:bg-white hover:shadow-md text-slate-400 hover:text-[#005d52] rounded-xl transition-all" onClick={() => navigate(`/sales/production/production-edit/${j.id}`)}>
                                                     <Edit3 size={16} />
                                                 </button>
-                                                <button title="Settings" className="p-2 hover:bg-white hover:shadow-md text-slate-400 hover:text-slate-600 rounded-xl transition-all">
-                                                    <Settings size={16} />
-                                                </button>
-                                                <button title="Delete Job" className="p-2 hover:bg-white hover:shadow-md text-slate-400 hover:text-rose-600 rounded-xl transition-all">
+                                                <button title="Delete Job" onClick={() => handleDelete(j.id)} className="p-2 hover:bg-white hover:shadow-md text-slate-400 hover:text-rose-600 rounded-xl transition-all">
                                                     <Trash2 size={16} />
                                                 </button>
                                             </div>
@@ -321,10 +351,10 @@ const ProductionList: React.FC = () => {
                                 ))}
                             </tbody>
                         </table>
-                        {!loading && filteredJobs.length === 0 && (
+                        {!loading && productions.length === 0 && (
                             <div className="py-32 flex flex-col items-center justify-center text-center">
                                 <div className="p-6 bg-slate-50 rounded-full mb-4">
-                                    <Settings className="text-slate-200 animate-spin-slow" size={40} />
+                                    <Settings className="text-slate-200" size={40} />
                                 </div>
                                 <h3 className="text-lg font-bold text-slate-800">No Production Jobs</h3>
                                 <p className="text-slate-400 text-sm max-w-xs">We couldn't find any manufacturing records matching these filters.</p>
@@ -332,35 +362,30 @@ const ProductionList: React.FC = () => {
                         )}
                     </div>
 
-                    {/* Pagination Footer */}
-                    <footer className="p-6 bg-slate-50/50 border-t border-slate-100 flex flex-col md:flex-row justify-between items-center gap-6">
-                        <div className="flex items-center gap-6">
-
+                    {totalPages > 0 && (
+                        <footer className="p-6 bg-slate-50/50 border-t border-slate-100 flex flex-col md:flex-row justify-between items-center gap-6">
                             <div className="text-[11px] font-bold text-slate-800 uppercase tracking-widest">
-                                Showing <span className="text-slate-900">{paginatedJobs.length > 0 ? (currentPage - 1) * itemsPerPage + 1 : 0} - {Math.min(currentPage * itemsPerPage, filteredJobs.length)}</span> of <span className="text-slate-900">{filteredJobs.length}</span> Jobs
+                                Showing <span className="text-slate-900">{productions.length > 0 ? (currentPage - 1) * itemsPerPage + 1 : 0} - {Math.min(currentPage * itemsPerPage, pagination?.total || 0)}</span> of <span className="text-slate-900">{pagination?.total || 0}</span> Jobs
                             </div>
-                        </div>
-
-                        <div className="flex items-center gap-2">
-                            <button onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1} className="p-2.5 rounded-xl border border-slate-200 bg-white text-slate-500 hover:text-[#005d52] disabled:opacity-30 transition-all shadow-sm">
-                                <ChevronLeft size={18} strokeWidth={2.5} />
-                            </button>
-
-                            <div className="flex items-center gap-1.5">
-                                {getPageNumbers().map((page, i) => (
-                                    page === "..." ? <span key={i} className="px-2 text-slate-300"><MoreHorizontal size={14} /></span> : (
-                                        <button key={i} onClick={() => setCurrentPage(page as number)} className={`min-w-10 h-10 rounded-xl text-xs font-bold transition-all ${currentPage === page ? "bg-[#005d52] text-white shadow-lg shadow-teal-900/20 scale-105" : "bg-white text-slate-500 border border-slate-200 hover:border-slate-300 shadow-sm"}`}>
-                                            {page}
-                                        </button>
-                                    )
-                                ))}
+                            <div className="flex items-center gap-2">
+                                <button onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1} className="p-2.5 rounded-xl border border-slate-200 bg-white text-slate-500 hover:text-[#005d52] disabled:opacity-30 transition-all shadow-sm">
+                                    <ChevronLeft size={18} strokeWidth={2.5} />
+                                </button>
+                                <div className="flex items-center gap-1.5">
+                                    {getPageNumbers().map((page, i) => (
+                                        page === "..." ? <span key={i} className="px-2 text-slate-300"><MoreHorizontal size={14} /></span> : (
+                                            <button key={i} onClick={() => setCurrentPage(page as number)} className={`min-w-10 h-10 rounded-xl text-xs font-bold transition-all ${currentPage === page ? "bg-[#005d52] text-white shadow-lg shadow-teal-900/20 scale-105" : "bg-white text-slate-500 border border-slate-200 hover:border-slate-300 shadow-sm"}`}>
+                                                {page}
+                                            </button>
+                                        )
+                                    ))}
+                                </div>
+                                <button onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages || totalPages === 0} className="p-2.5 rounded-xl border border-slate-200 bg-white text-slate-500 hover:text-[#005d52] disabled:opacity-30 transition-all shadow-sm">
+                                    <ChevronRight size={18} strokeWidth={2.5} />
+                                </button>
                             </div>
-
-                            <button onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages || totalPages === 0} className="p-2.5 rounded-xl border border-slate-200 bg-white text-slate-500 hover:text-[#005d52] disabled:opacity-30 transition-all shadow-sm">
-                                <ChevronRight size={18} strokeWidth={2.5} />
-                            </button>
-                        </div>
-                    </footer>
+                        </footer>
+                    )}
                 </div>
             </div>
         </div>

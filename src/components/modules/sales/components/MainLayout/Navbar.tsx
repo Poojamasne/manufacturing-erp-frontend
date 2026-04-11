@@ -98,21 +98,7 @@ const Navbar = ({ onMenuClick }: { onMenuClick: () => void }) => {
         >
           <span className="text-xl">☰</span>
         </button>
-
-        <div className="hidden md:block relative w-full max-w-70 lg:max-w-100">
-          <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
-            <img src="/icons/search.svg" className="h-4 w-4 opacity-30" alt="" />
-          </div>
-          <input
-            type="text"
-            placeholder="Search..."
-            className="w-full bg-white rounded-2xl py-2.75 pl-11 pr-4 text-sm shadow-sm focus:ring-2 focus:ring-[#005d52]/20 outline-none"
-          />
-
-        </div>
-        <button className="outline-none hidden md:block relative bg-[#005d52] text-white border hover:border-[#005d52] px-4 py-2 rounded-2xl hover:bg-white hover:text-[#005d52] transition-colors">
-          Search
-        </button>
+      
       </div>
 
       {/* RIGHT */}
