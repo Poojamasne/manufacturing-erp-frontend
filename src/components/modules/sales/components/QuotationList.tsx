@@ -40,6 +40,7 @@ const QuotationList: React.FC = () => {
     const { quotations, loading, error } = useAppSelector((state: RootState) => state.SalesQuotation);
 
     const [searchQuery, setSearchQuery] = useState<string>("");
+    const [debouncedSearch, setDebouncedSearch] = useState(searchQuery);
     const [activeTab, setActiveTab] = useState<TimeTab>("All Time");
     const [statusFilter, setStatusFilter] = useState<Status>("All");
     const [customRange, setCustomRange] = useState({ start: "", end: new Date().toISOString().split("T")[0] });
@@ -53,7 +54,7 @@ const QuotationList: React.FC = () => {
     const fetchQuotations = () => {
         dispatch(getQuotations({
             status: statusFilter !== 'All' ? statusFilter : undefined,
-            search: searchQuery || undefined,
+            search: debouncedSearch || undefined,
             page: currentPage,
             limit: itemsPerPage
         }));
@@ -62,7 +63,15 @@ const QuotationList: React.FC = () => {
     useEffect(() => {
         fetchQuotations();
         return () => { dispatch(clearSalesErrors()); };
-    }, [dispatch, currentPage, statusFilter, searchQuery]);
+    }, [dispatch, currentPage, statusFilter, debouncedSearch]);
+
+    useEffect(() => {
+    const handler = setTimeout(() => {
+        setDebouncedSearch(searchQuery);
+    }, 500); // delay
+
+    return () => clearTimeout(handler);
+}, [searchQuery]);
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -111,9 +120,7 @@ const QuotationList: React.FC = () => {
         if (quotationsArray.length === 0) return [];
         
         return quotationsArray.filter((qt: Quotation) => {
-            const matchesSearch =
-                qt.company_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                qt.quote_id?.toLowerCase().includes(searchQuery.toLowerCase());
+            const matchesSearch = true;
 
             const matchesStatus = statusFilter === "All" || qt.status === statusFilter;
 
@@ -217,7 +224,7 @@ const QuotationList: React.FC = () => {
     }
 
     // Error state - SAFELY render error as string (NOT the error object)
-    if (errorMessage) {
+   if (errorMessage && !loading) {
         return (
             <div className="min-h-screen bg-[#F8FAFC] flex items-center justify-center p-8">
                 <div className="bg-red-50 border border-red-200 rounded-2xl p-8 max-w-md text-center">

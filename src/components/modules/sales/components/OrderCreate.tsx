@@ -170,8 +170,16 @@ const OrderCreate: React.FC = () => {
     if (!formData.shipping_address.trim())
       newErrors.shipping_address = "Shipping address is required";
     if (lineItems.some((item) => !item.product_name.trim())) {
-      newErrors.lineItems = "Please ensure all products have names";
-    }
+  newErrors.lineItems = "Please ensure all products have names";
+}
+
+if (lineItems.some((item) => item.quantity <= 0)) {
+  newErrors.lineItems = "Quantity must be greater than 0";
+}
+
+if (lineItems.some((item) => item.unit_price <= 0)) {
+  newErrors.lineItems = "Unit price must be greater than 0";
+}
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);

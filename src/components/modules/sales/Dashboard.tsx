@@ -50,6 +50,12 @@ export const Dashboard = () => {
 
   const { salesByCategory, stats, pipeline } = useAppSelector((state: RootState) => state.SalesDashboard);
 
+  const formattedData = salesByCategory?.map((item: any) => ({
+  ...item,
+  units_sold: Number(item.units_sold),
+  target: Number(item.target || 0),
+}));
+
   const [filter, setFilter] = useState<FilterType>("Weekly");
   const [customRange, setCustomRange] = useState({ start: "", end: new Date().toISOString().split("T")[0] });
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
@@ -141,7 +147,7 @@ export const Dashboard = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
           <StatCard title="Total Leads" value={stats?.totalLeads} svg="/icons/users.svg" />
           <StatCard title="Deals Won" value={stats?.dealsWon} svg="/icons/win.svg" />
-          <StatCard title="Revenue" value={`₹${stats?.totalRevenue}`} svg="/icons/rupee.svg" />
+          <StatCard title="Revenue" value={`₹ ${Number(stats?.totalRevenue || 0).toLocaleString("en-IN")}`} svg="/icons/rupee.svg" />
           <StatCard title="Win Rate" value={`${stats?.winRate}%`} svg="/icons/trending.svg" />
         </div>
 
@@ -187,7 +193,7 @@ export const Dashboard = () => {
             </div>
             <div className="h-80 sm:h-96 w-full">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={salesByCategory} margin={{ top: 10, right: 10, left: -25, bottom: 0 }} barGap={8}>
+                <BarChart data={formattedData} margin={{ top: 10, right: 10, left: -25, bottom: 0 }} barGap={8}>
                   <CartesianGrid vertical={false} stroke="#f1f5f9" />
                   <XAxis dataKey="category" axisLine={false} tickLine={false} tick={{ fill: '#7e899c', fontSize: 10 }} />
                   <YAxis axisLine={false} tickLine={false} tick={{ fill: '#7e899c', fontSize: 10 }} />

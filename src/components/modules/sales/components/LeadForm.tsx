@@ -131,6 +131,16 @@ const LeadForm: React.FC = () => {
   const validate = (): boolean => {
     const newErrors: FormErrors = {};
 
+   if (formData.followup_date && formData.expected_close_date) {
+  const followUp = new Date(formData.followup_date);
+  const closing = new Date(formData.expected_close_date);
+
+  if (followUp > closing) {
+    newErrors.followup_date = "Follow-up must be before closing date";
+    newErrors.expected_close_date = "Closing date must be after follow-up";
+  }
+}
+
     if (!formData.company_name.trim())
       newErrors.company_name = "Company name is required";
     if (!formData.contact_person.trim())
@@ -573,19 +583,23 @@ const LeadForm: React.FC = () => {
                   ]}
                 />
                 <FormInput
-                  label="Follow-up Date"
-                  name="followup_date"
-                  type="date"
-                  value={formData.followup_date}
-                  onChange={handleInputChange}
-                />
-                <FormInput
-                  label="Closing Date (Est)"
-                  name="expected_close_date"
-                  type="date"
-                  value={formData.expected_close_date}
-                  onChange={handleInputChange}
-                />
+  label="Follow-up Date"
+  name="followup_date"
+  type="date"
+  value={formData.followup_date}
+  onChange={handleInputChange}
+  error={errors.followup_date}
+  max={formData.expected_close_date || undefined}
+/>
+               <FormInput
+  label="Closing Date (Est)"
+  name="expected_close_date"
+  type="date"
+  value={formData.expected_close_date}
+  onChange={handleInputChange}
+  error={errors.expected_close_date}
+  min={formData.followup_date || undefined}
+/>
               </div>
               <div className="mt-5">
                 <FormInput

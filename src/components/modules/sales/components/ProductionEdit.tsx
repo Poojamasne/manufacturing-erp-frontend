@@ -93,12 +93,23 @@ const ProductionEdit: React.FC = () => {
   };
 
   const validateForm = () => {
-    const newErrors: Record<string, string> = {};
-    if (!formData.stage) newErrors.stage = "Stage is required";
-    if (!formData.status) newErrors.status = "Status is required";
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
+  const newErrors: Record<string, string> = {};
+  if (!formData.stage) newErrors.stage = "Stage is required";
+  if (!formData.status) newErrors.status = "Status is required";
+  
+  // Add date validation
+  if (formData.started_at && formData.completed_at) {
+    const startDate = new Date(formData.started_at);
+    const completedDate = new Date(formData.completed_at);
+    
+    if (completedDate < startDate) {
+      newErrors.completed_at = "Completed date cannot be earlier than start date";
+    }
+  }
+  
+  setErrors(newErrors);
+  return Object.keys(newErrors).length === 0;
+};
 
   const handleSave = async () => {
     if (!validateForm()) return;
@@ -131,12 +142,31 @@ const ProductionEdit: React.FC = () => {
   };
 
   const updateFormData = (field: string, value: any) => {
-    setFormData((prev: any) => ({ ...prev, [field]: value }));
-    if (errors[field]) {
-      const { [field]: _, ...rest } = errors;
-      setErrors(rest);
+  setFormData((prev: any) => ({ ...prev, [field]: value }));
+  
+  
+  if (errors[field]) {
+    const newErrors = { ...errors };
+    delete newErrors[field];
+    setErrors(newErrors);
+  }
+  
+  if (field === 'started_at' || field === 'completed_at') {
+    const newFormData = { ...formData, [field]: value };
+    if (newFormData.started_at && newFormData.completed_at) {
+      const startDate = new Date(newFormData.started_at);
+      const completedDate = new Date(newFormData.completed_at);
+      
+      if (completedDate < startDate) {
+        setErrors(prev => ({ ...prev, completed_at: "Completed date cannot be earlier than start date" }));
+      } else {
+        const newErrors = { ...errors };
+        delete newErrors.completed_at;
+        setErrors(newErrors);
+      }
     }
-  };
+  }
+};
 
   if (loading && !production?.id) {
     return (
@@ -379,18 +409,23 @@ const ProductionEdit: React.FC = () => {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Completed Date
-                    </label>
-                    <input
-                      type="date"
-                      value={formData.completed_at}
-                      onChange={(e) =>
-                        updateFormData("completed_at", e.target.value)
-                      }
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#005d52] focus:border-transparent"
-                    />
-                  </div>
+  <label className="block text-sm font-medium text-gray-700 mb-2">
+    Expected Completion Date
+  </label>
+  <input
+    type="date"
+    value={formData.completed_at}
+    onChange={(e) => updateFormData("completed_at", e.target.value)}
+    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-[#005d52] focus:border-transparent ${
+      errors.completed_at ? "border-red-500" : "border-gray-300"
+    }`}
+  />
+  {errors.completed_at && (
+    <p className="mt-1 text-xs text-red-500 flex items-center gap-1">
+      <AlertCircle size={12} /> {errors.completed_at}
+    </p>
+  )}
+</div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Assigned To (User ID)

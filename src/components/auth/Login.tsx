@@ -10,7 +10,10 @@ import {
   CheckCircle2,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { loginUser, clearErrors } from "../modules/sales/ModuleStateFiles/AuthSlice";
+import {
+  loginUser,
+  clearErrors,
+} from "../modules/sales/ModuleStateFiles/AuthSlice";
 import { useAppDispatch, useAppSelector } from "../common/ReduxMainHooks";
 
 const Login: React.FC = () => {
@@ -21,7 +24,9 @@ const Login: React.FC = () => {
 
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const { loading, error: authError } = useAppSelector((state: any) => state.auth);
+  const { loading, error: authError } = useAppSelector(
+    (state: any) => state.auth,
+  );
 
   useEffect(() => {
     dispatch(clearErrors());
@@ -29,38 +34,76 @@ const Login: React.FC = () => {
 
   const emailStatus = useMemo(() => {
     if (!email) return { error: null, isValid: false };
-    if (email.includes(" ")) return { error: "Spaces are not allowed", isValid: false };
+    if (email.includes(" "))
+      return { error: "Spaces are not allowed", isValid: false };
 
     const atParts = email.split("@");
-    if (atParts.length !== 2) return { error: "Only one @ allowed", isValid: false };
+    if (atParts.length !== 2)
+      return { error: "Only one @ allowed", isValid: false };
 
     const [username, domain] = atParts;
     if (!username) return { error: "Enter username before @", isValid: false };
     if (!domain) return { error: "Enter domain after @", isValid: false };
-    if (email.includes("..")) return { error: "Consecutive dots (..) not allowed", isValid: false };
-    if (email.startsWith(".") || email.endsWith(".")) return { error: "Dot cannot be at start or end", isValid: false };
+    if (email.includes(".."))
+      return { error: "Consecutive dots (..) not allowed", isValid: false };
+    if (email.startsWith(".") || email.endsWith("."))
+      return { error: "Dot cannot be at start or end", isValid: false };
 
     const domainParts = domain.split(".");
-    if (domainParts.length < 2) return { error: "Invalid domain format", isValid: false };
+    if (domainParts.length < 2)
+      return { error: "Invalid domain format", isValid: false };
 
     const validDomains = [
-      "com", "org", "net", "edu", "gov", "mil",
-      "int", "info", "biz", "name",
-      "co", "io", "ai", "app", "dev", "tech",
-      "me", "tv", "xyz", "online", "store",
-      "blog", "site", "club", "shop",
-      "in", "us", "uk", "au", "ca", "de",
-      "fr", "jp", "cn", "ru", "br", "za", "live"
+      "com",
+      "org",
+      "net",
+      "edu",
+      "gov",
+      "mil",
+      "int",
+      "info",
+      "biz",
+      "name",
+      "co",
+      "io",
+      "ai",
+      "app",
+      "dev",
+      "tech",
+      "me",
+      "tv",
+      "xyz",
+      "online",
+      "store",
+      "blog",
+      "site",
+      "club",
+      "shop",
+      "in",
+      "us",
+      "uk",
+      "au",
+      "ca",
+      "de",
+      "fr",
+      "jp",
+      "cn",
+      "ru",
+      "br",
+      "za",
+      "live",
     ];
     const extension = domainParts[domainParts.length - 1];
-    if (!validDomains.includes(extension)) return { error: "Only .com, .org, .co, .in allowed", isValid: false };
+    if (!validDomains.includes(extension))
+      return { error: "Only .com, .org, .co, .in allowed", isValid: false };
 
     return { error: null, isValid: true };
   }, [email]);
 
   const passwordStatus = useMemo(() => {
     if (!password) return { error: null, isValid: false };
-    if (password.length < 6) return { error: "Minimum 6 characters required", isValid: false };
+    if (password.length < 6)
+      return { error: "Minimum 6 characters required", isValid: false };
     return { error: null, isValid: true };
   }, [password]);
 
@@ -76,7 +119,6 @@ const Login: React.FC = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#f4f7f6] px-4">
       <div className="w-full max-w-4xl bg-white rounded-2xl shadow-xl border border-gray-200 flex flex-col md:flex-row overflow-hidden">
-
         {/* LEFT PANEL */}
         <div className="hidden md:flex md:w-1/2 bg-[#005d52] p-8 flex-col justify-between">
           <div>
@@ -87,31 +129,52 @@ const Login: React.FC = () => {
               Manufacturing ERP System
             </h1>
             <div className="space-y-3 text-sm text-[#d1e9e7]">
-              <div className="flex items-center gap-2"><CheckCircle2 size={14} /> Streamlined Business Processes</div>
-              <div className="flex items-center gap-2"><CheckCircle2 size={14} /> Production & Inventory Control</div>
-              <div className="flex items-center gap-2"><CheckCircle2 size={14} /> Analytics for Operational Efficiency</div>
-              <div className="flex items-center gap-2"><CheckCircle2 size={14} /> Analytics Dashboard</div>
+              <div className="flex items-center gap-2">
+                <CheckCircle2 size={14} /> Streamlined Business Processes
+              </div>
+              <div className="flex items-center gap-2">
+                <CheckCircle2 size={14} /> Production & Inventory Control
+              </div>
+              <div className="flex items-center gap-2">
+                <CheckCircle2 size={14} /> Analytics for Operational Efficiency
+              </div>
+              <div className="flex items-center gap-2">
+                <CheckCircle2 size={14} /> Analytics Dashboard
+              </div>
             </div>
           </div>
-          <p className="text-[10px] text-[#d1e9e7] uppercase tracking-widest">Secure Access</p>
+          <p className="text-[10px] text-[#d1e9e7] uppercase tracking-widest">
+            Secure Access
+          </p>
         </div>
 
         {/* RIGHT PANEL */}
         <div className="w-full md:w-1/2 p-6 sm:p-8 lg:p-10 flex flex-col justify-center">
           <div className="mb-8 flex flex-col items-center">
             <div className="mb-6 flex justify-center w-full">
-              <img src="/logo.svg" alt="Zonixtec Logo" className="h-8 w-auto object-contain" />
+              <img
+                src="/logo.svg"
+                alt="Zonixtec Logo"
+                className="h-8 w-auto object-contain"
+              />
             </div>
             <h2 className="text-xl font-bold text-gray-800">ERP Login</h2>
-            <p className="text-sm text-gray-400">Enter your credentials to continue</p>
+            <p className="text-sm text-gray-400">
+              Enter your credentials to continue
+            </p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
             {/* EMAIL */}
             <div>
-              <label className="text-xs text-gray-600 font-semibold uppercase">Email</label>
+              <label className="text-xs text-gray-600 font-semibold uppercase">
+                Email
+              </label>
               <div className="relative mt-1">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" size={16} />
+                <Mail
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500"
+                  size={16}
+                />
                 <input
                   type="email"
                   disabled={loading}
@@ -121,30 +184,39 @@ const Login: React.FC = () => {
                   onChange={(e) => setEmail(e.target.value)}
                 />
               </div>
-              {(isSubmitted && !email) ? (
+              {isSubmitted && !email ? (
                 <p className="text-red-500 text-xs mt-1 flex items-center gap-1">
                   <AlertCircle size={12} /> Email is required
                 </p>
-              ) : (!emailStatus.isValid && email && (
-                <p className="text-red-500 text-xs mt-1 flex items-center gap-1">
-                  <AlertCircle size={12} /> {emailStatus.error}
-                </p>
-              ))}
+              ) : (
+                !emailStatus.isValid &&
+                email && (
+                  <p className="text-red-500 text-xs mt-1 flex items-center gap-1">
+                    <AlertCircle size={12} /> {emailStatus.error}
+                  </p>
+                )
+              )}
             </div>
 
             {/* PASSWORD */}
             <div>
               <div className="flex justify-between">
-                <label className="text-xs text-gray-600 font-semibold uppercase">Password</label>
+                <label className="text-xs text-gray-600 font-semibold uppercase">
+                  Password
+                </label>
               </div>
               <div className="relative mt-1">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" size={16} />
+                <Lock
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500"
+                  size={16}
+                />
                 <input
                   type={showPassword ? "text" : "password"}
                   disabled={loading}
-                  className="w-full pl-10 pr-10 py-3 rounded-xl border border-gray-200 text-sm outline-none focus:border-[#005d52] transition-colors disabled:bg-gray-50"
-                  placeholder="••••••"
-                  value={password}
+                  autoComplete="off"
+                  className="w-full pl-10 pr-10 py-3 rounded-xl border border-gray-200 text-sm outline-none focus:border-[#005d52]"
+                  placeholder="Enter your password"
+                  value={password || ""}
                   onChange={(e) => setPassword(e.target.value)}
                 />
                 <button
@@ -155,15 +227,18 @@ const Login: React.FC = () => {
                   {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
               </div>
-              {(isSubmitted && !password) ? (
+              {isSubmitted && !password ? (
                 <p className="text-red-500 text-xs mt-1 flex items-center gap-1">
                   <AlertCircle size={12} /> Password is required
                 </p>
-              ) : (!passwordStatus.isValid && password && (
-                <p className="text-red-500 text-xs mt-1 flex items-center gap-1">
-                  <AlertCircle size={12} /> {passwordStatus.error}
-                </p>
-              ))}
+              ) : (
+                !passwordStatus.isValid &&
+                password && (
+                  <p className="text-red-500 text-xs mt-1 flex items-center gap-1">
+                    <AlertCircle size={12} /> {passwordStatus.error}
+                  </p>
+                )
+              )}
             </div>
 
             {/* REDUX AUTH ERROR */}
