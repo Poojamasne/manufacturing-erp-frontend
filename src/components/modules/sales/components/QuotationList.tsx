@@ -7,7 +7,6 @@ import {
     ChevronLeft,
     ChevronRight,
     Eye,
-    X,
     MoreHorizontal,
     FileText,
     Loader2,

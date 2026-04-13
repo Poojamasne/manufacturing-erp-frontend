@@ -8,9 +8,7 @@ import {
     ChevronRight,
     Eye,
     FileEdit,
-    X,
     Filter,
-    Calendar as CalendarIcon,
     MoreHorizontal,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";

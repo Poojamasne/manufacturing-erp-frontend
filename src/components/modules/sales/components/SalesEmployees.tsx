@@ -172,7 +172,7 @@ const SalesEmployees: React.FC = () => {
     return "All Employees";
   };
 
-  if (loading && employees.length === 0) {
+  if (loading && (!employees || (Array.isArray(employees) && (employees as Employee[]).length === 0))) {
     return (
       <div className="min-h-screen bg-[#f4f7f6] flex items-center justify-center">
         <Loader2 className="animate-spin text-[#005d52]" size={48} />
@@ -234,7 +234,7 @@ const SalesEmployees: React.FC = () => {
           </div>
         </section>
 
-        {/* Main Data Container */}
+      
         <div className="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
           {/* Toolbar */}
           <div className="p-6 flex flex-col lg:flex-row justify-between items-center gap-4 border-b border-slate-50">
