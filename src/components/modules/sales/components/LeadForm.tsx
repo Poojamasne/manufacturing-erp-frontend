@@ -476,7 +476,7 @@ const LeadForm: React.FC = () => {
                           Unit Price
                         </span>
                         <div className="h-12 flex items-center bg-white px-4 rounded-xl border border-slate-200 text-sm font-bold text-[#005d52]">
-                          ₹{row.unit_price.toLocaleString()}
+                          ₹ {row.unit_price.toLocaleString()}
                         </div>
                       </div>
                     </div>
@@ -537,7 +537,7 @@ const LeadForm: React.FC = () => {
                     Deal Value
                   </p>
                   <p className="text-2xl font-black">
-                    ₹{summary.totalValue.toLocaleString()}
+                    ₹ {summary.totalValue.toLocaleString()}
                   </p>
                 </div>
               </div>
@@ -682,9 +682,12 @@ const FormInput: React.FC<InputFieldProps> = ({
   ...props
 }) => (
   <div className="flex flex-col gap-1.5">
-    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">
-      {label} {required && <span className="text-red-500">*</span>}
-    </label>
+    <label className="text-xs font-black text-slate-500 uppercase tracking-widest px-1 flex items-center gap-1">
+  {label}
+  {required && (
+    <span className="text-red-500 text-sm font-extrabold">*</span>
+  )}
+</label>
     <div className="relative group">
       <input
         {...props}
@@ -721,9 +724,12 @@ const FormSelect: React.FC<SelectFieldProps> = ({
   ...props
 }) => (
   <div className="flex flex-col gap-1.5">
-    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">
-      {label} {required && <span className="text-red-500">*</span>}
-    </label>
+    <label className="text-xs font-black text-slate-500 uppercase tracking-widest px-1 flex items-center gap-1">
+  {label}
+  {required && (
+    <span className="text-red-500 text-sm font-extrabold">*</span>
+  )}
+</label>
     <div className="relative group">
       <select
         {...props}
