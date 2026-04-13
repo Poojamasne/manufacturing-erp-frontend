@@ -9,7 +9,6 @@ import {
   CartesianGrid,
   Cell,
 } from "recharts";
-import { Calendar as CalendarIcon, X } from "lucide-react";
 import { getDashboardData } from "../sales/ModuleStateFiles/DashboardSlice"; // Adjust path
 import { useAppDispatch, useAppSelector } from "../../common/ReduxMainHooks";
 import type { RootState } from "../../../ApplicationState/Store";
