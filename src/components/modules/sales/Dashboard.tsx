@@ -9,6 +9,7 @@ import {
   CartesianGrid,
   Cell,
 } from "recharts";
+import { Filter, ChevronDown } from "lucide-react";
 import { getDashboardData } from "../sales/ModuleStateFiles/DashboardSlice";
 import { useAppDispatch, useAppSelector } from "../../common/ReduxMainHooks";
 import type { RootState } from "../../../ApplicationState/Store";
@@ -55,18 +56,22 @@ export const Dashboard = () => {
   }));
 
   const [filter, setFilter] = useState<FilterType>("Weekly");
-  const [customRange, setCustomRange] = useState({ start: "", end: new Date().toISOString().split("T")[0] });
+  const [customRange, setCustomRange] = useState({ start: "", end: "" });
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const calendarRef = useRef<HTMLDivElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 640);
 
   // Fetch data when filter or custom range changes
   useEffect(() => {
     if (filter === "Custom") {
       if (customRange.start && customRange.end) {
+        console.log("Fetching custom range:", customRange);
         dispatch(getDashboardData(filter, customRange));
       }
     } else {
+      console.log("Fetching filter:", filter);
       dispatch(getDashboardData(filter));
     }
   }, [dispatch, filter, customRange.start, customRange.end]);
@@ -77,8 +82,12 @@ export const Dashboard = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  // Close dropdown and calendar when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsDropdownOpen(false);
+      }
       if (calendarRef.current && !calendarRef.current.contains(event.target as Node)) {
         setIsCalendarOpen(false);
       }
@@ -88,12 +97,16 @@ export const Dashboard = () => {
   }, []);
 
   const handleFilterChange = (value: FilterType) => {
-    setFilter(value);
+    console.log("Changing filter to:", value);
     if (value === "Custom") {
+      setFilter("Custom");
       setIsCalendarOpen(true);
+      setIsDropdownOpen(false);
     } else {
+      setFilter(value);
+      setIsDropdownOpen(false);
       setIsCalendarOpen(false);
-      setCustomRange({ start: "", end: new Date().toISOString().split("T")[0] });
+      setCustomRange({ start: "", end: "" });
     }
   };
 
@@ -102,7 +115,18 @@ export const Dashboard = () => {
       alert("Please select date range");
       return;
     }
+    console.log("Applying custom range:", customRange);
+    setFilter("Custom");
     setIsCalendarOpen(false);
+    setIsDropdownOpen(false);
+    // The useEffect will trigger the data fetch
+  };
+
+  const getFilterDisplayText = () => {
+    if (filter === "Custom" && customRange.start && customRange.end) {
+      return `${customRange.start} to ${customRange.end}`;
+    }
+    return filter;
   };
 
   if (loading) {
@@ -130,20 +154,44 @@ export const Dashboard = () => {
             </p>
           </div>
 
-          <div className="relative">
-            <select
-              value={filter}
-              onChange={(e) => handleFilterChange(e.target.value as FilterType)}
-              className="px-4 py-2 rounded-xl border border-slate-200 bg-white text-sm font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-[#005d52]/20"
+          {/* Filter Dropdown with Icon */}
+          <div className="relative" ref={dropdownRef}>
+            <button
+              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+              className="px-4 py-2 rounded-xl border border-slate-200 bg-white text-sm font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-[#005d52]/20 flex items-center gap-2 text-gray-700"
             >
-              <option value="Weekly">Weekly</option>
-              <option value="Monthly">Monthly</option>
-              <option value="Quarterly">Quarterly</option>
-              <option value="Yearly">Yearly</option>
-              <option value="Custom">Custom</option>
-            </select>
+              <Filter size={16} className="text-[#005d52]" />
+              <span>{getFilterDisplayText()}</span>
+              <ChevronDown size={14} className={`transition-transform ${isDropdownOpen ? "rotate-180" : ""}`} />
+            </button>
 
-            {isCalendarOpen && filter === "Custom" && (
+            {/* Dropdown Menu */}
+            {isDropdownOpen && !isCalendarOpen && (
+              <div className="absolute right-0 mt-2 bg-white border border-slate-100 rounded-2xl shadow-2xl z-50 py-2 min-w-[160px] animate-in fade-in zoom-in-95">
+                {(["Weekly", "Monthly", "Quarterly", "Yearly"] as FilterType[]).map((tab) => (
+                  <button
+                    key={tab}
+                    onClick={() => handleFilterChange(tab)}
+                    className={`outline-none w-full text-left px-4 py-2.5 text-[13px] transition-colors ${
+                      filter === tab ? "text-[#005d52] font-bold bg-teal-50/50" : "text-slate-600 hover:bg-slate-50"
+                    }`}
+                  >
+                    {tab}
+                  </button>
+                ))}
+                <button
+                  onClick={() => handleFilterChange("Custom")}
+                  className={`outline-none w-full text-left px-4 py-2.5 text-[13px] transition-colors ${
+                    filter === "Custom" ? "text-[#005d52] font-bold bg-teal-50/50" : "text-slate-600 hover:bg-slate-50"
+                  }`}
+                >
+                  Custom
+                </button>
+              </div>
+            )}
+
+            {/* Custom Date Range Popup */}
+            {isCalendarOpen && (
               <div 
                 ref={calendarRef}
                 className="absolute right-0 mt-3 bg-white p-6 rounded-2xl shadow-xl border z-50 w-72"
@@ -192,7 +240,7 @@ export const Dashboard = () => {
 
         {/* CHARTS */}
         <div className="grid grid-cols-1 gap-8">
-          {/* Sales Pipeline Chart - FIXED STRAIGHT LABELS */}
+          {/* Sales Pipeline Chart */}
           <div className="bg-white p-6 sm:p-8 rounded-[2.5rem] border border-gray-100 shadow-sm w-full">
             <h3 className="text-[11px] font-bold text-gray-800 uppercase tracking-widest mb-1">Sales Pipeline</h3>
             <p className="text-sm text-gray-400 font-normal mb-8">Conversion stages distribution</p>
@@ -229,7 +277,7 @@ export const Dashboard = () => {
             </div>
           </div>
 
-          {/* Product Performance Chart - FIXED STRAIGHT LABELS */}
+          {/* Product Performance Chart */}
           <div className="bg-white p-6 sm:p-8 rounded-[2.5rem] border border-gray-100 shadow-sm w-full">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
               <div>

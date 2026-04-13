@@ -55,7 +55,7 @@ const LeadList: React.FC = () => {
     const [activeTab, setActiveTab] = useState<TimeTab>("All Time");
     const [priorityFilter, setPriorityFilter] = useState<string>("All");
     const [statusFilter, setStatusFilter] = useState<string>("All");
-    const [customRange, setCustomRange] = useState({ start: "", end: new Date().toISOString().split("T")[0] });
+    const [customRange, setCustomRange] = useState({ start: "", end: "" });
 
     // Professional Pagination States
     const [currentPage, setCurrentPage] = useState(1);
@@ -63,7 +63,9 @@ const LeadList: React.FC = () => {
 
     // UI States
     const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [isCalendarOpen, setIsCalendarOpen] = useState(false);
+    const dropdownRef = useRef<HTMLDivElement>(null);
     const calendarRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -71,9 +73,12 @@ const LeadList: React.FC = () => {
         return () => { dispatch(clearErrors()); };
     }, [dispatch]);
 
-    // Close calendar on click outside
+    // Close dropdown when clicking outside
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+                setIsDropdownOpen(false);
+            }
             if (calendarRef.current && !calendarRef.current.contains(event.target as Node)) {
                 setIsCalendarOpen(false);
             }
@@ -85,7 +90,7 @@ const LeadList: React.FC = () => {
     // Reset page to 1 when filters change
     useEffect(() => {
         setCurrentPage(1);
-    }, [searchQuery, priorityFilter, statusFilter, activeTab]);
+    }, [searchQuery, priorityFilter, statusFilter, activeTab, customRange]);
 
     // --- Filtering Logic ---
     const filteredLeads = useMemo(() => {
@@ -105,7 +110,10 @@ const LeadList: React.FC = () => {
             if (activeTab === "Custom") {
                 const start = customRange.start ? new Date(customRange.start) : null;
                 const end = customRange.end ? new Date(customRange.end) : null;
-                if (start) matchesTime = matchesTime && leadDate >= start;
+                if (start) {
+                    start.setHours(0, 0, 0, 0);
+                    matchesTime = matchesTime && leadDate >= start;
+                }
                 if (end) {
                     const endOfRange = new Date(end);
                     endOfRange.setHours(23, 59, 59);
@@ -183,6 +191,39 @@ const LeadList: React.FC = () => {
         setSelectedIds([]);
     };
 
+    // Handle filter change - closes dropdown automatically
+    const handleFilterChange = (value: TimeTab) => {
+        if (value === "Custom") {
+            setIsCalendarOpen(true);
+            setIsDropdownOpen(false);
+        } else {
+            setActiveTab(value);
+            setIsDropdownOpen(false);
+            setIsCalendarOpen(false);
+            setCustomRange({ start: "", end: "" });
+        }
+    };
+
+    // Handle custom range application
+    const handleCustomApply = () => {
+        if (!customRange.start || !customRange.end) {
+            alert("Please select date range");
+            return;
+        }
+        setActiveTab("Custom");
+        setIsCalendarOpen(false);
+        setIsDropdownOpen(false);
+        setCurrentPage(1);
+    };
+
+    // Get display text for filter button
+    const getFilterDisplayText = () => {
+        if (activeTab === "Custom" && customRange.start && customRange.end) {
+            return `${customRange.start} to ${customRange.end}`;
+        }
+        return activeTab;
+    };
+
     // --- Dynamic Styles ---
     const getStatusStyle = (status: string) => {
         const base = "px-3 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider border ";
@@ -224,48 +265,81 @@ const LeadList: React.FC = () => {
                     </button>
                 </header>
 
-                {/* --- Time Filters --- */}
-                <section className="relative mb-8 flex flex-wrap items-center gap-3">
-                    <div className="flex p-1.5 bg-white rounded-2xl border border-slate-200 shadow-sm">
-                        {(["Weekly", "Monthly", "Quarterly", "Yearly", "All Time"] as TimeTab[]).map((tab) => (
-                            <button
-                                key={tab}
-                                onClick={() => {
-                                    setActiveTab(tab);
-                                    setCurrentPage(1);
-                                }}
-                                className={`outline-none px-5 py-2 text-xs font-bold rounded-xl transition-all ${activeTab === tab ? "bg-[#005d52] text-white shadow-md" : "text-slate-400 hover:text-slate-600 hover:bg-slate-50"}`}
-                            >
-                                {tab}
-                            </button>
-                        ))}
+                {/* --- Time Filters - With Static Filter Icon --- */}
+                <section className="relative mb-8 flex justify-end">
+                    <div className="relative" ref={dropdownRef}>
                         <button
-                            onClick={() => setIsCalendarOpen(!isCalendarOpen)}
-                            className={`outline-none px-5 py-3 text-xs font-bold rounded-2xl transition-all flex items-center gap-2 ${activeTab === "Custom" ? "bg-[#005d52] text-white shadow-md" : " text-slate-400 hover:text-slate-600 hover:bg-slate-50"}`}
+                            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                            className="px-4 py-2 rounded-xl border border-slate-200 bg-white text-sm font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-[#005d52]/20 flex items-center gap-2 text-gray-700"
                         >
-                            <CalendarIcon size={14} /> Custom
+                            <Filter size={16} className="text-[#005d52]" />
+                            <span>{getFilterDisplayText()}</span>
+                            <ChevronDown size={14} className={`transition-transform ${isDropdownOpen ? "rotate-180" : ""}`} />
                         </button>
-                    </div>
 
-                    {isCalendarOpen && (
-                        <div ref={calendarRef} className="absolute top-full mt-3 left-0 md:left-auto md:right-100 z-50 bg-white p-6 rounded-3xl shadow-2xl border border-slate-100 min-w-[320px] animate-in slide-in-from-top-2">
-                            <div className="flex justify-between items-center mb-4">
-                                <h4 className="text-sm font-bold text-slate-800">Custom Date Range</h4>
-                                <button onClick={() => setIsCalendarOpen(false)} className="outline-none "><X size={18} className="outline-none text-slate-400 hover:text-red-500" /></button>
+                        {/* Dropdown Menu */}
+                        {isDropdownOpen && !isCalendarOpen && (
+                            <div className="absolute right-0 mt-2 bg-white border border-slate-100 rounded-2xl shadow-2xl z-50 py-2 min-w-[160px] animate-in fade-in zoom-in-95">
+                                {(["Weekly", "Monthly", "Quarterly", "Yearly", "All Time"] as TimeTab[]).map((tab) => (
+                                    <button
+                                        key={tab}
+                                        onClick={() => handleFilterChange(tab)}
+                                        className={`outline-none w-full text-left px-4 py-2.5 text-[13px] transition-colors ${
+                                            activeTab === tab ? "text-[#005d52] font-bold bg-teal-50/50" : "text-slate-600 hover:bg-slate-50"
+                                        }`}
+                                    >
+                                        {tab}
+                                    </button>
+                                ))}
+                                <button
+                                    onClick={() => handleFilterChange("Custom")}
+                                    className={`outline-none w-full text-left px-4 py-2.5 text-[13px] transition-colors ${
+                                        activeTab === "Custom" ? "text-[#005d52] font-bold bg-teal-50/50" : "text-slate-600 hover:bg-slate-50"
+                                    }`}
+                                >
+                                    Custom
+                                </button>
                             </div>
-                            <div className="space-y-4">
-                                <div className="space-y-1">
-                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Start Date</label>
-                                    <input type="date" value={customRange.start} onChange={(e) => setCustomRange({ ...customRange, start: e.target.value })} className="w-full p-3 bg-slate-50 border-none rounded-xl text-sm outline-none focus:ring-2 focus:ring-teal-500/20" />
+                        )}
+
+                        {/* Custom Date Range Popup */}
+                        {isCalendarOpen && (
+                            <div 
+                                ref={calendarRef}
+                                className="absolute right-0 mt-3 bg-white p-6 rounded-2xl shadow-xl border z-50 w-72"
+                            >
+                                <div className="space-y-3">
+                                    <input
+                                        type="date"
+                                        value={customRange.start}
+                                        onChange={(e) =>
+                                            setCustomRange({ ...customRange, start: e.target.value })
+                                        }
+                                        className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#005d52]/20"
+                                        placeholder="Start Date"
+                                    />
+
+                                    <input
+                                        type="date"
+                                        value={customRange.end}
+                                        min={customRange.start}
+                                        onChange={(e) =>
+                                            setCustomRange({ ...customRange, end: e.target.value })
+                                        }
+                                        className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#005d52]/20"
+                                        placeholder="End Date"
+                                    />
+
+                                    <button
+                                        onClick={handleCustomApply}
+                                        className="w-full bg-[#005d52] text-white py-2 rounded-lg text-sm hover:bg-[#004a40] transition-colors"
+                                    >
+                                        Apply Range
+                                    </button>
                                 </div>
-                                <div className="space-y-1">
-                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">End Date</label>
-                                    <input type="date" value={customRange.end} onChange={(e) => setCustomRange({ ...customRange, end: e.target.value })} className="w-full p-3 bg-slate-50 border-none rounded-xl text-sm outline-none focus:ring-2 focus:ring-teal-500/20" />
-                                </div>
-                                <button onClick={() => { setActiveTab("Custom"); setIsCalendarOpen(false); setCurrentPage(1); }} className="w-full py-3.5 bg-[#005d52] text-white rounded-xl font-bold text-xs shadow-lg shadow-teal-900/10">Apply Selection</button>
                             </div>
-                        </div>
-                    )}
+                        )}
+                    </div>
                 </section>
 
                 {/* --- Main Data Container --- */}

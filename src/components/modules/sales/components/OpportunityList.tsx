@@ -7,10 +7,9 @@ import {
     ChevronRight,
     Eye,
     FileEdit,
-    X,
-    Calendar as CalendarIcon,
     MoreHorizontal,
     TrendingUp,
+    Filter,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { getLeads, deleteLead, clearErrors } from "../ModuleStateFiles/LeadSlice";
@@ -48,6 +47,8 @@ const OPPORTUNITY_STATUSES = ["Qualified", "Won", "In Progress", "Converted", "C
 const OpportunityList: React.FC = () => {
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
+    const dropdownRef = useRef<HTMLDivElement>(null);
+    const calendarRef = useRef<HTMLDivElement>(null);
 
     // Redux State - Using Leads state
     const { leads, loading } = useAppSelector((state: RootState) => state.SalesLeads) as { leads: Lead[]; loading: boolean };
@@ -57,25 +58,23 @@ const OpportunityList: React.FC = () => {
     const [selectedIds, setSelectedIds] = useState<number[]>([]);
     const [activeTab, setActiveTab] = useState<TimeTab>("All Time");
     const [statusFilter, setStatusFilter] = useState<string>("All");
-    const [customRange, setCustomRange] = useState({ start: "", end: new Date().toISOString().split("T")[0] });
+    const [customRange, setCustomRange] = useState({ start: "", end: "" });
 
     // Professional Pagination States
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 5;
 
     // UI States
-    const [openDropdown, setOpenDropdown] = useState<string | null>(null);
     const [isCalendarOpen, setIsCalendarOpen] = useState(false);
-    const calendarRef = useRef<HTMLDivElement>(null);
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+    const [isStatusOpen, setIsStatusOpen] = useState(false);
 
     // Status options for Opportunities (from leads with specific statuses)
     const statusOptions = ["All", ...OPPORTUNITY_STATUSES];
 
     // Fetch leads on mount
     const fetchLeads = async () => {
-        
         await dispatch(getLeads());
-        // setIsRefreshing(false);
     };
 
     useEffect(() => {
@@ -83,9 +82,12 @@ const OpportunityList: React.FC = () => {
         return () => { dispatch(clearErrors()); };
     }, [dispatch]);
 
-    // Close calendar on click outside
+    // Close dropdown and calendar on click outside
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+                setIsDropdownOpen(false);
+            }
             if (calendarRef.current && !calendarRef.current.contains(event.target as Node)) {
                 setIsCalendarOpen(false);
             }
@@ -97,7 +99,40 @@ const OpportunityList: React.FC = () => {
     // Reset page to 1 when filters change
     useEffect(() => {
         setCurrentPage(1);
-    }, [searchQuery, statusFilter, activeTab]);
+    }, [searchQuery, statusFilter, activeTab, customRange]);
+
+    // Handle filter change - closes dropdown automatically
+    const handleFilterChange = (value: TimeTab) => {
+        if (value === "Custom") {
+            setIsCalendarOpen(true);
+            setIsDropdownOpen(false);
+        } else {
+            setActiveTab(value);
+            setIsDropdownOpen(false);
+            setIsCalendarOpen(false);
+            setCustomRange({ start: "", end: "" });
+        }
+    };
+
+    // Handle custom range application
+    const handleCustomApply = () => {
+        if (!customRange.start || !customRange.end) {
+            alert("Please select date range");
+            return;
+        }
+        setActiveTab("Custom");
+        setIsCalendarOpen(false);
+        setIsDropdownOpen(false);
+        setCurrentPage(1);
+    };
+
+    // Get display text for filter button
+    const getFilterDisplayText = () => {
+        if (activeTab === "Custom" && customRange.start && customRange.end) {
+            return `${customRange.start} to ${customRange.end}`;
+        }
+        return activeTab;
+    };
 
     // --- Filtering Logic - Only show leads with Opportunity statuses ---
     const opportunityLeads = useMemo(() => {
@@ -123,7 +158,11 @@ const OpportunityList: React.FC = () => {
             if (activeTab === "Custom") {
                 const start = customRange.start ? new Date(customRange.start) : null;
                 const end = customRange.end ? new Date(customRange.end) : null;
-                if (start) matchesTime = matchesTime && leadDate >= start;
+                if (start) {
+                    const startOfRange = new Date(start);
+                    startOfRange.setHours(0, 0, 0, 0);
+                    matchesTime = matchesTime && leadDate >= startOfRange;
+                }
                 if (end) {
                     const endOfRange = new Date(end);
                     endOfRange.setHours(23, 59, 59);
@@ -142,7 +181,9 @@ const OpportunityList: React.FC = () => {
 
     // --- Pagination Helpers ---
     const totalPages = Math.ceil(filteredOpportunities.length / itemsPerPage);
-    const paginatedOpportunities = filteredOpportunities.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const paginatedOpportunities = filteredOpportunities.slice(startIndex, endIndex);
 
     const getPageNumbers = () => {
         const pages = [];
@@ -163,8 +204,30 @@ const OpportunityList: React.FC = () => {
         return pages;
     };
 
+    const goToPage = (page: number) => {
+        if (page >= 1 && page <= totalPages) {
+            setCurrentPage(page);
+        }
+    };
+
+    const handlePrevPage = () => {
+        if (currentPage > 1) {
+            setCurrentPage(currentPage - 1);
+        }
+    };
+
+    const handleNextPage = () => {
+        if (currentPage < totalPages) {
+            setCurrentPage(currentPage + 1);
+        }
+    };
+
     const toggleSelectAll = () => {
-        setSelectedIds(selectedIds.length === paginatedOpportunities.length ? [] : paginatedOpportunities.map(o => o.id));
+        if (selectedIds.length === paginatedOpportunities.length && paginatedOpportunities.length > 0) {
+            setSelectedIds([]);
+        } else {
+            setSelectedIds(paginatedOpportunities.map(o => o.id));
+        }
     };
 
     const handleDelete = (id: number) => {
@@ -177,7 +240,6 @@ const OpportunityList: React.FC = () => {
         setSelectedIds([]);
     };
 
-
     // Calculate total opportunity value (sum of product totals)
     const getOpportunityValue = (lead: Lead) => {
         if (lead.products && lead.products.length > 0) {
@@ -188,15 +250,15 @@ const OpportunityList: React.FC = () => {
 
     // --- Dynamic Styles ---
     const getStatusStyle = (status: string) => {
-        const base = "px-3 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider border ";
+        const base = "px-3 py-1 rounded-lg border text-[10px] font-black uppercase tracking-widest ";
         switch (status) {
-            case 'Won': return base + 'bg-emerald-50 text-emerald-700 border-emerald-100';
-            case 'Converted': return base + 'bg-emerald-50 text-emerald-700 border-emerald-100';
-            case 'Lost': return base + 'bg-rose-50 text-rose-700 border-rose-100';
-            case 'Qualified': return base + 'bg-indigo-50 text-indigo-700 border-indigo-100';
-            case 'In Progress': return base + 'bg-blue-50 text-blue-700 border-blue-100';
-            case 'Contacted': return base + 'bg-cyan-50 text-cyan-700 border-cyan-100';
-            default: return base + 'bg-slate-50 text-slate-600 border-slate-200';
+            case 'Won': return base + 'bg-emerald-50 text-emerald-600 border-emerald-100';
+            case 'Converted': return base + 'bg-emerald-50 text-emerald-600 border-emerald-100';
+            case 'Lost': return base + 'bg-rose-50 text-rose-600 border-rose-100';
+            case 'Qualified': return base + 'bg-indigo-50 text-indigo-600 border-indigo-100';
+            case 'In Progress': return base + 'bg-blue-50 text-blue-600 border-blue-100';
+            case 'Contacted': return base + 'bg-cyan-50 text-cyan-600 border-cyan-100';
+            default: return base + 'bg-slate-50 text-slate-400 border-slate-100';
         }
     };
 
@@ -228,45 +290,77 @@ const OpportunityList: React.FC = () => {
                     </div>
                 </header>
 
-                {/* --- Time Filters --- */}
-                <section className="relative mb-8 flex flex-wrap items-center gap-3">
-                    <div className="flex p-1.5 bg-white rounded-2xl border border-slate-200 shadow-sm">
-                        {(["Weekly", "Monthly", "Quarterly", "Yearly", "All Time"] as TimeTab[]).map((tab) => (
-                            <button
-                                key={tab}
-                                onClick={() => setActiveTab(tab)}
-                                className={`outline-none px-5 py-2 text-xs font-bold rounded-xl transition-all ${activeTab === tab ? "bg-[#005d52] text-white shadow-md" : "text-slate-400 hover:text-slate-600 hover:bg-slate-50"}`}
-                            >
-                                {tab}
-                            </button>
-                        ))}
+                {/* --- Time Filters - With Filter Button (Matching OrderList) --- */}
+                <section className="relative mb-8 flex justify-end">
+                    <div className="relative" ref={dropdownRef}>
                         <button
-                            onClick={() => setIsCalendarOpen(!isCalendarOpen)}
-                            className={`outline-none px-5 py-3 text-xs font-bold rounded-2xl transition-all flex items-center gap-2 ${activeTab === "Custom" ? "bg-[#005d52] text-white shadow-md" : " text-slate-400 hover:text-slate-600 hover:bg-slate-50"}`}
+                            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                            className="px-4 py-2 rounded-xl border border-slate-200 bg-white text-sm font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-[#005d52]/20 flex items-center gap-2 text-gray-700"
                         >
-                            <CalendarIcon size={14} /> Custom
+                            <Filter size={16} className="text-[#005d52]" />
+                            <span>{getFilterDisplayText()}</span>
+                            <ChevronDown size={14} className={`transition-transform ${isDropdownOpen ? "rotate-180" : ""}`} />
                         </button>
-                    </div>
 
-                    {isCalendarOpen && (
-                        <div ref={calendarRef} className="absolute top-full mt-3 left-0 md:left-auto md:right-100 z-50 bg-white p-6 rounded-3xl shadow-2xl border border-slate-100 min-w-[320px] animate-in slide-in-from-top-2">
-                            <div className="flex justify-between items-center mb-4">
-                                <h4 className="text-sm font-bold text-slate-800">Custom Date Range</h4>
-                                <button onClick={() => setIsCalendarOpen(false)} className="outline-none "><X size={18} className="outline-none text-slate-400 hover:text-red-500" /></button>
+                        {/* Dropdown Menu */}
+                        {isDropdownOpen && !isCalendarOpen && (
+                            <div className="absolute right-0 mt-2 bg-white border border-slate-100 rounded-2xl shadow-2xl z-50 py-2 min-w-[160px]">
+                                {(["Weekly", "Monthly", "Quarterly", "Yearly", "All Time"] as TimeTab[]).map((tab) => (
+                                    <button
+                                        key={tab}
+                                        onClick={() => handleFilterChange(tab)}
+                                        className={`outline-none w-full text-left px-4 py-2.5 text-[13px] transition-colors ${
+                                            activeTab === tab ? "text-[#005d52] font-bold bg-teal-50/50" : "text-slate-600 hover:bg-slate-50"
+                                        }`}
+                                    >
+                                        {tab}
+                                    </button>
+                                ))}
+                                <button
+                                    onClick={() => handleFilterChange("Custom")}
+                                    className={`outline-none w-full text-left px-4 py-2.5 text-[13px] transition-colors ${
+                                        activeTab === "Custom" ? "text-[#005d52] font-bold bg-teal-50/50" : "text-slate-600 hover:bg-slate-50"
+                                    }`}
+                                >
+                                    Custom
+                                </button>
                             </div>
-                            <div className="space-y-4">
-                                <div className="space-y-1">
-                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Start Date</label>
-                                    <input type="date" value={customRange.start} onChange={(e) => setCustomRange({ ...customRange, start: e.target.value })} className="w-full p-3 bg-slate-50 border-none rounded-xl text-sm outline-none focus:ring-2 focus:ring-teal-500/20" />
+                        )}
+
+                        {/* Custom Date Range Popup */}
+                        {isCalendarOpen && (
+                            <div 
+                                ref={calendarRef}
+                                className="absolute right-0 mt-3 bg-white p-6 rounded-2xl shadow-xl border z-50 w-72"
+                            >
+                                <div className="space-y-3">
+                                    <input
+                                        type="date"
+                                        value={customRange.start}
+                                        onChange={(e) => setCustomRange({ ...customRange, start: e.target.value })}
+                                        className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#005d52]/20"
+                                        placeholder="Start Date"
+                                    />
+
+                                    <input
+                                        type="date"
+                                        value={customRange.end}
+                                        min={customRange.start}
+                                        onChange={(e) => setCustomRange({ ...customRange, end: e.target.value })}
+                                        className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#005d52]/20"
+                                        placeholder="End Date"
+                                    />
+
+                                    <button
+                                        onClick={handleCustomApply}
+                                        className="w-full bg-[#005d52] text-white py-2 rounded-lg text-sm hover:bg-[#004a40] transition-colors"
+                                    >
+                                        Apply Range
+                                    </button>
                                 </div>
-                                <div className="space-y-1">
-                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">End Date</label>
-                                    <input type="date" value={customRange.end} onChange={(e) => setCustomRange({ ...customRange, end: e.target.value })} className="w-full p-3 bg-slate-50 border-none rounded-xl text-sm outline-none focus:ring-2 focus:ring-teal-500/20" />
-                                </div>
-                                <button onClick={() => { setActiveTab("Custom"); setIsCalendarOpen(false); }} className="w-full py-3.5 bg-[#005d52] text-white rounded-xl font-bold text-xs shadow-lg shadow-teal-900/10">Apply Selection</button>
                             </div>
-                        </div>
-                    )}
+                        )}
+                    </div>
                 </section>
 
                 {/* --- Main Data Container --- */}
@@ -278,7 +372,7 @@ const OpportunityList: React.FC = () => {
                             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" size={18} />
                             <input
                                 type="text"
-                                placeholder="Search opportunities by company, lead ID, contact..."
+                                placeholder="Search opportunities by company..."
                                 className="w-full pl-12 pr-4 py-3.5 bg-slate-50 border-transparent rounded-2xl focus:bg-white focus:ring-4 focus:ring-teal-500/5 text-sm outline-none transition-all placeholder:text-slate-400"
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -289,18 +383,18 @@ const OpportunityList: React.FC = () => {
                             {/* Status Filter */}
                             <div className="relative min-w-35">
                                 <button
-                                    onClick={() => setOpenDropdown(openDropdown === "status" ? null : "status")}
+                                    onClick={() => setIsStatusOpen(!isStatusOpen)}
                                     className={`outline-none w-full flex items-center justify-between gap-2 px-4 py-3 rounded-xl border text-[13px] font-bold transition-all ${statusFilter !== "All" ? "bg-teal-50 border-teal-200 text-[#005d52]" : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"}`}
                                 >
                                     <span className="truncate">{statusFilter === "All" ? "Status" : statusFilter}</span>
-                                    <ChevronDown size={14} className={`transition-transform ${openDropdown === "status" ? "rotate-180" : ""}`} />
+                                    <ChevronDown size={14} className={`transition-transform ${isStatusOpen ? "rotate-180" : ""}`} />
                                 </button>
-                                {openDropdown === "status" && (
-                                    <div className="absolute right-0 mt-2 w-full bg-white border border-slate-100 rounded-2xl shadow-2xl z-50 py-2 animate-in fade-in zoom-in-95">
+                                {isStatusOpen && (
+                                    <div className="absolute right-0 mt-2 w-full bg-white border border-slate-100 rounded-2xl shadow-2xl z-50 py-2">
                                         {statusOptions.map(opt => (
                                             <button
                                                 key={opt}
-                                                onClick={() => { setStatusFilter(opt); setOpenDropdown(null); }}
+                                                onClick={() => { setStatusFilter(opt); setIsStatusOpen(false); setCurrentPage(1); }}
                                                 className={`outline-none w-full text-left px-4 py-2 text-[13px] hover:bg-slate-50 ${statusFilter === opt ? "text-[#005d52] font-bold bg-teal-50/50" : "text-slate-600"}`}
                                             >
                                                 {opt}
@@ -325,7 +419,7 @@ const OpportunityList: React.FC = () => {
                         <table className="w-full text-left border-collapse">
                             <thead>
                                 <tr className="bg-slate-50/50">
-                                    <th className="w-16 p-5 text-center border-b border-slate-100">
+                                    <th className="w-12 p-5 text-center border-b border-slate-100">
                                         <input type="checkbox" className="accent-[#005d52] w-4 h-4 cursor-pointer" checked={paginatedOpportunities.length > 0 && selectedIds.length === paginatedOpportunities.length} onChange={toggleSelectAll} />
                                     </th>
                                     <th className="px-4 py-4 text-[13px] text-slate-800 uppercase tracking-widest border-b border-slate-100 text-center">OPP ID</th>
@@ -346,16 +440,16 @@ const OpportunityList: React.FC = () => {
                                             <td className="p-5 text-center">
                                                 <input type="checkbox" className="accent-[#005d52] w-4 h-4 cursor-pointer" checked={selectedIds.includes(lead.id)} onChange={() => setSelectedIds(prev => prev.includes(lead.id) ? prev.filter(i => i !== lead.id) : [...prev, lead.id])} />
                                             </td>
-                                            <td className="px-4 py-4 text-[13px] text-slate-800 text-center font-mono">{lead.lead_id}</td>
-                                            <td className="px-4 py-4 text-[13px] text-slate-800 whitespace-nowrap text-center">
+                                            <td className="px-4 py-4 text-[13px] font-medium text-slate-800 text-center">{lead.lead_id}</td>
+                                            <td className="px-4 py-4 text-[13px] text-slate-600 text-center whitespace-nowrap">
                                                 {new Date(lead.created_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
                                             </td>
-                                            <td className="px-4 py-4 text-[13px] text-slate-800 font-medium text-center">{lead.company_name}</td>
+                                            <td className="px-4 py-4 text-[13px] font-medium text-slate-800 text-center">{lead.company_name}</td>
                                             <td className="px-4 py-4 text-[13px] text-slate-600 text-center">
-                                                <div>{lead.contact_person}</div>
-                                                <div className="text-[10px] text-slate-400">{lead.phone}</div>
+                                                <div>{lead.contact_person || "-"}</div>
+                                                <div className="text-[10px] text-slate-400">{lead.phone || "-"}</div>
                                             </td>
-                                            <td className="px-4 py-4 text-[13px] text-center">
+                                            <td className="px-4 py-4 text-center">
                                                 <span className={`font-bold ${getValueStyle(opportunityValue)}`}>
                                                     ₹{opportunityValue.toLocaleString('en-IN')}
                                                 </span>
@@ -368,13 +462,13 @@ const OpportunityList: React.FC = () => {
                                             </td>
                                             <td className="px-4 py-4">
                                                 <div className="flex justify-center gap-2">
-                                                    <button onClick={() => navigate("/sales/opportunities/opportunity-view/" + lead.id)} className="outline-none p-2 hover:bg-white text-slate-800 hover:text-[#005d52] rounded-xl transition-all">
+                                                    <button onClick={() => navigate("/sales/opportunities/opportunity-view/" + lead.id)} className="outline-none p-2 hover:bg-white text-slate-500 hover:text-[#005d52] rounded-xl transition-all">
                                                         <Eye size={16} />
                                                     </button>
-                                                    <button onClick={() => navigate("/sales/opportunities/opportunity-edit/" + lead.id)} className="outline-none p-2 hover:bg-white text-slate-800 hover:text-blue-600 rounded-xl transition-all">
+                                                    <button onClick={() => navigate("/sales/opportunities/opportunity-edit/" + lead.id)} className="outline-none p-2 hover:bg-white text-slate-500 hover:text-blue-600 rounded-xl transition-all">
                                                         <FileEdit size={16} />
                                                     </button>
-                                                    <button onClick={() => handleDelete(lead.id)} className="outline-none p-2 hover:bg-white text-slate-800 hover:text-rose-600 rounded-xl transition-all">
+                                                    <button onClick={() => handleDelete(lead.id)} className="outline-none p-2 hover:bg-white text-slate-500 hover:text-rose-600 rounded-xl transition-all">
                                                         <Trash2 size={16} />
                                                     </button>
                                                 </div>
@@ -384,6 +478,7 @@ const OpportunityList: React.FC = () => {
                                 })}
                             </tbody>
                         </table>
+
                         {!loading && filteredOpportunities.length === 0 && (
                             <div className="py-32 flex flex-col items-center justify-center text-center">
                                 <div className="p-6 bg-slate-50 rounded-full mb-4">
@@ -402,26 +497,38 @@ const OpportunityList: React.FC = () => {
                         <footer className="p-6 bg-slate-50/50 border-t border-slate-100 flex flex-col md:flex-row justify-between items-center gap-6">
                             <div className="flex items-center gap-6">
                                 <div className="text-[11px] font-bold text-slate-800 uppercase tracking-widest">
-                                    Showing <span className="text-slate-900">{filteredOpportunities.length > 0 ? (currentPage - 1) * itemsPerPage + 1 : 0}</span> to <span className="text-slate-900">{Math.min(currentPage * itemsPerPage, filteredOpportunities.length)}</span> of <span className="text-slate-900">{filteredOpportunities.length}</span> Opportunities
+                                    Showing <span className="text-slate-900">{filteredOpportunities.length > 0 ? startIndex + 1 : 0}</span> to <span className="text-slate-900">{Math.min(endIndex, filteredOpportunities.length)}</span> of <span className="text-slate-900">{filteredOpportunities.length}</span> Opportunities
                                 </div>
                             </div>
 
                             <div className="flex items-center gap-2">
-                                <button onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1} className="p-2.5 rounded-xl border border-slate-200 bg-white text-slate-500 hover:text-[#005d52] disabled:opacity-30 transition-all">
+                                <button 
+                                    onClick={handlePrevPage} 
+                                    disabled={currentPage === 1} 
+                                    className="p-2.5 rounded-xl border border-slate-200 bg-white text-slate-500 hover:text-[#005d52] disabled:opacity-30 transition-all"
+                                >
                                     <ChevronLeft size={18} strokeWidth={2.5} />
                                 </button>
 
                                 <div className="flex items-center gap-1.5">
                                     {getPageNumbers().map((page, i) => (
-                                        page === "..." ? <span key={i} className="px-2 text-slate-300"><MoreHorizontal size={14} /></span> : (
-                                            <button key={i} onClick={() => setCurrentPage(page as number)} className={`min-w-10 h-10 rounded-xl text-xs font-bold transition-all ${currentPage === page ? "bg-[#005d52] text-white shadow-lg shadow-teal-900/20 scale-105" : "bg-white text-slate-500 border border-slate-200"}`}>
+                                        page === "..." ? 
+                                            <span key={i} className="px-2 text-slate-300"><MoreHorizontal size={14} /></span> : 
+                                            <button 
+                                                key={i} 
+                                                onClick={() => goToPage(page as number)} 
+                                                className={`min-w-10 h-10 rounded-xl text-xs font-bold transition-all ${currentPage === page ? "bg-[#005d52] text-white shadow-lg shadow-teal-900/20 scale-105" : "bg-white text-slate-500 border border-slate-200"}`}
+                                            >
                                                 {page}
                                             </button>
-                                        )
                                     ))}
                                 </div>
 
-                                <button onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages || totalPages === 0} className="p-2.5 rounded-xl border border-slate-200 bg-white text-slate-500 hover:text-[#005d52] disabled:opacity-30 transition-all">
+                                <button 
+                                    onClick={handleNextPage} 
+                                    disabled={currentPage === totalPages || totalPages === 0} 
+                                    className="p-2.5 rounded-xl border border-slate-200 bg-white text-slate-500 hover:text-[#005d52] disabled:opacity-30 transition-all"
+                                >
                                     <ChevronRight size={18} strokeWidth={2.5} />
                                 </button>
                             </div>

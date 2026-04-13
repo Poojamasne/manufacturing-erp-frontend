@@ -1,5 +1,4 @@
-import React, { useState, useMemo, useEffect } from "react";
-import type { ChangeEvent } from "react";
+import React, { useState, useMemo, useEffect, useRef} from "react";
 import {
   UserPlus,
   Search,
@@ -10,7 +9,10 @@ import {
   Eye,
   FileEdit,
   Trash2,
-  MoreHorizontal
+  MoreHorizontal,
+  Filter,
+  ChevronDown,
+  Loader2
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { getEmployees, clearSalesErrors, deleteEmployee } from "../ModuleStateFiles/EmployeeSlice";
@@ -29,19 +31,36 @@ interface Employee {
   created_at: string;
 }
 
+type EmployeeStatus = "Active" | "Inactive" | "All";
+
 const SalesEmployees: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   const { employees, loading } = useAppSelector((state: RootState) => state.SalesEmployee);
 
   // Filter & Search States
   const [searchQuery, setSearchQuery] = useState("");
-  const [activeTab, setActiveTab] = useState<"Active" | "All">("Active");
+  const [statusFilter, setStatusFilter] = useState<EmployeeStatus>("Active");
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
-  // Professional Pagination States
+
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10; // Matches Leads Module
+  const itemsPerPage = 10;
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+
+
+  const statusOptions: EmployeeStatus[] = ["Active", "Inactive", "All"];
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchQuery);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
   useEffect(() => {
     dispatch(getEmployees());
     return () => {
@@ -49,29 +68,46 @@ const SalesEmployees: React.FC = () => {
     };
   }, [dispatch]);
 
-  // Reset to page 1 when filters or density change
+  // Reset to page 1 when filters change
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchQuery, activeTab, itemsPerPage]);
+  }, [debouncedSearch, statusFilter]);
+
+  // Close dropdown on click outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   // Filtering Logic
   const filteredEmployees = useMemo(() => {
     if (!employees) return [];
     return (employees as Employee[]).filter(emp => {
-      const matchesSearch = emp.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        emp.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        emp.user_id.toLowerCase().includes(searchQuery.toLowerCase());
-      const matchesTab = activeTab === "All" || emp.is_active === 1;
-      return matchesSearch && matchesTab;
+      const matchesSearch = 
+        emp.name.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
+        emp.email.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
+        emp.user_id.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
+        emp.designation.toLowerCase().includes(debouncedSearch.toLowerCase());
+      
+      let matchesStatus = true;
+      if (statusFilter === "Active") matchesStatus = emp.is_active === 1;
+      else if (statusFilter === "Inactive") matchesStatus = emp.is_active === 0;
+      else matchesStatus = true;
+      
+      return matchesSearch && matchesStatus;
     });
-  }, [employees, searchQuery, activeTab]);
+  }, [employees, debouncedSearch, statusFilter]);
 
   // --- Pagination Helpers ---
   const totalPages = Math.ceil(filteredEmployees.length / itemsPerPage);
-  const paginatedData = filteredEmployees.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedData = filteredEmployees.slice(startIndex, endIndex);
 
   const getPageNumbers = () => {
     const pages = [];
@@ -92,197 +128,273 @@ const SalesEmployees: React.FC = () => {
     return pages;
   };
 
+  const goToPage = (page: number) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+    }
+  };
+
+  const handlePrevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedIds.length === paginatedData.length && paginatedData.length > 0) {
+      setSelectedIds([]);
+    } else {
+      setSelectedIds(paginatedData.map(emp => emp.id));
+    }
+  };
+
   const handleDelete = (id: string) => {
     dispatch(deleteEmployee(id, navigate) as any);
+    setSelectedIds(prev => prev.filter(pid => pid !== id));
+  };
+
+  const handleBulkDelete = () => {
+    if (selectedIds.length === 0) return;
+    selectedIds.forEach(id => dispatch(deleteEmployee(id, navigate) as any));
+    setSelectedIds([]);
+  };
+
+  // Get display text for filter button
+  const getFilterDisplayText = () => {
+    if (statusFilter === "Active") return "Active";
+    if (statusFilter === "Inactive") return "Inactive";
+    return "All Employees";
+  };
+
+  if (loading && employees.length === 0) {
+    return (
+      <div className="min-h-screen bg-[#f4f7f6] flex items-center justify-center">
+        <Loader2 className="animate-spin text-[#005d52]" size={48} />
+      </div>
+    );
   }
 
   return (
     <div className="min-h-screen bg-[#f4f7f6] p-4 sm:p-6 lg:p-8 font-sans text-slate-900">
+      <div className="max-w-7xl mx-auto">
+        {/* Header Section */}
+        <header className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 mb-10">
+          <div>
+            <h1 className="text-3xl font-extrabold text-slate-800 tracking-tight">Employees</h1>
+            <p className="text-sm text-gray-500 mt-1 font-medium">Manage employee accounts and access permissions.</p>
+          </div>
 
-      {/* Header Section */}
-      <div className="max-w-7xl mx-auto mb-10 flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
-        <div>
-          <h1 className="text-3xl font-extrabold text-slate-800 tracking-tight">Employees</h1>
-          <p className="text-sm text-gray-500 mt-1 font-medium">Manage employee accounts and access permissions.</p>
-        </div>
-
-        <button
-          onClick={() => navigate("/sales/employees/add-employee")}
-          className="outline-none group flex items-center gap-2 bg-[#005d52] hover:bg-[#004a41] text-white px-6 py-3.5 rounded-2xl font-bold text-sm shadow-xl shadow-teal-900/20 transition-all active:scale-95"
-        >
-          <UserPlus size={18} />
-          Add Sales Employee
-        </button>
-      </div>
-
-      {/* Tabs & Search Row */}
-      <div className="max-w-7xl mx-auto flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-8">
-        <div className="flex p-1.5 bg-white rounded-2xl border border-slate-200 shadow-sm w-fit">
           <button
-            onClick={() => setActiveTab("Active")}
-            className={` outline-none px-6 py-2 rounded-xl text-xs font-bold transition-all ${activeTab === "Active" ? "bg-[#005d52] text-white shadow-md" : "text-slate-400 hover:text-slate-600 hover:bg-slate-50"}`}
+            onClick={() => navigate("/sales/employees/add-employee")}
+            className="outline-none group flex items-center gap-2 bg-[#005d52] hover:bg-[#004a41] text-white px-6 py-3.5 rounded-2xl font-bold text-sm shadow-xl shadow-teal-900/20 transition-all active:scale-95"
           >
-            Active
+            <UserPlus size={18} />
+            Add Sales Employee
           </button>
-          <button
-            onClick={() => setActiveTab("All")}
-            className={` outline-none px-6 py-2 rounded-xl text-xs font-bold transition-all ${activeTab === "All" ? "bg-[#005d52] text-white shadow-md" : "text-slate-400 hover:text-slate-600 hover:bg-slate-50"}`}
-          >
-            All Employees
-          </button>
-        </div>
+        </header>
 
-        <div className="relative w-full lg:w-96">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" size={18} />
-          <input
-            type="text"
-            placeholder="Search by name, email or ID..."
-            value={searchQuery}
-            onChange={(e: ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
-            className="w-full pl-12 pr-4 py-3.5 bg-white border border-slate-200 rounded-2xl text-sm outline-none shadow-sm focus:ring-4 focus:ring-teal-500/5 transition-all placeholder:text-slate-400"
-          />
-        </div>
-      </div>
+        {/* Filter Button - Same as OrderList */}
+        <section className="relative mb-8 flex justify-end">
+          <div className="relative" ref={dropdownRef}>
+            <button
+              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+              className="px-4 py-2 rounded-xl border border-slate-200 bg-white text-sm font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-[#005d52]/20 flex items-center gap-2 text-gray-700"
+            >
+              <Filter size={16} className="text-[#005d52]" />
+              <span>{getFilterDisplayText()}</span>
+              <ChevronDown size={14} className={`transition-transform ${isDropdownOpen ? "rotate-180" : ""}`} />
+            </button>
 
-      {/* Table Container */}
-      <div className="max-w-7xl mx-auto bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden relative">
+            {/* Dropdown Menu */}
+            {isDropdownOpen && (
+              <div className="absolute right-0 mt-2 bg-white border border-slate-100 rounded-2xl shadow-2xl z-50 py-2 min-w-[160px]">
+                {statusOptions.map((option) => (
+                  <button
+                    key={option}
+                    onClick={() => {
+                      setStatusFilter(option);
+                      setIsDropdownOpen(false);
+                      setCurrentPage(1);
+                    }}
+                    className={`outline-none w-full text-left px-4 py-2.5 text-[13px] transition-colors ${
+                      statusFilter === option ? "text-[#005d52] font-bold bg-teal-50/50" : "text-slate-600 hover:bg-slate-50"
+                    }`}
+                  >
+                    {option === "Active" ? "Active" : option === "Inactive" ? "Inactive" : "All Employees"}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        </section>
 
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
-            <thead>
-              <tr className="bg-slate-50/50">
-                <th className="px-6 py-5 text-[13px] text-slate-800 uppercase tracking-widest border-b border-slate-100 text-center">Name & Id</th>
-                <th className="px-4 py-5 text-[13px] text-slate-800 uppercase tracking-widest border-b border-slate-100 text-center">Designation</th>
-                <th className="px-6 py-5 text-[13px] text-slate-800 uppercase tracking-widest border-b border-slate-100 text-center">Contact</th>
-                <th className="px-6 py-5 text-[13px] text-slate-800 uppercase tracking-widest border-b border-slate-100 text-center">Status</th>
-                <th className="px-6 py-5 text-[13px] text-slate-800 uppercase tracking-widest border-b border-slate-100 text-center">Joined Date</th>
-                <th className="px-6 py-5 text-[13px] text-slate-800 uppercase tracking-widest border-b border-slate-100 text-center">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-50">
-              {paginatedData.map((emp) => (
-                <tr key={emp.user_id} className="group hover:bg-teal-50/20 transition-colors">
-                  <td className="px-6 py-5 cursor-pointer" onClick={() => navigate(`/sales/employees/view-employee/${emp?.id}`)}>
-                    <div className="flex items-center gap-4">
-                      <div className="w-11 h-11 shrink-0 rounded-2xl bg-teal-50 flex items-center justify-center text-[#005d52] font-black text-xs border border-teal-100 shadow-sm group-hover:bg-white group-hover:scale-110 transition-all">
-                        {emp.name ? emp.name.split(' ').map(n => n[0]).join('') : 'U'}
-                      </div>
+        {/* Main Data Container */}
+        <div className="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
+          {/* Toolbar */}
+          <div className="p-6 flex flex-col lg:flex-row justify-between items-center gap-4 border-b border-slate-50">
+            <div className="relative w-full lg:w-96">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" size={18} />
+              <input
+                type="text"
+                placeholder="Search by name, email, ID..."
+                className="w-full pl-12 pr-4 py-3.5 bg-slate-50 border-transparent rounded-2xl focus:bg-white focus:ring-4 focus:ring-teal-500/5 text-sm outline-none transition-all placeholder:text-slate-400"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
+
+            <div className="flex flex-wrap items-center justify-center lg:justify-end gap-3 w-full">
+              <button 
+                onClick={handleBulkDelete}
+                disabled={selectedIds.length === 0} 
+                className="p-3 bg-rose-50 text-rose-500 rounded-xl hover:bg-rose-100 disabled:opacity-20 transition-colors"
+              >
+                <Trash2 size={20} />
+              </button>
+            </div>
+          </div>
+
+          {/* Table */}
+          <div className="w-full overflow-x-auto">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="bg-slate-50/50">
+                  <th className="w-12 p-5 text-center border-b border-slate-100">
+                    <input 
+                      type="checkbox" 
+                      className="accent-[#005d52] w-4 h-4 cursor-pointer" 
+                      checked={paginatedData.length > 0 && selectedIds.length === paginatedData.length} 
+                      onChange={toggleSelectAll} 
+                    />
+                  </th>
+                  <th className="px-4 py-4 text-[13px] text-slate-800 uppercase tracking-widest border-b border-slate-100 text-center">NAME & ID</th>
+                  <th className="px-4 py-4 text-[13px] text-slate-800 uppercase tracking-widest border-b border-slate-100 text-center">DESIGNATION</th>
+                  <th className="px-4 py-4 text-[13px] text-slate-800 uppercase tracking-widest border-b border-slate-100 text-center">CONTACT</th>
+                  <th className="px-4 py-4 text-[13px] text-slate-800 uppercase tracking-widest border-b border-slate-100 text-center">STATUS</th>
+                  <th className="px-4 py-4 text-[13px] text-slate-800 uppercase tracking-widest border-b border-slate-100 text-center">JOINED DATE</th>
+                  <th className="px-4 py-4 text-[13px] text-slate-800 uppercase tracking-widest border-b border-slate-100 text-center">ACTIONS</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-50">
+                {paginatedData.map((emp) => (
+                  <tr key={emp.id} className="group hover:bg-teal-50/20 transition-colors">
+                    <td className="p-5 text-center">
+                      <input 
+                        type="checkbox" 
+                        className="accent-[#005d52] w-4 h-4 cursor-pointer" 
+                        checked={selectedIds.includes(emp.id)} 
+                        onChange={() => setSelectedIds(prev => prev.includes(emp.id) ? prev.filter(i => i !== emp.id) : [...prev, emp.id])} 
+                      />
+                    </td>
+                    <td className="px-4 py-4 text-center">
                       <div>
                         <p className="text-[13px] font-bold text-slate-800">{emp.name}</p>
-                        <p className="text-[11px] font-bold text-[#005d52] uppercase tracking-wider">{emp.user_id}</p>
+                        <p className="text-[10px] font-bold text-[#005d52] uppercase tracking-wider">{emp.user_id}</p>
                       </div>
-                    </div>
-                  </td>
-
-                  <td className="px-4 py-5">
-                    <span className="text-[13px] text-slate-800 text-center">{emp.designation}</span>
-                  </td>
-
-                  <td className="px-6 py-5">
-                    <div className="space-y-1.5">
-                      <div className="flex items-center gap-2 text-[13px] text-slate-800 text-center">
-                        <Mail size={14} className="text-[#005d52]/50" /> {emp.email}
+                    </td>
+                    <td className="px-4 py-4 text-center">
+                      <span className="text-[13px] text-slate-600">{emp.designation}</span>
+                    </td>
+                    <td className="px-4 py-4">
+                      <div className="space-y-1 text-center">
+                        <div className="flex items-center justify-center gap-2 text-[12px] text-slate-600">
+                          <Mail size={12} className="text-[#005d52]/50" /> {emp.email}
+                        </div>
+                        <div className="flex items-center justify-center gap-2 text-[12px] text-slate-600">
+                          <Phone size={12} className="text-[#005d52]/50" /> {emp.phone}
+                        </div>
                       </div>
-                      <div className="flex items-center gap-2 text-[12px] text-slate-800 text-center">
-                        <Phone size={14} className="text-[#005d52]/50" /> {emp.phone}
+                    </td>
+                    <td className="px-4 py-4 text-center">
+                      <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider border ${emp.is_active === 1 ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 'bg-slate-50 text-slate-400 border-slate-200'}`}>
+                        <div className={`w-1.5 h-1.5 rounded-full ${emp.is_active === 1 ? 'bg-emerald-500' : 'bg-slate-300'}`} />
+                        {emp.is_active === 1 ? 'Active' : 'Inactive'}
+                      </span>
+                    </td>
+                    <td className="px-4 py-4 text-center">
+                      <span className="text-[13px] text-slate-600 whitespace-nowrap">
+                        {emp?.created_at ? new Date(emp.created_at).toLocaleDateString("en-GB", { day: '2-digit', month: 'short', year: 'numeric' }) : "N/A"}
+                      </span>
+                    </td>
+                    <td className="px-4 py-4">
+                      <div className="flex justify-center gap-2">
+                        <button onClick={() => navigate(`/sales/employees/view-employee/${emp?.id}`)} className="outline-none p-2 hover:bg-white text-slate-500 hover:text-[#005d52] rounded-xl transition-all">
+                          <Eye size={16} />
+                        </button>
+                        <button onClick={() => navigate(`/sales/employees/edit-employee/${emp?.id}`)} className="outline-none p-2 hover:bg-white text-slate-500 hover:text-blue-600 rounded-xl transition-all">
+                          <FileEdit size={16} />
+                        </button>
+                        <button onClick={() => handleDelete(emp?.id)} className="outline-none p-2 hover:bg-white text-slate-500 hover:text-rose-600 rounded-xl transition-all">
+                          <Trash2 size={16} />
+                        </button>
                       </div>
-                    </div>
-                  </td>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
 
-                  <td className="px-2 py-5 text-center">
-                    <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider border ${emp.is_active === 1 ? 'bg-emerald-50 text-emerald-700 border-emerald-100' : 'bg-slate-50 text-slate-400 border-slate-200'}`}>
-                      <div className={`w-1.5 h-1.5 rounded-full ${emp.is_active === 1 ? 'bg-emerald-500 animate-pulse' : 'bg-slate-300'}`} />
-                      {emp.is_active === 1 ? 'Active' : 'Inactive'}
-                    </span>
-                  </td>
-
-                  <td className="px-6 py-5 text-center">
-                    <span className="text-[13px] text-slate-800 text-center whitespace-nowrap">
-                      {emp?.created_at ? new Date(emp.created_at).toLocaleDateString("en-GB", { day: '2-digit', month: 'short', year: 'numeric' }) : "N/A"}
-                    </span>
-                  </td>
-
-                  <td className="px-6 py-5">
-                    <div className="flex justify-center gap-2">
-                      <button onClick={() => navigate(`/sales/employees/view-employee/${emp?.id}`)} className="outline-none p-2 hover:bg-white hover:shadow-md text-slate-400 hover:text-[#005d52] rounded-xl transition-all">
-                        <Eye size={16} />
-                      </button>
-                      <button onClick={() => navigate(`/sales/employees/edit-employee/${emp?.id}`)} className="outline-none p-2 hover:bg-white hover:shadow-md text-slate-400 hover:text-blue-600 rounded-xl transition-all">
-                        <FileEdit size={16} />
-                      </button>
-                      <button onClick={() => handleDelete(emp?.id)} className="outline-none p-2 hover:bg-white hover:shadow-md text-slate-400 hover:text-rose-600 rounded-xl transition-all">
-                        <Trash2 size={16} />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-
-          {/* EMPTY STATE */}
-          {!loading && filteredEmployees.length === 0 && (
-            <div className="py-32 flex flex-col items-center justify-center text-center">
-              <div className="p-6 bg-slate-50 rounded-full mb-4">
-                <Search className="text-slate-200" size={40} />
+            {/* EMPTY STATE */}
+            {!loading && filteredEmployees.length === 0 && (
+              <div className="py-32 flex flex-col items-center justify-center text-center">
+                <div className="p-6 bg-slate-50 rounded-full mb-4">
+                  <UserPlus className="text-slate-200" size={40} />
+                </div>
+                <h3 className="text-lg font-bold text-slate-800">No Employees Found</h3>
+                <p className="text-slate-400 text-sm max-w-xs">We couldn't find any employees matching your current filter criteria.</p>
               </div>
-              <h3 className="text-lg font-bold text-slate-800">No Workforce Found</h3>
-              <p className="text-slate-400 text-sm max-w-xs">We couldn't find any employees matching your criteria.</p>
-            </div>
+            )}
+          </div>
+
+          {/* Pagination Footer - Same as OrderList */}
+          {totalPages > 0 && (
+            <footer className="p-6 bg-slate-50/50 border-t border-slate-100 flex flex-col md:flex-row justify-between items-center gap-6">
+              <div className="flex items-center gap-6">
+                <div className="text-[11px] font-bold text-slate-800 uppercase tracking-widest">
+                  Showing <span className="text-slate-900">{filteredEmployees.length > 0 ? startIndex + 1 : 0}</span> to <span className="text-slate-900">{Math.min(endIndex, filteredEmployees.length)}</span> of <span className="text-slate-900">{filteredEmployees.length}</span> Employees
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button 
+                  onClick={handlePrevPage} 
+                  disabled={currentPage === 1} 
+                  className="p-2.5 rounded-xl border border-slate-200 bg-white text-slate-500 hover:text-[#005d52] disabled:opacity-30 transition-all"
+                >
+                  <ChevronLeft size={18} strokeWidth={2.5} />
+                </button>
+
+                <div className="flex items-center gap-1.5">
+                  {getPageNumbers().map((page, i) => (
+                    page === "..." ? 
+                      <span key={i} className="px-2 text-slate-300"><MoreHorizontal size={14} /></span> : 
+                      <button 
+                        key={i} 
+                        onClick={() => goToPage(page as number)} 
+                        className={`min-w-10 h-10 rounded-xl text-xs font-bold transition-all ${currentPage === page ? "bg-[#005d52] text-white shadow-lg shadow-teal-900/20 scale-105" : "bg-white text-slate-500 border border-slate-200"}`}
+                      >
+                        {page}
+                      </button>
+                  ))}
+                </div>
+
+                <button 
+                  onClick={handleNextPage} 
+                  disabled={currentPage === totalPages || totalPages === 0} 
+                  className="p-2.5 rounded-xl border border-slate-200 bg-white text-slate-500 hover:text-[#005d52] disabled:opacity-30 transition-all"
+                >
+                  <ChevronRight size={18} strokeWidth={2.5} />
+                </button>
+              </div>
+            </footer>
           )}
         </div>
-
-        {/* --- CONSISTENT ERP PAGINATION FOOTER --- */}
-        <footer className="p-6 bg-slate-50/50 border-t border-slate-100 flex flex-col md:flex-row justify-between items-center gap-6">
-
-          {/* Left: Rows Per Page & Stats */}
-          <div className="flex items-center gap-6">
-           
-            <div className="text-[11px] font-bold text-slate-800 uppercase tracking-widest">
-              Showing <span className="text-slate-900">{paginatedData.length > 0 ? (currentPage - 1) * itemsPerPage + 1 : 0}</span> to <span className="text-slate-900">{Math.min(currentPage * itemsPerPage, filteredEmployees.length)}</span> of <span className="text-slate-900">{filteredEmployees.length}</span> Employees
-            </div>
-          </div>
-
-          {/* Right: Smart Navigation */}
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-              disabled={currentPage === 1}
-              className="p-2.5 rounded-xl border border-slate-200 bg-white text-slate-500 hover:text-[#005d52] hover:border-teal-200 disabled:opacity-30 disabled:pointer-events-none transition-all shadow-sm"
-            >
-              <ChevronLeft size={18} strokeWidth={2.5} />
-            </button>
-
-            <div className="flex items-center gap-1.5">
-              {getPageNumbers().map((page, index) => (
-                page === "..." ? (
-                  <span key={`dots-${index}`} className="px-2 text-slate-300">
-                    <MoreHorizontal size={14} />
-                  </span>
-                ) : (
-                  <button
-                    key={page}
-                    onClick={() => setCurrentPage(page as number)}
-                    className={`min-w-10 h-10 rounded-xl text-xs font-bold transition-all duration-200 ${currentPage === page
-                      ? "bg-[#005d52] text-white shadow-lg shadow-teal-900/20 scale-105"
-                      : "bg-white text-slate-500 border border-slate-200 hover:border-slate-300 hover:text-slate-800 shadow-sm"
-                      }`}
-                  >
-                    {page}
-                  </button>
-                )
-              ))}
-            </div>
-
-            <button
-              onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-              disabled={currentPage === totalPages || totalPages === 0}
-              className="p-2.5 rounded-xl border border-slate-200 bg-white text-slate-500 hover:text-[#005d52] hover:border-teal-200 disabled:opacity-30 disabled:pointer-events-none transition-all shadow-sm"
-            >
-              <ChevronRight size={18} strokeWidth={2.5} />
-            </button>
-          </div>
-        </footer>
       </div>
     </div>
   );
