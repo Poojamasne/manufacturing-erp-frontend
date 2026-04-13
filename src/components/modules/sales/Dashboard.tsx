@@ -9,7 +9,7 @@ import {
   CartesianGrid,
   Cell,
 } from "recharts";
-import { getDashboardData } from "../sales/ModuleStateFiles/DashboardSlice"; // Adjust path
+import { getDashboardData } from "../sales/ModuleStateFiles/DashboardSlice";
 import { useAppDispatch, useAppSelector } from "../../common/ReduxMainHooks";
 import type { RootState } from "../../../ApplicationState/Store";
 
@@ -22,8 +22,6 @@ interface StatCardProps {
 type FilterType = "Weekly" | "Monthly" | "Quarterly" | "Yearly" | "Custom";
 
 const COLORS = ["#005d52", "#1a7a6f", "#4fb29b", "#7bc7b5", "#f08552", "#b0d9d9", "#cbd5e1"];
-
-// Keeping mock stats for now as requested
 
 const StatCard = ({ title, value, svg }: StatCardProps) => (
   <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm transition-all hover:shadow-md">
@@ -46,14 +44,15 @@ const StatCard = ({ title, value, svg }: StatCardProps) => (
 
 export const Dashboard = () => {
   const dispatch = useAppDispatch();
-
-  const { salesByCategory, stats, pipeline } = useAppSelector((state: RootState) => state.SalesDashboard);
+  const { salesByCategory, stats, pipeline, loading } = useAppSelector(
+    (state: RootState) => state.SalesDashboard
+  );
 
   const formattedData = salesByCategory?.map((item: any) => ({
-  ...item,
-  units_sold: Number(item.units_sold),
-  target: Number(item.target || 0),
-}));
+    ...item,
+    units_sold: Number(item.units_sold),
+    target: Number(item.target) || Math.round(Number(item.units_sold) * 1.2),
+  }));
 
   const [filter, setFilter] = useState<FilterType>("Weekly");
   const [customRange, setCustomRange] = useState({ start: "", end: new Date().toISOString().split("T")[0] });
@@ -61,15 +60,16 @@ export const Dashboard = () => {
   const calendarRef = useRef<HTMLDivElement>(null);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 640);
 
-  // Only fetch data when filter changes, but skip the initial "Custom" selection that hasn't applied a range yet
-  const [shouldFetch, setShouldFetch] = useState(true);
-
+  // Fetch data when filter or custom range changes
   useEffect(() => {
-    if (shouldFetch) {
-      dispatch(getDashboardData());
+    if (filter === "Custom") {
+      if (customRange.start && customRange.end) {
+        dispatch(getDashboardData(filter, customRange));
+      }
+    } else {
+      dispatch(getDashboardData(filter));
     }
-    setShouldFetch(true);
-  }, [dispatch, filter, shouldFetch]);
+  }, [dispatch, filter, customRange.start, customRange.end]);
 
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 640);
@@ -87,40 +87,40 @@ export const Dashboard = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Handle custom range application
+  const handleFilterChange = (value: FilterType) => {
+    setFilter(value);
+    if (value === "Custom") {
+      setIsCalendarOpen(true);
+    } else {
+      setIsCalendarOpen(false);
+      setCustomRange({ start: "", end: new Date().toISOString().split("T")[0] });
+    }
+  };
+
   const handleApplyCustomRange = () => {
     if (!customRange.start || !customRange.end) {
       alert("Please select date range");
       return;
     }
     setIsCalendarOpen(false);
-    // Trigger data fetch with custom range
-    setShouldFetch(true);
-    // Keep filter as "Custom"
-    setFilter("Custom");
   };
 
-  // Handle filter change
-  const handleFilterChange = (value: FilterType) => {
-    if (value === "Custom") {
-      setFilter("Custom");
-      setIsCalendarOpen(true);
-      setShouldFetch(false); // Prevent data fetch until range is applied
-    } else {
-      setFilter(value);
-      setIsCalendarOpen(false);
-      setShouldFetch(true); // Fetch data for the selected non-custom filter
-    }
-  };
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#f4f7f6] flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#005d52] mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading dashboard...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#f4f7f6] p-4 sm:p-6 lg:p-8 font-sans text-gray-800">
       <div className="max-w-7xl mx-auto">
-
         {/* HEADER & TIME FILTERS */}
         <div className="mb-10 flex flex-col xl:flex-row xl:items-center justify-between gap-6">
-  
-          {/* LEFT */}
           <div>
             <h1 className="text-3xl font-extrabold text-slate-800 tracking-tight">
               Dashboard
@@ -130,7 +130,6 @@ export const Dashboard = () => {
             </p>
           </div>
 
-          {/* RIGHT - DROPDOWN */}
           <div className="relative">
             <select
               value={filter}
@@ -144,7 +143,6 @@ export const Dashboard = () => {
               <option value="Custom">Custom</option>
             </select>
 
-            {/* Custom Date Range Popup */}
             {isCalendarOpen && filter === "Custom" && (
               <div 
                 ref={calendarRef}
@@ -157,7 +155,7 @@ export const Dashboard = () => {
                     onChange={(e) =>
                       setCustomRange({ ...customRange, start: e.target.value })
                     }
-                    className="w-full p-2 border rounded-lg"
+                    className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#005d52]/20"
                     placeholder="Start Date"
                   />
 
@@ -168,7 +166,7 @@ export const Dashboard = () => {
                     onChange={(e) =>
                       setCustomRange({ ...customRange, end: e.target.value })
                     }
-                    className="w-full p-2 border rounded-lg"
+                    className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#005d52]/20"
                     placeholder="End Date"
                   />
 
@@ -176,7 +174,7 @@ export const Dashboard = () => {
                     onClick={handleApplyCustomRange}
                     className="w-full bg-[#005d52] text-white py-2 rounded-lg text-sm hover:bg-[#004a40] transition-colors"
                   >
-                    Apply
+                    Apply Range
                   </button>
                 </div>
               </div>
@@ -184,30 +182,45 @@ export const Dashboard = () => {
           </div>
         </div>
 
-        {/* STATS GRID (Keeping mock for now) */}
+        {/* STATS GRID */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
-          <StatCard title="Total Leads" value={stats?.totalLeads} svg="/icons/users.svg" />
-          <StatCard title="Deals Won" value={stats?.dealsWon} svg="/icons/win.svg" />
+          <StatCard title="Total Leads" value={stats?.totalLeads || 0} svg="/icons/users.svg" />
+          <StatCard title="Deals Won" value={stats?.dealsWon || 0} svg="/icons/win.svg" />
           <StatCard title="Revenue" value={`₹ ${Number(stats?.totalRevenue || 0).toLocaleString("en-IN")}`} svg="/icons/rupee.svg" />
-          <StatCard title="Win Rate" value={`${stats?.winRate}%`} svg="/icons/trending.svg" />
+          <StatCard title="Win Rate" value={`${stats?.winRate || 0}%`} svg="/icons/trending.svg" />
         </div>
 
-        {/* CHARTS (Using Redux Data) */}
+        {/* CHARTS */}
         <div className="grid grid-cols-1 gap-8">
-
-          {/* Sales Pipeline Chart */}
+          {/* Sales Pipeline Chart - FIXED STRAIGHT LABELS */}
           <div className="bg-white p-6 sm:p-8 rounded-[2.5rem] border border-gray-100 shadow-sm w-full">
             <h3 className="text-[11px] font-bold text-gray-800 uppercase tracking-widest mb-1">Sales Pipeline</h3>
             <p className="text-sm text-gray-400 font-normal mb-8">Conversion stages distribution</p>
             <div className="h-80 sm:h-96 w-full">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={pipeline} margin={{ top: 10, right: 10, left: -25, bottom: 0 }}>
+                <BarChart 
+                  data={pipeline || []} 
+                  margin={{ top: 10, right: 10, left: -25, bottom: 60 }}
+                >
                   <CartesianGrid vertical={false} stroke="#f1f5f9" />
-                  <XAxis dataKey="stage" axisLine={false} tickLine={false} tick={isMobile ? false : { fill: '#7e899c', fontSize: 10 }} />
+                  <XAxis 
+                    dataKey="stage" 
+                    axisLine={false} 
+                    tickLine={false} 
+                    tick={{ fill: '#7e899c', fontSize: 11, fontWeight: 500 }}
+                    interval={0}
+                    angle={0}
+                    textAnchor="middle"
+                    dy={10}
+                    height={60}
+                  />
                   <YAxis axisLine={false} tickLine={false} tick={{ fill: '#7e899c', fontSize: 10 }} />
-                  <Tooltip cursor={{ fill: '#f8fafc' }} contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }} />
+                  <Tooltip 
+                    cursor={{ fill: '#f8fafc' }} 
+                    contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }}
+                  />
                   <Bar dataKey="count" radius={[8, 8, 0, 0]} barSize={isMobile ? 28 : 35}>
-                    {pipeline?.map((_, index) => (
+                    {(pipeline || []).map((_: any, index: number) => (
                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                     ))}
                   </Bar>
@@ -216,7 +229,7 @@ export const Dashboard = () => {
             </div>
           </div>
 
-          {/* Product Performance Chart */}
+          {/* Product Performance Chart - FIXED STRAIGHT LABELS */}
           <div className="bg-white p-6 sm:p-8 rounded-[2.5rem] border border-gray-100 shadow-sm w-full">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
               <div>
@@ -234,9 +247,23 @@ export const Dashboard = () => {
             </div>
             <div className="h-80 sm:h-96 w-full">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={formattedData} margin={{ top: 10, right: 10, left: -25, bottom: 0 }} barGap={8}>
+                <BarChart 
+                  data={formattedData || []} 
+                  margin={{ top: 10, right: 10, left: -25, bottom: 60 }} 
+                  barGap={8}
+                >
                   <CartesianGrid vertical={false} stroke="#f1f5f9" />
-                  <XAxis dataKey="category" axisLine={false} tickLine={false} tick={{ fill: '#7e899c', fontSize: 10 }} />
+                  <XAxis 
+                    dataKey="category" 
+                    axisLine={false} 
+                    tickLine={false} 
+                    tick={{ fill: '#7e899c', fontSize: 11, fontWeight: 500 }}
+                    interval={0}
+                    angle={0}
+                    textAnchor="middle"
+                    dy={10}
+                    height={60}
+                  />
                   <YAxis axisLine={false} tickLine={false} tick={{ fill: '#7e899c', fontSize: 10 }} />
                   <Tooltip cursor={{ fill: 'transparent' }} />
                   <Bar dataKey="units_sold" fill="#005d52" radius={[6, 6, 0, 0]} barSize={28} />
