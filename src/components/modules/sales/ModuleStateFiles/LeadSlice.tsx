@@ -216,7 +216,7 @@ export const createLead = (payload: any, navigate: NavigateFunction) => async (d
     dispatch(request());
     
     try {
-        const loadingSwal = Swal.fire({
+        Swal.fire({
             title: "Creating Lead...",
             text: "Please wait while we create the lead.",
             allowOutsideClick: false,
@@ -395,7 +395,7 @@ const handleError = (error: any, dispatch: any) => {
     const status = error.response?.status;
     let message = error.response?.data?.message || "Something went wrong";
     
-    // ✅ Check for variant-related errors and make them user-friendly
+   
     if (message.includes("Variant with ID")) {
         // Extract variant name from message if possible
         const variantMatch = message.match(/Variant with ID (.+?) not found/);
