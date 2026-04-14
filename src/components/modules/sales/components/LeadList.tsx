@@ -19,6 +19,7 @@ import {
 } from "../ModuleStateFiles/LeadSlice";
 import { useAppDispatch, useAppSelector } from "../../../common/ReduxMainHooks";
 import type { RootState } from "../../../../ApplicationState/Store";
+import toast from "react-hot-toast";
 
 // --- Types ---
 type TimeTab =
@@ -110,13 +111,16 @@ const LeadList: React.FC = () => {
     setCurrentPage(1);
   }, [searchQuery, priorityFilter, statusFilter, activeTab, customRange]);
 
-  // --- Filtering Logic ---
-  const filteredLeads = useMemo(() => {
+  // --- CRITICAL FIX: Filtering & Sorting Logic (NEWEST FIRST by ID) ---
+  const filteredAndSortedLeads = useMemo(() => {
     if (!leads || leads.length === 0) return [];
-    return leads.filter((lead) => {
+    
+    // First filter the leads
+    const filtered = leads.filter((lead) => {
       const matchesSearch =
         lead.company_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        lead.lead_id?.toLowerCase().includes(searchQuery.toLowerCase());
+        lead.lead_id?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        lead.id?.toString().includes(searchQuery.toLowerCase());
 
       const matchesPriority =
         priorityFilter === "All" || lead.priority === priorityFilter;
@@ -158,6 +162,23 @@ const LeadList: React.FC = () => {
       }
       return matchesSearch && matchesPriority && matchesStatus && matchesTime;
     });
+    
+    // CRITICAL FIX: Sort by ID in DESCENDING order (highest ID first = newest lead)
+    const sorted = [...filtered].sort((a, b) => {
+      // Primary sort by numeric ID (higher = newer)
+      const idCompare = (b.id || 0) - (a.id || 0);
+      if (idCompare !== 0) return idCompare;
+      
+      // Secondary sort by created_at date
+      if (a.created_at && b.created_at) {
+        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+      }
+      return 0;
+    });
+    
+    console.log("Sorted Leads (first 5):", sorted.slice(0, 5).map(l => ({ id: l.id, name: l.company_name })));
+    
+    return sorted;
   }, [
     leads,
     searchQuery,
@@ -168,10 +189,10 @@ const LeadList: React.FC = () => {
   ]);
 
   // --- Pagination Helpers ---
-  const totalPages = Math.ceil(filteredLeads.length / itemsPerPage);
+  const totalPages = Math.ceil(filteredAndSortedLeads.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
-  const paginatedLeads = filteredLeads.slice(startIndex, endIndex);
+  const paginatedLeads = filteredAndSortedLeads.slice(startIndex, endIndex);
 
   const getPageNumbers = () => {
     const pages = [];
@@ -232,7 +253,6 @@ const LeadList: React.FC = () => {
   };
 
 
-
   // Handle filter change - closes dropdown automatically
   const handleFilterChange = (value: TimeTab) => {
     if (value === "Custom") {
@@ -266,15 +286,24 @@ const LeadList: React.FC = () => {
     return activeTab;
   };
 
-
   const formatDate = (date: string) => {
-  if (!date) return "";
-  const d = new Date(date);
-  const month = String(d.getMonth() + 1).padStart(2, "0");
-  const day = String(d.getDate()).padStart(2, "0");
-  const year = d.getFullYear();
-  return `${month}/${day}/${year}`;
-};
+    if (!date) return "";
+    const d = new Date(date);
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    const year = d.getFullYear();
+    return `${month}/${day}/${year}`;
+  };
+
+  // Format Lead ID - Use numeric ID
+  const getDisplayLeadId = (lead: Lead) => {
+    // If lead has a valid lead_id that's not "LNaN", use it
+    if (lead.lead_id && lead.lead_id !== "LNaN") {
+      return lead.lead_id;
+    }
+    // Otherwise use the numeric ID
+    return `LD-${lead.id}`;
+  };
 
   // --- Dynamic Styles ---
   const getStatusStyle = (status: string) => {
@@ -285,6 +314,8 @@ const LeadList: React.FC = () => {
         return base + "bg-emerald-50 text-emerald-700 border-emerald-100";
       case "New":
         return base + "bg-blue-50 text-blue-700 border-blue-100";
+      case "Contacted":
+        return base + "bg-purple-50 text-purple-700 border-purple-100";
       case "Qualified":
         return base + "bg-indigo-50 text-indigo-700 border-indigo-100";
       case "Lost":
@@ -321,16 +352,18 @@ const LeadList: React.FC = () => {
               Pipeline Overview & Prospect Tracking
             </p>
           </div>
-          <button
-            onClick={() => navigate("/sales/leads/new-lead")}
-            className="outline-none group flex items-center gap-2 bg-[#005d52] hover:bg-[#004a41] text-white px-6 py-3.5 rounded-2xl font-bold text-sm shadow-xl shadow-teal-900/20 transition-all active:scale-95"
-          >
-            <Plus size={18} />
-            Create New Lead
-          </button>
+          <div className="flex gap-3">
+            <button
+              onClick={() => navigate("/sales/leads/new-lead")}
+              className="outline-none group flex items-center gap-2 bg-[#005d52] hover:bg-[#004a41] text-white px-6 py-3.5 rounded-2xl font-bold text-sm shadow-xl shadow-teal-900/20 transition-all active:scale-95"
+            >
+              <Plus size={18} />
+              Create New Lead
+            </button>
+          </div>
         </header>
 
-        {/* --- Time Filters - With Static Filter Icon --- */}
+        {/* --- Time Filters --- */}
         <section className="relative mb-8 flex justify-end">
           <div className="relative" ref={dropdownRef}>
             <button
@@ -347,19 +380,17 @@ const LeadList: React.FC = () => {
 
             {/* Dropdown Menu */}
             {isDropdownOpen && !isCalendarOpen && (
-              <div className="absolute right-0 mt-2 bg-white border border-slate-100 rounded-2xl shadow-2xl z-50 py-2 min-w-[160px] animate-in fade-in zoom-in-95">
-                {(
-                  [
-                    "Weekly",
-                    "Monthly",
-                    "Quarterly",
-                    "Yearly",
-                    "All Time",
-                  ] as TimeTab[]
-                ).map((tab) => (
+              <div className="absolute right-0 mt-2 bg-white border border-slate-100 rounded-2xl shadow-2xl z-50 py-2 min-w-[160px]">
+                {[
+                  "Weekly",
+                  "Monthly",
+                  "Quarterly",
+                  "Yearly",
+                  "All Time",
+                ].map((tab) => (
                   <button
                     key={tab}
-                    onClick={() => handleFilterChange(tab)}
+                    onClick={() => handleFilterChange(tab as TimeTab)}
                     className={`outline-none w-full text-left px-4 py-2.5 text-[13px] transition-colors ${
                       activeTab === tab
                         ? "text-[#005d52] font-bold bg-teal-50/50"
@@ -396,9 +427,7 @@ const LeadList: React.FC = () => {
                       setCustomRange({ ...customRange, start: e.target.value })
                     }
                     className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#005d52]/20"
-                    placeholder="Start Date"
                   />
-
                   <input
                     type="date"
                     value={customRange.end}
@@ -407,9 +436,7 @@ const LeadList: React.FC = () => {
                       setCustomRange({ ...customRange, end: e.target.value })
                     }
                     className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#005d52]/20"
-                    placeholder="End Date"
                   />
-
                   <button
                     onClick={handleCustomApply}
                     className="w-full bg-[#005d52] text-white py-2 rounded-lg text-sm hover:bg-[#004a40] transition-colors"
@@ -474,18 +501,24 @@ const LeadList: React.FC = () => {
                     onClick={() =>
                       setOpenDropdown(openDropdown === f.label ? null : f.label)
                     }
-                    className={`outline-none w-full flex items-center justify-between gap-2 px-4 py-3 rounded-xl border text-[13px] font-bold transition-all ${f.value !== "All" ? "bg-teal-50 border-teal-200 text-[#005d52]" : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"}`}
+                    className={`outline-none w-full flex items-center justify-between gap-2 px-4 py-3 rounded-xl border text-[13px] font-bold transition-all ${
+                      f.value !== "All"
+                        ? "bg-teal-50 border-teal-200 text-[#005d52]"
+                        : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
+                    }`}
                   >
                     <span className="truncate">
                       {f.value === "All" ? f.label : f.value}
                     </span>
                     <ChevronDown
                       size={14}
-                      className={`transition-transform ${openDropdown === f.label ? "rotate-180" : ""}`}
+                      className={`transition-transform ${
+                        openDropdown === f.label ? "rotate-180" : ""
+                      }`}
                     />
                   </button>
                   {openDropdown === f.label && (
-                    <div className="absolute right-0 mt-2 w-full bg-white border border-slate-100 rounded-2xl shadow-2xl z-50 py-2 animate-in fade-in zoom-in-95">
+                    <div className="absolute right-0 mt-2 w-full bg-white border border-slate-100 rounded-2xl shadow-2xl z-50 py-2">
                       {f.options.map((opt) => (
                         <button
                           key={opt}
@@ -494,7 +527,11 @@ const LeadList: React.FC = () => {
                             setOpenDropdown(null);
                             setCurrentPage(1);
                           }}
-                          className={`outline-none w-full text-left px-4 py-2 text-[13px] hover:bg-slate-50 ${f.value === opt ? "text-[#005d52] font-bold bg-teal-50/50" : "text-slate-600"}`}
+                          className={`outline-none w-full text-left px-4 py-2 text-[13px] hover:bg-slate-50 ${
+                            f.value === opt
+                              ? "text-[#005d52] font-bold bg-teal-50/50"
+                              : "text-slate-600"
+                          }`}
                         >
                           {opt}
                         </button>
@@ -534,7 +571,6 @@ const LeadList: React.FC = () => {
                     />
                   </th>
                   <th className="px-4 py-4 text-[13px] text-slate-800 uppercase tracking-widest border-b border-slate-100 text-center">
-                    {" "}
                     ID
                   </th>
                   <th className="px-4 py-4 text-[13px] text-slate-800 uppercase tracking-widest border-b border-slate-100 text-center">
@@ -572,13 +608,13 @@ const LeadList: React.FC = () => {
                           setSelectedIds((prev) =>
                             prev.includes(lead.id)
                               ? prev.filter((i) => i !== lead.id)
-                              : [...prev, lead.id],
+                              : [...prev, lead.id]
                           )
                         }
                       />
                     </td>
-                    <td className="px-4 py-4 text-[13px] text-slate-800 text-center">
-                      {lead.lead_id}
+                    <td className="px-4 py-4 text-[13px] text-slate-800 text-center font-mono font-bold">
+                      {getDisplayLeadId(lead)}
                     </td>
                     <td className="px-4 py-4 text-[13px] text-slate-800 whitespace-nowrap text-center">
                       {formatDate(lead.created_at)}
@@ -589,7 +625,7 @@ const LeadList: React.FC = () => {
                     <td className="px-4 py-4 text-[13px] text-slate-800 text-center">
                       {lead.products?.reduce(
                         (total, p) => total + (p.quantity || 0),
-                        0,
+                        0
                       ) || 0}
                     </td>
                     <td className="px-4 py-4 text-center">
@@ -616,7 +652,7 @@ const LeadList: React.FC = () => {
                           onClick={() =>
                             navigate("/sales/leads/edit-lead/" + lead.id)
                           }
-                          className="outline-none p-2 hover:bg-white  text-slate-800 hover:text-blue-600 rounded-xl transition-all"
+                          className="outline-none p-2 hover:bg-white text-slate-800 hover:text-blue-600 rounded-xl transition-all"
                         >
                           <FileEdit size={16} />
                         </button>
@@ -632,7 +668,7 @@ const LeadList: React.FC = () => {
                 ))}
               </tbody>
             </table>
-            {!loading && filteredLeads.length === 0 && (
+            {!loading && filteredAndSortedLeads.length === 0 && (
               <div className="py-32 flex flex-col items-center justify-center text-center">
                 <div className="p-6 bg-slate-50 rounded-full mb-4">
                   <Filter className="text-slate-200" size={40} />
@@ -648,21 +684,23 @@ const LeadList: React.FC = () => {
             )}
           </div>
 
-          {/* --- Professional Pagination Footer --- */}
+          {/* Pagination Footer */}
           {totalPages > 0 && (
             <footer className="p-6 bg-slate-50/50 border-t border-slate-100 flex flex-col md:flex-row justify-between items-center gap-6">
               <div className="flex items-center gap-6">
                 <div className="text-[11px] font-bold text-slate-800 uppercase tracking-widest">
                   Showing{" "}
                   <span className="text-slate-900">
-                    {filteredLeads.length > 0 ? startIndex + 1 : 0}
+                    {filteredAndSortedLeads.length > 0 ? startIndex + 1 : 0}
                   </span>{" "}
                   to{" "}
                   <span className="text-slate-900">
-                    {Math.min(endIndex, filteredLeads.length)}
+                    {Math.min(endIndex, filteredAndSortedLeads.length)}
                   </span>{" "}
                   of{" "}
-                  <span className="text-slate-900">{filteredLeads.length}</span>{" "}
+                  <span className="text-slate-900">
+                    {filteredAndSortedLeads.length}
+                  </span>{" "}
                   Leads
                 </div>
               </div>
@@ -686,11 +724,15 @@ const LeadList: React.FC = () => {
                       <button
                         key={i}
                         onClick={() => goToPage(page as number)}
-                        className={`min-w-10 h-10 rounded-xl text-xs font-bold transition-all ${currentPage === page ? "bg-[#005d52] text-white shadow-lg shadow-teal-900/20 scale-105" : "bg-white text-slate-500 border border-slate-200"}`}
+                        className={`min-w-10 h-10 rounded-xl text-xs font-bold transition-all ${
+                          currentPage === page
+                            ? "bg-[#005d52] text-white shadow-lg shadow-teal-900/20 scale-105"
+                            : "bg-white text-slate-500 border border-slate-200"
+                        }`}
                       >
                         {page}
                       </button>
-                    ),
+                    )
                   )}
                 </div>
 
