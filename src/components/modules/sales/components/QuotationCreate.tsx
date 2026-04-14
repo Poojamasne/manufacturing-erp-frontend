@@ -8,8 +8,6 @@ import {
   IndianRupee,
   Building2,
   User,
-  Phone,
-  Mail,
   FileText,
   Printer,
   Loader2,

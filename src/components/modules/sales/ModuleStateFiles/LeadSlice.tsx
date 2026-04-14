@@ -211,17 +211,15 @@ export const getLead =
     };
 
 
-// CREATE LEAD
+// In LeadSlice.ts - Replace the createLead function
 export const createLead = (payload: any, navigate: NavigateFunction) => async (dispatch: AppDispatch, getState: () => RootState) => {
     dispatch(request());
+    
     try {
-        Swal.fire({
+        const loadingSwal = Swal.fire({
             title: "Creating Lead...",
             text: "Please wait while we create the lead.",
             allowOutsideClick: false,
-            customClass: {
-                loader: 'lead-loader'
-            },
             didOpen: () => {
                 Swal.showLoading();
             }
@@ -229,28 +227,65 @@ export const createLead = (payload: any, navigate: NavigateFunction) => async (d
 
         const token = getState().auth.token || localStorage.getItem("token");
 
+        console.log("Sending to API:", JSON.stringify(payload, null, 2));
+
         const { data } = await axios.post(
             `${import.meta.env.VITE_API_BASE_URL}/sales/leads`,
             payload,
             {
-                headers: { Authorization: `Bearer ${token}` },
+                headers: { 
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
             }
         );
+        
+        console.log("API Response:", data);
+        
         dispatch(createLeadSuccess(data));
         toast.success("Lead created successfully!");
-        Swal.fire({
+        
+        await Swal.fire({
             icon: "success",
             iconColor: "#005d52",
             title: "Lead Created",
-            text: data.message || "Success",
+            text: data.message || "Lead has been created successfully",
             timer: 1500,
             showConfirmButton: false,
         });
+        
         navigate("/sales/leads");
-        Swal.close();
     } catch (error: any) {
+        console.error("Full error object:", error);
+        console.error("Error response:", error.response);
+        console.error("Error data:", error.response?.data);
+        
         Swal.close();
-        handleError(error, dispatch);
+        
+        // Extract detailed error message
+        let errorMessage = "Failed to create lead";
+        let errorDetails = "";
+        
+        if (error.response?.data) {
+            const errorData = error.response.data;
+            errorMessage = errorData.message || errorMessage;
+            errorDetails = errorData.error || errorData.details || "";
+            
+            // Handle validation errors
+            if (errorData.errors) {
+                const validationErrors = Object.values(errorData.errors).flat().join("\n");
+                errorDetails = validationErrors;
+            }
+        }
+        
+        Swal.fire({
+            icon: "error",
+            title: "Creation Failed",
+            html: `${errorMessage}<br/><small class="text-gray-500">${errorDetails}</small>`,
+            confirmButtonColor: "#005d52"
+        });
+        
+        dispatch(failure(errorMessage));
     }
 };
 

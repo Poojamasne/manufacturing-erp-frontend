@@ -131,15 +131,15 @@ const LeadForm: React.FC = () => {
   const validate = (): boolean => {
     const newErrors: FormErrors = {};
 
-   if (formData.followup_date && formData.expected_close_date) {
-  const followUp = new Date(formData.followup_date);
-  const closing = new Date(formData.expected_close_date);
+    if (formData.followup_date && formData.expected_close_date) {
+      const followUp = new Date(formData.followup_date);
+      const closing = new Date(formData.expected_close_date);
 
-  if (followUp > closing) {
-    newErrors.followup_date = "Follow-up must be before closing date";
-    newErrors.expected_close_date = "Closing date must be after follow-up";
-  }
-}
+      if (followUp > closing) {
+        newErrors.followup_date = "Follow-up must be before closing date";
+        newErrors.expected_close_date = "Closing date must be after follow-up";
+      }
+    }
 
     if (!formData.company_name.trim())
       newErrors.company_name = "Company name is required";
@@ -148,37 +148,21 @@ const LeadForm: React.FC = () => {
     if (!/^\d{10}$/.test(formData.phone))
       newErrors.phone = "Enter a valid 10-digit number";
 
-    // ✅ IMPROVED EMAIL VALIDATION
     if (formData.email) {
-      // Check if email is empty
       if (!formData.email.trim()) {
         newErrors.email = "Email address is required";
       }
-      // Check basic email format
       else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
         newErrors.email =
           "Enter a valid email address (e.g., name@company.com)";
       }
-      // Check for valid domain extensions
       else {
         const emailParts = formData.email.split("@");
         if (emailParts.length === 2) {
           const domain = emailParts[1];
           const validTLDs = [
-            "com",
-            "org",
-            "net",
-            "edu",
-            "gov",
-            "in",
-            "co",
-            "io",
-            "ai",
-            "app",
-            "dev",
-            "tech",
-            "info",
-            "biz",
+            "com", "org", "net", "edu", "gov", "in", "co", "io", "ai", 
+            "app", "dev", "tech", "info", "biz",
           ];
           const tld = domain.split(".").pop()?.toLowerCase();
 
@@ -186,7 +170,6 @@ const LeadForm: React.FC = () => {
             newErrors.email = `Invalid email domain. Valid domains: .com, .org, .net, .in, .edu, .gov, etc.`;
           }
 
-          // Check if domain has at least one dot and valid structure
           if (domain.split(".").length < 2) {
             newErrors.email = "Invalid email domain format (e.g., example.com)";
           }
@@ -222,7 +205,6 @@ const LeadForm: React.FC = () => {
       [name]:
         name === "assigned_to" ? (value === "" ? "" : Number(value)) : value,
     }));
-    // Clear error when user types
     if (errors[name]) {
       const updatedErrors = { ...errors };
       delete updatedErrors[name];
@@ -264,53 +246,85 @@ const LeadForm: React.FC = () => {
     });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validate()) return;
 
     setIsSubmitting(true);
+    
+    // CRITICAL FIX: Convert empty date strings to null
     const payload = {
-      ...formData,
+      company_name: formData.company_name,
+      contact_person: formData.contact_person,
+      phone: formData.phone,
+      email: formData.email,
+      address: formData.address,
+      city: formData.city,
+      state: formData.state,
+      gst_number: formData.gst_number,
+      lead_source: formData.lead_source,
+      priority: formData.priority,
+      // Fix: Send null instead of empty string for dates
+      expected_close_date: formData.expected_close_date || null,
+      followup_date: formData.followup_date || null,
+      notes: formData.notes,
+      assigned_to: Number(formData.assigned_to),
       products: productRows
         .filter((p) => p.product_id !== "" && p.variant_id !== "")
         .map((p) => ({
-          product_id: p.product_id,
-          variant_id: p.variant_id,
-          quantity: p.quantity,
-          unit_price: p.unit_price,
-        })),
+          product_id: Number(p.product_id),
+          variant_id: Number(p.variant_id),
+          quantity: Number(p.quantity),
+          unit_price: Number(p.unit_price)
+        }))
     };
 
-    console.log("Validation Passed. Final Payload:", payload);
-    // Dispatch API Action Here
-    dispatch(createLead(payload, navigate));
+    console.log("Final Payload being sent:", JSON.stringify(payload, null, 2));
+    
+    // Check if products exist
+    if (payload.products.length === 0) {
+      setErrors({ ...errors, products: "Please add at least one product" });
+      setIsSubmitting(false);
+      return;
+    }
+    
+    try {
+      await dispatch(createLead(payload, navigate));
+    } catch (error) {
+      console.error("Submission error:", error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] p-4 sm:p-6 lg:p-8 font-sans text-slate-900">
+    <div className="min-h-screen bg-[#f4f7f6] p-4 sm:p-6 lg:p-8 font-sans text-slate-900">
       <div className="max-w-6xl mx-auto">
         {/* Header Section */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
           <div>
-            <div className="flex items-center gap-2 text-gray-400 mb-1">
+            <div className="flex items-center gap-2 text-gray-400 text-sm mb-1">
               <button
                 onClick={() => navigate("/sales/leads")}
-                className="hover:text-[#005d52] transition-colors"
+                className="hover:text-[#005d52] transition-colors font-medium"
               >
                 Leads
               </button>
               <ChevronRight size={14} />
-              <span className="text-gray-800 font-medium">New Lead</span>
+              <span className="text-gray-800 font-bold">New Lead</span>
             </div>
-            <h1 className="text-3xl font-black text-slate-900 tracking-tight">
+            <h1 className="text-3xl font-extrabold text-slate-800 tracking-tight">
               Create Lead
             </h1>
+            <p className="text-sm text-gray-500 mt-1 font-medium">
+              Add new prospect to your pipeline
+            </p>
           </div>
           <div className="flex gap-3 w-full md:w-auto">
             <button
               type="button"
               onClick={() => navigate("/sales/leads")}
-              className="flex-1 md:flex-none px-6 py-3 rounded-xl font-bold text-sm bg-white border border-slate-200 hover:bg-slate-50 transition-all"
+              className="flex-1 md:flex-none px-6 py-3.5 rounded-2xl font-bold text-sm bg-white border border-slate-200 hover:bg-slate-50 transition-all text-slate-600"
             >
               Cancel
             </button>
@@ -318,7 +332,7 @@ const LeadForm: React.FC = () => {
               type="button"
               onClick={handleSubmit}
               disabled={isSubmitting}
-              className="flex-1 md:flex-none px-8 py-3 rounded-xl font-bold text-sm text-white bg-[#005d52] shadow-lg shadow-teal-900/20 hover:bg-[#004a41] disabled:opacity-70 transition-all flex items-center justify-center gap-2"
+              className="flex-1 md:flex-none px-8 py-3.5 rounded-2xl font-bold text-sm text-white bg-[#005d52] shadow-lg shadow-teal-900/20 hover:bg-[#004a41] disabled:opacity-70 transition-all flex items-center justify-center gap-2"
             >
               {isSubmitting ? (
                 "Processing..."
@@ -331,9 +345,15 @@ const LeadForm: React.FC = () => {
           </div>
         </div>
 
+        {errors.products && (
+          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-2xl text-red-700 text-sm">
+            {errors.products}
+          </div>
+        )}
+
         <div className="space-y-6">
           {/* Section 1: Company Info */}
-          <div className="bg-white rounded-4xl p-6 sm:p-8 border border-slate-100 shadow-sm">
+          <div className="bg-white rounded-[2.5rem] p-6 sm:p-8 border border-gray-100 shadow-sm">
             <SectionTitle
               icon={<Building2 size={20} />}
               title="Customer Information"
@@ -346,7 +366,7 @@ const LeadForm: React.FC = () => {
                 onChange={handleInputChange}
                 required
                 error={errors.company_name}
-                placeholder="e.g. Reliance Ind."
+                placeholder="e.g. ABC Electronics"
               />
               <FormInput
                 label="Contact Person"
@@ -371,6 +391,7 @@ const LeadForm: React.FC = () => {
                 name="email"
                 value={formData.email}
                 onChange={handleInputChange}
+                required
                 error={errors.email}
                 placeholder="mail@company.com"
               />
@@ -400,7 +421,7 @@ const LeadForm: React.FC = () => {
           </div>
 
           {/* Section 2: Products */}
-          <div className="bg-white rounded-4xl p-6 sm:p-8 border border-slate-100 shadow-sm">
+          <div className="bg-white rounded-[2.5rem] p-6 sm:p-8 border border-gray-100 shadow-sm">
             <SectionTitle
               icon={<Package size={20} />}
               title="Requirements & Products"
@@ -413,7 +434,11 @@ const LeadForm: React.FC = () => {
                 return (
                   <div
                     key={row.id}
-                    className={`grid grid-cols-1 md:grid-cols-12 gap-4 p-5 rounded-2xl border transition-all items-end ${errors[`prod_${row.id}`] || errors[`var_${row.id}`] ? "bg-red-50/30 border-red-100" : "bg-slate-50/50 border-slate-100"}`}
+                    className={`grid grid-cols-1 md:grid-cols-12 gap-4 p-5 rounded-2xl border transition-all items-end ${
+                      errors[`prod_${row.id}`] || errors[`var_${row.id}`] 
+                        ? "bg-red-50/30 border-red-100" 
+                        : "bg-slate-50/50 border-slate-100"
+                    }`}
                   >
                     <div className="md:col-span-4">
                       <FormSelect
@@ -454,7 +479,7 @@ const LeadForm: React.FC = () => {
                     </div>
                     <div className="md:col-span-2">
                       <FormInput
-                        label="Qty"
+                        label="Quantity"
                         type="number"
                         value={row.quantity}
                         required
@@ -471,11 +496,11 @@ const LeadForm: React.FC = () => {
                       />
                     </div>
                     <div className="md:col-span-2">
-                      <div className="flex flex-col gap-1.5 px-1">
-                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                      <div className="flex flex-col gap-1.5">
+                        <label className="text-xs font-black text-slate-500 uppercase tracking-widest px-1">
                           Unit Price
-                        </span>
-                        <div className="h-12 flex items-center bg-white px-4 rounded-xl border border-slate-200 text-sm font-bold text-[#005d52]">
+                        </label>
+                        <div className="h-12 flex items-center bg-white px-4 rounded-xl border border-slate-200 text-sm font-bold text-slate-900">
                           ₹ {row.unit_price.toLocaleString()}
                         </div>
                       </div>
@@ -489,7 +514,7 @@ const LeadForm: React.FC = () => {
                             prev.filter((r) => r.id !== row.id),
                           )
                         }
-                        className="p-2 text-slate-300 hover:text-red-500 transition-colors hover:bg-red-50 rounded-lg"
+                        className="p-2 text-slate-400 hover:text-rose-600 transition-colors hover:bg-rose-50 rounded-lg"
                       >
                         <Trash2 size={20} />
                       </button>
@@ -511,9 +536,9 @@ const LeadForm: React.FC = () => {
                     },
                   ])
                 }
-                className="flex items-center gap-2 text-[#005d52] font-black text-xs uppercase tracking-widest px-4 py-2 hover:bg-teal-50 rounded-xl transition-all"
+                className="flex items-center gap-2 text-[#005d52] font-bold text-xs uppercase tracking-widest px-4 py-2 hover:bg-teal-50 rounded-xl transition-all"
               >
-                <Plus size={16} strokeWidth={3} /> Add Another Item
+                <Plus size={16} strokeWidth={2.5} /> Add Another Item
               </button>
             </div>
 
@@ -521,19 +546,19 @@ const LeadForm: React.FC = () => {
             <div className="mt-8 bg-[#005d52] rounded-2xl p-6 text-white flex flex-col sm:flex-row justify-between items-center gap-6 shadow-xl shadow-teal-900/20 border border-white/10">
               <div className="flex gap-10">
                 <div>
-                  <p className="text-[10px] uppercase font-black text-teal-200 tracking-tighter mb-1">
+                  <p className="text-[10px] uppercase font-black text-teal-200 tracking-wider mb-1">
                     Items Total
                   </p>
                   <p className="text-2xl font-black">
                     {summary.totalQty}{" "}
-                    <span className="text-sm font-medium opacity-60">
+                    <span className="text-sm font-medium opacity-80">
                       Units
                     </span>
                   </p>
                 </div>
                 <div className="w-px h-10 bg-white/10 hidden sm:block" />
                 <div>
-                  <p className="text-[10px] uppercase font-black text-teal-200 tracking-tighter mb-1">
+                  <p className="text-[10px] uppercase font-black text-teal-200 tracking-wider mb-1">
                     Deal Value
                   </p>
                   <p className="text-2xl font-black">
@@ -542,7 +567,7 @@ const LeadForm: React.FC = () => {
                 </div>
               </div>
               <div className="text-right hidden md:block">
-                <p className="text-[10px] font-medium text-teal-100 italic opacity-60">
+                <p className="text-[10px] font-medium text-teal-100 italic opacity-80">
                   Total includes all variants and quantities selected above.
                 </p>
               </div>
@@ -551,7 +576,7 @@ const LeadForm: React.FC = () => {
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Section 3: Assignment */}
-            <div className="bg-white rounded-4xl p-6 sm:p-8 border border-slate-100 shadow-sm">
+            <div className="bg-white rounded-[2.5rem] p-6 sm:p-8 border border-gray-100 shadow-sm">
               <SectionTitle
                 icon={<FileText size={20} />}
                 title="Logistics & Ownership"
@@ -583,23 +608,21 @@ const LeadForm: React.FC = () => {
                   ]}
                 />
                 <FormInput
-  label="Follow-up Date"
-  name="followup_date"
-  type="date"
-  value={formData.followup_date}
-  onChange={handleInputChange}
-  error={errors.followup_date}
-  max={formData.expected_close_date || undefined}
-/>
-               <FormInput
-  label="Closing Date (Est)"
-  name="expected_close_date"
-  type="date"
-  value={formData.expected_close_date}
-  onChange={handleInputChange}
-  error={errors.expected_close_date}
-  min={formData.followup_date || undefined}
-/>
+                  label="Follow-up Date"
+                  name="followup_date"
+                  type="date"
+                  value={formData.followup_date}
+                  onChange={handleInputChange}
+                  error={errors.followup_date}
+                />
+                <FormInput
+                  label="Closing Date (Est)"
+                  name="expected_close_date"
+                  type="date"
+                  value={formData.expected_close_date}
+                  onChange={handleInputChange}
+                  error={errors.expected_close_date}
+                />
               </div>
               <div className="mt-5">
                 <FormInput
@@ -613,7 +636,7 @@ const LeadForm: React.FC = () => {
             </div>
 
             {/* Section 4: Location */}
-            <div className="bg-white rounded-4xl p-6 sm:p-8 border border-slate-100 shadow-sm">
+            <div className="bg-white rounded-[2.5rem] p-6 sm:p-8 border border-gray-100 shadow-sm">
               <SectionTitle
                 icon={<MapPin size={20} />}
                 title="Location Details"
@@ -635,7 +658,7 @@ const LeadForm: React.FC = () => {
                 />
               </div>
               <div className="flex flex-col gap-1.5">
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">
+                <label className="text-xs font-black text-slate-500 uppercase tracking-widest px-1">
                   Full Installation Address
                 </label>
                 <textarea
@@ -643,7 +666,7 @@ const LeadForm: React.FC = () => {
                   value={formData.address}
                   onChange={handleInputChange}
                   rows={4}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 text-sm focus:border-[#005d52] focus:ring-4 focus:ring-teal-500/5 outline-none transition-all resize-none font-bold placeholder:font-normal"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 text-sm focus:border-[#005d52] focus:ring-4 focus:ring-teal-500/5 outline-none transition-all resize-none font-medium placeholder:font-normal text-slate-800"
                   placeholder="Building, Street, Area info..."
                 />
               </div>
@@ -682,27 +705,29 @@ const FormInput: React.FC<InputFieldProps> = ({
   ...props
 }) => (
   <div className="flex flex-col gap-1.5">
-    <label className="text-xs font-black text-slate-500 uppercase tracking-widest px-1 flex items-center gap-1">
-  {label}
-  {required && (
-    <span className="text-red-500 text-sm font-extrabold">*</span>
-  )}
-</label>
+    <label className="text-xs font-black text-slate-500 uppercase tracking-widest px-1">
+      {label}
+      {required && (
+        <span className="text-rose-500 text-sm font-extrabold ml-1">*</span>
+      )}
+    </label>
     <div className="relative group">
       <input
         {...props}
-        {...("type" in props && props.type === "number" ? { min: 1 } : {})}
-        className={`w-full bg-slate-50 border ${error ? "border-red-300 ring-4 ring-red-50" : "border-slate-200"} rounded-xl px-4 py-3 text-sm focus:border-[#005d52] focus:ring-4 focus:ring-teal-500/5 outline-none transition-all font-bold group-hover:border-slate-300 placeholder:font-normal`}
+        {...(props.type === "number" ? { min: 1 } : {})}
+        className={`w-full bg-slate-50 border ${
+          error ? "border-rose-300 ring-4 ring-rose-50" : "border-slate-200"
+        } rounded-xl px-4 py-3 text-sm focus:border-[#005d52] focus:ring-4 focus:ring-teal-500/5 outline-none transition-all font-medium text-slate-800 group-hover:border-slate-300 placeholder:font-normal placeholder:text-slate-400`}
       />
       {error && (
         <AlertCircle
-          className="absolute right-3 top-1/2 -translate-y-1/2 text-red-400 animate-pulse"
+          className="absolute right-3 top-1/2 -translate-y-1/2 text-rose-400"
           size={16}
         />
       )}
     </div>
     {error && (
-      <p className="text-[10px] text-red-500 font-bold uppercase px-1">
+      <p className="text-xs font-medium text-rose-600 px-1 flex items-center gap-1">
         {error}
       </p>
     )}
@@ -724,20 +749,22 @@ const FormSelect: React.FC<SelectFieldProps> = ({
   ...props
 }) => (
   <div className="flex flex-col gap-1.5">
-    <label className="text-xs font-black text-slate-500 uppercase tracking-widest px-1 flex items-center gap-1">
-  {label}
-  {required && (
-    <span className="text-red-500 text-sm font-extrabold">*</span>
-  )}
-</label>
+    <label className="text-xs font-black text-slate-500 uppercase tracking-widest px-1">
+      {label}
+      {required && (
+        <span className="text-rose-500 text-sm font-extrabold ml-1">*</span>
+      )}
+    </label>
     <div className="relative group">
       <select
         {...props}
-        className={`w-full bg-slate-50 border ${error ? "border-red-300 ring-4 ring-red-50" : "border-slate-200"} rounded-xl px-4 py-3 text-sm appearance-none outline-none focus:border-[#005d52] focus:ring-4 focus:ring-teal-500/5 transition-all font-bold cursor-pointer group-hover:border-slate-300`}
+        className={`w-full bg-slate-50 border ${
+          error ? "border-rose-300 ring-4 ring-rose-50" : "border-slate-200"
+        } rounded-xl px-4 py-3 text-sm appearance-none outline-none focus:border-[#005d52] focus:ring-4 focus:ring-teal-500/5 transition-all font-medium text-slate-800 cursor-pointer group-hover:border-slate-300`}
       >
-        <option value="">Select option</option>
+        <option value="" className="text-slate-400">Select option</option>
         {options.map((o) => (
-          <option key={o.v} value={o.v}>
+          <option key={o.v} value={o.v} className="text-slate-800">
             {o.l}
           </option>
         ))}
@@ -748,7 +775,7 @@ const FormSelect: React.FC<SelectFieldProps> = ({
       />
     </div>
     {error && (
-      <p className="text-[10px] text-red-500 font-bold uppercase px-1">
+      <p className="text-xs font-medium text-rose-600 px-1 flex items-center gap-1">
         {error}
       </p>
     )}
