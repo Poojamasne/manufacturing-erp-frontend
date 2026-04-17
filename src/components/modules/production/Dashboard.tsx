@@ -1,17 +1,23 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { 
-  AlertCircle, 
-  Clock, 
-  Factory, 
-  CheckCircle, 
-  Package,
+import React, { useState, useRef, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import {
+  ChevronDown,
+  Filter,
+  Clock,
+  Factory,
+  CheckCircle,
   AlertTriangle,
+  Package,
+  TrendingUp,
+  Calendar,
+  Users,
   Play,
-  Pause,
   Eye,
-  FileText
+  ArrowRight,
 } from "lucide-react";
+
+// ==================== Types ====================
+type TimeFilter = "Weekly" | "Monthly" | "Quarterly" | "Yearly" | "All Time" | "Custom";
 
 interface ProductionStats {
   pendingOrders: number;
@@ -21,142 +27,237 @@ interface ProductionStats {
   totalProduction: number;
   efficiency: number;
   onTimeDelivery: number;
+  activeMachines: number;
+  totalMachines: number;
+  activeOperators: number;
+  totalOperators: number;
+  defectRate: number;
 }
 
-interface ProductionOrder {
+interface MaterialAlert {
+  id: number;
+  material: string;
+  required: number;
+  available: number;
+  shortage: number;
+  unit: string;
+  status: "CRITICAL" | "LOW" | "OK";
+}
+
+interface RecentActivity {
   id: string;
-  productName: string;
-  quantity: number;
-  deadline: string;
-  status: string;
-  progress: number;
-  priority: 'HIGH' | 'MEDIUM' | 'LOW';
+  type: 'ORDER_CREATED' | 'ORDER_STARTED' | 'ORDER_COMPLETED' | 'MATERIAL_ALERT' | 'WORK_ORDER_ASSIGNED';
+  title: string;
+  description: string;
+  timestamp: string;
+  orderId?: string;
 }
 
+interface ProductionTrend {
+  day: string;
+  planned: number;
+  actual: number;
+}
+
+// ==================== Mock Data ====================
+const mockStats: ProductionStats = {
+  pendingOrders: 12,
+  inProgress: 8,
+  completedOrders: 1245,
+  materialShortages: 3,
+  totalProduction: 1265,
+  efficiency: 87,
+  onTimeDelivery: 92,
+  activeMachines: 8,
+  totalMachines: 12,
+  activeOperators: 15,
+  totalOperators: 20,
+  defectRate: 3.2
+};
+
+const mockMaterialAlerts: MaterialAlert[] = [
+  { id: 1, material: 'Steel Grade A', required: 5000, available: 3200, shortage: 1800, unit: 'kg', status: 'CRITICAL' },
+  { id: 2, material: 'Plastic Resin', required: 2500, available: 500, shortage: 2000, unit: 'kg', status: 'CRITICAL' },
+  { id: 3, material: 'Copper Wire', required: 8000, available: 2500, shortage: 5500, unit: 'm', status: 'CRITICAL' },
+  { id: 4, material: 'Aluminum Sheet', required: 1000, available: 850, shortage: 150, unit: 'sheets', status: 'LOW' },
+];
+
+const mockRecentActivities: RecentActivity[] = [
+  { id: '1', type: 'ORDER_CREATED', title: 'New Production Order', description: 'PO-006 created for Copper Wires', timestamp: '2024-05-16 09:30 AM', orderId: 'PO-006' },
+  { id: '2', type: 'ORDER_STARTED', title: 'Production Started', description: 'PO-001 (Steel Bolts) started on CNC Machine B', timestamp: '2024-05-16 08:00 AM', orderId: 'PO-001' },
+  { id: '3', type: 'WORK_ORDER_ASSIGNED', title: 'Work Order Assigned', description: 'WO-004 assigned to John Doe for Frame Assembly', timestamp: '2024-05-15 04:30 PM' },
+  { id: '4', type: 'ORDER_COMPLETED', title: 'Order Completed', description: 'PO-004 (Rubber Gaskets) completed successfully', timestamp: '2024-05-15 05:00 PM', orderId: 'PO-004' },
+  { id: '5', type: 'MATERIAL_ALERT', title: 'Material Shortage', description: 'Steel Grade A running low - 1800kg shortage', timestamp: '2024-05-15 02:30 PM' },
+  { id: '6', type: 'ORDER_CREATED', title: 'New Production Order', description: 'PO-005 created for Steel Plates', timestamp: '2024-05-15 11:00 AM', orderId: 'PO-005' },
+];
+
+const mockProductionTrend: ProductionTrend[] = [
+  { day: 'Mon', planned: 850, actual: 820 },
+  { day: 'Tue', planned: 850, actual: 890 },
+  { day: 'Wed', planned: 850, actual: 780 },
+  { day: 'Thu', planned: 850, actual: 910 },
+  { day: 'Fri', planned: 850, actual: 850 },
+  { day: 'Sat', planned: 500, actual: 480 },
+  { day: 'Sun', planned: 300, actual: 290 },
+];
+
+const formatDate = (date: string) => {
+  if (!date) return "-";
+  const d = new Date(date);
+  return `${String(d.getMonth() + 1).padStart(2, "0")}/${String(d.getDate()).padStart(2, "0")}/${d.getFullYear()}`;
+};
+
+const getActivityIcon = (type: string) => {
+  switch(type) {
+    case 'ORDER_CREATED': return <Package size={16} className="text-green-500" />;
+    case 'ORDER_STARTED': return <Play size={16} className="text-blue-500" />;
+    case 'ORDER_COMPLETED': return <CheckCircle size={16} className="text-green-500" />;
+    case 'MATERIAL_ALERT': return <AlertTriangle size={16} className="text-red-500" />;
+    case 'WORK_ORDER_ASSIGNED': return <Users size={16} className="text-purple-500" />;
+    default: return <Clock size={16} className="text-gray-500" />;
+  }
+};
+
+// ==================== Main Component ====================
 const ProductionDashboard: React.FC = () => {
   const navigate = useNavigate();
-  
-  const [stats] = useState<ProductionStats>({
-    pendingOrders: 12,
-    inProgress: 8,
-    completedOrders: 45,
-    materialShortages: 3,
-    totalProduction: 65,
-    efficiency: 87,
-    onTimeDelivery: 92
-  });
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const calendarRef = useRef<HTMLDivElement>(null);
 
-  const [recentOrders] = useState<ProductionOrder[]>([
-    { id: 'PO-001', productName: 'Steel Bolts', quantity: 5000, deadline: '2024-05-20', status: 'In Progress', progress: 65, priority: 'HIGH' },
-    { id: 'PO-002', productName: 'Aluminum Frames', quantity: 250, deadline: '2024-05-18', status: 'Pending', progress: 0, priority: 'HIGH' },
-    { id: 'PO-003', productName: 'Plastic Molds', quantity: 1000, deadline: '2024-05-22', status: 'Material Shortage', progress: 0, priority: 'MEDIUM' },
-    { id: 'PO-004', productName: 'Rubber Gaskets', quantity: 3000, deadline: '2024-05-19', status: 'In Progress', progress: 45, priority: 'HIGH' },
-    { id: 'PO-005', productName: 'Steel Plates', quantity: 1500, deadline: '2024-05-21', status: 'Completed', progress: 100, priority: 'LOW' },
-  ]);
+  // State
+  const [stats] = useState<ProductionStats>(mockStats);
+  const [materialAlerts] = useState<MaterialAlert[]>(mockMaterialAlerts);
+  const [recentActivities] = useState<RecentActivity[]>(mockRecentActivities);
+  const [productionTrend] = useState<ProductionTrend[]>(mockProductionTrend);
 
-  const [materialAlerts] = useState([
-    { material: 'Steel Grade A', required: 5000, available: 3200, shortage: 1800 },
-    { material: 'Aluminum Sheet', required: 1000, available: 1000, shortage: 0 },
-    { material: 'Plastic Resin', required: 2500, available: 500, shortage: 2000 },
-  ]);
+  // Filter States
+  const [timeFilter, setTimeFilter] = useState<TimeFilter>("Weekly");
+  const [customRange, setCustomRange] = useState({ start: "", end: "" });
 
-  const getStatusColor = (status: string) => {
-    switch(status) {
-      case 'In Progress': return 'bg-orange-100 text-orange-700';
-      case 'Pending': return 'bg-blue-100 text-blue-700';
-      case 'Material Shortage': return 'bg-red-100 text-red-700';
-      case 'Completed': return 'bg-green-100 text-green-700';
-      default: return 'bg-gray-100 text-gray-700';
-    }
+  // UI States
+  const [isTimeDropdownOpen, setIsTimeDropdownOpen] = useState(false);
+  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
+  const [showAllActivities, setShowAllActivities] = useState(false);
+
+  // Close dropdowns
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) setIsTimeDropdownOpen(false);
+      if (calendarRef.current && !calendarRef.current.contains(event.target as Node)) setIsCalendarOpen(false);
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleTimeFilterChange = (value: TimeFilter) => {
+    if (value === "Custom") { setIsCalendarOpen(true); setIsTimeDropdownOpen(false); }
+    else { setTimeFilter(value); setIsTimeDropdownOpen(false); setIsCalendarOpen(false); setCustomRange({ start: "", end: "" }); }
   };
 
-  const getPriorityColor = (priority: string) => {
-    switch(priority) {
-      case 'HIGH': return 'text-red-600 bg-red-50';
-      case 'MEDIUM': return 'text-orange-600 bg-orange-50';
-      case 'LOW': return 'text-green-600 bg-green-50';
-      default: return 'text-gray-600 bg-gray-50';
-    }
+  const handleCustomApply = () => {
+    if (!customRange.start || !customRange.end) { alert("Please select date range"); return; }
+    setTimeFilter("Custom"); setIsCalendarOpen(false); setIsTimeDropdownOpen(false);
   };
 
-  const handleViewOrder = (orderId: string) => {
-    navigate(`/production/orders/view/${orderId}`);
+  const getFilterDisplayText = () => {
+    if (timeFilter === "Custom" && customRange.start && customRange.end) return `${formatDate(customRange.start)} - ${formatDate(customRange.end)}`;
+    return timeFilter;
   };
 
-  const handleCreateProduction = () => {
-    navigate('/production/planning');
-  };
+  const displayedActivities = showAllActivities ? recentActivities : recentActivities.slice(0, 4);
+  const criticalMaterials = materialAlerts.filter(m => m.status === "CRITICAL");
 
   return (
-    <div className="min-h-screen bg-[#FEF9E8] p-4 sm:p-6 lg:p-8">
+    <div className="min-h-screen bg-[#f4f7f6] p-4 sm:p-6 lg:p-8 text-slate-900 font-sans">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-extrabold text-slate-800 tracking-tight">
-            Production Dashboard
-          </h1>
-          <p className="text-sm text-gray-500 mt-1">
-            Monitor and manage production activities
-          </p>
-        </div>
+        <header className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 mb-10">
+          <div>
+            <h1 className="text-3xl font-extrabold text-slate-800 tracking-tight">Production Dashboard</h1>
+            <p className="text-sm text-gray-500 mt-1 font-medium">Monitor and manage production activities</p>
+          </div>
 
-        {/* Stats Cards */}
+          {/* Global Time Filter */}
+          <div className="relative" ref={dropdownRef}>
+            <button onClick={() => setIsTimeDropdownOpen(!isTimeDropdownOpen)} className="px-4 py-2 rounded-xl border border-slate-200 bg-white text-sm font-medium shadow-sm flex items-center gap-2 text-gray-700">
+              <Filter size={16} className="text-orange-500" />
+              <span>{getFilterDisplayText()}</span>
+              <ChevronDown size={14} className={isTimeDropdownOpen ? "rotate-180" : ""} />
+            </button>
+            {isTimeDropdownOpen && !isCalendarOpen && (
+              <div className="absolute right-0 mt-2 bg-white border border-slate-100 rounded-2xl shadow-2xl z-50 py-2 min-w-40">
+                {["Weekly", "Monthly", "Quarterly", "Yearly", "All Time"].map(tab => (
+                  <button key={tab} onClick={() => handleTimeFilterChange(tab as TimeFilter)} className={`w-full text-left px-4 py-2.5 text-[13px] ${timeFilter === tab ? "text-orange-600 font-bold bg-orange-50/50" : "text-slate-600 hover:bg-slate-50"}`}>{tab}</button>
+                ))}
+                <button onClick={() => handleTimeFilterChange("Custom")} className={`w-full text-left px-4 py-2.5 text-[13px] ${timeFilter === "Custom" ? "text-orange-600 font-bold bg-orange-50/50" : "text-slate-600 hover:bg-slate-50"}`}>Custom</button>
+              </div>
+            )}
+            {isCalendarOpen && (
+              <div ref={calendarRef} className="absolute right-0 mt-3 bg-white p-6 rounded-2xl shadow-xl border z-50 w-72">
+                <div className="space-y-3">
+                  <input type="date" value={customRange.start} onChange={(e) => setCustomRange({ ...customRange, start: e.target.value })} className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500/20" />
+                  <input type="date" value={customRange.end} min={customRange.start} onChange={(e) => setCustomRange({ ...customRange, end: e.target.value })} className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500/20" />
+                  <button onClick={handleCustomApply} className="w-full bg-orange-500 text-white py-2 rounded-lg text-sm font-bold hover:bg-orange-600">Apply Range</button>
+                </div>
+              </div>
+            )}
+          </div>
+        </header>
+
+        {/* Stats Cards - SRS 3.2 Dashboard Features */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white p-6 rounded-2xl border-l-4 border-orange-500 shadow-sm hover:shadow-md transition-shadow">
+          <div className="bg-white p-6 rounded-2xl border-l-4 border-orange-500 shadow-sm hover:shadow-md transition">
             <div className="flex items-center justify-between mb-2">
-              <p className="text-xs font-bold text-gray-400 uppercase">Pending Orders</p>
+              <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">Pending Orders</p>
               <Clock size={20} className="text-orange-500" />
             </div>
-            <h3 className="text-2xl font-bold text-gray-800">{stats.pendingOrders}</h3>
+            <h3 className="text-2xl font-extrabold text-gray-800">{stats.pendingOrders}</h3>
             <p className="text-xs text-gray-500 mt-1">Awaiting production</p>
           </div>
 
-          <div className="bg-white p-6 rounded-2xl border-l-4 border-blue-500 shadow-sm hover:shadow-md transition-shadow">
+          <div className="bg-white p-6 rounded-2xl border-l-4 border-blue-500 shadow-sm hover:shadow-md transition">
             <div className="flex items-center justify-between mb-2">
-              <p className="text-xs font-bold text-gray-400 uppercase">In Progress</p>
+              <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">In Progress</p>
               <Factory size={20} className="text-blue-500" />
             </div>
-            <h3 className="text-2xl font-bold text-gray-800">{stats.inProgress}</h3>
+            <h3 className="text-2xl font-extrabold text-gray-800">{stats.inProgress}</h3>
             <p className="text-xs text-gray-500 mt-1">Currently manufacturing</p>
           </div>
 
-          <div className="bg-white p-6 rounded-2xl border-l-4 border-green-500 shadow-sm hover:shadow-md transition-shadow">
+          <div className="bg-white p-6 rounded-2xl border-l-4 border-green-500 shadow-sm hover:shadow-md transition">
             <div className="flex items-center justify-between mb-2">
-              <p className="text-xs font-bold text-gray-400 uppercase">Completed</p>
+              <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">Completed Orders</p>
               <CheckCircle size={20} className="text-green-500" />
             </div>
-            <h3 className="text-2xl font-bold text-gray-800">{stats.completedOrders}</h3>
+            <h3 className="text-2xl font-extrabold text-gray-800">{stats.completedOrders.toLocaleString()}</h3>
             <p className="text-xs text-gray-500 mt-1">Finished products</p>
           </div>
 
-          <div className="bg-white p-6 rounded-2xl border-l-4 border-red-500 shadow-sm hover:shadow-md transition-shadow">
+          <div className="bg-white p-6 rounded-2xl border-l-4 border-red-500 shadow-sm hover:shadow-md transition">
             <div className="flex items-center justify-between mb-2">
-              <p className="text-xs font-bold text-gray-400 uppercase">Material Shortages</p>
+              <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">Material Shortages</p>
               <AlertTriangle size={20} className="text-red-500" />
             </div>
-            <h3 className="text-2xl font-bold text-gray-800">{stats.materialShortages}</h3>
+            <h3 className="text-2xl font-extrabold text-gray-800">{stats.materialShortages}</h3>
             <p className="text-xs text-gray-500 mt-1">Need immediate attention</p>
           </div>
         </div>
 
-        {/* Additional Metrics */}
-       
-
-        {/* Material Shortages Alert */}
-        {materialAlerts.filter(m => m.shortage > 0).length > 0 && (
+        {/* Material Shortages Alert - SRS 3.2 */}
+        {criticalMaterials.length > 0 && (
           <div className="bg-red-50 border border-red-200 rounded-2xl p-5 mb-8">
             <div className="flex items-start gap-3">
-              <AlertCircle className="text-red-500 mt-0.5" size={22} />
+              <AlertTriangle className="text-red-500 mt-0.5" size={22} />
               <div className="flex-1">
-                <h4 className="font-semibold text-red-800 mb-2">Material Shortages Alert</h4>
+                <h4 className="font-semibold text-red-800 mb-3">Critical Material Shortages Alert</h4>
                 <div className="space-y-3">
-                  {materialAlerts.filter(m => m.shortage > 0).map((alert, idx) => (
-                    <div key={idx} className="flex flex-wrap items-center justify-between gap-3 p-3 bg-white rounded-xl">
+                  {criticalMaterials.map(alert => (
+                    <div key={alert.id} className="flex flex-wrap items-center justify-between gap-3 p-3 bg-white rounded-xl">
                       <span className="font-medium text-gray-800">{alert.material}</span>
                       <div className="flex gap-4 text-sm">
-                        <span>Required: <strong>{alert.required}</strong></span>
-                        <span>Available: <strong>{alert.available}</strong></span>
-                        <span className="text-red-600">Shortage: <strong>{alert.shortage}</strong></span>
+                        <span>Required: <strong>{alert.required.toLocaleString()} {alert.unit}</strong></span>
+                        <span>Available: <strong>{alert.available.toLocaleString()} {alert.unit}</strong></span>
+                        <span className="text-red-600">Shortage: <strong>{alert.shortage.toLocaleString()} {alert.unit}</strong></span>
                       </div>
                       <button className="px-3 py-1.5 bg-orange-500 text-white rounded-lg text-sm hover:bg-orange-600 transition">
                         Create Purchase Order
@@ -169,93 +270,159 @@ const ProductionDashboard: React.FC = () => {
           </div>
         )}
 
-        {/* Recent Production Orders */}
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm mb-8">
-          <div className="p-6 border-b border-gray-200 flex flex-wrap justify-between items-center gap-4">
-            <div>
-              <h2 className="text-lg font-bold text-gray-800">Recent Production Orders</h2>
-              <p className="text-sm text-gray-500 mt-1">Latest production activities</p>
+        {/* Charts and Activities Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+          {/* Production Trend Chart */}
+          <div className="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+            <div className="flex justify-between items-center mb-6">
+              <div>
+                <h3 className="text-[11px] font-bold text-gray-800 uppercase tracking-widest">Production Trend</h3>
+                <p className="text-sm text-gray-400 font-normal mt-1">Weekly planned vs actual output</p>
+              </div>
+              <div className="flex gap-4">
+                <div className="flex items-center gap-2 text-[10px] font-bold text-gray-400 uppercase">
+                  <div className="w-2 h-2 rounded-full bg-orange-500" /> Planned
+                </div>
+                <div className="flex items-center gap-2 text-[10px] font-bold text-gray-400 uppercase">
+                  <div className="w-2 h-2 rounded-full bg-blue-500" /> Actual
+                </div>
+              </div>
             </div>
-            <button 
-              onClick={() => navigate('/production/orders')}
-              className="px-4 py-2 bg-orange-500 text-white rounded-xl text-sm font-medium hover:bg-orange-600 transition flex items-center gap-2"
-            >
-              <Package size={16} />
-              View All Orders
-            </button>
-          </div>
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase">Order ID</th>
-                  <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase">Product</th>
-                  <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase">Quantity</th>
-                  <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase">Deadline</th>
-                  <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase">Priority</th>
-                  <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                  <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase">Progress</th>
-                  <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase">Action</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100">
-                {recentOrders.map((order) => (
-                  <tr key={order.id} className="hover:bg-orange-50/30 transition-colors">
-                    <td className="px-6 py-4 text-sm font-semibold text-gray-900">{order.id}</td>
-                    <td className="px-6 py-4 text-sm text-gray-600">{order.productName}</td>
-                    <td className="px-6 py-4 text-sm text-gray-600">{order.quantity.toLocaleString()}</td>
-                    <td className="px-6 py-4 text-sm text-gray-600">{order.deadline}</td>
-                    <td className="px-6 py-4">
-                      <span className={`px-2 py-1 text-xs font-medium rounded-full ${getPriorityColor(order.priority)}`}>
-                        {order.priority}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className={`inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium rounded-full ${getStatusColor(order.status)}`}>
-                        {order.status}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-3">
-                        <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
-                          <div className="h-full bg-orange-500 rounded-full" style={{ width: `${order.progress}%` }} />
+            <div className="h-64">
+              <div className="flex h-full items-end gap-2">
+                {productionTrend.map((day, idx) => (
+                  <div key={idx} className="flex-1 flex flex-col items-center gap-2">
+                    <div className="relative w-full flex flex-col items-center gap-1">
+                      <div className="w-full flex justify-center gap-1">
+                        <div className="w-8 bg-orange-200 rounded-t" style={{ height: `${(day.planned / 1000) * 100}px` }}>
+                          <div className="w-full bg-orange-500 rounded-t" style={{ height: `${(day.actual / day.planned) * 100}%` }} />
                         </div>
-                        <span className="text-xs font-semibold text-gray-600">{order.progress}%</span>
                       </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <button
-                        onClick={() => handleViewOrder(order.id)}
-                        className="p-1.5 text-gray-400 hover:text-orange-500 transition"
-                      >
-                        <Eye size={18} />
-                      </button>
-                    </td>
-                  </tr>
+                    </div>
+                    <span className="text-[10px] text-gray-500">{day.day}</span>
+                  </div>
                 ))}
-              </tbody>
-            </table>
+              </div>
+            </div>
+          </div>
+
+          {/* Resource Status */}
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+            <h3 className="text-[11px] font-bold text-gray-800 uppercase tracking-widest mb-4">Resource Status</h3>
+            <div className="space-y-4">
+              <div>
+                <div className="flex justify-between text-sm mb-1">
+                  <span className="text-gray-600">Machines</span>
+                  <span className="font-semibold">{stats.activeMachines}/{stats.totalMachines} Active</span>
+                </div>
+                <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                  <div className="h-full bg-orange-500 rounded-full" style={{ width: `${(stats.activeMachines / stats.totalMachines) * 100}%` }} />
+                </div>
+              </div>
+              <div>
+                <div className="flex justify-between text-sm mb-1">
+                  <span className="text-gray-600">Operators</span>
+                  <span className="font-semibold">{stats.activeOperators}/{stats.totalOperators} Active</span>
+                </div>
+                <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                  <div className="h-full bg-blue-500 rounded-full" style={{ width: `${(stats.activeOperators / stats.totalOperators) * 100}%` }} />
+                </div>
+              </div>
+              <div className="pt-4 border-t">
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-sm text-gray-600">Overall Equipment Effectiveness</span>
+                  <span className="text-lg font-bold text-orange-600">{stats.efficiency}%</span>
+                </div>
+                <div className="h-3 bg-gray-100 rounded-full overflow-hidden">
+                  <div className="h-full bg-orange-500 rounded-full" style={{ width: `${stats.efficiency}%` }} />
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Quick Actions */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <button
-            onClick={handleCreateProduction}
-            className="flex items-center justify-center gap-2 p-4 bg-orange-500 text-white rounded-xl font-medium hover:bg-orange-600 transition"
-          >
-            <Play size={18} /> Start New Production
-          </button>
-          <button className="flex items-center justify-center gap-2 p-4 bg-white border border-gray-200 text-gray-700 rounded-xl font-medium hover:bg-gray-50 transition">
-            <Pause size={18} /> Hold Production
-          </button>
-          <button className="flex items-center justify-center gap-2 p-4 bg-white border border-gray-200 text-gray-700 rounded-xl font-medium hover:bg-gray-50 transition">
-            <AlertTriangle size={18} /> Report Issue
-          </button>
-          <button className="flex items-center justify-center gap-2 p-4 bg-white border border-gray-200 text-gray-700 rounded-xl font-medium hover:bg-gray-50 transition">
-            <FileText size={18} /> Generate Report
-          </button>
+        {/* Recent Activities & Quick Actions */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Recent Activities */}
+          <div className="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-gray-100">
+            <div className="p-6 border-b border-gray-200 flex justify-between items-center">
+              <div>
+                <h2 className="text-lg font-bold text-gray-800">Recent Activities</h2>
+                <p className="text-sm text-gray-500 mt-1">Latest production events</p>
+              </div>
+              <button onClick={() => setShowAllActivities(!showAllActivities)} className="text-sm text-orange-500 hover:text-orange-600 font-medium">
+                {showAllActivities ? "Show Less" : "View All"} <ArrowRight size={14} className="inline" />
+              </button>
+            </div>
+            <div className="divide-y divide-gray-100">
+              {displayedActivities.map(activity => (
+                <div key={activity.id} className="p-4 hover:bg-orange-50/20 transition flex items-start gap-3">
+                  <div className="p-2 bg-gray-100 rounded-xl">
+                    {getActivityIcon(activity.type)}
+                  </div>
+                  <div className="flex-1">
+                    <p className="font-semibold text-gray-800">{activity.title}</p>
+                    <p className="text-sm text-gray-500">{activity.description}</p>
+                    <p className="text-xs text-gray-400 mt-1">{activity.timestamp}</p>
+                  </div>
+                  {activity.orderId && (
+                    <button className="text-xs text-orange-500 hover:text-orange-600">View</button>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Quick Actions */}
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100">
+            <div className="p-6 border-b border-gray-200">
+              <h2 className="text-lg font-bold text-gray-800">Quick Actions</h2>
+              <p className="text-sm text-gray-500 mt-1">Common production tasks</p>
+            </div>
+            <div className="p-4 space-y-3">
+              <button onClick={() => navigate("/production/planning")} className="w-full flex items-center justify-between p-3 bg-orange-50 rounded-xl hover:bg-orange-100 transition group">
+                <span className="font-medium text-gray-800">New Production Planning</span>
+                <Factory size={18} className="text-orange-500" />
+              </button>
+              <button onClick={() => navigate("/production/orders")} className="w-full flex items-center justify-between p-3 bg-blue-50 rounded-xl hover:bg-blue-100 transition group">
+                <span className="font-medium text-gray-800">View Production Orders</span>
+                <Package size={18} className="text-blue-500" />
+              </button>
+              <button onClick={() => navigate("/production/shop-floor")} className="w-full flex items-center justify-between p-3 bg-green-50 rounded-xl hover:bg-green-100 transition group">
+                <span className="font-medium text-gray-800">Shop Floor View</span>
+                <Eye size={18} className="text-green-500" />
+              </button>
+              <button onClick={() => navigate("/production/scheduling")} className="w-full flex items-center justify-between p-3 bg-purple-50 rounded-xl hover:bg-purple-100 transition group">
+                <span className="font-medium text-gray-800">Production Scheduling</span>
+                <Calendar size={18} className="text-purple-500" />
+              </button>
+              <button onClick={() => navigate("/production/resources")} className="w-full flex items-center justify-between p-3 bg-yellow-50 rounded-xl hover:bg-yellow-100 transition group">
+                <span className="font-medium text-gray-800">Resource Allocation</span>
+                <Users size={18} className="text-yellow-600" />
+              </button>
+            </div>
+          </div>
         </div>
+
+        {/* Low Stock Warning */}
+        {materialAlerts.filter(m => m.status === "LOW").length > 0 && (
+          <div className="mt-8 bg-yellow-50 border border-yellow-200 rounded-2xl p-4">
+            <div className="flex items-start gap-3">
+              <AlertTriangle className="text-yellow-600 mt-0.5" size={18} />
+              <div className="flex-1">
+                <p className="text-sm font-semibold text-yellow-800">Low Stock Warning</p>
+                <div className="flex flex-wrap gap-4 mt-2">
+                  {materialAlerts.filter(m => m.status === "LOW").map(alert => (
+                    <div key={alert.id} className="text-sm text-yellow-700">
+                      {alert.material}: <strong>{alert.available.toLocaleString()} {alert.unit}</strong> remaining
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <button className="text-sm text-yellow-700 hover:text-yellow-800 font-medium">Review Inventory →</button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
