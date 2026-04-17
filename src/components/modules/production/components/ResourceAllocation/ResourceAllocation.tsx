@@ -6,7 +6,10 @@ import {
   Factory,
   X,
   Eye,
-  Pencil
+  Pencil,
+  ChevronLeft,
+  ChevronRight,
+  MoreHorizontal
 } from "lucide-react";
 
 // ==================== Types ====================
@@ -39,12 +42,17 @@ const initialMachines: Machine[] = [
   { id: "MAC-102", name: "Laser Cutter v2", type: "Precision", status: "In Use", load: 85 },
   { id: "MAC-103", name: "Lathe Pro", type: "Manual", status: "Maintenance", load: 0 },
   { id: "MAC-104", name: "3D Printer Industrial", type: "Additive", status: "Shutdown", load: 0 },
+  { id: "MAC-105", name: "Drill Press A", type: "Manual", status: "Available", load: 10 },
+  { id: "MAC-106", name: "Hydraulic Press", type: "Heavy", status: "In Use", load: 45 },
 ];
 
 const initialOperators: Operator[] = [
   { id: "OP-001", name: "John Doe", role: "CNC Specialist", skill: "Senior", workload: 60, status: "Assigned", shift: "Morning" },
   { id: "OP-002", name: "Sarah Smith", role: "Assembly Tech", skill: "Junior", workload: 0, status: "Available", shift: "Afternoon" },
   { id: "OP-003", name: "Mike Ross", role: "Quality Control", skill: "Senior", workload: 100, status: "At Capacity", shift: "Evening" },
+  { id: "OP-004", name: "Anna Bell", role: "Logistics", skill: "Intermediate", workload: 20, status: "Available", shift: "Morning" },
+  { id: "OP-005", name: "Chris Post", role: "Maintenance", skill: "Senior", workload: 50, status: "Assigned", shift: "Afternoon" },
+  { id: "OP-006", name: "Dana White", role: "Operator", skill: "Junior", workload: 10, status: "Available", shift: "Morning" },
 ];
 
 // ==================== Helper Components ====================
@@ -80,6 +88,11 @@ const ResourceAllocation: React.FC = () => {
   const [operators] = useState<Operator[]>(initialOperators);
   const [editingMachine, setEditingMachine] = useState<Machine | null>(null);
 
+  // Pagination States
+  const itemsPerPage = 5;
+  const [currentPageMachines, setCurrentPageMachines] = useState(1);
+  const [currentPageOperators, setCurrentPageOperators] = useState(1);
+
   // Filter States
   const [machineSearch, setMachineSearch] = useState("");
   const [machineStatusFilter, setMachineStatusFilter] = useState<string>("All");
@@ -104,6 +117,10 @@ const ResourceAllocation: React.FC = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // Reset pagination on filter change
+  useEffect(() => { setCurrentPageMachines(1); }, [machineSearch, machineStatusFilter]);
+  useEffect(() => { setCurrentPageOperators(1); }, [operatorSearch, operatorStatusFilter]);
+
   // Filter Logic
   const filteredMachines = useMemo(() => {
     return machines.filter(m =>
@@ -118,6 +135,25 @@ const ResourceAllocation: React.FC = () => {
       (o.id.toLowerCase().includes(operatorSearch.toLowerCase()) || o.name.toLowerCase().includes(operatorSearch.toLowerCase()))
     );
   }, [operators, operatorSearch, operatorStatusFilter]);
+
+  // Pagination Logic
+  const totalPagesMachines = Math.ceil(filteredMachines.length / itemsPerPage);
+  const paginatedMachines = filteredMachines.slice((currentPageMachines - 1) * itemsPerPage, currentPageMachines * itemsPerPage);
+
+  const totalPagesOperators = Math.ceil(filteredOperators.length / itemsPerPage);
+  const paginatedOperators = filteredOperators.slice((currentPageOperators - 1) * itemsPerPage, currentPageOperators * itemsPerPage);
+
+  const getPageNumbers = (current: number, total: number) => {
+    const pages = [];
+    for (let i = 1; i <= total; i++) {
+      if (i === 1 || i === total || (i >= current - 1 && i <= current + 1)) {
+        pages.push(i);
+      } else if (pages[pages.length - 1] !== "...") {
+        pages.push("...");
+      }
+    }
+    return pages;
+  };
 
   const handleTimeFilterChange = (value: TimeFilter) => {
     if (value === "Custom") {
@@ -232,7 +268,7 @@ const ResourceAllocation: React.FC = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">
-              {filteredMachines.map((m) => (
+              {paginatedMachines.map((m) => (
                 <tr key={m.id} className="hover:bg-orange-50/20 transition-colors">
                   <td className="p-5 text-center"><input type="checkbox" className="accent-orange-500" /></td>
                   <td className="px-4 py-4 text-[13px] font-mono font-bold text-slate-800 text-center">{m.id}</td>
@@ -250,6 +286,23 @@ const ResourceAllocation: React.FC = () => {
               ))}
             </tbody>
           </table>
+
+          {/* Machine Pagination Footer */}
+          <footer className="p-6 bg-slate-50/50 border-t border-slate-100 flex flex-col md:flex-row justify-between items-center gap-6">
+            <div className="text-[11px] font-bold text-slate-800 uppercase tracking-widest">
+              Showing {filteredMachines.length > 0 ? (currentPageMachines - 1) * itemsPerPage + 1 : 0} to {Math.min(currentPageMachines * itemsPerPage, filteredMachines.length)} of {filteredMachines.length} Machines
+            </div>
+            <div className="flex items-center gap-2">
+              <button onClick={() => setCurrentPageMachines(prev => Math.max(prev - 1, 1))} disabled={currentPageMachines === 1} className="p-2.5 rounded-xl border border-slate-200 bg-white text-slate-500 hover:text-orange-600 disabled:opacity-30 transition-all"><ChevronLeft size={18} /></button>
+              <div className="flex items-center gap-1.5">
+                {getPageNumbers(currentPageMachines, totalPagesMachines).map((page, i) => (
+                  page === "..." ? <span key={i} className="px-2 text-slate-300"><MoreHorizontal size={14} /></span> :
+                  <button key={i} onClick={() => setCurrentPageMachines(page as number)} className={`min-w-10 h-10 rounded-xl text-xs font-bold transition-all ${currentPageMachines === page ? "bg-orange-500 text-white shadow-lg" : "bg-white text-slate-500 border border-slate-200"}`}>{page}</button>
+                ))}
+              </div>
+              <button onClick={() => setCurrentPageMachines(prev => Math.min(prev + 1, totalPagesMachines))} disabled={currentPageMachines === totalPagesMachines} className="p-2.5 rounded-xl border border-slate-200 bg-white text-slate-500 hover:text-orange-600 disabled:opacity-30 transition-all"><ChevronRight size={18} /></button>
+            </div>
+          </footer>
         </div>
 
         {/* Operator Allocation Section */}
@@ -299,7 +352,7 @@ const ResourceAllocation: React.FC = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">
-              {filteredOperators.map((o) => (
+              {paginatedOperators.map((o) => (
                 <tr key={o.id} className="hover:bg-orange-50/20 transition-colors">
                   <td className="p-5 text-center"><input type="checkbox" className="accent-orange-500" /></td>
                   <td className="px-4 py-4 text-[13px] font-mono font-bold text-slate-800 text-center">{o.id}</td>
@@ -323,6 +376,23 @@ const ResourceAllocation: React.FC = () => {
               ))}
             </tbody>
           </table>
+
+          {/* Operator Pagination Footer */}
+          <footer className="p-6 bg-slate-50/50 border-t border-slate-100 flex flex-col md:flex-row justify-between items-center gap-6">
+            <div className="text-[11px] font-bold text-slate-800 uppercase tracking-widest">
+              Showing {filteredOperators.length > 0 ? (currentPageOperators - 1) * itemsPerPage + 1 : 0} to {Math.min(currentPageOperators * itemsPerPage, filteredOperators.length)} of {filteredOperators.length} Operators
+            </div>
+            <div className="flex items-center gap-2">
+              <button onClick={() => setCurrentPageOperators(prev => Math.max(prev - 1, 1))} disabled={currentPageOperators === 1} className="p-2.5 rounded-xl border border-slate-200 bg-white text-slate-500 hover:text-orange-600 disabled:opacity-30 transition-all"><ChevronLeft size={18} /></button>
+              <div className="flex items-center gap-1.5">
+                {getPageNumbers(currentPageOperators, totalPagesOperators).map((page, i) => (
+                  page === "..." ? <span key={i} className="px-2 text-slate-300"><MoreHorizontal size={14} /></span> :
+                  <button key={i} onClick={() => setCurrentPageOperators(page as number)} className={`min-w-10 h-10 rounded-xl text-xs font-bold transition-all ${currentPageOperators === page ? "bg-orange-500 text-white shadow-lg" : "bg-white text-slate-500 border border-slate-200"}`}>{page}</button>
+                ))}
+              </div>
+              <button onClick={() => setCurrentPageOperators(prev => Math.min(prev + 1, totalPagesOperators))} disabled={currentPageOperators === totalPagesOperators} className="p-2.5 rounded-xl border border-slate-200 bg-white text-slate-500 hover:text-orange-600 disabled:opacity-30 transition-all"><ChevronRight size={18} /></button>
+            </div>
+          </footer>
         </div>
       </div>
 
