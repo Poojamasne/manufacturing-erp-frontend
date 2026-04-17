@@ -200,6 +200,7 @@ const EditSalesEmployee: React.FC = () => {
                                     { label: "Manager", value: "manager" }
                                 ]}
                                 value={formData.role}
+                                //eslint-disable-next-line @typescript-eslint/no-explicit-any
                                 onChange={(val) => setFormData({ ...formData, role: val as any })}
                             />
                             <FormSelect
@@ -210,6 +211,7 @@ const EditSalesEmployee: React.FC = () => {
                                     { label: "Inactive", value: "0" }
                                 ]}
                                 value={formData.is_active}
+                                //eslint-disable-next-line @typescript-eslint/no-explicit-any
                                 onChange={(val) => setFormData({ ...formData, is_active: val as any })}
                             />
                         </div>

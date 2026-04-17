@@ -14,9 +14,8 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch } from "../../../common/ReduxMainHooks";
-import { createEmployee } from "../ModuleStateFiles/EmployeeSlice"; // Ensure this thunk exists in your slice
+import { createEmployee } from "../ModuleStateFiles/EmployeeSlice"; 
 
-// --- Interfaces ---
 interface EmployeeFormData {
     name: string;
     email: string;
@@ -33,7 +32,7 @@ const AddSalesEmployee: React.FC = () => {
     const [isSaving, setIsSaving] = useState(false);
     const [showSuccess, setShowSuccess] = useState(false);
 
-    // --- Form State matched to Payload ---
+    
     const [formData, setFormData] = useState<EmployeeFormData>({
         name: "",
         email: "",
@@ -41,7 +40,7 @@ const AddSalesEmployee: React.FC = () => {
         phone: "",
         designation: "Sales Executive",
         role: "salesperson",
-        is_active: "1" // Default to Active
+        is_active: "1" 
     });
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -49,7 +48,7 @@ const AddSalesEmployee: React.FC = () => {
         setIsSaving(true);
 
         try {
-            // The payload sent to the backend
+           
             const payload = {
                 ...formData,
                 is_active: Number(formData.is_active)
@@ -174,6 +173,7 @@ const AddSalesEmployee: React.FC = () => {
                                     { label: "Manager", value: "manager" }
                                 ]}
                                 value={formData.role}
+                                //eslint-disable-next-line @typescript-eslint/no-explicit-any
                                 onChange={(val) => setFormData({ ...formData, role: val as any })}
                             />
                             <FormSelect
@@ -184,6 +184,7 @@ const AddSalesEmployee: React.FC = () => {
                                     { label: "Inactive", value: "0" }
                                 ]}
                                 value={formData.is_active}
+                                //eslint-disable-next-line @typescript-eslint/no-explicit-any
                                 onChange={(val) => setFormData({ ...formData, is_active: val as any })}
                             />
                         </div>
@@ -201,7 +202,6 @@ const AddSalesEmployee: React.FC = () => {
     );
 };
 
-// --- INTERNAL UI SUB-COMPONENTS ---
 
 const SectionHeader: React.FC<{ icon: React.ReactNode; title: string }> = ({ icon, title }) => (
     <div className="flex items-center gap-3 mb-6">

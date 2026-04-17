@@ -112,6 +112,7 @@ const ProductionList: React.FC = () => {
 
   // Fetch productions with filters
   const fetchProductions = useCallback(() => {
+    //eslint-disable-next-line @typescript-eslint/no-explicit-any
     const params: any = {
       page: currentPage,
       limit: itemsPerPage,
@@ -146,6 +147,7 @@ const ProductionList: React.FC = () => {
   }, [fetchProductions]);
 
   useEffect(() => {
+    //eslint-disable-next-line react-hooks/exhaustive-deps
     setCurrentPage(1);
   }, [statusFilter, stageFilter, debouncedSearch, activeTab, customRange]);
 

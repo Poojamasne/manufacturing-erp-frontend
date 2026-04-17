@@ -23,7 +23,7 @@ import { useAppDispatch, useAppSelector } from "../../../common/ReduxMainHooks";
 import type { RootState } from "../../../../ApplicationState/Store";
 import Swal from "sweetalert2";
 
-// --- Types ---
+
 type TimeTab =
   | "Weekly"
   | "Monthly"
@@ -65,7 +65,7 @@ const OrderList: React.FC = () => {
   const itemsPerPage = 10;
   const [debouncedSearch, setDebouncedSearch] = useState("");
 
-  // Debounce search
+ 
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearch(searchQuery);
@@ -73,8 +73,9 @@ const OrderList: React.FC = () => {
     return () => clearTimeout(timer);
   }, [searchQuery]);
 
-  // Fetch orders with filters
+ 
   const fetchOrders = useCallback(() => {
+    //eslint-disable-next-line @typescript-eslint/no-explicit-any
     const params: any = {
       page: currentPage,
       limit: itemsPerPage,
@@ -106,6 +107,7 @@ const OrderList: React.FC = () => {
   }, [fetchOrders]);
 
   useEffect(() => {
+    //eslint-disable-next-line react-hooks/exhaustive-deps
     setCurrentPage(1);
   }, [statusFilter, debouncedSearch, activeTab, customRange]);
 

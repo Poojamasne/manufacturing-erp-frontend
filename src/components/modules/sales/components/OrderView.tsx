@@ -34,7 +34,7 @@ const OrderView: React.FC = () => {
         return () => { dispatch(clearSalesErrors()); };
     }, [dispatch, id]);
 
-    // ✅ Status Update Handler
+   
     const handleStatusUpdate = async (newStatus: string) => {
         if (!id || newStatus === order?.status) return;
         

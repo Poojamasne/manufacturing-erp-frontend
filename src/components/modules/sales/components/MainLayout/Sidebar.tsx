@@ -9,14 +9,12 @@ const Sidebar: React.FC = () => {
 
   const handleLogout = () => {
     dispatch(logout());
-    // navigate to login page after logout
     navigate("/");
   };
 
   return (
     <div className="w-64 bg-white h-screen border-r border-[#005d5230] flex flex-col sticky top-0 overflow-hidden">
 
-      {/* 1. FIXED HEADER - Always at the top */}
       <div className="shrink-0 p-6 py-[21.5px] flex items-center gap-3 border-b border-[#005d5230] bg-white z-10">
         <Link to="/sales/dashboard" className="bg-[#005d52] p-2 rounded-xl text-white shadow-md">
           <img src="/icons/SalesDashboard.svg" className="h-5 w-5" alt="Logo" />

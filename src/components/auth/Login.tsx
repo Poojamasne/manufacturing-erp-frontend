@@ -25,6 +25,7 @@ const Login: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { loading, error: authError } = useAppSelector(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (state: any) => state.auth,
   );
 
@@ -54,44 +55,10 @@ const Login: React.FC = () => {
       return { error: "Invalid domain format", isValid: false };
 
     const validDomains = [
-      "com",
-      "org",
-      "net",
-      "edu",
-      "gov",
-      "mil",
-      "int",
-      "info",
-      "biz",
-      "name",
-      "co",
-      "io",
-      "ai",
-      "app",
-      "dev",
-      "tech",
-      "me",
-      "tv",
-      "xyz",
-      "online",
-      "store",
-      "blog",
-      "site",
-      "club",
-      "shop",
-      "in",
-      "us",
-      "uk",
-      "au",
-      "ca",
-      "de",
-      "fr",
-      "jp",
-      "cn",
-      "ru",
-      "br",
-      "za",
-      "live",
+      "com", "org", "net", "edu", "gov", "mil", "int", "info", "biz", "name",
+      "co", "io", "ai", "app", "dev", "tech", "me", "tv", "xyz", "online",
+      "store", "blog", "site", "club", "shop", "in", "us", "uk", "au", "ca",
+      "de", "fr", "jp", "cn", "ru", "br", "za", "live", "production"
     ];
     const extension = domainParts[domainParts.length - 1];
     if (!validDomains.includes(extension))
@@ -113,6 +80,35 @@ const Login: React.FC = () => {
 
     if (!emailStatus.isValid || !passwordStatus.isValid) return;
 
+    // ========== TEST CREDENTIALS FOR PRODUCTION PANEL ==========
+    // Production Planner
+    if (email === "planner@production.com" && password === "planner123") {
+      localStorage.setItem("token", "test-token-production-planner");
+      localStorage.setItem("designation", "Production Planner");
+      localStorage.setItem("userName", "Production Planner");
+      navigate("/production/dashboard");
+      return;
+    }
+    
+    // Shop Floor Operator
+    if (email === "operator@production.com" && password === "operator123") {
+      localStorage.setItem("token", "test-token-production-operator");
+      localStorage.setItem("designation", "Shop Floor Operator");
+      localStorage.setItem("userName", "Shop Floor Operator");
+      navigate("/production/dashboard");
+      return;
+    }
+    
+    // Sales Manager (for testing sales panel)
+    if (email === "sales@manager.com" && password === "sales123") {
+      localStorage.setItem("token", "test-token-sales");
+      localStorage.setItem("designation", "Sales Manager");
+      localStorage.setItem("userName", "Sales Manager");
+      navigate("/sales/dashboard");
+      return;
+    }
+   
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     dispatch(loginUser({ email, password }, navigate) as any);
   };
 
@@ -261,7 +257,15 @@ const Login: React.FC = () => {
             </button>
           </form>
 
-          <div className="mt-8 text-center text-[10px] text-gray-500 uppercase tracking-widest">
+          {/* Test Credentials Info */}
+          <div className="mt-6 text-center text-xs text-gray-400 border-t pt-4">
+            <p className="font-semibold mb-1">Test Credentials:</p>
+            <p>Production Planner: planner@production.com / planner123</p>
+            {/* <p>Shop Floor Operator: operator@production.com / operator123</p> */}
+            <p>Sales Manager: sales@manager.com / sales123</p>
+          </div>
+
+          <div className="mt-4 text-center text-[10px] text-gray-500 uppercase tracking-widest">
             Zonixtec ERP System • {new Date().getFullYear()}
           </div>
         </div>

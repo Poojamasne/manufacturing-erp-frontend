@@ -38,6 +38,7 @@ const ProductionEdit: React.FC = () => {
   const [activeTab, setActiveTab] = useState("details");
   const [isSaving, setIsSaving] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  //eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [formData, setFormData] = useState<any>({});
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -141,7 +142,9 @@ const ProductionEdit: React.FC = () => {
     }
   };
 
+  //eslint-disable-next-line @typescript-eslint/no-explicit-any
   const updateFormData = (field: string, value: any) => {
+    //eslint-disable-next-line @typescript-eslint/no-explicit-any
   setFormData((prev: any) => ({ ...prev, [field]: value }));
   
   

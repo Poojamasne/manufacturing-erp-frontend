@@ -74,6 +74,7 @@ const SalesEmployees: React.FC = () => {
 
   // Reset to page 1 when filters change
   useEffect(() => {
+    //eslint-disable-next-line react-hooks/exhaustive-deps
     setCurrentPage(1);
   }, [debouncedSearch, statusFilter]);
 
@@ -165,12 +166,14 @@ const SalesEmployees: React.FC = () => {
   };
 
   const handleDelete = (id: string) => {
+    //eslint-disable-next-line @typescript-eslint/no-explicit-any
     dispatch(deleteEmployee(id, navigate) as any);
     setSelectedIds((prev) => prev.filter((pid) => pid !== id));
   };
 
   const handleBulkDelete = () => {
     if (selectedIds.length === 0) return;
+    //eslint-disable-next-line @typescript-eslint/no-explicit-any
     selectedIds.forEach((id) => dispatch(deleteEmployee(id, navigate) as any));
     setSelectedIds([]);
   };

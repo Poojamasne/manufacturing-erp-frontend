@@ -157,8 +157,7 @@ const ViewSalesEmployee: React.FC = () => {
   );
 };
 
-// --- Reusable Sub-components ---
-
+//eslint-disable-next-line @typescript-eslint/no-explicit-any
 const InfoRow = ({ icon, label, value, className = "" }: any) => (
   <div className="flex items-center gap-3 group">
     <div className="w-9 h-9 rounded-lg bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-teal-50 group-hover:text-[#005d52] transition-all">
@@ -171,6 +170,7 @@ const InfoRow = ({ icon, label, value, className = "" }: any) => (
   </div>
 );
 
+//eslint-disable-next-line @typescript-eslint/no-explicit-any
 const StatCard = ({ label, value, icon, trend, positive }: any) => (
   <div className="bg-white p-5 rounded-2xl border border-slate-100 flex justify-between items-center shadow-sm">
     <div>

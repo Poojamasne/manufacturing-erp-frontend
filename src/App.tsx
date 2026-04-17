@@ -1,6 +1,7 @@
 ﻿import {
   createBrowserRouter,
   RouterProvider,
+  Navigate,
 } from "react-router-dom";
 import { lazy, Suspense } from "react";
 
@@ -10,7 +11,8 @@ const LoginPage = lazy(() => import("./pages/LoginPage"));
 
 // Normal imports
 import ProtectedRoute from "./components/auth/ProtectedRoute";
-import MainLayout from "./components/modules/sales/components/MainLayout/MainLayout";
+import SalesMainLayout from "./components/modules/sales/components/MainLayout/MainLayout";
+import ProductionMainLayout from "./components/modules/production/components/MainLayout/MainLayout";
 import NotFound from "./components/common/NotFound";
 import ReportsAndAnalytics from "./components/modules/sales/components/ReportsAndAnalytics";
 import SalesEmployees from "./components/modules/sales/components/SalesEmployees";
@@ -34,6 +36,18 @@ import EditLeadForm from "./components/modules/sales/components/EditLeadForm";
 import AddSalesEmployee from "./components/modules/sales/components/AddSalesEmployee";
 import ViewSalesEmployee from "./components/modules/sales/components/ViewSalesEmployee";
 import EditSalesEmployee from "./components/modules/sales/components/EditSalesEmployee";
+
+// Production Imports
+import ProductionProtectedRoute from "./components/auth/ProductionProtectedRoute";
+import ProductionDashboard from './components/modules/production/Dashboard';
+import ProductionPlanningScreen from './components/modules/production/components/ProductionPlanning/ProductionPlanningScreen';
+import ProductionOrderList from './components/modules/production/components/ProductionOrder/ProductionOrderList';
+import WorkOrderList from './components/modules/production/components/ProductionOrder/WorkOrderList';
+import ResourceAllocation from './components/modules/production/components/ResourceAllocation/ResourceAllocation';
+import ProductionScheduler from './components/modules/production/components/Scheduling/ProductionScheduler';
+import ShopFloorExecution from './components/modules/production/components/ShopFloor/ShopFloorExecution';
+import ProductionReports from './components/modules/production/components/Reports/ProductionReports';
+
 import { Toaster } from "react-hot-toast";
 
 /* Global Suspense Wrapper */
@@ -51,17 +65,14 @@ const withSuspense = (Component: React.ReactNode) => (
 
 function App() {
   const router = createBrowserRouter([
-
-    // Login Route
     {
       path: "/",
       element: withSuspense(<LoginPage />),
     },
-
-    // Role mismatch
     {
       path: "/role-mismatch",
       element: <RoleNotMatched />,
+
     },
 
     // Sales Module
@@ -70,20 +81,16 @@ function App() {
       element: <ProtectedRoute requiredRole="Sales Manager" />,
       children: [
         {
-          element: <MainLayout />,
+          element: <SalesMainLayout />,
           children: [
-
-            // Default route → /sales
             {
               index: true,
               element: withSuspense(<SalesDashboard />),
             },
-
             {
               path: "dashboard",
               element: withSuspense(<SalesDashboard />),
             },
-
             {
               path: "leads",
               element: <LeadsPage />,
@@ -95,6 +102,10 @@ function App() {
             {
               path: "leads/edit-lead/:id",
               element: <EditLeadForm />,
+            },
+            {
+              path: "leads/view-lead/:id",
+              element: <LeadView />,
             },
             {
               path: "opportunities",
@@ -161,10 +172,6 @@ function App() {
               element: <ViewSalesEmployee />,
             },
             {
-              path: "leads/view-lead/:id",
-              element: <LeadView />,
-            },
-            {
               path: "notes",
               element: <NotesPage />,
             },
@@ -173,7 +180,127 @@ function App() {
       ],
     },
 
-    // Fallback Route
+    // Production Module - Full Working Routes
+    {
+      path: "/production",
+      element: <ProductionProtectedRoute requiredRoles={["Production Planner", "Shop Floor Operator"]} />,
+      children: [
+        {
+          element: <ProductionMainLayout />,
+          children: [
+      
+            { 
+              index: true, 
+              element: <Navigate to="/production/dashboard" replace /> 
+            },
+            
+            // Dashboard
+            { 
+              path: "dashboard", 
+              element: <ProductionDashboard /> 
+            },
+            
+            // Production Planning
+            { 
+              path: "planning", 
+              element: <ProductionPlanningScreen /> 
+            },
+            
+            // Production Orders
+            { 
+              path: "orders", 
+              element: <ProductionOrderList /> 
+            },
+            { 
+              path: "orders/view/:id", 
+              element: <ProductionOrderList /> 
+            },
+            { 
+              path: "orders/edit/:id", 
+              element: <ProductionOrderList /> 
+            },
+            
+            // Work Orders
+            { 
+              path: "work-orders", 
+              element: <WorkOrderList /> 
+            },
+            { 
+              path: "work-orders/view/:id", 
+              element: <WorkOrderList /> 
+            },
+            { 
+              path: "work-orders/assign", 
+              element: <WorkOrderList /> 
+            },
+            
+            // Resource Allocation (Machines & Operators)
+            { 
+              path: "resources", 
+              element: <ResourceAllocation /> 
+            },
+            { 
+              path: "machines", 
+              element: <ResourceAllocation /> 
+            },
+            { 
+              path: "operators", 
+              element: <ResourceAllocation /> 
+            },
+            
+            // Production Scheduling
+            { 
+              path: "scheduling", 
+              element: <ProductionScheduler /> 
+            },
+            { 
+              path: "calendar", 
+              element: <ProductionScheduler /> 
+            },
+            { 
+              path: "shifts", 
+              element: <ProductionScheduler /> 
+            },
+            
+            // Shop Floor Execution
+            { 
+              path: "shop-floor", 
+              element: <ShopFloorExecution /> 
+            },
+            { 
+              path: "production-tracking", 
+              element: <ShopFloorExecution /> 
+            },
+            { 
+              path: "work-instructions", 
+              element: <ShopFloorExecution /> 
+            },
+            
+            // Reports & Analytics
+            { 
+              path: "reports", 
+              element: <ProductionReports /> 
+            },
+            { 
+              path: "analytics", 
+              element: <ProductionReports /> 
+            },
+            
+            // Notes
+            { 
+              path: "notes", 
+              element: <NotesPage /> 
+            },
+            
+            // Sales Orders (Integration with sales module)
+            { 
+              path: "sales-orders", 
+              element: <ProductionPlanningScreen /> 
+            },
+          ],
+        },
+      ],
+    },
     {
       path: "*",
       element: <NotFound />,
@@ -197,7 +324,6 @@ function App() {
           top: 85,
         }}
       />
-
       <RouterProvider router={router} />
     </Suspense>
   );

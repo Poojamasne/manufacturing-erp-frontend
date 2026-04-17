@@ -89,9 +89,9 @@ const QuotationView: React.FC = () => {
    const formatDate = (dateStr: string | null | undefined) => {
     if (!dateStr) return "N/A";
     try {
-        // Handle both string and Date objects
+        
         const date = typeof dateStr === 'string' ? new Date(dateStr) : dateStr;
-        // Check if date is valid
+
         if (isNaN(date.getTime())) return "N/A";
         return date.toLocaleDateString('en-GB', { 
             day: '2-digit', 
@@ -120,21 +120,18 @@ const QuotationView: React.FC = () => {
         }
     };
 
-    // Safe error message extraction
     const getErrorMessage = (): string | null => {
         if (!error) return null;
         if (typeof error === 'string') return error;
+        //eslint-disable-next-line @typescript-eslint/no-explicit-any
         if (error && typeof error === 'object' && 'message' in error) return String((error as any).message);
         return 'An unexpected error occurred';
     };
 
     const errorMessage = getErrorMessage();
-
-    // Safe data extraction - prevent "Cannot read property of undefined"
     const quotationData = (quotation && typeof quotation === 'object' && !Array.isArray(quotation)) ? quotation : {} as QuotationData;
     const hasData = quotationData && Object.keys(quotationData).length > 0 && quotationData.id;
 
-    // Loading state
     if (loading) {
         return (
             <div className="min-h-screen bg-[#F8FAFC] flex items-center justify-center">

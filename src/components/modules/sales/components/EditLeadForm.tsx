@@ -93,10 +93,10 @@ const EditLead: React.FC = () => {
         return () => { dispatch(clearErrors()); };
     }, [dispatch, id]);
 
-    // Prefill Form when Lead Data is fetched
+   
     useEffect(() => {
         if (lead && lead.id && String(lead.id) === id) {
-            // Helper to format ISO date to YYYY-MM-DD
+            
             const formatDate = (date: string) => date ? date.split("T")[0] : "";
 
             setFormData({
@@ -117,12 +117,13 @@ const EditLead: React.FC = () => {
                 assigned_to: lead.assigned_to ? Number(lead.assigned_to) : "",
             });
 
-            // Map existing products to row state
+            
             if (lead.products && lead.products.length > 0) {
+                //eslint-disable-next-line @typescript-eslint/no-explicit-any
                 const mappedRows: ProductRow[] = lead.products.map((p: any) => ({
                     id: p.id || Date.now() + Math.random(),
                     product_id: String(p.product_id),
-                    variant_id: String(p.variant_id || p.variant), // handle potential field name mismatch
+                    variant_id: String(p.variant_id || p.variant), 
                     quantity: Number(p.quantity),
                     unit_price: Number(p.unit_price)
                 }));
@@ -199,7 +200,7 @@ const EditLead: React.FC = () => {
         dispatch(editLead(Number(id), payload, navigate)).finally(() => setIsSubmitting(false));
     };
 
-    if (loading && !formData.company_name) return null; // Thunk handles SweetAlert
+    if (loading && !formData.company_name) return null; 
 
     return (
         <div className="min-h-screen bg-[#f8fafc] p-4 sm:p-6 lg:p-8 font-sans text-slate-900">
@@ -252,6 +253,7 @@ const EditLead: React.FC = () => {
                                             <FormSelect
                                                 label="Product" value={row.product_id} required
                                                 error={errors[`prod_${row.id}`]}
+                                                //eslint-disable-next-line @typescript-eslint/no-explicit-any
                                                 onChange={(e: any) => handleProductSelect(row.id, e.target.value)}
                                                 options={products.map(p => ({ l: p.product_name, v: String(p.product_id) }))}
                                             />
@@ -260,6 +262,7 @@ const EditLead: React.FC = () => {
                                             <FormSelect
                                                 label="Variant" value={row.variant_id} required
                                                 disabled={!row.product_id} error={errors[`var_${row.id}`]}
+                                                //eslint-disable-next-line @typescript-eslint/no-explicit-any
                                                 onChange={(e: any) => handleVariantSelect(row.id, e.target.value, row.product_id)}
                                                 options={selectedProd?.variants.map(v => ({ l: v.variant_name, v: String(v.variant_id) })) || []}
                                             />
@@ -328,7 +331,6 @@ const EditLead: React.FC = () => {
     );
 };
 
-// --- Atomic Components ---
 const SectionTitle: React.FC<{ icon: React.ReactNode; title: string }> = ({ icon, title }) => (
     <div className="flex items-center gap-3 mb-8">
         <div className="p-2.5 bg-teal-50 text-[#005d52] rounded-xl border border-teal-100 shadow-sm">{icon}</div>
@@ -336,6 +338,7 @@ const SectionTitle: React.FC<{ icon: React.ReactNode; title: string }> = ({ icon
     </div>
 );
 
+//eslint-disable-next-line @typescript-eslint/no-explicit-any
 const FormInput: React.FC<any> = ({ label, error, required, ...props }) => (
     <div className="flex flex-col gap-1.5">
         <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">{label} {required && <span className="text-red-500">*</span>}</label>
@@ -349,6 +352,7 @@ const FormInput: React.FC<any> = ({ label, error, required, ...props }) => (
     </div>
 );
 
+//eslint-disable-next-line @typescript-eslint/no-explicit-any
 const FormSelect: React.FC<any> = ({ label, options, error, required, ...props }) => (
     <div className="flex flex-col gap-1.5">
         <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">{label} {required && <span className="text-red-500">*</span>}</label>

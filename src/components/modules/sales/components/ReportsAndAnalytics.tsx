@@ -425,9 +425,11 @@ const ReportsAndAnalytics: FC = () => {
               Lead Sources
             </h3>
             <div className="flex-1 flex flex-col justify-center">
+          
               <div className="h-52 w-full">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
+                    
                     <Pie
                       data={currentData.sources}
                       innerRadius={60}

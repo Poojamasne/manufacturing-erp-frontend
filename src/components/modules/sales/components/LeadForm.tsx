@@ -264,7 +264,6 @@ const LeadForm: React.FC = () => {
       gst_number: formData.gst_number,
       lead_source: formData.lead_source,
       priority: formData.priority,
-      // Fix: Send null instead of empty string for dates
       expected_close_date: formData.expected_close_date || null,
       followup_date: formData.followup_date || null,
       notes: formData.notes,
@@ -281,7 +280,6 @@ const LeadForm: React.FC = () => {
 
     console.log("Final Payload being sent:", JSON.stringify(payload, null, 2));
     
-    // Check if products exist
     if (payload.products.length === 0) {
       setErrors({ ...errors, products: "Please add at least one product" });
       setIsSubmitting(false);

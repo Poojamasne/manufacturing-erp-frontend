@@ -12,7 +12,8 @@ import ReportReducer from "../components/modules/sales/ModuleStateFiles/ReportSl
 
 const store = configureStore({
     reducer: {
-        // global Login reducer
+        // global Login reducer\
+        
         auth: authReducer,
         // sales module reducers
         SalesEmployee: salesEmployeeReducer,
