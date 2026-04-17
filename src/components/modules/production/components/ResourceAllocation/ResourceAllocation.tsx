@@ -11,9 +11,10 @@ import {
   ChevronRight,
   MoreHorizontal
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 // ==================== Types ====================
-type TimeFilter = "Weekly" | "Monthly" | "Quarterly" | "Yearly" | "All Time" | "Custom";
+type TimeFilter = "All Time" |"Weekly" | "Monthly" | "Quarterly" | "Yearly" |  "Custom";
 type MachineStatus = "Available" | "In Use" | "Maintenance" | "Shutdown";
 type OperatorStatus = "Assigned" | "Available" | "At Capacity";
 type Shift = "Morning" | "Afternoon" | "Evening";
@@ -106,7 +107,7 @@ const ResourceAllocation: React.FC = () => {
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const [isMachineFilterOpen, setIsMachineFilterOpen] = useState(false);
   const [isOperatorFilterOpen, setIsOperatorFilterOpen] = useState(false);
-
+  const navigate = useNavigate();
   // Close dropdowns on outside click
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -197,7 +198,7 @@ const ResourceAllocation: React.FC = () => {
 
             {isTimeDropdownOpen && (
               <div className="absolute right-0 mt-2 bg-white border border-slate-100 rounded-2xl shadow-2xl z-50 py-2 min-w-40">
-                {["Weekly", "Monthly", "Quarterly", "Yearly", "All Time", "Custom"].map((tab) => (
+                {[ "All Time","Weekly", "Monthly", "Quarterly", "Yearly", "Custom"].map((tab) => (
                   <button
                     key={tab}
                     onClick={() => handleTimeFilterChange(tab as TimeFilter)}
@@ -237,16 +238,14 @@ const ResourceAllocation: React.FC = () => {
                 />
               </div>
               <div className="relative">
-                <button onClick={() => setIsMachineFilterOpen(!isMachineFilterOpen)} className={`outline-none w-full flex items-center justify-between gap-2 px-4 py-3 rounded-xl border text-[13px] font-bold transition-all ${
-                    machineStatusFilter !== "All" ? "bg-orange-50 border-orange-200 text-orange-600" : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
+                <button onClick={() => setIsMachineFilterOpen(!isMachineFilterOpen)} className={`outline-none w-full flex items-center justify-between gap-2 px-4 py-3 rounded-xl border text-[13px] font-bold transition-all ${machineStatusFilter !== "All" ? "bg-orange-50 border-orange-200 text-orange-600" : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
                   }`}>
                   {machineStatusFilter === "All" ? "Status" : machineStatusFilter} <ChevronDown size={14} />
                 </button>
                 {isMachineFilterOpen && (
                   <div className="absolute right-0 mt-2 w-full bg-white border border-slate-100 rounded-2xl shadow-2xl z-50 py-2">
                     {["All", "Available", "In Use", "Maintenance", "Shutdown"].map(opt => (
-                      <button key={opt} onClick={() => { setMachineStatusFilter(opt); setIsMachineFilterOpen(false); }} className={`outline-none w-full text-left px-2 py-2 text-[13px] hover:bg-slate-50 ${
-                          machineStatusFilter === opt ? "text-orange-600 font-bold bg-orange-50/50" : "text-slate-600"
+                      <button key={opt} onClick={() => { setMachineStatusFilter(opt); setIsMachineFilterOpen(false); }} className={`outline-none w-full text-left px-2 py-2 text-[13px] hover:bg-slate-50 ${machineStatusFilter === opt ? "text-orange-600 font-bold bg-orange-50/50" : "text-slate-600"
                         }`}>{opt}</button>
                     ))}
                   </div>
@@ -278,7 +277,9 @@ const ResourceAllocation: React.FC = () => {
                   <td className="px-4 py-4 text-[13px] font-bold text-slate-800 text-center">{m.load}%</td>
                   <td className="px-4 py-4">
                     <div className="flex justify-center gap-2">
-                      <button className="p-2 text-slate-400 hover:text-orange-500 transition-colors"><Eye size={16} /></button>
+                      <button
+                        onClick={() => navigate("/production/resources/machines/" + m?.id)}
+                        className="p-2 text-slate-400 hover:text-orange-500 transition-colors"><Eye size={16} /></button>
                       <button onClick={() => setEditingMachine(m)} className="p-2 text-slate-400 hover:text-orange-500 transition-colors"><Pencil size={16} /></button>
                     </div>
                   </td>
@@ -297,7 +298,7 @@ const ResourceAllocation: React.FC = () => {
               <div className="flex items-center gap-1.5">
                 {getPageNumbers(currentPageMachines, totalPagesMachines).map((page, i) => (
                   page === "..." ? <span key={i} className="px-2 text-slate-300"><MoreHorizontal size={14} /></span> :
-                  <button key={i} onClick={() => setCurrentPageMachines(page as number)} className={`min-w-10 h-10 rounded-xl text-xs font-bold transition-all ${currentPageMachines === page ? "bg-orange-500 text-white shadow-lg" : "bg-white text-slate-500 border border-slate-200"}`}>{page}</button>
+                    <button key={i} onClick={() => setCurrentPageMachines(page as number)} className={`min-w-10 h-10 rounded-xl text-xs font-bold transition-all ${currentPageMachines === page ? "bg-orange-500 text-white shadow-lg" : "bg-white text-slate-500 border border-slate-200"}`}>{page}</button>
                 ))}
               </div>
               <button onClick={() => setCurrentPageMachines(prev => Math.min(prev + 1, totalPagesMachines))} disabled={currentPageMachines === totalPagesMachines} className="p-2.5 rounded-xl border border-slate-200 bg-white text-slate-500 hover:text-orange-600 disabled:opacity-30 transition-all"><ChevronRight size={18} /></button>
@@ -321,16 +322,14 @@ const ResourceAllocation: React.FC = () => {
                 />
               </div>
               <div className="relative">
-                <button onClick={() => setIsOperatorFilterOpen(!isOperatorFilterOpen)} className={`outline-none w-full flex items-center justify-between gap-2 px-5 py-3 rounded-xl border text-[13px] font-bold transition-all ${
-                    operatorStatusFilter !== "All" ? "bg-orange-50 border-orange-200 text-orange-600" : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
+                <button onClick={() => setIsOperatorFilterOpen(!isOperatorFilterOpen)} className={`outline-none w-full flex items-center justify-between gap-2 px-5 py-3 rounded-xl border text-[13px] font-bold transition-all ${operatorStatusFilter !== "All" ? "bg-orange-50 border-orange-200 text-orange-600" : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
                   }`}>
                   {operatorStatusFilter === "All" ? "Status" : operatorStatusFilter} <ChevronDown size={14} />
                 </button>
                 {isOperatorFilterOpen && (
                   <div className="absolute right-0 mt-2 w-full bg-white border border-slate-100 rounded-2xl shadow-2xl z-50 py-2">
                     {["All", "Assigned", "Available", "At Capacity"].map(opt => (
-                      <button key={opt} onClick={() => { setOperatorStatusFilter(opt); setIsOperatorFilterOpen(false); }} className={`outline-none w-full text-left px-4 py-2 text-[13px] hover:bg-slate-50 ${
-                          operatorStatusFilter === opt ? "text-orange-600 font-bold bg-orange-50/50" : "text-slate-600"
+                      <button key={opt} onClick={() => { setOperatorStatusFilter(opt); setIsOperatorFilterOpen(false); }} className={`outline-none w-full text-left px-4 py-2 text-[13px] hover:bg-slate-50 ${operatorStatusFilter === opt ? "text-orange-600 font-bold bg-orange-50/50" : "text-slate-600"
                         }`}>{opt}</button>
                     ))}
                   </div>
@@ -387,7 +386,7 @@ const ResourceAllocation: React.FC = () => {
               <div className="flex items-center gap-1.5">
                 {getPageNumbers(currentPageOperators, totalPagesOperators).map((page, i) => (
                   page === "..." ? <span key={i} className="px-2 text-slate-300"><MoreHorizontal size={14} /></span> :
-                  <button key={i} onClick={() => setCurrentPageOperators(page as number)} className={`min-w-10 h-10 rounded-xl text-xs font-bold transition-all ${currentPageOperators === page ? "bg-orange-500 text-white shadow-lg" : "bg-white text-slate-500 border border-slate-200"}`}>{page}</button>
+                    <button key={i} onClick={() => setCurrentPageOperators(page as number)} className={`min-w-10 h-10 rounded-xl text-xs font-bold transition-all ${currentPageOperators === page ? "bg-orange-500 text-white shadow-lg" : "bg-white text-slate-500 border border-slate-200"}`}>{page}</button>
                 ))}
               </div>
               <button onClick={() => setCurrentPageOperators(prev => Math.min(prev + 1, totalPagesOperators))} disabled={currentPageOperators === totalPagesOperators} className="p-2.5 rounded-xl border border-slate-200 bg-white text-slate-500 hover:text-orange-600 disabled:opacity-30 transition-all"><ChevronRight size={18} /></button>

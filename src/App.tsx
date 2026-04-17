@@ -49,6 +49,7 @@ import ShopFloorExecution from './components/modules/production/components/ShopF
 import ProductionReports from './components/modules/production/components/Reports/ProductionReports';
 
 import { Toaster } from "react-hot-toast";
+import MachineDetailView from "./components/modules/production/components/ResourceAllocation/MachineDetailView";
 
 /* Global Suspense Wrapper */
 const withSuspense = (Component: React.ReactNode) => (
@@ -188,114 +189,110 @@ function App() {
         {
           element: <ProductionMainLayout />,
           children: [
-      
-            { 
-              index: true, 
-              element: <Navigate to="/production/dashboard" replace /> 
+
+            {
+              index: true,
+              element: <Navigate to="/production/dashboard" replace />
             },
-            
+
             // Dashboard
-            { 
-              path: "dashboard", 
-              element: <ProductionDashboard /> 
+            {
+              path: "dashboard",
+              element: <ProductionDashboard />
             },
-            
+
             // Production Planning
-            { 
-              path: "planning", 
-              element: <ProductionPlanningScreen /> 
+            {
+              path: "planning",
+              element: <ProductionPlanningScreen />
             },
-            
+
             // Production Orders
-            { 
-              path: "orders", 
-              element: <ProductionOrderList /> 
+            {
+              path: "orders",
+              element: <ProductionOrderList />
             },
-            { 
-              path: "orders/view/:id", 
-              element: <ProductionOrderList /> 
+            {
+              path: "orders/view/:id",
+              element: <ProductionOrderList />
             },
-            { 
-              path: "orders/edit/:id", 
-              element: <ProductionOrderList /> 
+            {
+              path: "orders/edit/:id",
+              element: <ProductionOrderList />
             },
-            
+
             // Work Orders
-            { 
-              path: "work-orders", 
-              element: <WorkOrderList /> 
+            {
+              path: "work-orders",
+              element: <WorkOrderList />
             },
-            { 
-              path: "work-orders/view/:id", 
-              element: <WorkOrderList /> 
+            {
+              path: "work-orders/view/:id",
+              element: <WorkOrderList />
             },
-            { 
-              path: "work-orders/assign", 
-              element: <WorkOrderList /> 
+            {
+              path: "work-orders/assign",
+              element: <WorkOrderList />
             },
-            
+
             // Resource Allocation (Machines & Operators)
-            { 
-              path: "resources", 
-              element: <ResourceAllocation /> 
+            {
+              path: "resources",
+              element: <ResourceAllocation />
             },
-            { 
-              path: "machines", 
-              element: <ResourceAllocation /> 
+            {
+              path: "resources/machines/:id",
+              element: <MachineDetailView />
             },
-            { 
-              path: "operators", 
-              element: <ResourceAllocation /> 
-            },
-            
+
             // Production Scheduling
-            { 
-              path: "scheduling", 
-              element: <ProductionScheduler /> 
+            {
+              path: "scheduling",
+              element: <ProductionScheduler />
             },
-            { 
-              path: "calendar", 
-              element: <ProductionScheduler /> 
+            {
+              path: "calendar",
+              element: <ProductionScheduler />
             },
-            { 
-              path: "shifts", 
-              element: <ProductionScheduler /> 
+            {
+              path: "shifts",
+              element: <ProductionScheduler />
             },
-            
+
             // Shop Floor Execution
-            { 
-              path: "shop-floor", 
-              element: <ShopFloorExecution /> 
+            {
+              path: "shop-floor",
+              element: <ShopFloorExecution />
             },
-            { 
-              path: "production-tracking", 
-              element: <ShopFloorExecution /> 
+            {
+              path: "production-tracking",
+              element: <ShopFloorExecution />
             },
-            { 
-              path: "work-instructions", 
-              element: <ShopFloorExecution /> 
+            {
+              path: "work-instructions",
+              element: <ShopFloorExecution />
             },
-            
+
             // Reports & Analytics
-            { 
-              path: "reports", 
-              element: <ProductionReports /> 
+            {
+              path: "reports",
+              element: <ProductionReports />
             },
-            { 
-              path: "analytics", 
-              element: <ProductionReports /> 
+            {
+              path: "analytics",
+              element: <ProductionReports />
             },
-            
+
             // Notes
-            { 
-              path: "notes", 
-              element: <NotesPage /> 
+            {
+              path: "notes",
+              element: <NotesPage />
             },
-            
+
             // Sales Orders (Integration with sales module)
-            { 
-              path: "sales-orders", 
-              element: <ProductionPlanningScreen /> 
+            {
+              path: "sales-orders",
+              element: <ProductionPlanningScreen />
             },
           ],
         },
