@@ -51,7 +51,6 @@ interface Lead {
   value?: number;
 }
 
-// Statuses that should appear in Opportunities (Qualified, Won, In Progress, etc.)
 const OPPORTUNITY_STATUSES = [
   "Qualified",
   "Won",
@@ -124,6 +123,7 @@ const OpportunityList: React.FC = () => {
 
   // Reset page to 1 when filters change
   useEffect(() => {
+    //eslint-disable-next-line react-hooks/exhaustive-deps
     setCurrentPage(1);
   }, [searchQuery, statusFilter, activeTab, customRange]);
 
@@ -296,6 +296,7 @@ const OpportunityList: React.FC = () => {
     if (lead.products && lead.products.length > 0) {
       return lead.products.reduce(
         (total, product) =>
+          //eslint-disable-next-line @typescript-eslint/no-explicit-any
           total + (product.quantity * (product as any).unit_price || 0),
         0,
       );

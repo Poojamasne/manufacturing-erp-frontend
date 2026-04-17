@@ -49,6 +49,8 @@ export const Dashboard = () => {
     (state: RootState) => state.SalesDashboard
   );
 
+
+  //eslint-disable-next-line
   const formattedData = salesByCategory?.map((item: any) => ({
     ...item,
     units_sold: Number(item.units_sold),
