@@ -8,7 +8,6 @@ import {
   CheckCircle,
   AlertTriangle,
   Package,
-  TrendingUp,
   Calendar,
   Users,
   Play,
