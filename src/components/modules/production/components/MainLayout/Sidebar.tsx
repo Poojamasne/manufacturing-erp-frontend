@@ -3,8 +3,8 @@ import { useNavigate, useLocation, Link } from "react-router-dom";
 const Sidebar: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  
-  
+
+
   const isActive = (path: string) => location.pathname.startsWith(path);
 
   const handleLogout = () => {
@@ -32,34 +32,29 @@ const Sidebar: React.FC = () => {
         [-ms-overflow-style:none] 
         [&::-webkit-scrollbar]:hidden"
       >
-        {/* Dashboard */}
+
         <button
           onClick={() => navigate("/production/dashboard")}
-          className={`outline-none w-full flex items-center gap-3 px-4 py-3 cursor-pointer rounded-xl transition-all duration-200 ${
-            isActive("/production/dashboard")
-              ? "bg-[#F59E0B] text-white shadow-md"
-              : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
-          }`}
+          className={`outline-none w-full flex items-center gap-3 px-4 py-3 cursor-pointer rounded-xl transition-all duration-200 ${isActive("/production/dashboard")
+            ? "bg-[#F59E0B] text-white shadow-md"
+            : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
+            }`}
         >
           <img
-  src="/icons/dashboard-monitor.svg"  // Using the factory icon that works
-  className={`h-5 w-5 ${isActive("/production/dashboard") ? "brightness-0 invert" : "opacity-60"}`}
-  alt=""
-/>
-          <span className={`${isActive("/production/dashboard") ? "font-bold" : "font-semibold"} text-sm`}>
-            Dashboard
-          </span>
+            src="/icons/dashboard-monitor.svg"
+            className={`h-5 w-5 ${isActive("/production/dashboard") ? "" : "invert opacity-60"}`}
+            alt=""
+          />
+          <span className={`${isActive("/production/dashboard") ? "font-bold" : "font-semibold"} text-sm`}>Dashboard</span>
         </button>
-
 
         {/* Production Planning */}
         <button
           onClick={() => navigate("/production/planning")}
-          className={`outline-none w-full flex items-center gap-3 px-4 cursor-pointer py-3 rounded-xl transition-all duration-200 ${
-            isActive("/production/planning")
-              ? "bg-[#F59E0B] text-white shadow-md"
-              : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
-          }`}
+          className={`outline-none w-full flex items-center gap-3 px-4 cursor-pointer py-3 rounded-xl transition-all duration-200 ${isActive("/production/planning")
+            ? "bg-[#F59E0B] text-white shadow-md"
+            : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
+            }`}
         >
           <img
             src="/icons/Production-Planning.svg"
@@ -74,11 +69,10 @@ const Sidebar: React.FC = () => {
         {/* Production Orders */}
         <button
           onClick={() => navigate("/production/orders")}
-          className={`outline-none w-full flex items-center gap-3 px-4 cursor-pointer py-3 rounded-xl transition-all duration-200 ${
-            isActive("/production/orders")
-              ? "bg-[#F59E0B] text-white shadow-md"
-              : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
-          }`}
+          className={`outline-none w-full flex items-center gap-3 px-4 cursor-pointer py-3 rounded-xl transition-all duration-200 ${isActive("/production/orders")
+            ? "bg-[#F59E0B] text-white shadow-md"
+            : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
+            }`}
         >
           <img
             src="/icons/Production-orders.svg"
@@ -93,11 +87,10 @@ const Sidebar: React.FC = () => {
         {/* Work Orders */}
         <button
           onClick={() => navigate("/production/work-orders")}
-          className={`outline-none w-full flex items-center gap-3 px-4 hover:cursor-pointer py-3 rounded-xl transition-all duration-200 ${
-            isActive("/production/work-orders")
-              ? "bg-[#F59E0B] text-white shadow-md"
-              : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
-          }`}
+          className={`outline-none w-full flex items-center gap-3 px-4 hover:cursor-pointer py-3 rounded-xl transition-all duration-200 ${isActive("/production/work-orders")
+            ? "bg-[#F59E0B] text-white shadow-md"
+            : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
+            }`}
         >
           <img
             src="/icons/work-orders.svg"
@@ -109,33 +102,13 @@ const Sidebar: React.FC = () => {
           </span>
         </button>
 
-        {/* Resources */}
-        <button
-          onClick={() => navigate("/production/resources")}
-          className={`outline-none w-full flex items-center gap-3 px-4 hover:cursor-pointer py-3 rounded-xl transition-all duration-200 ${
-            isActive("/production/resources")
-              ? "bg-[#F59E0B] text-white shadow-md"
-              : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
-          }`}
-        >
-          <img
-            src="/icons/Resources.svg"
-            className={`h-5 w-5 ${isActive("/production/resources") ? "brightness-0 invert" : "opacity-60"}`}
-            alt=""
-          />
-          <span className={`${isActive("/production/resources") ? "font-bold" : "font-semibold"} text-sm`}>
-            Resources
-          </span>
-        </button>
-
         {/* Scheduling */}
         <button
           onClick={() => navigate("/production/scheduling")}
-          className={`outline-none w-full flex items-center gap-3 px-4 hover:cursor-pointer py-3 rounded-xl transition-all duration-200 ${
-            isActive("/production/scheduling")
-              ? "bg-[#F59E0B] text-white shadow-md"
-              : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
-          }`}
+          className={`outline-none w-full flex items-center gap-3 px-4 hover:cursor-pointer py-3 rounded-xl transition-all duration-200 ${isActive("/production/scheduling")
+            ? "bg-[#F59E0B] text-white shadow-md"
+            : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
+            }`}
         >
           <img
             src="/icons/Scheduling.svg"
@@ -147,14 +120,31 @@ const Sidebar: React.FC = () => {
           </span>
         </button>
 
+
+        {/* Resources */}
+        <button
+          onClick={() => navigate("/production/resources")}
+          className={`outline-none w-full flex items-center gap-3 px-4 hover:cursor-pointer py-3 rounded-xl transition-all duration-200 ${isActive("/production/resources")
+            ? "bg-[#F59E0B] text-white shadow-md"
+            : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
+            }`}
+        >
+          <img
+            src="/icons/Resources.svg"
+            className={`h-5 w-5 ${isActive("/production/resources") ? "brightness-0 invert" : "opacity-60"}`}
+            alt=""
+          />
+          <span className={`${isActive("/production/resources") ? "font-bold" : "font-semibold"} text-sm`}>
+            Resources
+          </span>
+        </button>
         {/* Shop Floor */}
         <button
           onClick={() => navigate("/production/shop-floor")}
-          className={`outline-none w-full flex items-center gap-3 px-4 hover:cursor-pointer py-3 rounded-xl transition-all duration-200 ${
-            isActive("/production/shop-floor")
-              ? "bg-[#F59E0B] text-white shadow-md"
-              : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
-          }`}
+          className={`outline-none w-full flex items-center gap-3 px-4 hover:cursor-pointer py-3 rounded-xl transition-all duration-200 ${isActive("/production/shop-floor")
+            ? "bg-[#F59E0B] text-white shadow-md"
+            : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
+            }`}
         >
           <img
             src="/icons/Shop-floor.svg"
@@ -169,11 +159,10 @@ const Sidebar: React.FC = () => {
         {/* Reports */}
         <button
           onClick={() => navigate("/production/reports")}
-          className={`outline-none w-full flex items-center gap-3 px-4 hover:cursor-pointer py-3 rounded-xl transition-all duration-200 ${
-            isActive("/production/reports")
-              ? "bg-[#F59E0B] text-white shadow-md"
-              : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
-          }`}
+          className={`outline-none w-full flex items-center gap-3 px-4 hover:cursor-pointer py-3 rounded-xl transition-all duration-200 ${isActive("/production/reports")
+            ? "bg-[#F59E0B] text-white shadow-md"
+            : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
+            }`}
         >
           <img
             src="/icons/data-report.svg"

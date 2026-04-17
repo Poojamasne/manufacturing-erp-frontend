@@ -44,12 +44,13 @@ import ProductionPlanningScreen from './components/modules/production/components
 import ProductionOrderList from './components/modules/production/components/ProductionOrder/ProductionOrderList';
 import WorkOrderList from './components/modules/production/components/ProductionOrder/WorkOrderList';
 import ResourceAllocation from './components/modules/production/components/ResourceAllocation/ResourceAllocation';
-import ProductionScheduler from './components/modules/production/components/Scheduling/ProductionScheduler';
+import ProductionScheduler from './components/modules/production/components/Scheduling/ProductionScheduling';
 import ShopFloorExecution from './components/modules/production/components/ShopFloor/ShopFloorExecution';
 import ProductionReports from './components/modules/production/components/Reports/ProductionReports';
 
 import { Toaster } from "react-hot-toast";
 import MachineDetailView from "./components/modules/production/components/ResourceAllocation/MachineDetailView";
+import ProductionScheduling from "./components/modules/production/components/Scheduling/ProductionScheduling";
 
 /* Global Suspense Wrapper */
 const withSuspense = (Component: React.ReactNode) => (
@@ -243,6 +244,10 @@ function App() {
             {
               path: "resources/machines/:id",
               element: <MachineDetailView />
+            },
+            {
+              path: "scheduling",
+              element: <ProductionScheduling />
             },
 
             // Production Scheduling
