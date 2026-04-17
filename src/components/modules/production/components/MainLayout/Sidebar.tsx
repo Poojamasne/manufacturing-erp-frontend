@@ -4,6 +4,7 @@ import { useAppDispatch } from "../../../../common/ReduxMainHooks";
 const Sidebar: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  //eslint-disable-next-line @typescript-eslint/no-unused-vars
   const dispatch = useAppDispatch();
   
   const isActive = (path: string) => location.pathname.startsWith(path);
