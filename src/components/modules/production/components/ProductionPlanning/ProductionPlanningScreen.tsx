@@ -178,6 +178,7 @@ const formatDate = (date: string) => {
 const ProductionPlanningScreen: React.FC = () => {
   const navigate = useNavigate();
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const priorityRef = useRef<HTMLDivElement>(null);
   const calendarRef = useRef<HTMLDivElement>(null);
 
   // State
@@ -215,6 +216,9 @@ const ProductionPlanningScreen: React.FC = () => {
       }
       if (calendarRef.current && !calendarRef.current.contains(event.target as Node)) {
         setIsCalendarOpen(false);
+      }      
+      if (priorityRef.current && !priorityRef.current.contains(event.target as Node)) {
+        setIsPriorityOpen(false);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
@@ -460,7 +464,7 @@ const ProductionPlanningScreen: React.FC = () => {
                   <ChevronDown size={14} className={isPriorityOpen ? "rotate-180" : ""} />
                 </button>
                 {isPriorityOpen && (
-                  <div className="absolute right-0 mt-2 w-full bg-white border border-slate-100 rounded-2xl shadow-2xl z-50 py-2">
+                  <div ref={priorityRef} className="absolute right-0 mt-2 w-full bg-white border border-slate-100 rounded-2xl shadow-2xl z-50 py-2">
                     {priorityOptions.map((opt) => (
                       <button
                         key={opt}

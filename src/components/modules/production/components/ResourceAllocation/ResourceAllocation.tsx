@@ -14,7 +14,7 @@ import {
 import { useNavigate } from "react-router-dom";
 
 // ==================== Types ====================
-type TimeFilter = "All Time" |"Weekly" | "Monthly" | "Quarterly" | "Yearly" |  "Custom";
+type TimeFilter = "All Time" | "Weekly" | "Monthly" | "Quarterly" | "Yearly" | "Custom";
 type MachineStatus = "Available" | "In Use" | "Maintenance" | "Shutdown";
 type OperatorStatus = "Assigned" | "Available" | "At Capacity";
 type Shift = "Morning" | "Afternoon" | "Evening";
@@ -83,6 +83,8 @@ const formatDate = (date: string) => {
 const ResourceAllocation: React.FC = () => {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const calendarRef = useRef<HTMLDivElement>(null);
+  const MachineStatusRef = useRef<HTMLDivElement>(null);
+  const OperatorStatusRef = useRef<HTMLDivElement>(null);
 
   // Data States
   const [machines, setMachines] = useState<Machine[]>(initialMachines);
@@ -113,6 +115,8 @@ const ResourceAllocation: React.FC = () => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) setIsTimeDropdownOpen(false);
       if (calendarRef.current && !calendarRef.current.contains(event.target as Node)) setIsCalendarOpen(false);
+      if (MachineStatusRef.current && !MachineStatusRef.current.contains(event.target as Node)) setIsMachineFilterOpen(false);
+      if (OperatorStatusRef.current && !OperatorStatusRef.current.contains(event.target as Node)) setIsOperatorFilterOpen(false);
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
@@ -198,7 +202,7 @@ const ResourceAllocation: React.FC = () => {
 
             {isTimeDropdownOpen && (
               <div className="absolute right-0 mt-2 bg-white border border-slate-100 rounded-2xl shadow-2xl z-50 py-2 min-w-40">
-                {[ "All Time","Weekly", "Monthly", "Quarterly", "Yearly", "Custom"].map((tab) => (
+                {["All Time", "Weekly", "Monthly", "Quarterly", "Yearly", "Custom"].map((tab) => (
                   <button
                     key={tab}
                     onClick={() => handleTimeFilterChange(tab as TimeFilter)}
@@ -243,7 +247,7 @@ const ResourceAllocation: React.FC = () => {
                   {machineStatusFilter === "All" ? "Status" : machineStatusFilter} <ChevronDown size={14} />
                 </button>
                 {isMachineFilterOpen && (
-                  <div className="absolute right-0 mt-2 w-full bg-white border border-slate-100 rounded-2xl shadow-2xl z-50 py-2">
+                  <div ref={MachineStatusRef} className="absolute right-0 mt-2 w-full bg-white border border-slate-100 rounded-2xl shadow-2xl z-50 py-2">
                     {["All", "Available", "In Use", "Maintenance", "Shutdown"].map(opt => (
                       <button key={opt} onClick={() => { setMachineStatusFilter(opt); setIsMachineFilterOpen(false); }} className={`outline-none w-full text-left px-2 py-2 text-[13px] hover:bg-slate-50 ${machineStatusFilter === opt ? "text-orange-600 font-bold bg-orange-50/50" : "text-slate-600"
                         }`}>{opt}</button>
@@ -327,7 +331,7 @@ const ResourceAllocation: React.FC = () => {
                   {operatorStatusFilter === "All" ? "Status" : operatorStatusFilter} <ChevronDown size={14} />
                 </button>
                 {isOperatorFilterOpen && (
-                  <div className="absolute right-0 mt-2 w-full bg-white border border-slate-100 rounded-2xl shadow-2xl z-50 py-2">
+                  <div ref={OperatorStatusRef} className="absolute right-0 mt-2 w-full bg-white border border-slate-100 rounded-2xl shadow-2xl z-50 py-2">
                     {["All", "Assigned", "Available", "At Capacity"].map(opt => (
                       <button key={opt} onClick={() => { setOperatorStatusFilter(opt); setIsOperatorFilterOpen(false); }} className={`outline-none w-full text-left px-4 py-2 text-[13px] hover:bg-slate-50 ${operatorStatusFilter === opt ? "text-orange-600 font-bold bg-orange-50/50" : "text-slate-600"
                         }`}>{opt}</button>
