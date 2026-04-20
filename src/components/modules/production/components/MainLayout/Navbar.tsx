@@ -6,6 +6,7 @@ const Navbar = ({ onMenuClick }: { onMenuClick: () => void }) => {
   useEffect(() => {
     const handler = (e: MouseEvent) => {
       if (!noteRef.current?.contains(e.target as Node)) {
+        //eslint-disable-next-line react-hooks/exhaustive-deps
         setOpenNote(false);
       }
     };
@@ -77,7 +78,7 @@ const Navbar = ({ onMenuClick }: { onMenuClick: () => void }) => {
   };
 
   return (
-    <header className="h-16 sm:h-20 bg-[#FFF9EF] border-b border-[#F59E0B30] flex items-center justify-between px-4 sm:px-6 lg:px-10 sticky top-0 z-30">
+    <header className="h-16 sm:h-20 bg-white border-b border-[#F59E0B30] flex items-center justify-between px-4 sm:px-6 lg:px-10 sticky top-0 z-30">
       {/* LEFT */}
       <div className="flex items-center gap-2 sm:gap-4 flex-1">
         <button

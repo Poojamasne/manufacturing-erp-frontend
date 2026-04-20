@@ -12,7 +12,7 @@ import {
   Trash2,
 } from "lucide-react";
 
-// ==================== Types ====================
+
 type TimeFilter = "Weekly" | "Monthly" | "Quarterly" | "Yearly" | "All Time" | "Custom";
 type ProductionOrderStatus = "DRAFT" | "PLANNED" | "SCHEDULED" | "IN_PROGRESS" | "ON_HOLD" | "COMPLETED" | "CANCELLED";
 type Priority = "HIGH" | "MEDIUM" | "LOW";
