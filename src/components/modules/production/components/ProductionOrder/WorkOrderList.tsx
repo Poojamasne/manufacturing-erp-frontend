@@ -235,7 +235,7 @@ const WorkOrderList: React.FC = () => {
 } className={`px-4 py-3 rounded-xl border text-[13px] font-bold flex items-center gap-2 ${statusFilter !== "All" ? "bg-orange-50 border-orange-200 text-orange-600" : "bg-white border-slate-200 text-slate-600"}`}>
                   {statusFilter === "All" ? "Status" : statusFilter} <ChevronDown size={14} className={activeDropdown === "status" ? "rotate-180" : ""} />
                 </button>
-                {activeDropdown === "status" &&  (<div className="absolute right-0 mt-2 w-40 bg-white border rounded-2xl shadow-2xl z-50 py-2">{statusOptions.map(opt => (<button key={opt} onClick={() => { setStatusFilter(opt); setIsStatusOpen(false); }} className={`w-full text-left px-4 py-2 text-[13px] hover:bg-slate-50 ${statusFilter === opt ? "text-orange-600 font-bold bg-orange-50/50" : "text-slate-600"}`}>{opt}</button>))}</div>)}
+                {activeDropdown === "status" &&  (<div className="absolute right-0 mt-2 w-40 bg-white border rounded-2xl shadow-2xl z-50 py-2">{statusOptions.map(opt => (<button key={opt} onClick={() => { setStatusFilter(opt); setActiveDropdown(null); }} className={`w-full text-left px-4 py-2 text-[13px] hover:bg-slate-50 ${statusFilter === opt ? "text-orange-600 font-bold bg-orange-50/50" : "text-slate-600"}`}>{opt}</button>))}</div>)}
               </div>
               {/* Shift Filter */}
               <div className="relative">
@@ -244,7 +244,7 @@ const WorkOrderList: React.FC = () => {
 } className={`px-4 py-3 rounded-xl border text-[13px] font-bold flex items-center gap-2 ${shiftFilter !== "All" ? "bg-orange-50 border-orange-200 text-orange-600" : "bg-white border-slate-200 text-slate-600"}`}>
                   {shiftFilter === "All" ? "Shift" : getShiftLabel(shiftFilter as Shift)} <ChevronDown size={14} className={activeDropdown === "shift" ? "rotate-180" : ""} />
                 </button>
-                {activeDropdown === "shift" &&  (<div className="absolute right-0 mt-2 w-40 bg-white border rounded-2xl shadow-2xl z-50 py-2">{shiftOptions.map(opt => (<button key={opt} onClick={() => { setShiftFilter(opt); setIsShiftOpen(false); }} className={`w-full text-left px-4 py-2 text-[13px] hover:bg-slate-50 ${shiftFilter === opt ? "text-orange-600 font-bold bg-orange-50/50" : "text-slate-600"}`}>{opt === "All" ? "All" : getShiftLabel(opt as Shift)}</button>))}</div>)}
+                {activeDropdown === "shift" &&  (<div className="absolute right-0 mt-2 w-40 bg-white border rounded-2xl shadow-2xl z-50 py-2">{shiftOptions.map(opt => (<button key={opt} onClick={() => { setShiftFilter(opt); setActiveDropdown(null);}} className={`w-full text-left px-4 py-2 text-[13px] hover:bg-slate-50 ${shiftFilter === opt ? "text-orange-600 font-bold bg-orange-50/50" : "text-slate-600"}`}>{opt === "All" ? "All" : getShiftLabel(opt as Shift)}</button>))}</div>)}
               </div>
             </div>
           </div>
