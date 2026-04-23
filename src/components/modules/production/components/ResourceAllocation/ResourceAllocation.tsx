@@ -76,10 +76,15 @@ const StatusBadge: React.FC<{ status: string }> = ({ status }) => {
 const formatDate = (date: string) => {
   if (!date) return "-";
   const d = new Date(date);
-  return `${String(d.getMonth() + 1).padStart(2, "0")}/${String(d.getDate()).padStart(2, "0")}/${d.getFullYear()}`;
+
+  const day = String(d.getDate()).padStart(2, "0");
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const year = d.getFullYear();
+
+  return `${day}/${month}/${year}`;
 };
 
-// ==================== Main Component ====================
+
 const ResourceAllocation: React.FC = () => {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const calendarRef = useRef<HTMLDivElement>(null);
@@ -104,13 +109,12 @@ const ResourceAllocation: React.FC = () => {
   const [timeFilter, setTimeFilter] = useState<TimeFilter>("All Time");
   const [customRange, setCustomRange] = useState({ start: "", end: "" });
 
-  // UI States
   const [isTimeDropdownOpen, setIsTimeDropdownOpen] = useState(false);
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const [isMachineFilterOpen, setIsMachineFilterOpen] = useState(false);
   const [isOperatorFilterOpen, setIsOperatorFilterOpen] = useState(false);
   const navigate = useNavigate();
-  // Close dropdowns on outside click
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) setIsTimeDropdownOpen(false);
@@ -122,7 +126,8 @@ const ResourceAllocation: React.FC = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Reset pagination on filter change
+  
+  //eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { setCurrentPageMachines(1); }, [machineSearch, machineStatusFilter]);
   useEffect(() => { setCurrentPageOperators(1); }, [operatorSearch, operatorStatusFilter]);
 

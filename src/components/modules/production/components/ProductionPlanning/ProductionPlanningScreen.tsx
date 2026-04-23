@@ -250,13 +250,15 @@ const StatusBadge: React.FC<{ status: string }> = ({ status }) => {
 const formatDate = (date: string) => {
   if (!date) return "-";
   const d = new Date(date);
-  const month = String(d.getMonth() + 1).padStart(2, "0");
+
   const day = String(d.getDate()).padStart(2, "0");
+  const month = String(d.getMonth() + 1).padStart(2, "0");
   const year = d.getFullYear();
-  return `${month}/${day}/${year}`;
+
+  return `${day}/${month}/${year}`; 
 };
 
-// ==================== Main Component ====================
+
 const ProductionPlanningScreen: React.FC = () => {
   const navigate = useNavigate();
   const dropdownRef = useRef<HTMLDivElement>(null);

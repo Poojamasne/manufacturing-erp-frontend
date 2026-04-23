@@ -88,11 +88,16 @@ const downtimeBreakdown = [
   { label: "Other", value: 10, description: "Minor stops and approvals", color: "slate" },
 ];
 
-// ==================== Helper Components ====================
+
 const formatDate = (date: string) => {
   if (!date) return "-";
   const d = new Date(date);
-  return `${String(d.getMonth() + 1).padStart(2, "0")}/${String(d.getDate()).padStart(2, "0")}/${d.getFullYear()}`;
+
+  const day = String(d.getDate()).padStart(2, "0");
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const year = d.getFullYear();
+
+  return `${day}/${month}/${year}`;
 };
 
 const getStatusBadge = (status: ProductionOrderStatus) => {

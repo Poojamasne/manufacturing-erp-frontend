@@ -17,7 +17,6 @@ import {
   Check,
 } from "lucide-react";
 
-// ==================== Types ====================
 type TimeFilter =
   | "Weekly"
   | "Monthly"
@@ -49,7 +48,7 @@ interface MaterialAlert {
   shortage: number;
   unit: string;
   status: "CRITICAL" | "LOW" | "OK";
-  poCreated?: boolean; // Track if purchase order was created
+  poCreated?: boolean;
 }
 
 interface RecentActivity {
@@ -72,7 +71,6 @@ interface ProductionTrend {
   actual: number;
 }
 
-// ==================== Mock Data ====================
 const mockStats: ProductionStats = {
   pendingOrders: 12,
   inProgress: 8,
@@ -193,7 +191,7 @@ const mockProductionTrend: ProductionTrend[] = [
 const formatDate = (date: string) => {
   if (!date) return "-";
   const d = new Date(date);
-  return `${String(d.getMonth() + 1).padStart(2, "0")}/${String(d.getDate()).padStart(2, "0")}/${d.getFullYear()}`;
+  return `${String(d.getDate()).padStart(2, "0")}/${String(d.getMonth() + 1).padStart(2, "0")}/${d.getFullYear()}`;
 };
 
 const getActivityIcon = (type: string) => {
@@ -213,7 +211,6 @@ const getActivityIcon = (type: string) => {
   }
 };
 
-// ==================== Main Component ====================
 const ProductionDashboard: React.FC = () => {
   const navigate = useNavigate();
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -221,7 +218,8 @@ const ProductionDashboard: React.FC = () => {
 
   // State
   const [stats] = useState<ProductionStats>(mockStats);
-  const [materialAlerts, setMaterialAlerts] = useState<MaterialAlert[]>(mockMaterialAlerts);
+  const [materialAlerts, setMaterialAlerts] =
+    useState<MaterialAlert[]>(mockMaterialAlerts);
   const [recentActivities] = useState<RecentActivity[]>(mockRecentActivities);
   const [productionTrend] = useState<ProductionTrend[]>(mockProductionTrend);
   const [isAlertDismissed, setIsAlertDismissed] = useState(false);
@@ -301,7 +299,6 @@ const ProductionDashboard: React.FC = () => {
     }
   };
 
-  // ✅ Proper descending sort (latest first)
   const sortedActivities = [...recentActivities].sort(
     (a, b) =>
       parseDate(b.timestamp).getTime() - parseDate(a.timestamp).getTime(),
@@ -329,18 +326,18 @@ const ProductionDashboard: React.FC = () => {
 
   // Handle Create Purchase Order action
   const handleCreatePO = (alertId: number) => {
-    setMaterialAlerts(prevAlerts =>
-      prevAlerts.map(alert =>
+    setMaterialAlerts((prevAlerts) =>
+      prevAlerts.map((alert) =>
         alert.id === alertId
           ? { ...alert, poCreated: true, status: "OK" as const }
-          : alert
-      )
+          : alert,
+      ),
     );
-    
+
     setSuccessMessage("Purchase Order created successfully!");
-    
+
     const remainingCritical = materialAlerts.filter(
-      a => a.status === "CRITICAL" && a.id !== alertId
+      (a) => a.status === "CRITICAL" && a.id !== alertId,
     ).length;
     stats.materialShortages = remainingCritical;
   };
@@ -351,7 +348,7 @@ const ProductionDashboard: React.FC = () => {
   };
 
   const criticalMaterials = materialAlerts.filter(
-    (m) => m.status === "CRITICAL" && !m.poCreated
+    (m) => m.status === "CRITICAL" && !m.poCreated,
   );
 
   const maxValue = Math.max(
@@ -507,7 +504,11 @@ const ProductionDashboard: React.FC = () => {
               <AlertTriangle size={20} className="text-red-500" />
             </div>
             <h3 className="text-2xl font-extrabold text-gray-800">
-              {materialAlerts.filter(a => a.status === "CRITICAL" && !a.poCreated).length}
+              {
+                materialAlerts.filter(
+                  (a) => a.status === "CRITICAL" && !a.poCreated,
+                ).length
+              }
             </h3>
             <p className="text-xs text-gray-500 mt-1">
               Need immediate attention
@@ -526,7 +527,7 @@ const ProductionDashboard: React.FC = () => {
             >
               <X size={20} />
             </button>
-            
+
             <div className="flex items-start gap-3">
               <AlertTriangle className="text-red-500 mt-0.5" size={22} />
               <div className="flex-1">
@@ -763,7 +764,9 @@ Actual: ${day.actual}`}
                     <p className="text-xs text-gray-400 mt-1">
                       {isNaN(parseDate(activity.timestamp).getTime())
                         ? activity.timestamp
-                        : parseDate(activity.timestamp).toLocaleString()}
+                        : formatDate(
+                            parseDate(activity.timestamp).toISOString(),
+                          )}
                     </p>
                   </div>
                   <button
