@@ -180,6 +180,13 @@ const ResourceAllocation: React.FC = () => {
     }
   };
 
+  const handleViewDetails = (item: any) => {
+  console.log("View Details:", item);
+
+  // Example: open modal / alert / navigation
+  alert(`Viewing details for ${item.name}`);
+};
+
   const handleCustomApply = () => {
     if (!customRange.start || !customRange.end) {
       alert("Please select date range");

@@ -11,6 +11,8 @@ import {
   Clock,
   Factory,
   MoreHorizontal,
+  Eye,
+  Trash2,
 } from "lucide-react";
 
 type TimeFilter =
@@ -114,11 +116,12 @@ const ProductionScheduling: React.FC = () => {
   const priorityRef = useRef<HTMLDivElement>(null);
 
   // Data States
-  const [orders] = useState<ProductionOrder[]>(mockOrders);
+  const [orders, setOrders] = useState<ProductionOrder[]>(mockOrders);
   const [selectedOrder, setSelectedOrder] = useState<ProductionOrder | null>(
     null,
   );
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
 
   // Filter States
   const [searchQuery, setSearchQuery] = useState("");
@@ -133,7 +136,8 @@ const ProductionScheduling: React.FC = () => {
   // UI States
   const [isTimeDropdownOpen, setIsTimeDropdownOpen] = useState(false);
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
-  const [isPriorityOpen, setIsPriorityOpen] = useState(false);
+  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
   const [formData, setFormData] = useState({
     startDate: "",
@@ -163,7 +167,7 @@ const ProductionScheduling: React.FC = () => {
         priorityRef.current &&
         !priorityRef.current.contains(event.target as Node)
       ) {
-        setIsPriorityOpen(false);
+        setActiveDropdown(null);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
@@ -291,6 +295,34 @@ const ProductionScheduling: React.FC = () => {
     setIsModalOpen(true);
   };
 
+  const handleViewDetails = (order: ProductionOrder) => {
+    setSelectedOrder(order);
+    setShowDetailsModal(true);
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedIds.length === paginatedOrders.length && paginatedOrders.length > 0) {
+      setSelectedIds([]);
+    } else {
+      setSelectedIds(paginatedOrders.map((o) => o.id));
+    }
+  };
+
+  const handleDelete = (id: string) => {
+    if (window.confirm("Delete this production order?")) {
+      setOrders(orders.filter((o) => o.id !== id));
+      setSelectedIds(selectedIds.filter((selectedId) => selectedId !== id));
+    }
+  };
+
+  const handleBulkDelete = () => {
+    if (selectedIds.length === 0) return;
+    if (window.confirm(`Delete ${selectedIds.length} order(s)?`)) {
+      setOrders(orders.filter((o) => !selectedIds.includes(o.id)));
+      setSelectedIds([]);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[#f4f7f6] p-4 sm:p-6 lg:p-8 text-slate-900 font-sans">
       <div className="max-w-7xl mx-auto">
@@ -309,7 +341,7 @@ const ProductionScheduling: React.FC = () => {
           <div className="relative" ref={dropdownRef}>
             <button
               onClick={() => setIsTimeDropdownOpen(!isTimeDropdownOpen)}
-              className="px-4 py-3 rounded-xl border border-slate-200 bg-white text-[13px] font-bold shadow-sm flex items-center gap-2 text-slate-700"
+              className="px-4 py-2 rounded-xl border border-slate-200 bg-white text-sm font-medium shadow-sm flex items-center gap-2 text-gray-700"
             >
               <Filter size={16} className="text-orange-500" />
               <span>{getFilterDisplayText()}</span>
@@ -388,6 +420,7 @@ const ProductionScheduling: React.FC = () => {
         <div className="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
           {/* Toolbar */}
           <div className="p-6 flex flex-col lg:flex-row justify-between items-center gap-4 border-b border-slate-50">
+            {/* Search Bar - Left Side */}
             <div className="relative w-full lg:w-96">
               <Search
                 className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300"
@@ -402,32 +435,33 @@ const ProductionScheduling: React.FC = () => {
               />
             </div>
 
+            {/* Filters and Actions - Right Side */}
             <div className="flex flex-wrap gap-3">
               {/* Priority Filter */}
               <div className="relative" ref={priorityRef}>
                 <button
-                  onClick={() => setIsPriorityOpen(!isPriorityOpen)}
-                  className={`px-4 py-3 rounded-xl border border-slate-200 text-[13px] font-bold flex items-center gap-2 ${
+                  onClick={() => setActiveDropdown(activeDropdown === "priority" ? null : "priority")}
+                  className={`px-4 py-3 rounded-xl border text-[13px] font-bold flex items-center gap-2 ${
                     priorityFilter !== "All"
-                      ? "bg-orange-50 text-orange-600"
-                      : "bg-white text-slate-700"
+                      ? "bg-orange-50 border-orange-200 text-orange-600"
+                      : "bg-white border-slate-200 text-slate-600"
                   }`}
                 >
                   {priorityFilter === "All" ? "Priority" : priorityFilter}
                   <ChevronDown
                     size={14}
-                    className={isPriorityOpen ? "rotate-180" : ""}
+                    className={activeDropdown === "priority" ? "rotate-180" : ""}
                   />
                 </button>
 
-                {isPriorityOpen && (
+                {activeDropdown === "priority" && (
                   <div className="absolute right-0 mt-2 w-32 bg-white border rounded-2xl shadow-2xl z-50 py-2">
                     {priorityOptions.map((opt) => (
                       <button
                         key={opt}
                         onClick={() => {
                           setPriorityFilter(opt);
-                          setIsPriorityOpen(false);
+                          setActiveDropdown(null);
                         }}
                         className={`w-full text-left px-4 py-2 text-[13px] hover:bg-slate-50 ${
                           priorityFilter === opt
@@ -441,6 +475,15 @@ const ProductionScheduling: React.FC = () => {
                   </div>
                 )}
               </div>
+
+              {/* Bulk Delete Button */}
+              <button
+                disabled={selectedIds.length === 0}
+                onClick={handleBulkDelete}
+                className={`p-3 rounded-xl ${selectedIds.length === 0 ? "bg-gray-100 text-gray-400 cursor-not-allowed" : "bg-rose-600 text-white hover:bg-rose-700"}`}
+              >
+                <Trash2 size={20} />
+              </button>
             </div>
           </div>
 
@@ -450,25 +493,30 @@ const ProductionScheduling: React.FC = () => {
               <thead>
                 <tr className="bg-slate-50/50">
                   <th className="w-12 p-5 text-center border-b border-slate-100">
-                    <input type="checkbox" className="accent-orange-500" />
+                    <input
+                      type="checkbox"
+                      className="accent-orange-500 w-4 h-4 cursor-pointer"
+                      checked={paginatedOrders.length > 0 && selectedIds.length === paginatedOrders.length}
+                      onChange={toggleSelectAll}
+                    />
                   </th>
-                  <th className="px-4 py-4 text-[13px] text-slate-800 uppercase tracking-widest border-b border-slate-100 text-center">
+                  <th className="px-4 py-4 text-[11px] text-slate-800 uppercase tracking-widest border-b border-slate-100 text-center">
                     ORDER ID
                   </th>
-                  <th className="px-4 py-4 text-[13px] text-slate-800 uppercase tracking-widest border-b border-slate-100 text-center">
+                  <th className="px-4 py-4 text-[11px] text-slate-800 uppercase tracking-widest border-b border-slate-100 text-center">
                     PRODUCT
                   </th>
-                  <th className="px-4 py-4 text-[13px] text-slate-800 uppercase tracking-widest border-b border-slate-100 text-center">
+                  <th className="px-4 py-4 text-[11px] text-slate-800 uppercase tracking-widest border-b border-slate-100 text-center">
                     QUANTITY
                   </th>
-                  <th className="px-4 py-4 text-[13px] text-slate-800 uppercase tracking-widest border-b border-slate-100 text-center">
+                  <th className="px-4 py-4 text-[11px] text-slate-800 uppercase tracking-widest border-b border-slate-100 text-center">
                     DEADLINE
                   </th>
-                  <th className="px-4 py-4 text-[13px] text-slate-800 uppercase tracking-widest border-b border-slate-100 text-center">
+                  <th className="px-4 py-4 text-[11px] text-slate-800 uppercase tracking-widest border-b border-slate-100 text-center">
                     PRIORITY
                   </th>
-                  <th className="px-4 py-4 text-[13px] text-slate-800 uppercase tracking-widest border-b border-slate-100 text-center">
-                    ACTION
+                  <th className="px-4 py-4 text-[11px] text-slate-800 uppercase tracking-widest border-b border-slate-100 text-center">
+                    ACTIONS
                   </th>
                 </tr>
               </thead>
@@ -479,7 +527,16 @@ const ProductionScheduling: React.FC = () => {
                     className="group hover:bg-orange-50/20 transition-colors"
                   >
                     <td className="p-5 text-center">
-                      <input type="checkbox" className="accent-orange-500" />
+                      <input
+                        type="checkbox"
+                        className="accent-orange-500 w-4 h-4 cursor-pointer"
+                        checked={selectedIds.includes(order.id)}
+                        onChange={() => {
+                          if (selectedIds.includes(order.id))
+                            setSelectedIds(selectedIds.filter((id) => id !== order.id));
+                          else setSelectedIds([...selectedIds, order.id]);
+                        }}
+                      />
                     </td>
                     <td className="px-4 py-4 text-[13px] font-mono font-bold text-slate-800 text-center">
                       {order.id}
@@ -496,13 +553,27 @@ const ProductionScheduling: React.FC = () => {
                     <td className="px-4 py-4 text-center">
                       <PriorityBadge priority={order.priority} />
                     </td>
-                    <td className="px-4 py-4 text-center">
-                      <button
-                        onClick={() => handleOpenModal(order)}
-                        className="px-4 py-2 bg-orange-500 text-white rounded-xl text-xs font-bold hover:bg-orange-600 transition flex items-center gap-2 mx-auto"
-                      >
-                        <Play size={14} fill="currentColor" /> Start
-                      </button>
+                    <td className="px-4 py-4">
+                      <div className="flex justify-center gap-2">
+                        <button
+                          onClick={() => handleViewDetails(order)}
+                          className="p-1.5 text-slate-400 hover:text-orange-500 transition-colors"
+                        >
+                          <Eye size={16} />
+                        </button>
+                        <button
+                          onClick={() => handleOpenModal(order)}
+                          className="p-1.5 text-slate-400 hover:text-green-500 transition-colors"
+                        >
+                          <Play size={16} />
+                        </button>
+                        <button
+                          onClick={() => handleDelete(order.id)}
+                          className="p-1.5 text-slate-400 hover:text-rose-600 transition-colors"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -555,7 +626,7 @@ const ProductionScheduling: React.FC = () => {
                         onClick={() => goToPage(page as number)}
                         className={`min-w-10 h-10 rounded-xl text-xs font-bold transition-all ${
                           currentPage === page
-                            ? "bg-orange-500 text-white shadow-lg shadow-orange-900/20"
+                            ? "bg-orange-500 text-white shadow-lg"
                             : "bg-white text-slate-500 border border-slate-200"
                         }`}
                       >
@@ -681,6 +752,67 @@ const ProductionScheduling: React.FC = () => {
                   Confirm Run <ArrowRight size={16} />
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Order Details Modal */}
+      {showDetailsModal && selectedOrder && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
+          <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="sticky top-0 bg-white border-b p-6 flex justify-between">
+              <div>
+                <h2 className="text-xl font-bold">{selectedOrder.id}</h2>
+                <p className="text-sm text-gray-500">{selectedOrder.productName}</p>
+              </div>
+              <button
+                onClick={() => setShowDetailsModal(false)}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                ✕
+              </button>
+            </div>
+            <div className="p-6 space-y-6">
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                <div className="p-3 bg-gray-50 rounded-xl">
+                  <label className="text-xs text-gray-500 uppercase">Product</label>
+                  <p className="font-semibold">{selectedOrder.productName}</p>
+                </div>
+                <div className="p-3 bg-gray-50 rounded-xl">
+                  <label className="text-xs text-gray-500 uppercase">Quantity</label>
+                  <p className="font-semibold">{selectedOrder.quantity.toLocaleString()}</p>
+                </div>
+                <div className="p-3 bg-gray-50 rounded-xl">
+                  <label className="text-xs text-gray-500 uppercase">Deadline</label>
+                  <p className="font-semibold">{formatDate(selectedOrder.deadline)}</p>
+                </div>
+                <div className="p-3 bg-gray-50 rounded-xl">
+                  <label className="text-xs text-gray-500 uppercase">Priority</label>
+                  <PriorityBadge priority={selectedOrder.priority} />
+                </div>
+                <div className="p-3 bg-gray-50 rounded-xl">
+                  <label className="text-xs text-gray-500 uppercase">Created At</label>
+                  <p className="font-semibold">{formatDate(selectedOrder.created_at || "")}</p>
+                </div>
+              </div>
+            </div>
+            <div className="sticky bottom-0 bg-white border-t p-6 flex justify-end gap-3">
+              <button
+                onClick={() => setShowDetailsModal(false)}
+                className="px-6 py-2 bg-gray-100 rounded-xl hover:bg-gray-200"
+              >
+                Close
+              </button>
+              <button
+                onClick={() => {
+                  setShowDetailsModal(false);
+                  handleOpenModal(selectedOrder);
+                }}
+                className="px-6 py-2 bg-orange-500 text-white rounded-xl hover:bg-orange-600"
+              >
+                Start Production
+              </button>
             </div>
           </div>
         </div>
