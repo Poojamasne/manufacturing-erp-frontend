@@ -132,7 +132,7 @@ const ResourceAllocation: React.FC = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  
+  //eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { setCurrentPage(1); }, [searchQuery, statusFilter, resourceType]);
 
   // Get current data based on resource type
@@ -180,6 +180,7 @@ const ResourceAllocation: React.FC = () => {
     }
   };
 
+  //eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleViewDetails = (item: any) => {
   console.log("View Details:", item);
 
@@ -216,6 +217,7 @@ const ResourceAllocation: React.FC = () => {
     if (selectedIds.length === paginatedData.length && paginatedData.length > 0) {
       setSelectedIds([]);
     } else {
+      //eslint-disable-next-line @typescript-eslint/no-explicit-any
       setSelectedIds(paginatedData.map((item: any) => item.id));
     }
   };

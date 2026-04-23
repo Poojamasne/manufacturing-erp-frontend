@@ -15,6 +15,8 @@ import {
   AlertTriangle,
   ChevronRight as ChevronRightIcon,
   X,
+  Eye,
+  Trash2,
 } from "lucide-react";
 
 // ==================== Types ====================
@@ -240,7 +242,7 @@ const StatusBadge: React.FC<{ status: string }> = ({ status }) => {
   };
   return (
     <span
-      className={`px-2 py-1 rounded text-[13px] font-medium uppercase border ${styles[status] || styles.MEDIUM}`}
+      className={`px-2 py-1 rounded text-[10px] font-black uppercase border ${styles[status] || styles.MEDIUM}`}
     >
       {status}
     </span>
@@ -258,7 +260,6 @@ const formatDate = (date: string) => {
   return `${day}/${month}/${year}`; 
 };
 
-
 const ProductionPlanningScreen: React.FC = () => {
   const navigate = useNavigate();
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -266,12 +267,14 @@ const ProductionPlanningScreen: React.FC = () => {
   const calendarRef = useRef<HTMLDivElement>(null);
 
   // State
-  const [salesOrders] = useState<SalesOrder[]>(mockSalesOrders);
+  const [salesOrders, setSalesOrders] = useState<SalesOrder[]>(mockSalesOrders);
   const [selectedOrder, setSelectedOrder] = useState<SalesOrder | null>(null);
+  const [viewOrder, setViewOrder] = useState<SalesOrder | null>(null);
   const [currentStep, setCurrentStep] = useState(1);
   const [bomItems, setBomItems] = useState<BOMItem[]>([]);
   const [inventoryItems, setInventoryItems] = useState<InventoryItem[]>([]);
   const [showPurchaseRequest, setShowPurchaseRequest] = useState(false);
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
 
   // Filter States
   const [searchQuery, setSearchQuery] = useState("");
@@ -286,7 +289,7 @@ const ProductionPlanningScreen: React.FC = () => {
   // UI States
   const [isTimeDropdownOpen, setIsTimeDropdownOpen] = useState(false);
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
-  const [isPriorityOpen, setIsPriorityOpen] = useState(false);
+  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
   // Priority options
@@ -311,7 +314,7 @@ const ProductionPlanningScreen: React.FC = () => {
         priorityRef.current &&
         !priorityRef.current.contains(event.target as Node)
       ) {
-        setIsPriorityOpen(false);
+        setActiveDropdown(null);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
@@ -453,6 +456,26 @@ const ProductionPlanningScreen: React.FC = () => {
     }
   };
 
+  const handleDelete = (id: string) => {
+    if (window.confirm("Delete this sales order?")) {
+      setSalesOrders(salesOrders.filter((o) => o.id !== id));
+      setSelectedIds(selectedIds.filter((selectedId) => selectedId !== id));
+    }
+  };
+
+  const handleBulkDelete = () => {
+    if (selectedIds.length === 0) return;
+    if (window.confirm(`Delete ${selectedIds.length} order(s)?`)) {
+      setSalesOrders(salesOrders.filter((o) => !selectedIds.includes(o.id)));
+      setSelectedIds([]);
+    }
+  };
+
+  const handleViewDetails = (order: SalesOrder) => {
+    setViewOrder(order);
+    setShowDetailsModal(true);
+  };
+
   // Handle production planning
   const handlePlanProduction = (order: SalesOrder) => {
     setSelectedOrder(order);
@@ -589,13 +612,12 @@ const ProductionPlanningScreen: React.FC = () => {
         <div className="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
           {/* Toolbar */}
           <div className="p-6 flex flex-col lg:flex-row justify-between items-center gap-4 border-b border-slate-50">
-            {/* ✅ Search (EXACT SAME AS Production Orders) */}
+            {/* Search */}
             <div className="relative w-full lg:w-96">
               <Search
                 className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300"
                 size={18}
               />
-
               <input
                 type="text"
                 placeholder="Search by order ID or product..."
@@ -607,12 +629,12 @@ const ProductionPlanningScreen: React.FC = () => {
               />
             </div>
 
-            {/* ✅ Right side filters (same spacing as Orders) */}
+            {/* Right side filters and actions */}
             <div className="flex flex-wrap gap-3">
               {/* Priority Filter */}
-              <div className="relative">
+              <div className="relative" ref={priorityRef}>
                 <button
-                  onClick={() => setIsPriorityOpen(!isPriorityOpen)}
+                  onClick={() => setActiveDropdown(activeDropdown === "priority" ? null : "priority")}
                   className={`px-4 py-3 rounded-xl border text-[13px] font-bold flex items-center gap-2 ${
                     priorityFilter !== "All"
                       ? "bg-orange-50 border-orange-200 text-orange-600"
@@ -622,18 +644,18 @@ const ProductionPlanningScreen: React.FC = () => {
                   {priorityFilter === "All" ? "Priority" : priorityFilter}
                   <ChevronDown
                     size={14}
-                    className={isPriorityOpen ? "rotate-180" : ""}
+                    className={activeDropdown === "priority" ? "rotate-180" : ""}
                   />
                 </button>
 
-                {isPriorityOpen && (
+                {activeDropdown === "priority" && (
                   <div className="absolute right-0 mt-2 w-32 bg-white border rounded-2xl shadow-2xl z-50 py-2">
                     {priorityOptions.map((opt) => (
                       <button
                         key={opt}
                         onClick={() => {
                           setPriorityFilter(opt);
-                          setIsPriorityOpen(false);
+                          setActiveDropdown(null);
                         }}
                         className={`w-full text-left px-4 py-2 text-[13px] hover:bg-slate-50 ${
                           priorityFilter === opt
@@ -647,6 +669,15 @@ const ProductionPlanningScreen: React.FC = () => {
                   </div>
                 )}
               </div>
+
+              {/* Bulk Delete Button */}
+              <button
+                disabled={selectedIds.length === 0}
+                onClick={handleBulkDelete}
+                className={`p-3 rounded-xl ${selectedIds.length === 0 ? "bg-gray-100 text-gray-400 cursor-not-allowed" : "bg-rose-600 text-white hover:bg-rose-700"}`}
+              >
+                <Trash2 size={20} />
+              </button>
             </div>
           </div>
 
@@ -685,7 +716,7 @@ const ProductionPlanningScreen: React.FC = () => {
                     PRIORITY
                   </th>
                   <th className="px-4 py-4 text-[11px] text-slate-800 uppercase tracking-widest border-b border-slate-100 text-center">
-                    ACTION
+                    ACTIONS
                   </th>
                 </tr>
               </thead>
@@ -728,12 +759,27 @@ const ProductionPlanningScreen: React.FC = () => {
                       <StatusBadge status={order.priority} />
                     </td>
                     <td className="px-4 py-4">
-                      <div className="flex justify-center">
+                      <div className="flex justify-center gap-2">
+                        <button
+                          onClick={() => handleViewDetails(order)}
+                          className="p-1.5 text-slate-400 hover:text-orange-500 transition-colors"
+                          title="View Details"
+                        >
+                          <Eye size={16} />
+                        </button>
                         <button
                           onClick={() => handlePlanProduction(order)}
-                          className="px-4 py-2 bg-orange-500 text-white rounded-xl text-xs font-medium hover:bg-orange-600 transition flex items-center gap-2"
+                          className="p-1.5 text-slate-400 hover:text-green-500 transition-colors"
+                          title="Plan Production"
                         >
-                          <Factory size={14} /> Plan
+                          <Factory size={16} />
+                        </button>
+                        <button
+                          onClick={() => handleDelete(order.id)}
+                          className="p-1.5 text-slate-400 hover:text-rose-600 transition-colors"
+                          title="Delete"
+                        >
+                          <Trash2 size={16} />
                         </button>
                       </div>
                     </td>
@@ -802,6 +848,79 @@ const ProductionPlanningScreen: React.FC = () => {
           )}
         </div>
       </div>
+
+      {/* Order Details Modal */}
+      {showDetailsModal && viewOrder && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
+          <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="sticky top-0 bg-white border-b p-6 flex justify-between">
+              <div>
+                <h2 className="text-xl font-bold">{viewOrder.id}</h2>
+                <p className="text-sm text-gray-500">{viewOrder.productName}</p>
+              </div>
+              <button
+                onClick={() => setShowDetailsModal(false)}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                ✕
+              </button>
+            </div>
+            <div className="p-6 space-y-6">
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                <div className="p-3 bg-gray-50 rounded-xl">
+                  <label className="text-xs text-gray-500 uppercase">Product</label>
+                  <p className="font-semibold">{viewOrder.productName}</p>
+                </div>
+                <div className="p-3 bg-gray-50 rounded-xl">
+                  <label className="text-xs text-gray-500 uppercase">Quantity</label>
+                  <p className="font-semibold">{viewOrder.quantity.toLocaleString()}</p>
+                </div>
+                <div className="p-3 bg-gray-50 rounded-xl">
+                  <label className="text-xs text-gray-500 uppercase">Delivery Date</label>
+                  <p className="font-semibold">{formatDate(viewOrder.deliveryDate)}</p>
+                </div>
+                <div className="p-3 bg-gray-50 rounded-xl">
+                  <label className="text-xs text-gray-500 uppercase">Priority</label>
+                  <StatusBadge status={viewOrder.priority} />
+                </div>
+                <div className="p-3 bg-gray-50 rounded-xl">
+                  <label className="text-xs text-gray-500 uppercase">Customer</label>
+                  <p className="font-semibold">{viewOrder.customerName}</p>
+                </div>
+                <div className="p-3 bg-gray-50 rounded-xl">
+                  <label className="text-xs text-gray-500 uppercase">Contact</label>
+                  <p className="font-semibold">{viewOrder.customerPhone}</p>
+                </div>
+                <div className="p-3 bg-gray-50 rounded-xl">
+                  <label className="text-xs text-gray-500 uppercase">Email</label>
+                  <p className="font-semibold text-sm">{viewOrder.customerEmail}</p>
+                </div>
+                <div className="p-3 bg-gray-50 rounded-xl">
+                  <label className="text-xs text-gray-500 uppercase">Created At</label>
+                  <p className="font-semibold">{formatDate(viewOrder.created_at || "")}</p>
+                </div>
+              </div>
+            </div>
+            <div className="sticky bottom-0 bg-white border-t p-6 flex justify-end gap-3">
+              <button
+                onClick={() => setShowDetailsModal(false)}
+                className="px-6 py-2 bg-gray-100 rounded-xl hover:bg-gray-200"
+              >
+                Close
+              </button>
+              <button
+                onClick={() => {
+                  setShowDetailsModal(false);
+                  handlePlanProduction(viewOrder);
+                }}
+                className="px-6 py-2 bg-orange-500 text-white rounded-xl hover:bg-orange-600 flex items-center gap-2"
+              >
+                <Factory size={14} /> Plan Production
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Production Planning Modal */}
       {selectedOrder && (

@@ -12,6 +12,7 @@ import {
   AlertTriangle,
   User,
   Cpu,
+  Trash2,
 } from "lucide-react";
 
 
@@ -99,6 +100,7 @@ const WorkOrderList: React.FC = () => {
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [selectedOrder, setSelectedOrder] = useState<WorkOrder | null>(null);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
   const statusOptions = ["All", "PENDING", "ASSIGNED", "IN_PROGRESS", "COMPLETED", "BLOCKED"];
   const shiftOptions = ["All", "MORNING", "EVENING", "NIGHT"];
@@ -170,10 +172,38 @@ const WorkOrderList: React.FC = () => {
     return pages;
   };
 
-  const handleViewDetails = (order: WorkOrder) => { setSelectedOrder(order); setShowDetailsModal(true); };
-  const handleStartTask = (id: string) => { setWorkOrders(workOrders.map(w => w.id === id ? { ...w, status: "IN_PROGRESS", progress: 5 } : w)); alert("Task started successfully!"); };
-  const handleCompleteTask = (id: string) => { setWorkOrders(workOrders.map(w => w.id === id ? { ...w, status: "COMPLETED", progress: 100 } : w)); alert("Task completed!"); };
+  const toggleSelectAll = () => {
+    if (selectedIds.length === paginatedOrders.length && paginatedOrders.length > 0) {
+      setSelectedIds([]);
+    } else {
+      setSelectedIds(paginatedOrders.map((o) => o.id));
+    }
+  };
 
+  const handleDelete = (id: string) => {
+    if (window.confirm("Delete this work order?")) {
+      setWorkOrders(workOrders.filter((o) => o.id !== id));
+      setSelectedIds(selectedIds.filter((selectedId) => selectedId !== id));
+    }
+  };
+
+  const handleBulkDelete = () => {
+    if (selectedIds.length === 0) return;
+    if (window.confirm(`Delete ${selectedIds.length} work order(s)?`)) {
+      setWorkOrders(workOrders.filter((o) => !selectedIds.includes(o.id)));
+      setSelectedIds([]);
+    }
+  };
+
+  const handleViewDetails = (order: WorkOrder) => { setSelectedOrder(order); setShowDetailsModal(true); };
+  const handleStartTask = (id: string) => { 
+    setWorkOrders(workOrders.map(w => w.id === id ? { ...w, status: "IN_PROGRESS", progress: 5 } : w)); 
+    alert("Task started successfully!"); 
+  };
+  const handleCompleteTask = (id: string) => { 
+    setWorkOrders(workOrders.map(w => w.id === id ? { ...w, status: "COMPLETED", progress: 100 } : w)); 
+    alert("Task completed!"); 
+  };
 
   return (
     <div className="min-h-screen bg-[#f4f7f6] p-4 sm:p-6 lg:p-8 text-slate-900 font-sans">
@@ -230,22 +260,26 @@ const WorkOrderList: React.FC = () => {
             <div className="flex flex-wrap gap-3">
               {/* Status Filter */}
               <div className="relative">
-                <button onClick={() =>
-  setActiveDropdown(activeDropdown === "status" ? null : "status")
-} className={`px-4 py-3 rounded-xl border text-[13px] font-bold flex items-center gap-2 ${statusFilter !== "All" ? "bg-orange-50 border-orange-200 text-orange-600" : "bg-white border-slate-200 text-slate-600"}`}>
+                <button onClick={() => setActiveDropdown(activeDropdown === "status" ? null : "status")} className={`px-4 py-3 rounded-xl border text-[13px] font-bold flex items-center gap-2 ${statusFilter !== "All" ? "bg-orange-50 border-orange-200 text-orange-600" : "bg-white border-slate-200 text-slate-600"}`}>
                   {statusFilter === "All" ? "Status" : statusFilter} <ChevronDown size={14} className={activeDropdown === "status" ? "rotate-180" : ""} />
                 </button>
-                {activeDropdown === "status" &&  (<div className="absolute right-0 mt-2 w-40 bg-white border rounded-2xl shadow-2xl z-50 py-2">{statusOptions.map(opt => (<button key={opt} onClick={() => { setStatusFilter(opt); setActiveDropdown(null); }} className={`w-full text-left px-4 py-2 text-[13px] hover:bg-slate-50 ${statusFilter === opt ? "text-orange-600 font-bold bg-orange-50/50" : "text-slate-600"}`}>{opt}</button>))}</div>)}
+                {activeDropdown === "status" && (<div className="absolute right-0 mt-2 w-40 bg-white border rounded-2xl shadow-2xl z-50 py-2">{statusOptions.map(opt => (<button key={opt} onClick={() => { setStatusFilter(opt); setActiveDropdown(null); }} className={`w-full text-left px-4 py-2 text-[13px] hover:bg-slate-50 ${statusFilter === opt ? "text-orange-600 font-bold bg-orange-50/50" : "text-slate-600"}`}>{opt}</button>))}</div>)}
               </div>
               {/* Shift Filter */}
               <div className="relative">
-                <button onClick={() =>
-  setActiveDropdown(activeDropdown === "shift" ? null : "shift")
-} className={`px-4 py-3 rounded-xl border text-[13px] font-bold flex items-center gap-2 ${shiftFilter !== "All" ? "bg-orange-50 border-orange-200 text-orange-600" : "bg-white border-slate-200 text-slate-600"}`}>
+                <button onClick={() => setActiveDropdown(activeDropdown === "shift" ? null : "shift")} className={`px-4 py-3 rounded-xl border text-[13px] font-bold flex items-center gap-2 ${shiftFilter !== "All" ? "bg-orange-50 border-orange-200 text-orange-600" : "bg-white border-slate-200 text-slate-600"}`}>
                   {shiftFilter === "All" ? "Shift" : getShiftLabel(shiftFilter as Shift)} <ChevronDown size={14} className={activeDropdown === "shift" ? "rotate-180" : ""} />
                 </button>
-                {activeDropdown === "shift" &&  (<div className="absolute right-0 mt-2 w-40 bg-white border rounded-2xl shadow-2xl z-50 py-2">{shiftOptions.map(opt => (<button key={opt} onClick={() => { setShiftFilter(opt); setActiveDropdown(null);}} className={`w-full text-left px-4 py-2 text-[13px] hover:bg-slate-50 ${shiftFilter === opt ? "text-orange-600 font-bold bg-orange-50/50" : "text-slate-600"}`}>{opt === "All" ? "All" : getShiftLabel(opt as Shift)}</button>))}</div>)}
+                {activeDropdown === "shift" && (<div className="absolute right-0 mt-2 w-40 bg-white border rounded-2xl shadow-2xl z-50 py-2">{shiftOptions.map(opt => (<button key={opt} onClick={() => { setShiftFilter(opt); setActiveDropdown(null);}} className={`w-full text-left px-4 py-2 text-[13px] hover:bg-slate-50 ${shiftFilter === opt ? "text-orange-600 font-bold bg-orange-50/50" : "text-slate-600"}`}>{opt === "All" ? "All" : getShiftLabel(opt as Shift)}</button>))}</div>)}
               </div>
+              {/* Bulk Delete Button */}
+              <button
+                disabled={selectedIds.length === 0}
+                onClick={handleBulkDelete}
+                className={`p-3 rounded-xl ${selectedIds.length === 0 ? "bg-gray-100 text-gray-400 cursor-not-allowed" : "bg-rose-600 text-white hover:bg-rose-700"}`}
+              >
+                <Trash2 size={20} />
+              </button>
             </div>
           </div>
 
@@ -253,6 +287,14 @@ const WorkOrderList: React.FC = () => {
           <div className="w-full overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead><tr className="bg-slate-50/50">
+                <th className="w-12 p-5 text-center border-b border-slate-100">
+                  <input
+                    type="checkbox"
+                    className="accent-orange-500 w-4 h-4 cursor-pointer"
+                    checked={paginatedOrders.length > 0 && selectedIds.length === paginatedOrders.length}
+                    onChange={toggleSelectAll}
+                  />
+                </th>
                 <th className="px-4 py-4 text-[11px] text-slate-800 uppercase tracking-widest text-center">WO ID</th>
                 <th className="px-4 py-4 text-[11px] text-slate-800 uppercase tracking-widest text-center">TASK</th>
                 <th className="px-4 py-4 text-[11px] text-slate-800 uppercase tracking-widest text-center">PO ID</th>
@@ -266,6 +308,18 @@ const WorkOrderList: React.FC = () => {
               <tbody className="divide-y divide-slate-50">
                 {paginatedOrders.map(wo => (
                   <tr key={wo.id} className="group hover:bg-orange-50/20 transition-colors">
+                    <td className="p-5 text-center">
+                      <input
+                        type="checkbox"
+                        className="accent-orange-500 w-4 h-4 cursor-pointer"
+                        checked={selectedIds.includes(wo.id)}
+                        onChange={() => {
+                          if (selectedIds.includes(wo.id))
+                            setSelectedIds(selectedIds.filter((id) => id !== wo.id));
+                          else setSelectedIds([...selectedIds, wo.id]);
+                        }}
+                      />
+                    </td>
                     <td className="px-4 py-4 text-[13px] font-mono font-bold text-slate-800 text-center">{wo.workOrderId}</td>
                     <td className="px-4 py-4 text-[13px] text-slate-700 text-center">{wo.taskName}</td>
                     <td className="px-4 py-4 text-[13px] text-slate-700 text-center">{wo.productionOrderId}</td>
@@ -278,6 +332,7 @@ const WorkOrderList: React.FC = () => {
                       <button onClick={() => handleViewDetails(wo)} className="p-1.5 text-slate-400 hover:text-orange-500"><Eye size={16} /></button>
                       {wo.status === "PENDING" && <button onClick={() => handleStartTask(wo.id)} className="p-1.5 text-slate-400 hover:text-green-500"><Play size={16} /></button>}
                       {wo.status === "IN_PROGRESS" && <button onClick={() => handleCompleteTask(wo.id)} className="p-1.5 text-slate-400 hover:text-green-600"><CheckCircle size={16} /></button>}
+                      <button onClick={() => handleDelete(wo.id)} className="p-1.5 text-slate-400 hover:text-rose-600"><Trash2 size={16} /></button>
                     </div></td>
                   </tr>
                 ))}
