@@ -10,13 +10,15 @@ import {
   AlertTriangle,
   CheckCircle,
   PieChart,
-  Target,
   Factory,
   Package,
   AlertCircle,
   Play,
   Printer,
   ClipboardList,
+  Calendar,
+  X,
+  Trash2,
 } from "lucide-react";
 
 // ==================== Types ====================
@@ -51,6 +53,7 @@ interface MaterialRequirement {
   availableQty: number;
   shortage: number;
   unit: string;
+  status?: string;
 }
 
 // ==================== Mock Data ====================
@@ -64,11 +67,11 @@ const productionOrders: ProductionOrder[] = [
 ];
 
 const materialRequirements: MaterialRequirement[] = [
-  { materialName: "Steel Rod 10mm", requiredQty: 5000, availableQty: 3200, shortage: 1800, unit: "pcs" },
-  { materialName: "Aluminum Sheet", requiredQty: 250, availableQty: 250, shortage: 0, unit: "sheets" },
-  { materialName: "Plastic Granules", requiredQty: 1000, availableQty: 450, shortage: 550, unit: "kg" },
-  { materialName: "Rubber Compound", requiredQty: 3000, availableQty: 3000, shortage: 0, unit: "kg" },
-  { materialName: "Copper Wire", requiredQty: 8000, availableQty: 2000, shortage: 6000, unit: "m" },
+  { materialName: "Steel Rod 10mm", requiredQty: 5000, availableQty: 3200, shortage: 1800, unit: "pcs", status: "CRITICAL" },
+  { materialName: "Aluminum Sheet", requiredQty: 250, availableQty: 250, shortage: 0, unit: "sheets", status: "OK" },
+  { materialName: "Plastic Granules", requiredQty: 1000, availableQty: 450, shortage: 550, unit: "kg", status: "CRITICAL" },
+  { materialName: "Rubber Compound", requiredQty: 3000, availableQty: 3000, shortage: 0, unit: "kg", status: "OK" },
+  { materialName: "Copper Wire", requiredQty: 8000, availableQty: 2000, shortage: 6000, unit: "mtr", status: "CRITICAL" },
 ];
 
 const trendData = [
@@ -88,16 +91,18 @@ const downtimeBreakdown = [
   { label: "Other", value: 10, description: "Minor stops and approvals", color: "slate" },
 ];
 
-
 const formatDate = (date: string) => {
   if (!date) return "-";
   const d = new Date(date);
+  return `${String(d.getDate()).padStart(2, "0")}/${String(d.getMonth() + 1).padStart(2, "0")}/${d.getFullYear()}`;
+};
 
-  const day = String(d.getDate()).padStart(2, "0");
-  const month = String(d.getMonth() + 1).padStart(2, "0");
-  const year = d.getFullYear();
-
-  return `${day}/${month}/${year}`;
+const formatTime = (totalMinutes: number) => {
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
+  if (hours === 0) return `${minutes}m`;
+  if (minutes === 0) return `${hours}h`;
+  return `${hours}h ${minutes}m`;
 };
 
 const getStatusBadge = (status: ProductionOrderStatus) => {
@@ -114,7 +119,7 @@ const getStatusBadge = (status: ProductionOrderStatus) => {
     DRAFT: "Draft", PLANNED: "Planned", SCHEDULED: "Scheduled",
     IN_PROGRESS: "In Progress", ON_HOLD: "On Hold", COMPLETED: "Completed", CANCELLED: "Cancelled"
   };
-  return <span className={`px-2 py-1 rounded text-[10px] font-black uppercase border ${styles[status]}`}>{labels[status]}</span>;
+  return <span className={`px-2 py-1 rounded text-[10px] font-black uppercase border whitespace-nowrap ${styles[status]}`}>{labels[status]}</span>;
 };
 
 const getPriorityBadge = (priority: Priority) => {
@@ -123,14 +128,13 @@ const getPriorityBadge = (priority: Priority) => {
     MEDIUM: "text-amber-600 bg-amber-50 border-amber-100",
     LOW: "text-teal-600 bg-teal-50 border-teal-100"
   };
-  return <span className={`px-2 py-1 rounded text-[10px] font-black uppercase border ${styles[priority]}`}>{priority}</span>;
+  return <span className={`px-2 py-1 rounded text-[10px] font-black uppercase border whitespace-nowrap ${styles[priority]}`}>{priority}</span>;
 };
 
 const getShiftLabel = (shift: Shift) => {
   const labels: Record<Shift, string> = { MORNING: "Morning", EVENING: "Evening", NIGHT: "Night" };
   return labels[shift];
 };
-
 
 const ProductionReports: React.FC = () => {
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -146,6 +150,7 @@ const ProductionReports: React.FC = () => {
   const [shiftFilter, setShiftFilter] = useState<string>("All");
   const [timeFilter, setTimeFilter] = useState<TimeFilter>("All Time");
   const [customRange, setCustomRange] = useState({ start: "", end: "" });
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
@@ -154,14 +159,14 @@ const ProductionReports: React.FC = () => {
   // UI States
   const [isTimeDropdownOpen, setIsTimeDropdownOpen] = useState(false);
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
-  const [isStatusOpen, setIsStatusOpen] = useState(false);
-  const [isPriorityOpen, setIsPriorityOpen] = useState(false);
-  const [isShiftOpen, setIsShiftOpen] = useState(false);
+  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [selectedOrder, setSelectedOrder] = useState<ProductionOrder | null>(null);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [hoveredShift, setHoveredShift] = useState<number | null>(null);
   const [activeView, setActiveView] = useState<"orders" | "materials">("orders");
+  const [isAlertDismissed, setIsAlertDismissed] = useState(false);
+  const [materialAlerts, setMaterialAlerts] = useState<MaterialRequirement[]>(materialRequirements);
 
   // Options
   const statusOptions = ["All", "DRAFT", "PLANNED", "SCHEDULED", "IN_PROGRESS", "ON_HOLD", "COMPLETED", "CANCELLED"];
@@ -175,23 +180,30 @@ const ProductionReports: React.FC = () => {
     completed: productionOrders.filter(o => o.status === "COMPLETED").length,
     planned: productionOrders.filter(o => o.status === "PLANNED" || o.status === "SCHEDULED").length,
     onHold: productionOrders.filter(o => o.status === "ON_HOLD").length,
-    materialShortages: materialRequirements.filter(m => m.shortage > 0).length,
-  }), []);
+    materialShortages: materialAlerts.filter(m => m.shortage > 0).length,
+  }), [materialAlerts]);
+
+  // Auto-hide success message
+  useEffect(() => {
+    if (successMessage) {
+      const timer = setTimeout(() => setSuccessMessage(null), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [successMessage]);
 
   // Close dropdowns
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) setIsTimeDropdownOpen(false);
       if (calendarRef.current && !calendarRef.current.contains(event.target as Node)) setIsCalendarOpen(false);
-      if (statusDropdownRef.current && !statusDropdownRef.current.contains(event.target as Node)) setIsStatusOpen(false);
-      if (priorityDropdownRef.current && !priorityDropdownRef.current.contains(event.target as Node)) setIsPriorityOpen(false);
-      if (shiftDropdownRef.current && !shiftDropdownRef.current.contains(event.target as Node)) setIsShiftOpen(false);
+      if (statusDropdownRef.current && !statusDropdownRef.current.contains(event.target as Node)) setActiveDropdown(null);
+      if (priorityDropdownRef.current && !priorityDropdownRef.current.contains(event.target as Node)) setActiveDropdown(null);
+      if (shiftDropdownRef.current && !shiftDropdownRef.current.contains(event.target as Node)) setActiveDropdown(null);
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  //eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { setCurrentPage(1); }, [searchQuery, statusFilter, priorityFilter, shiftFilter, timeFilter, customRange]);
 
   const handleTimeFilterChange = (value: TimeFilter) => {
@@ -259,24 +271,63 @@ const ProductionReports: React.FC = () => {
     setShowDetailsModal(true); 
   };
 
-  const handleStartProduction = (orderId: string) => {
-    alert(`Production started for order ${orderId}`);
+  //eslint-disable-next-line react-hooks/exhaustive-deps
+  const handleDelete = (id: string) => {
+    if (window.confirm("Delete this production order?")) {
+      // In a real app, you would call an API here
+      setSuccessMessage("Production order deleted successfully!");
+    }
+  };
+
+  const handleBulkDelete = () => {
+    if (selectedIds.length === 0) return;
+    if (window.confirm(`Delete ${selectedIds.length} order(s)?`)) {
+      setSuccessMessage(`${selectedIds.length} production order(s) deleted successfully!`);
+      setSelectedIds([]);
+    }
+  };
+
+  const handleCreatePO = (materialName: string) => {
+    setMaterialAlerts(prev => 
+      prev.map(m => m.materialName === materialName && m.shortage > 0 
+        ? { ...m, shortage: 0, status: "OK" } 
+        : m
+      )
+    );
+    setSuccessMessage(`Purchase Order created for ${materialName}!`);
   };
 
   const bestShift = trendData.reduce((best, current) => (current.actual > best.actual ? current : best), trendData[0]);
-  const totalDowntime = 242;
+  const totalDowntimeMinutes = 242;
   const averageEfficiency = Math.round(trendData.reduce((sum, p) => sum + p.actual, 0) / trendData.length);
-  const shortageMaterials = materialRequirements.filter(m => m.shortage > 0);
+  const shortageMaterials = materialAlerts.filter(m => m.shortage > 0);
+  const maxValue = Math.max(...trendData.map(d => Math.max(d.actual, d.target)));
+  const yAxisSteps = 5;
+  const yAxisValues = Array.from({ length: yAxisSteps + 1 }, (_, i) => Math.round((maxValue / yAxisSteps) * i));
 
   return (
     <div className="min-h-screen bg-[#f4f7f6] p-4 sm:p-6 lg:p-8 text-slate-900 font-sans">
       <div className="max-w-7xl mx-auto">
         
+        {/* Success Toast Message */}
+        {successMessage && (
+          <div className="fixed top-4 right-4 z-50 animate-in slide-in-from-top-2 fade-in duration-300">
+            <div className="bg-green-500 text-white px-4 py-3 rounded-lg shadow-lg flex items-center gap-2">
+              <CheckCircle size={18} />
+              <span className="text-sm font-medium">{successMessage}</span>
+            </div>
+          </div>
+        )}
+
         {/* Header */}
         <header className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 mb-10">
           <div>
-            <h1 className="text-3xl font-extrabold text-slate-800 tracking-tight">Production Planning & Execution</h1>
-            <p className="text-sm text-gray-500 mt-1 font-medium">Manage orders, track production, and monitor shop floor</p>
+            <h1 className="text-3xl font-extrabold text-slate-800 tracking-tight">
+              Production Reports
+            </h1>
+            <p className="text-sm text-gray-500 mt-1 font-medium">
+              Analyze production performance and material requirements
+            </p>
           </div>
 
           {/* Global Time Filter */}
@@ -292,226 +343,241 @@ const ProductionReports: React.FC = () => {
             {isTimeDropdownOpen && !isCalendarOpen && (
               <div className="absolute right-0 mt-2 bg-white border border-slate-100 rounded-2xl shadow-2xl z-50 py-2 min-w-40">
                 {["Weekly", "Monthly", "Quarterly", "Yearly", "All Time"].map(tab => (
-                  <button 
-                    key={tab} 
-                    onClick={() => handleTimeFilterChange(tab as TimeFilter)} 
-                    className={`w-full text-left px-4 py-2.5 text-[13px] ${timeFilter === tab ? "text-orange-600 font-bold bg-orange-50/50" : "text-slate-600 hover:bg-slate-50"}`}
-                  >
+                  <button key={tab} onClick={() => handleTimeFilterChange(tab as TimeFilter)} className={`w-full text-left px-4 py-2.5 text-[13px] ${timeFilter === tab ? "text-orange-600 font-bold bg-orange-50/50" : "text-slate-600 hover:bg-slate-50"}`}>
                     {tab}
                   </button>
                 ))}
-                <button 
-                  onClick={() => handleTimeFilterChange("Custom")} 
-                  className={`w-full text-left px-4 py-2.5 text-[13px] ${timeFilter === "Custom" ? "text-orange-600 font-bold bg-orange-50/50" : "text-slate-600 hover:bg-slate-50"}`}
-                >
-                  Custom
-                </button>
+                <button onClick={() => handleTimeFilterChange("Custom")} className={`w-full text-left px-4 py-2.5 text-[13px] ${timeFilter === "Custom" ? "text-orange-600 font-bold bg-orange-50/50" : "text-slate-600 hover:bg-slate-50"}`}>Custom</button>
               </div>
             )}
             {isCalendarOpen && (
               <div ref={calendarRef} className="absolute right-0 mt-3 bg-white p-6 rounded-2xl shadow-xl border z-50 w-72">
                 <div className="space-y-3">
-                  <input 
-                    type="date" 
-                    value={customRange.start} 
-                    onChange={(e) => setCustomRange({ ...customRange, start: e.target.value })} 
-                    className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500/20" 
-                  />
-                  <input 
-                    type="date" 
-                    value={customRange.end} 
-                    min={customRange.start} 
-                    onChange={(e) => setCustomRange({ ...customRange, end: e.target.value })} 
-                    className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500/20" 
-                  />
-                  <button 
-                    onClick={handleCustomApply} 
-                    className="w-full bg-orange-500 text-white py-2 rounded-lg text-sm font-bold hover:bg-orange-600"
-                  >
-                    Apply Range
-                  </button>
+                  <input type="date" value={customRange.start} onChange={(e) => setCustomRange({ ...customRange, start: e.target.value })} className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500/20" />
+                  <input type="date" value={customRange.end} min={customRange.start} onChange={(e) => setCustomRange({ ...customRange, end: e.target.value })} className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500/20" />
+                  <button onClick={handleCustomApply} className="w-full bg-orange-500 text-white py-2 rounded-lg text-sm font-bold hover:bg-orange-600">Apply Range</button>
                 </div>
               </div>
             )}
           </div>
         </header>
 
-        {/* Dashboard Stats Cards - SRS Section 3.2 */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
-          <div className="bg-white p-5 rounded-2xl border-l-4 border-orange-500 shadow-sm">
-            <p className="text-xs text-gray-500">Total Orders</p>
-            <p className="text-2xl font-bold">{stats.totalOrders}</p>
+        {/* Dashboard Stats Cards - Matching Dashboard Style */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
+          <div className="bg-white p-6 rounded-2xl border-l-4 border-orange-500 shadow-sm hover:shadow-md transition">
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">Total Orders</p>
+              <Factory size={20} className="text-orange-500" />
+            </div>
+            <h3 className="text-2xl font-extrabold text-gray-800">{stats.totalOrders}</h3>
           </div>
-          <div className="bg-white p-5 rounded-2xl border-l-4 border-blue-500 shadow-sm">
-            <p className="text-xs text-gray-500">In Progress</p>
-            <p className="text-2xl font-bold">{stats.inProgress}</p>
+          <div className="bg-white p-6 rounded-2xl border-l-4 border-blue-500 shadow-sm hover:shadow-md transition">
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">In Progress</p>
+              <Play size={20} className="text-blue-500" />
+            </div>
+            <h3 className="text-2xl font-extrabold text-gray-800">{stats.inProgress}</h3>
           </div>
-          <div className="bg-white p-5 rounded-2xl border-l-4 border-green-500 shadow-sm">
-            <p className="text-xs text-gray-500">Completed</p>
-            <p className="text-2xl font-bold">{stats.completed}</p>
+          <div className="bg-white p-6 rounded-2xl border-l-4 border-green-500 shadow-sm hover:shadow-md transition">
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">Completed</p>
+              <CheckCircle size={20} className="text-green-500" />
+            </div>
+            <h3 className="text-2xl font-extrabold text-gray-800">{stats.completed}</h3>
           </div>
-          <div className="bg-white p-5 rounded-2xl border-l-4 border-purple-500 shadow-sm">
-            <p className="text-xs text-gray-500">Planned/Scheduled</p>
-            <p className="text-2xl font-bold">{stats.planned}</p>
+          <div className="bg-white p-6 rounded-2xl border-l-4 border-purple-500 shadow-sm hover:shadow-md transition">
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">Planned/Scheduled</p>
+              <Calendar size={20} className="text-purple-500" />
+            </div>
+            <h3 className="text-2xl font-extrabold text-gray-800">{stats.planned}</h3>
           </div>
-          <div className="bg-white p-5 rounded-2xl border-l-4 border-red-500 shadow-sm">
-            <p className="text-xs text-gray-500">Material Shortages</p>
-            <p className="text-2xl font-bold text-red-600">{stats.materialShortages}</p>
+          <div className="bg-white p-6 rounded-2xl border-l-4 border-red-500 shadow-sm hover:shadow-md transition">
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">Material Shortages</p>
+              <AlertTriangle size={20} className="text-red-500" />
+            </div>
+            <h3 className="text-2xl font-extrabold text-red-600">{stats.materialShortages}</h3>
           </div>
         </div>
 
-        {/* Material Shortages Alert - SRS Section 3.2 */}
-        {shortageMaterials.length > 0 && (
-          <div className="mb-8 bg-amber-50 border border-amber-200 rounded-2xl p-4 flex items-start gap-3">
-            <AlertTriangle size={20} className="text-amber-600 flex-shrink-0 mt-0.5" />
-            <div className="flex-1">
-              <p className="text-sm font-semibold text-amber-800">Material Shortages Detected</p>
-              <p className="text-xs text-amber-700 mt-0.5">Purchase orders required for: {shortageMaterials.map(m => m.materialName).join(", ")}</p>
-            </div>
-            <button className="px-3 py-1.5 bg-amber-600 text-white text-xs rounded-lg hover:bg-amber-700 transition">
-              Create Purchase Requests
+        {/* Material Shortages Alert - Matching Dashboard Style */}
+        {!isAlertDismissed && shortageMaterials.length > 0 && (
+          <div className="bg-red-50 border border-red-200 rounded-2xl p-5 mb-8 relative">
+            <button onClick={() => setIsAlertDismissed(true)} className="absolute top-4 right-4 text-red-400 hover:text-red-600 transition">
+              <X size={20} />
             </button>
+            <div className="flex items-start gap-3">
+              <AlertTriangle className="text-red-500 mt-0.5" size={22} />
+              <div className="flex-1">
+                <h4 className="font-semibold text-red-800 mb-3">Critical Material Shortages Alert</h4>
+                <div className="space-y-3">
+                  {shortageMaterials.map((material, idx) => (
+                    <div key={idx} className="flex flex-wrap items-center justify-between gap-3 p-3 bg-white rounded-xl">
+                      <span className="font-medium text-gray-800">{material.materialName}</span>
+                      <div className="flex gap-4 text-sm">
+                        <span>Required: <strong>{material.requiredQty.toLocaleString()} {material.unit}</strong></span>
+                        <span>Available: <strong>{material.availableQty.toLocaleString()} {material.unit}</strong></span>
+                        <span className="text-red-600">Shortage: <strong>{material.shortage.toLocaleString()} {material.unit}</strong></span>
+                      </div>
+                      <button onClick={() => handleCreatePO(material.materialName)} className="px-3 py-1.5 bg-orange-500 text-white rounded-lg text-sm hover:bg-orange-600 transition">
+                        Create PO
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
           </div>
         )}
 
-        {/* Charts and Insights Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+        {/* Charts and Insights Grid - Matching Dashboard Graph UI */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
           
-          {/* Efficiency Trend Chart */}
+          {/* Efficiency Trend Chart - Same as Dashboard Production Trend */}
           <div className="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-            <div className="flex justify-between items-center mb-6">
+            <div className="flex justify-between items-center mb-12">
               <div>
-                <div className="flex items-center gap-2 mb-1">
-                  <Target size={14} className="text-orange-500" />
-                  <h3 className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">EFFICIENCY TREND ANALYSIS</h3>
-                </div>
-                <p className="text-sm font-semibold text-slate-800">Actual vs Target Efficiency by Shift</p>
+                <h3 className="text-[11px] font-bold text-gray-800 uppercase tracking-widest">
+                  EFFICIENCY TREND ANALYSIS
+                </h3>
+                <p className="text-sm text-gray-400 font-normal mt-1">Actual vs Target Efficiency by Shift</p>
               </div>
               <div className="flex gap-4">
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-gradient-to-r from-orange-400 to-orange-500" />
-                  <span className="text-[10px] font-medium text-slate-500">Actual</span>
+                <div className="flex items-center gap-2 text-xs font-medium text-gray-500">
+                  <div className="w-2 h-2 rounded-full bg-orange-500" /> Actual
                 </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-slate-300" />
-                  <span className="text-[10px] font-medium text-slate-500">Target (80%)</span>
+                <div className="flex items-center gap-2 text-xs font-medium text-gray-500">
+                  <div className="w-2 h-2 rounded-full bg-slate-300" /> Target (80%)
                 </div>
               </div>
             </div>
             
-            <div className="relative">
-              <div className="flex justify-between items-end gap-3 h-64 mb-4">
-                {trendData.map((point, idx) => (
-                  <div key={point.label} className="flex-1 flex flex-col items-center group">
-                    <div className="relative w-full h-52 mb-2">
-                      <div 
-                        className="absolute bottom-0 w-full bg-slate-100 rounded-t-lg transition-all duration-300"
-                        style={{ height: `${point.target}%` }}
-                      >
-                        <div className={`absolute -top-7 left-1/2 -translate-x-1/2 transition-opacity bg-slate-700 text-white text-[10px] px-1.5 py-0.5 rounded whitespace-nowrap z-10 ${
-                          hoveredShift === idx ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
-                        }`}>
-                          Target: {point.target}%
-                        </div>
-                      </div>
-                      <div 
-                        className="absolute bottom-0 w-full bg-gradient-to-t from-orange-500 to-orange-400 rounded-t-lg transition-all duration-300 cursor-pointer shadow-sm"
-                        style={{ height: `${point.actual}%` }}
-                        onMouseEnter={() => setHoveredShift(idx)}
-                        onMouseLeave={() => setHoveredShift(null)}
-                      >
-                        <div className={`absolute -top-7 left-1/2 -translate-x-1/2 transition-opacity bg-orange-500 text-white text-[10px] px-1.5 py-0.5 rounded whitespace-nowrap z-10 ${
-                          hoveredShift === idx ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
-                        }`}>
-                          {point.actual}%
-                        </div>
-                      </div>
-                    </div>
-                    <p className="text-xs font-semibold text-slate-600 mt-2">{point.label}</p>
-                    <p className="text-[10px] text-slate-400 mt-0.5">{point.actual}%</p>
+            <div className="h-64 flex">
+              {/* Y-Axis */}
+              <div className="flex flex-col justify-between h-full text-[11px] text-gray-400 mr-2">
+                {[...yAxisValues].reverse().map((val, i) => (
+                  <div key={i} className="flex items-start">
+                    <span className="-translate-y-1/2">{val}%</span>
                   </div>
                 ))}
               </div>
+
+              {/* Graph Area */}
+              <div className="flex-1 relative">
+                {/* Grid Lines */}
+                <div className="absolute inset-0 flex flex-col justify-between pointer-events-none">
+                  {yAxisValues.map((_, i) => (
+                    <div key={i} className="border-t border-gray-200 w-full" />
+                  ))}
+                </div>
+
+                {/* Bars */}
+                <div className="relative flex h-full items-end gap-2">
+                  {trendData.map((point, idx) => (
+                    <div key={idx} className="flex-1 flex flex-col items-center h-full">
+                      <div className="w-full h-full flex items-end justify-center gap-1">
+                        <div
+                          className="w-4 bg-slate-300 rounded-t transition-all duration-300"
+                          style={{ height: `${(point.target / maxValue) * 100}%` }}
+                        />
+                        <div
+                          className="w-4 bg-orange-500 rounded-t transition-all duration-300 cursor-pointer relative"
+                          style={{ height: `${(point.actual / maxValue) * 100}%` }}
+                          onMouseEnter={() => setHoveredShift(idx)}
+                          onMouseLeave={() => setHoveredShift(null)}
+                        />
+                      </div>
+                      {hoveredShift === idx && (
+                        <div className="absolute -top-7 bg-slate-700 text-white text-[9px] px-1.5 py-0.5 rounded whitespace-nowrap z-10">
+                          {point.actual}%
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+
+                {/* X-axis Labels */}
+                <div className="flex mt-2">
+                  {trendData.map((point, idx) => (
+                    <div key={idx} className="flex-1 text-center text-[10px] text-gray-500">
+                      {point.label}
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
             
-            <div className="mt-4 pt-4 border-t border-slate-100 flex justify-between items-center">
+            <div className="mt-14 pt-4 border-t border-slate-100 flex justify-between items-center">
               <div className="flex items-center gap-4">
-                <div className="flex items-center gap-1.5">
-                  <span className="text-xs text-slate-500">Average:</span>
-                  <span className="text-sm font-bold text-slate-700">{averageEfficiency}%</span>
+                <div className="flex items-center gap-4">
+                  <span className="text-[11px] text-gray-500">Average:</span>
+                  <span className="text-sm font-bold text-gray-800">{averageEfficiency}%</span>
                 </div>
-                <div className="h-4 w-px bg-slate-200" />
-                <div className="flex items-center gap-1.5">
-                  <span className="text-xs text-slate-500">Peak:</span>
+                <div className="w-px h-4 bg-gray-200" />
+                <div className="flex items-center gap-2">
+                  <span className="text-[11px] text-gray-500">Peak:</span>
                   <span className="text-sm font-bold text-emerald-600">{Math.max(...trendData.map(p => p.actual))}%</span>
                 </div>
-                <div className="h-4 w-px bg-slate-200" />
-                <div className="flex items-center gap-1.5">
-                  <span className="text-xs text-slate-500">Best Shift:</span>
+                <div className="w-px h-4 bg-gray-200" />
+                <div className="flex items-center gap-2">
+                  <span className="text-[11px] text-gray-500">Best Shift:</span>
                   <span className="text-sm font-bold text-orange-600">{bestShift.label}</span>
                 </div>
               </div>
-              <div className="text-[10px] text-slate-400">Hover bars for details</div>
+              <div className="text-[10px] text-gray-400">Hover bars for details</div>
             </div>
           </div>
 
-          {/* Downtime Causes */}
+          {/* Downtime Causes - Matching Resource Status Style */}
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-            <div className="flex justify-between items-center mb-4">
+            <div className="flex justify-between items-start mb-4">
               <div>
                 <div className="flex items-center gap-2 mb-1">
-                  <PieChart size={14} className="text-rose-500" />
-                  <h3 className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">DOWNTIME ANALYSIS</h3>
+                  <PieChart size={16} className="text-rose-500" />
+                  <h3 className="text-[11px] font-bold text-gray-800 uppercase tracking-widest">DOWNTIME ANALYSIS</h3>
                 </div>
-                <p className="text-sm font-semibold text-slate-800">Root Cause Breakdown</p>
+                <p className="text-sm text-gray-400">Root Cause Breakdown</p>
               </div>
               <div className="text-right">
-                <p className="text-xl font-bold text-slate-800">{totalDowntime}<span className="text-xs font-normal text-slate-400">h</span></p>
-                <p className="text-[10px] text-slate-400">total idle time</p>
+                <p className="text-2xl font-extrabold text-gray-800">{formatTime(totalDowntimeMinutes)}</p>
+                <p className="text-[10px] text-gray-400">total idle time</p>
               </div>
             </div>
 
-            <div className="relative flex justify-center mb-6">
-              <div className="relative w-36 h-36">
+            <div className="relative flex justify-center my-6">
+              <div className="relative w-32 h-32">
                 <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
-                  {downtimeBreakdown.reduce((acc, item) => {
-                    const previousValue = acc.total;
-                    const value = item.value;
-                    const startAngle = (previousValue / 100) * 360;
-                    const endAngle = ((previousValue + value) / 100) * 360;
-                    acc.total += value;
-                    
-                    const startRad = (startAngle * Math.PI) / 180;
-                    const endRad = (endAngle * Math.PI) / 180;
-                    const x1 = 50 + 40 * Math.cos(startRad);
-                    const y1 = 50 + 40 * Math.sin(startRad);
-                    const x2 = 50 + 40 * Math.cos(endRad);
-                    const y2 = 50 + 40 * Math.sin(endRad);
-                    const largeArc = endAngle - startAngle > 180 ? 1 : 0;
-                    
-                    const colors = {
-                      orange: "#f97316",
-                      blue: "#3b82f6",
-                      emerald: "#10b981",
-                      slate: "#94a3b8",
-                    };
-                    
-                    acc.elements.push(
-                      <path
-                        key={item.label}
-                        d={`M 50 50 L ${x1} ${y1} A 40 40 0 ${largeArc} 1 ${x2} ${y2} Z`}
-                        fill={colors[item.color as keyof typeof colors]}
-                        className="transition-all duration-300 hover:opacity-80 cursor-pointer"
-                      />
-                    );
-                    return acc;
-                  }, { total: 0, elements: [] as JSX.Element[] }).elements}
-                  <circle cx="50" cy="50" r="25" fill="white" />
+                  {(() => {
+                    let cumulative = 0;
+                    const colors: Record<string, string> = { orange: "#f97316", blue: "#3b82f6", emerald: "#10b981", slate: "#94a3b8" };
+                    return downtimeBreakdown.map((item, idx) => {
+                      const startAngle = (cumulative / 100) * 360;
+                      const endAngle = ((cumulative + item.value) / 100) * 360;
+                      const startRad = (startAngle * Math.PI) / 180;
+                      const endRad = (endAngle * Math.PI) / 180;
+                      const x1 = 50 + 38 * Math.cos(startRad);
+                      const y1 = 50 + 38 * Math.sin(startRad);
+                      const x2 = 50 + 38 * Math.cos(endRad);
+                      const y2 = 50 + 38 * Math.sin(endRad);
+                      const largeArc = endAngle - startAngle > 180 ? 1 : 0;
+                      cumulative += item.value;
+                      return (
+                        <path
+                          key={item.label}
+                          d={`M 50 50 L ${x1} ${y1} A 38 38 0 ${largeArc} 1 ${x2} ${y2} Z`}
+                          fill={colors[item.color]}
+                          className="transition-all duration-300 hover:opacity-80 cursor-pointer"
+                        />
+                      );
+                    });
+                  })()}
+                  <circle cx="50" cy="50" r="22" fill="white" />
                 </svg>
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="text-center">
-                    <p className="text-lg font-bold text-slate-800">{totalDowntime}</p>
-                    <p className="text-[9px] text-slate-400">Hours</p>
+                    <p className="text-xl font-bold text-gray-800">{Math.floor(totalDowntimeMinutes / 60)}</p>
+                    <p className="text-[9px] text-gray-400">Hours</p>
                   </div>
                 </div>
               </div>
@@ -519,54 +585,46 @@ const ProductionReports: React.FC = () => {
 
             <div className="space-y-3">
               {downtimeBreakdown.map((item) => (
-                <div key={item.label} className="group">
-                  <div className="flex items-center justify-between mb-1">
-                    <div className="flex items-center gap-2">
-                      <div className={`w-2.5 h-2.5 rounded-full bg-${item.color}-500`} />
-                      <p className="text-sm font-medium text-slate-700">{item.label}</p>
-                    </div>
-                    <p className="text-sm font-bold text-slate-800">{item.value}%</p>
+                <div key={item.label}>
+                  <div className="flex justify-between text-sm mb-1">
+                    <span className="text-gray-600">{item.label}</span>
+                    <span className="font-semibold text-gray-800">{item.value}%</span>
                   </div>
-                  <div className="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
-                    <div 
-                      className={`h-full rounded-full bg-${item.color}-500 transition-all duration-500`}
-                      style={{ width: `${item.value}%` }}
-                    />
+                  <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                    <div className={`h-full bg-${item.color}-500 rounded-full`} style={{ width: `${item.value}%` }} />
                   </div>
-                  <p className="text-[10px] text-slate-400 mt-1 ml-4">{item.description}</p>
+                  <p className="text-[10px] text-gray-400 mt-1">{item.description}</p>
                 </div>
               ))}
             </div>
           </div>
         </div>
 
-        {/* View Toggle */}
-        <div className="flex gap-2 mb-5">
+        {/* View Toggle - Matching Dashboard Quick Actions Style */}
+        <div className="flex gap-3 mb-6">
           <button
             onClick={() => setActiveView("orders")}
-            className={`px-5 py-2.5 text-sm font-medium rounded-xl transition-all ${
+            className={`px-5 py-2.5 text-sm font-bold rounded-xl transition-all flex items-center gap-2 ${
               activeView === "orders" 
                 ? "bg-orange-500 text-white shadow-md" 
                 : "bg-white text-slate-600 border border-slate-200 hover:bg-slate-50"
             }`}
           >
-            <Factory size={14} className="inline mr-2" />
-            Production Orders
+            <Factory size={16} /> Production Orders
           </button>
           <button
             onClick={() => setActiveView("materials")}
-            className={`px-5 py-2.5 text-sm font-medium rounded-xl transition-all ${
+            className={`px-5 py-2.5 text-sm font-bold rounded-xl transition-all flex items-center gap-2 ${
               activeView === "materials" 
                 ? "bg-orange-500 text-white shadow-md" 
                 : "bg-white text-slate-600 border border-slate-200 hover:bg-slate-50"
             }`}
           >
-            <Package size={14} className="inline mr-2" />
-            Material Requirements (BOM)
+            <Package size={16} /> Material Requirements
           </button>
         </div>
 
-        {/* Production Orders Table - SRS Sections 3.3, 3.6, 3.7, 3.8 */}
+        {/* Production Orders Table - Matching Table Style from Other Pages */}
         {activeView === "orders" && (
           <div className="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
             
@@ -585,25 +643,13 @@ const ProductionReports: React.FC = () => {
               <div className="flex flex-wrap gap-3">
                 {/* Status Filter */}
                 <div className="relative" ref={statusDropdownRef}>
-                  <button 
-                    onClick={() => setIsStatusOpen(!isStatusOpen)} 
-                    className={`px-4 py-3 rounded-xl border text-[13px] font-bold flex items-center gap-2 ${
-                      statusFilter !== "All" ? "bg-orange-50 border-orange-200 text-orange-600" : "bg-white border-slate-200 text-slate-600"
-                    }`}
-                  >
-                    {statusFilter === "All" ? "Status" : statusFilter.replace("_", " ")} 
-                    <ChevronDown size={14} className={isStatusOpen ? "rotate-180" : ""} />
+                  <button onClick={() => setActiveDropdown(activeDropdown === "status" ? null : "status")} className={`px-4 py-3 rounded-xl border text-[13px] font-bold flex items-center gap-2 ${statusFilter !== "All" ? "bg-orange-50 border-orange-200 text-orange-600" : "bg-white border-slate-200 text-slate-600"}`}>
+                    {statusFilter === "All" ? "Status" : statusFilter.replace("_", " ")} <ChevronDown size={14} className={activeDropdown === "status" ? "rotate-180" : ""} />
                   </button>
-                  {isStatusOpen && (
+                  {activeDropdown === "status" && (
                     <div className="absolute right-0 mt-2 w-40 bg-white border rounded-2xl shadow-2xl z-50 py-2">
                       {statusOptions.map(opt => (
-                        <button 
-                          key={opt} 
-                          onClick={() => { setStatusFilter(opt); setIsStatusOpen(false); }} 
-                          className={`w-full text-left px-4 py-2 text-[13px] hover:bg-slate-50 ${
-                            statusFilter === opt ? "text-orange-600 font-bold bg-orange-50/50" : "text-slate-600"
-                          }`}
-                        >
+                        <button key={opt} onClick={() => { setStatusFilter(opt); setActiveDropdown(null); }} className={`w-full text-left px-4 py-2 text-[13px] hover:bg-slate-50 ${statusFilter === opt ? "text-orange-600 font-bold bg-orange-50/50" : "text-slate-600"}`}>
                           {opt === "All" ? "All" : opt.replace("_", " ")}
                         </button>
                       ))}
@@ -613,25 +659,13 @@ const ProductionReports: React.FC = () => {
                 
                 {/* Priority Filter */}
                 <div className="relative" ref={priorityDropdownRef}>
-                  <button 
-                    onClick={() => setIsPriorityOpen(!isPriorityOpen)} 
-                    className={`px-4 py-3 rounded-xl border text-[13px] font-bold flex items-center gap-2 ${
-                      priorityFilter !== "All" ? "bg-orange-50 border-orange-200 text-orange-600" : "bg-white border-slate-200 text-slate-600"
-                    }`}
-                  >
-                    {priorityFilter === "All" ? "Priority" : priorityFilter} 
-                    <ChevronDown size={14} className={isPriorityOpen ? "rotate-180" : ""} />
+                  <button onClick={() => setActiveDropdown(activeDropdown === "priority" ? null : "priority")} className={`px-4 py-3 rounded-xl border text-[13px] font-bold flex items-center gap-2 ${priorityFilter !== "All" ? "bg-orange-50 border-orange-200 text-orange-600" : "bg-white border-slate-200 text-slate-600"}`}>
+                    {priorityFilter === "All" ? "Priority" : priorityFilter} <ChevronDown size={14} className={activeDropdown === "priority" ? "rotate-180" : ""} />
                   </button>
-                  {isPriorityOpen && (
+                  {activeDropdown === "priority" && (
                     <div className="absolute right-0 mt-2 w-32 bg-white border rounded-2xl shadow-2xl z-50 py-2">
                       {priorityOptions.map(opt => (
-                        <button 
-                          key={opt} 
-                          onClick={() => { setPriorityFilter(opt); setIsPriorityOpen(false); }} 
-                          className={`w-full text-left px-4 py-2 text-[13px] hover:bg-slate-50 ${
-                            priorityFilter === opt ? "text-orange-600 font-bold bg-orange-50/50" : "text-slate-600"
-                          }`}
-                        >
+                        <button key={opt} onClick={() => { setPriorityFilter(opt); setActiveDropdown(null); }} className={`w-full text-left px-4 py-2 text-[13px] hover:bg-slate-50 ${priorityFilter === opt ? "text-orange-600 font-bold bg-orange-50/50" : "text-slate-600"}`}>
                           {opt}
                         </button>
                       ))}
@@ -641,31 +675,28 @@ const ProductionReports: React.FC = () => {
 
                 {/* Shift Filter */}
                 <div className="relative" ref={shiftDropdownRef}>
-                  <button 
-                    onClick={() => setIsShiftOpen(!isShiftOpen)} 
-                    className={`px-4 py-3 rounded-xl border text-[13px] font-bold flex items-center gap-2 ${
-                      shiftFilter !== "All" ? "bg-orange-50 border-orange-200 text-orange-600" : "bg-white border-slate-200 text-slate-600"
-                    }`}
-                  >
-                    {shiftFilter === "All" ? "Shift" : getShiftLabel(shiftFilter as Shift)} 
-                    <ChevronDown size={14} className={isShiftOpen ? "rotate-180" : ""} />
+                  <button onClick={() => setActiveDropdown(activeDropdown === "shift" ? null : "shift")} className={`px-4 py-3 rounded-xl border text-[13px] font-bold flex items-center gap-2 ${shiftFilter !== "All" ? "bg-orange-50 border-orange-200 text-orange-600" : "bg-white border-slate-200 text-slate-600"}`}>
+                    {shiftFilter === "All" ? "Shift" : getShiftLabel(shiftFilter as Shift)} <ChevronDown size={14} className={activeDropdown === "shift" ? "rotate-180" : ""} />
                   </button>
-                  {isShiftOpen && (
+                  {activeDropdown === "shift" && (
                     <div className="absolute right-0 mt-2 w-40 bg-white border rounded-2xl shadow-2xl z-50 py-2">
                       {shiftOptions.map(opt => (
-                        <button 
-                          key={opt} 
-                          onClick={() => { setShiftFilter(opt); setIsShiftOpen(false); }} 
-                          className={`w-full text-left px-4 py-2 text-[13px] hover:bg-slate-50 ${
-                            shiftFilter === opt ? "text-orange-600 font-bold bg-orange-50/50" : "text-slate-600"
-                          }`}
-                        >
+                        <button key={opt} onClick={() => { setShiftFilter(opt); setActiveDropdown(null); }} className={`w-full text-left px-4 py-2 text-[13px] hover:bg-slate-50 ${shiftFilter === opt ? "text-orange-600 font-bold bg-orange-50/50" : "text-slate-600"}`}>
                           {opt === "All" ? "All" : getShiftLabel(opt as Shift)}
                         </button>
                       ))}
                     </div>
                   )}
                 </div>
+
+                {/* Bulk Delete Button */}
+                <button
+                  disabled={selectedIds.length === 0}
+                  onClick={handleBulkDelete}
+                  className={`p-3 rounded-xl ${selectedIds.length === 0 ? "bg-gray-100 text-gray-400 cursor-not-allowed" : "bg-rose-600 text-white hover:bg-rose-700"}`}
+                >
+                  <Trash2 size={20} />
+                </button>
               </div>
             </div>
 
@@ -675,10 +706,10 @@ const ProductionReports: React.FC = () => {
                 <thead>
                   <tr className="bg-slate-50/50">
                     <th className="w-12 p-5 text-center border-b border-slate-100">
-                      <input type="checkbox" className="accent-orange-500 w-4 h-4" checked={paginatedOrders.length > 0 && selectedIds.length === paginatedOrders.length} onChange={toggleSelectAll} />
+                      <input type="checkbox" className="accent-orange-500 w-4 h-4 cursor-pointer" checked={paginatedOrders.length > 0 && selectedIds.length === paginatedOrders.length} onChange={toggleSelectAll} />
                     </th>
-                    <th className="px-4 py-4 text-[11px] text-slate-800 uppercase tracking-widest">PO ID</th>
-                    <th className="px-4 py-4 text-[11px] text-slate-800 uppercase tracking-widest">PRODUCT</th>
+                    <th className="px-4 py-4 text-[11px] text-slate-800 uppercase tracking-widest text-center">PO ID</th>
+                    <th className="px-4 py-4 text-[11px] text-slate-800 uppercase tracking-widest text-center">PRODUCT</th>
                     <th className="px-4 py-4 text-[11px] text-slate-800 uppercase tracking-widest text-center">QTY</th>
                     <th className="px-4 py-4 text-[11px] text-slate-800 uppercase tracking-widest text-center">COMPLETED</th>
                     <th className="px-4 py-4 text-[11px] text-slate-800 uppercase tracking-widest text-center">DEADLINE</th>
@@ -693,21 +724,21 @@ const ProductionReports: React.FC = () => {
                   {paginatedOrders.map((order) => (
                     <tr key={order.id} className="group hover:bg-orange-50/20 transition-colors">
                       <td className="p-5 text-center">
-                        <input type="checkbox" className="accent-orange-500 w-4 h-4" checked={selectedIds.includes(order.id)} onChange={() => { 
+                        <input type="checkbox" className="accent-orange-500 w-4 h-4 cursor-pointer" checked={selectedIds.includes(order.id)} onChange={() => { 
                           if (selectedIds.includes(order.id)) setSelectedIds(selectedIds.filter(id => id !== order.id)); 
                           else setSelectedIds([...selectedIds, order.id]); 
                         }} />
                       </td>
-                      <td className="px-4 py-4 text-[13px] font-mono font-bold text-slate-800">{order.productionOrderId}</td>
-                      <td className="px-4 py-4 text-[13px] text-slate-700">{order.productName}</td>
+                      <td className="px-4 py-4 text-[13px] font-mono font-bold text-slate-800 text-center whitespace-nowrap">{order.productionOrderId}</td>
+                      <td className="px-4 py-4 text-[13px] text-slate-700 text-center truncate max-w-[150px]">{order.productName}</td>
                       <td className="px-4 py-4 text-[13px] text-slate-600 text-center">{order.quantity.toLocaleString()}</td>
                       <td className="px-4 py-4 text-[13px] text-slate-600 text-center">{order.completedQuantity.toLocaleString()}</td>
-                      <td className={`px-4 py-4 text-[13px] text-center ${new Date(order.deadline) < new Date() && order.status !== "COMPLETED" ? "text-red-600 font-semibold" : "text-slate-600"}`}>
+                      <td className={`px-4 py-4 text-[13px] text-center whitespace-nowrap ${new Date(order.deadline) < new Date() && order.status !== "COMPLETED" ? "text-red-600 font-semibold" : "text-slate-600"}`}>
                         {formatDate(order.deadline)}
                       </td>
-                      <td className="px-4 py-4 text-[13px] text-slate-600 text-center">{getShiftLabel(order.shift)}</td>
-                      <td className="px-4 py-4 text-center">{getPriorityBadge(order.priority)}</td>
-                      <td className="px-4 py-4 text-center">{getStatusBadge(order.status)}</td>
+                      <td className="px-4 py-4 text-[13px] text-slate-600 text-center whitespace-nowrap">{getShiftLabel(order.shift)}</td>
+                      <td className="px-4 py-4 text-center whitespace-nowrap">{getPriorityBadge(order.priority)}</td>
+                      <td className="px-4 py-4 text-center whitespace-nowrap">{getStatusBadge(order.status)}</td>
                       <td className="px-4 py-4">
                         <div className="flex items-center justify-center gap-2">
                           <div className="w-20 h-1.5 bg-gray-100 rounded-full overflow-hidden">
@@ -715,17 +746,15 @@ const ProductionReports: React.FC = () => {
                           </div>
                           <span className="text-[11px] font-semibold text-slate-600">{order.progress}%</span>
                         </div>
-                       </td>
+                      </td>
                       <td className="px-4 py-4">
                         <div className="flex justify-center gap-2">
                           <button onClick={() => handleViewDetails(order)} className="p-1.5 text-slate-400 hover:text-orange-500 transition-colors" title="View Details">
                             <Eye size={16} />
                           </button>
-                          {order.status === "SCHEDULED" && (
-                            <button onClick={() => handleStartProduction(order.id)} className="p-1.5 text-slate-400 hover:text-green-500 transition-colors" title="Start Production">
-                              <Play size={16} />
-                            </button>
-                          )}
+                          <button onClick={() => handleDelete(order.id)} className="p-1.5 text-slate-400 hover:text-rose-600 transition-colors" title="Delete">
+                            <Trash2 size={16} />
+                          </button>
                         </div>
                        </td>
                      </tr>
@@ -734,12 +763,12 @@ const ProductionReports: React.FC = () => {
               </table>
               
               {filteredOrders.length === 0 && (
-                <div className="py-32 text-center">
-                  <div className="p-6 bg-slate-50 rounded-full w-fit mx-auto mb-4">
+                <div className="py-32 flex flex-col items-center justify-center text-center">
+                  <div className="p-6 bg-slate-50 rounded-full mb-4">
                     <Factory className="text-slate-200" size={40} />
                   </div>
                   <h3 className="text-lg font-bold text-slate-800">No Production Orders Found</h3>
-                  <p className="text-sm text-slate-500 mt-1">Try adjusting your search or filters</p>
+                  <p className="text-slate-400 text-sm max-w-xs">Try adjusting your search or filters.</p>
                 </div>
               )}
             </div>
@@ -747,17 +776,17 @@ const ProductionReports: React.FC = () => {
             {/* Pagination */}
             {totalPages > 0 && (
               <footer className="p-6 bg-slate-50/50 border-t border-slate-100 flex flex-col md:flex-row justify-between items-center gap-6">
-                <div className="text-[11px] font-bold text-slate-800 uppercase">
+                <div className="text-[11px] font-bold text-slate-800 uppercase tracking-widest">
                   Showing {(currentPage - 1) * itemsPerPage + 1} to {Math.min(currentPage * itemsPerPage, filteredOrders.length)} of {filteredOrders.length} Orders
                 </div>
                 <div className="flex items-center gap-2">
-                  <button onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1} className="p-2.5 rounded-xl border bg-white text-slate-500 hover:text-orange-600 disabled:opacity-30">
+                  <button onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1} className="p-2.5 rounded-xl border border-slate-200 bg-white text-slate-500 hover:text-orange-600 disabled:opacity-30">
                     <ChevronLeft size={18} />
                   </button>
                   <div className="flex gap-1.5">
-                    {getPageNumbers().map((page, i) => page === "..." ? <span key={i} className="px-2 text-slate-300"><MoreHorizontal size={14} /></span> : <button key={i} onClick={() => setCurrentPage(page as number)} className={`min-w-10 h-10 rounded-xl text-xs font-bold ${currentPage === page ? "bg-orange-500 text-white shadow-lg" : "bg-white text-slate-500 border border-slate-200"}`}>{page}</button>)}
+                    {getPageNumbers().map((page, i) => page === "..." ? (<span key={i} className="px-2 text-slate-300"><MoreHorizontal size={14} /></span>) : (<button key={i} onClick={() => setCurrentPage(page as number)} className={`min-w-10 h-10 rounded-xl text-xs font-bold ${currentPage === page ? "bg-orange-500 text-white shadow-lg" : "bg-white text-slate-500 border border-slate-200"}`}>{page}</button>))}
                   </div>
-                  <button onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages} className="p-2.5 rounded-xl border bg-white text-slate-500 hover:text-orange-600 disabled:opacity-30">
+                  <button onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages} className="p-2.5 rounded-xl border border-slate-200 bg-white text-slate-500 hover:text-orange-600 disabled:opacity-30">
                     <ChevronRight size={18} />
                   </button>
                 </div>
@@ -766,7 +795,7 @@ const ProductionReports: React.FC = () => {
           </div>
         )}
 
-        {/* Material Requirements Tab - SRS Sections 3.4.2, 3.4.3, 3.5 */}
+        {/* Material Requirements Tab */}
         {activeView === "materials" && (
           <div className="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
             <div className="p-6 border-b border-slate-100">
@@ -788,8 +817,8 @@ const ProductionReports: React.FC = () => {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-50">
-                  {materialRequirements.map((material, idx) => (
-                    <tr key={idx} className="hover:bg-orange-50/20">
+                  {materialAlerts.map((material, idx) => (
+                    <tr key={idx} className="hover:bg-orange-50/20 transition-colors">
                       <td className="px-6 py-4 text-sm font-medium text-slate-700">{material.materialName}</td>
                       <td className="px-6 py-4 text-sm text-slate-600 text-center">{material.requiredQty.toLocaleString()}</td>
                       <td className="px-6 py-4 text-sm text-slate-600 text-center">{material.availableQty.toLocaleString()}</td>
@@ -800,22 +829,22 @@ const ProductionReports: React.FC = () => {
                       <td className="px-6 py-4 text-center">
                         {material.shortage > 0 ? (
                           <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-red-100 text-red-600 text-[10px] font-bold">
-                            <AlertCircle size={10} /> Shortage
+                            <AlertCircle size={12} /> Shortage
                           </span>
                         ) : (
                           <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-green-100 text-green-600 text-[10px] font-bold">
-                            <CheckCircle size={10} /> Available
+                            <CheckCircle size={12} /> Available
                           </span>
                         )}
                       </td>
                       <td className="px-6 py-4 text-center">
                         {material.shortage > 0 && (
-                          <button className="px-3 py-1.5 bg-orange-500 text-white text-xs rounded-lg hover:bg-orange-600 transition">
+                          <button onClick={() => handleCreatePO(material.materialName)} className="px-3 py-1.5 bg-orange-500 text-white text-xs font-medium rounded-lg hover:bg-orange-600 transition">
                             Create PO
                           </button>
                         )}
                       </td>
-                     </tr>
+                    </tr>
                   ))}
                 </tbody>
               </table>
@@ -824,64 +853,63 @@ const ProductionReports: React.FC = () => {
         )}
       </div>
 
-      {/* Order Details Modal with Work Instructions - SRS Section 3.9 */}
+      {/* Order Details Modal - Same as Dashboard Modal Style */}
       {showDetailsModal && selectedOrder && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
           <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="sticky top-0 bg-white border-b p-6 flex justify-between items-center">
+            <div className="sticky top-0 bg-white border-b p-6 flex justify-between">
               <div>
-                <h2 className="text-xl font-bold text-slate-800">{selectedOrder.productionOrderId}</h2>
-                <p className="text-sm text-gray-500 mt-0.5">{selectedOrder.productName}</p>
+                <h2 className="text-xl font-bold">{selectedOrder.productionOrderId}</h2>
+                <p className="text-sm text-gray-500">{selectedOrder.productName}</p>
               </div>
-              <button onClick={() => setShowDetailsModal(false)} className="text-gray-400 hover:text-gray-600 text-xl">✕</button>
+              <button onClick={() => setShowDetailsModal(false)} className="text-gray-400 hover:text-gray-600">✕</button>
             </div>
             <div className="p-6 space-y-6">
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div className="p-3 bg-gray-50 rounded-xl">
-                  <label className="text-xs text-gray-500">Sales Order</label>
+                  <label className="text-xs text-gray-500 uppercase">Sales Order</label>
                   <p className="font-semibold">{selectedOrder.salesOrderId}</p>
                 </div>
                 <div className="p-3 bg-gray-50 rounded-xl">
-                  <label className="text-xs text-gray-500">Quantity</label>
+                  <label className="text-xs text-gray-500 uppercase">Quantity</label>
                   <p className="font-semibold">{selectedOrder.quantity.toLocaleString()}</p>
                 </div>
                 <div className="p-3 bg-gray-50 rounded-xl">
-                  <label className="text-xs text-gray-500">Completed</label>
+                  <label className="text-xs text-gray-500 uppercase">Completed</label>
                   <p className="font-semibold text-green-600">{selectedOrder.completedQuantity.toLocaleString()}</p>
                 </div>
                 <div className="p-3 bg-gray-50 rounded-xl">
-                  <label className="text-xs text-gray-500">Rejected</label>
+                  <label className="text-xs text-gray-500 uppercase">Rejected</label>
                   <p className="font-semibold text-red-600">{selectedOrder.rejectedQuantity.toLocaleString()}</p>
                 </div>
               </div>
 
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                 <div className="p-3 bg-gray-50 rounded-xl">
-                  <label className="text-xs text-gray-500">Machine</label>
+                  <label className="text-xs text-gray-500 uppercase">Machine</label>
                   <p className="font-semibold">{selectedOrder.assignedMachine || "Not Assigned"}</p>
                 </div>
                 <div className="p-3 bg-gray-50 rounded-xl">
-                  <label className="text-xs text-gray-500">Operator</label>
+                  <label className="text-xs text-gray-500 uppercase">Operator</label>
                   <p className="font-semibold">{selectedOrder.assignedOperator || "Not Assigned"}</p>
                 </div>
                 <div className="p-3 bg-gray-50 rounded-xl">
-                  <label className="text-xs text-gray-500">Shift</label>
+                  <label className="text-xs text-gray-500 uppercase">Shift</label>
                   <p className="font-semibold">{getShiftLabel(selectedOrder.shift)}</p>
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="p-3 bg-gray-50 rounded-xl">
-                  <label className="text-xs text-gray-500">Start Date</label>
+                  <label className="text-xs text-gray-500 uppercase">Start Date</label>
                   <p className="font-semibold">{formatDate(selectedOrder.startDate) || "Not Started"}</p>
                 </div>
                 <div className="p-3 bg-gray-50 rounded-xl">
-                  <label className="text-xs text-gray-500">Deadline</label>
+                  <label className="text-xs text-gray-500 uppercase">Deadline</label>
                   <p className="font-semibold">{formatDate(selectedOrder.deadline)}</p>
                 </div>
               </div>
 
-              {/* Work Instructions - SRS Section 3.9 */}
               <div className="bg-blue-50 p-4 rounded-xl border border-blue-100">
                 <div className="flex items-center gap-2 mb-2">
                   <ClipboardList size={16} className="text-blue-600" />
@@ -892,21 +920,18 @@ const ProductionReports: React.FC = () => {
 
               <div>
                 <div className="flex justify-between mb-1">
-                  <span className="text-xs text-slate-500">Production Progress</span>
+                  <span className="text-xs text-gray-500">Production Progress</span>
                   <span className="text-xs font-semibold">{selectedOrder.progress}%</span>
                 </div>
-                <div className="bg-gray-100 rounded-full h-2 overflow-hidden">
+                <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
                   <div className="h-full bg-orange-500 rounded-full" style={{ width: `${selectedOrder.progress}%` }} />
                 </div>
               </div>
             </div>
-            <div className="sticky bottom-0 bg-white border-t p-6 flex justify-end gap-3">
-              <button onClick={() => setShowDetailsModal(false)} className="px-6 py-2 bg-gray-100 rounded-xl text-slate-600 hover:bg-gray-200 transition-colors">
-                Close
-              </button>
-              <button className="px-6 py-2 bg-orange-500 text-white rounded-xl hover:bg-orange-600 transition-colors flex items-center gap-2">
-                <Printer size={16} />
-                Print Instructions
+            <div className="sticky bottom-0 bg-white border-t p-6 flex justify-between">
+              <button onClick={() => setShowDetailsModal(false)} className="px-6 py-2 bg-gray-100 rounded-xl text-sm font-medium hover:bg-gray-200 transition-colors">Close</button>
+              <button className="px-6 py-2 bg-orange-500 text-white rounded-xl text-sm font-medium hover:bg-orange-600 transition-colors flex items-center gap-2">
+                <Printer size={16} /> Print Instructions
               </button>
             </div>
           </div>
