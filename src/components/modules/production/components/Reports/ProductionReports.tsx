@@ -272,7 +272,7 @@ const ProductionReports: React.FC = () => {
   };
 
   //eslint-disable-next-line react-hooks/exhaustive-deps
-  const handleDelete = (id: string) => {
+  const handleDelete = (_id: string) => {
     if (window.confirm("Delete this production order?")) {
       // In a real app, you would call an API here
       setSuccessMessage("Production order deleted successfully!");
@@ -551,7 +551,7 @@ const ProductionReports: React.FC = () => {
                   {(() => {
                     let cumulative = 0;
                     const colors: Record<string, string> = { orange: "#f97316", blue: "#3b82f6", emerald: "#10b981", slate: "#94a3b8" };
-                    return downtimeBreakdown.map((item, idx) => {
+                    return downtimeBreakdown.map((item) => {
                       const startAngle = (cumulative / 100) * 360;
                       const endAngle = ((cumulative + item.value) / 100) * 360;
                       const startRad = (startAngle * Math.PI) / 180;
@@ -647,7 +647,7 @@ const ProductionReports: React.FC = () => {
                     {statusFilter === "All" ? "Status" : statusFilter.replace("_", " ")} <ChevronDown size={14} className={activeDropdown === "status" ? "rotate-180" : ""} />
                   </button>
                   {activeDropdown === "status" && (
-                    <div className="absolute right-0 mt-2 w-40 bg-white border rounded-2xl shadow-2xl z-50 py-2">
+                    <div className="absolute right-0 mt-2 w-40 bg-white rounded-2xl shadow-2xl z-50 py-2">
                       {statusOptions.map(opt => (
                         <button key={opt} onClick={() => { setStatusFilter(opt); setActiveDropdown(null); }} className={`w-full text-left px-4 py-2 text-[13px] hover:bg-slate-50 ${statusFilter === opt ? "text-orange-600 font-bold bg-orange-50/50" : "text-slate-600"}`}>
                           {opt === "All" ? "All" : opt.replace("_", " ")}
@@ -663,7 +663,7 @@ const ProductionReports: React.FC = () => {
                     {priorityFilter === "All" ? "Priority" : priorityFilter} <ChevronDown size={14} className={activeDropdown === "priority" ? "rotate-180" : ""} />
                   </button>
                   {activeDropdown === "priority" && (
-                    <div className="absolute right-0 mt-2 w-32 bg-white border rounded-2xl shadow-2xl z-50 py-2">
+                    <div className="absolute right-0 mt-2 w-32 bg-white rounded-2xl shadow-2xl z-50 py-2">
                       {priorityOptions.map(opt => (
                         <button key={opt} onClick={() => { setPriorityFilter(opt); setActiveDropdown(null); }} className={`w-full text-left px-4 py-2 text-[13px] hover:bg-slate-50 ${priorityFilter === opt ? "text-orange-600 font-bold bg-orange-50/50" : "text-slate-600"}`}>
                           {opt}
@@ -679,7 +679,7 @@ const ProductionReports: React.FC = () => {
                     {shiftFilter === "All" ? "Shift" : getShiftLabel(shiftFilter as Shift)} <ChevronDown size={14} className={activeDropdown === "shift" ? "rotate-180" : ""} />
                   </button>
                   {activeDropdown === "shift" && (
-                    <div className="absolute right-0 mt-2 w-40 bg-white border rounded-2xl shadow-2xl z-50 py-2">
+                    <div className="absolute right-0 mt-2 w-40 bg-white rounded-2xl shadow-2xl z-50 py-2">
                       {shiftOptions.map(opt => (
                         <button key={opt} onClick={() => { setShiftFilter(opt); setActiveDropdown(null); }} className={`w-full text-left px-4 py-2 text-[13px] hover:bg-slate-50 ${shiftFilter === opt ? "text-orange-600 font-bold bg-orange-50/50" : "text-slate-600"}`}>
                           {opt === "All" ? "All" : getShiftLabel(opt as Shift)}
@@ -730,7 +730,7 @@ const ProductionReports: React.FC = () => {
                         }} />
                       </td>
                       <td className="px-4 py-4 text-[13px] font-mono font-bold text-slate-800 text-center whitespace-nowrap">{order.productionOrderId}</td>
-                      <td className="px-4 py-4 text-[13px] text-slate-700 text-center truncate max-w-[150px]">{order.productName}</td>
+                      <td className="px-4 py-4 text-[13px] text-slate-700 text-center truncate max-w-37.5">{order.productName}</td>
                       <td className="px-4 py-4 text-[13px] text-slate-600 text-center">{order.quantity.toLocaleString()}</td>
                       <td className="px-4 py-4 text-[13px] text-slate-600 text-center">{order.completedQuantity.toLocaleString()}</td>
                       <td className={`px-4 py-4 text-[13px] text-center whitespace-nowrap ${new Date(order.deadline) < new Date() && order.status !== "COMPLETED" ? "text-red-600 font-semibold" : "text-slate-600"}`}>

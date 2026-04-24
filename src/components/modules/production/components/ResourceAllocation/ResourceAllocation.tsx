@@ -85,8 +85,8 @@ const formatDate = (date: string) => {
 };
 
 const ResourceAllocation: React.FC = () => {
+  // Refs for outside click detection
   const timeDropdownRef = useRef<HTMLDivElement>(null);
-  const calendarRef = useRef<HTMLDivElement>(null);
   const resourceFilterRef = useRef<HTMLDivElement>(null);
   const statusFilterRef = useRef<HTMLDivElement>(null);
 
@@ -114,7 +114,6 @@ const ResourceAllocation: React.FC = () => {
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
-
   // Options for filters
   const statusOptions = resourceType === "machines" 
     ? ["All", "Available", "In Use", "Maintenance", "Shutdown"]
@@ -123,19 +122,28 @@ const ResourceAllocation: React.FC = () => {
   // Close dropdowns on outside click
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (timeDropdownRef.current && !timeDropdownRef.current.contains(event.target as Node)) setIsTimeDropdownOpen(false);
-      if (calendarRef.current && !calendarRef.current.contains(event.target as Node)) setIsCalendarOpen(false);
-      if (resourceFilterRef.current && !resourceFilterRef.current.contains(event.target as Node)) setActiveDropdown(null);
-      if (statusFilterRef.current && !statusFilterRef.current.contains(event.target as Node)) setActiveDropdown(null);
+      const target = event.target as Node;
+
+      // Time & Calendar Ref logic
+      if (timeDropdownRef.current && !timeDropdownRef.current.contains(target)) {
+        setIsTimeDropdownOpen(false);
+        setIsCalendarOpen(false);
+      }
+      // Resource Filter logic
+      if (activeDropdown === "resource" && resourceFilterRef.current && !resourceFilterRef.current.contains(target)) {
+        setActiveDropdown(null);
+      }
+      // Status Filter logic
+      if (activeDropdown === "status" && statusFilterRef.current && !statusFilterRef.current.contains(target)) {
+        setActiveDropdown(null);
+      }
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+  }, [activeDropdown]);
 
-  //eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { setCurrentPage(1); }, [searchQuery, statusFilter, resourceType]);
 
-  // Get current data based on resource type
   const currentData = useMemo(() => {
     if (resourceType === "machines") {
       return machines.filter(item =>
@@ -152,7 +160,6 @@ const ResourceAllocation: React.FC = () => {
     }
   }, [machines, operators, resourceType, searchQuery, statusFilter]);
 
-  // Pagination Logic
   const totalPages = Math.ceil(currentData.length / itemsPerPage);
   const paginatedData = currentData.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
@@ -180,13 +187,9 @@ const ResourceAllocation: React.FC = () => {
     }
   };
 
-  //eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleViewDetails = (item: any) => {
-  console.log("View Details:", item);
-
-  // Example: open modal / alert / navigation
-  alert(`Viewing details for ${item.name}`);
-};
+    alert(`Viewing details for ${item.name}`);
+  };
 
   const handleCustomApply = () => {
     if (!customRange.start || !customRange.end) {
@@ -217,7 +220,6 @@ const ResourceAllocation: React.FC = () => {
     if (selectedIds.length === paginatedData.length && paginatedData.length > 0) {
       setSelectedIds([]);
     } else {
-      //eslint-disable-next-line @typescript-eslint/no-explicit-any
       setSelectedIds(paginatedData.map((item: any) => item.id));
     }
   };
@@ -228,9 +230,7 @@ const ResourceAllocation: React.FC = () => {
         setMachines(machines.filter(m => m.id !== id));
       } else {
         alert(`Would delete operator with id ${id}`);
-
       }
-      // Remove from selectedIds if present
       setSelectedIds(selectedIds.filter(selectedId => selectedId !== id));
     }
   };
@@ -279,7 +279,7 @@ const ResourceAllocation: React.FC = () => {
               <ChevronDown size={14} className={isTimeDropdownOpen ? "rotate-180" : ""} />
             </button>
             {isTimeDropdownOpen && !isCalendarOpen && (
-              <div className="absolute right-0 mt-2 bg-white border border-slate-100 rounded-2xl shadow-2xl z-50 py-2 min-w-40">
+              <div className="absolute right-0 mt-2 bg-white rounded-2xl shadow-2xl z-50 py-2 min-w-40 overflow-hidden">
                 {["Weekly", "Monthly", "Quarterly", "Yearly", "All Time"].map((tab) => (
                   <button
                     key={tab}
@@ -298,7 +298,7 @@ const ResourceAllocation: React.FC = () => {
               </div>
             )}
             {isCalendarOpen && (
-              <div ref={calendarRef} className="absolute right-0 mt-3 bg-white p-6 rounded-2xl shadow-xl border z-50 w-72">
+              <div className="absolute right-0 mt-3 bg-white p-6 rounded-2xl shadow-2xl z-50 w-72">
                 <div className="space-y-3">
                   <input
                     type="date"
@@ -359,7 +359,6 @@ const ResourceAllocation: React.FC = () => {
         <div className="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
           {/* Toolbar */}
           <div className="p-6 flex flex-col lg:flex-row justify-between items-center gap-4 border-b border-slate-50">
-            {/* Search Bar - Left Side */}
             <div className="relative w-full lg:w-96">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" size={18} />
               <input
@@ -371,10 +370,9 @@ const ResourceAllocation: React.FC = () => {
               />
             </div>
 
-            {/* Filters and Actions - Right Side */}
             <div className="flex flex-wrap gap-3">
               {/* Resource Type Filter */}
-              <div className="relative">
+              <div className="relative" ref={resourceFilterRef}>
                 <button
                   onClick={() => setActiveDropdown(activeDropdown === "resource" ? null : "resource")}
                   className={`px-4 py-3 rounded-xl border text-[13px] font-bold flex items-center gap-2 ${resourceType !== "machines" ? "bg-orange-50 border-orange-200 text-orange-600" : "bg-white border-slate-200 text-slate-600"}`}
@@ -384,7 +382,7 @@ const ResourceAllocation: React.FC = () => {
                   <ChevronDown size={14} className={activeDropdown === "resource" ? "rotate-180" : ""} />
                 </button>
                 {activeDropdown === "resource" && (
-                  <div className="absolute right-0 mt-2 w-40 bg-white border rounded-2xl shadow-2xl z-50 py-2">
+                  <div className="absolute right-0 mt-2 w-40 bg-white rounded-2xl shadow-2xl z-50 py-2 overflow-hidden">
                     <button
                       onClick={() => { setResourceType("machines"); setActiveDropdown(null); setSelectedIds([]); setCurrentPage(1); setSearchQuery(""); setStatusFilter("All"); }}
                       className={`w-full text-left px-4 py-2 text-[13px] hover:bg-slate-50 flex items-center gap-2 ${resourceType === "machines" ? "text-orange-600 font-bold bg-orange-50/50" : "text-slate-600"}`}
@@ -402,7 +400,7 @@ const ResourceAllocation: React.FC = () => {
               </div>
 
               {/* Status Filter */}
-              <div className="relative">
+              <div className="relative" ref={statusFilterRef}>
                 <button
                   onClick={() => setActiveDropdown(activeDropdown === "status" ? null : "status")}
                   className={`px-4 py-3 rounded-xl border text-[13px] font-bold flex items-center gap-2 ${statusFilter !== "All" ? "bg-orange-50 border-orange-200 text-orange-600" : "bg-white border-slate-200 text-slate-600"}`}
@@ -411,7 +409,7 @@ const ResourceAllocation: React.FC = () => {
                   <ChevronDown size={14} className={activeDropdown === "status" ? "rotate-180" : ""} />
                 </button>
                 {activeDropdown === "status" && (
-                  <div className="absolute right-0 mt-2 w-40 bg-white border rounded-2xl shadow-2xl z-50 py-2">
+                  <div className="absolute right-0 mt-2 w-40 bg-white rounded-2xl shadow-2xl z-50 py-2 overflow-hidden">
                     {statusOptions.map((opt) => (
                       <button
                         key={opt}
@@ -425,7 +423,6 @@ const ResourceAllocation: React.FC = () => {
                 )}
               </div>
 
-              {/* Bulk Delete Button - Same as Production Orders */}
               <button
                 disabled={selectedIds.length === 0}
                 onClick={handleBulkDelete}
@@ -494,21 +491,9 @@ const ResourceAllocation: React.FC = () => {
                         <td className="px-4 py-4 text-[13px] font-bold text-slate-800 text-center">{item.load}%</td>
                         <td className="px-4 py-4">
                           <div className="flex justify-center gap-2">
-                            <button
-                              onClick={() => handleViewDetails(item)}
-                              className="p-1.5 text-slate-400 hover:text-orange-500 transition-colors"
-                            >
-                              <Eye size={16} />
-                            </button>
-                            <button onClick={() => setEditingMachine(item)} className="p-1.5 text-slate-400 hover:text-blue-500 transition-colors">
-                              <Pencil size={16} />
-                            </button>
-                            <button
-                              onClick={() => handleDelete(item.id)}
-                              className="p-1.5 text-slate-400 hover:text-rose-600 transition-colors"
-                            >
-                              <Trash2 size={16} />
-                            </button>
+                            <button onClick={() => handleViewDetails(item)} className="p-1.5 text-slate-400 hover:text-orange-500 transition-colors"><Eye size={16} /></button>
+                            <button onClick={() => setEditingMachine(item)} className="p-1.5 text-slate-400 hover:text-blue-500 transition-colors"><Pencil size={16} /></button>
+                            <button onClick={() => handleDelete(item.id)} className="p-1.5 text-slate-400 hover:text-rose-600 transition-colors"><Trash2 size={16} /></button>
                           </div>
                         </td>
                       </>
@@ -528,21 +513,9 @@ const ResourceAllocation: React.FC = () => {
                         <td className="px-4 py-4 text-center"><StatusBadge status={item.status} /></td>
                         <td className="px-4 py-4 text-center">
                           <div className="flex justify-center gap-2">
-                            <button
-                              onClick={() => handleViewDetails(item)}
-                              className="p-1.5 text-slate-400 hover:text-orange-500 transition-colors"
-                            >
-                              <Eye size={16} />
-                            </button>
-                            <button className="p-1.5 text-slate-400 hover:text-blue-500 transition-colors">
-                              <Pencil size={16} />
-                            </button>
-                            <button
-                              onClick={() => handleDelete(item.id)}
-                              className="p-1.5 text-slate-400 hover:text-rose-600 transition-colors"
-                            >
-                              <Trash2 size={16} />
-                            </button>
+                            <button onClick={() => handleViewDetails(item)} className="p-1.5 text-slate-400 hover:text-orange-500 transition-colors"><Eye size={16} /></button>
+                            <button className="p-1.5 text-slate-400 hover:text-blue-500 transition-colors"><Pencil size={16} /></button>
+                            <button onClick={() => handleDelete(item.id)} className="p-1.5 text-slate-400 hover:text-rose-600 transition-colors"><Trash2 size={16} /></button>
                           </div>
                         </td>
                       </>
@@ -558,7 +531,6 @@ const ResourceAllocation: React.FC = () => {
                   {resourceType === "machines" ? <Factory className="text-slate-200" size={40} /> : <Users className="text-slate-200" size={40} />}
                 </div>
                 <h3 className="text-lg font-bold text-slate-800">No {resourceType === "machines" ? "Machines" : "Operators"} Found</h3>
-                <p className="text-slate-400 text-sm max-w-xs mx-auto">No {resourceType} matching your filter criteria.</p>
               </div>
             )}
           </div>
@@ -567,42 +539,14 @@ const ResourceAllocation: React.FC = () => {
           {totalPages > 0 && (
             <footer className="p-6 bg-slate-50/50 border-t border-slate-100 flex flex-col md:flex-row justify-between items-center gap-6">
               <div className="text-[11px] font-bold text-slate-800 uppercase">
-                Showing {(currentPage - 1) * itemsPerPage + 1} to{" "}
-                {Math.min(currentPage * itemsPerPage, currentData.length)} of{" "}
-                {currentData.length} {resourceType === "machines" ? "Machines" : "Operators"}
+                Showing {(currentPage - 1) * itemsPerPage + 1} to {Math.min(currentPage * itemsPerPage, currentData.length)} of {currentData.length} {resourceType}
               </div>
               <div className="flex items-center gap-2">
-                <button
-                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                  disabled={currentPage === 1}
-                  className="p-2.5 rounded-xl border bg-white text-slate-500 hover:text-orange-600 disabled:opacity-30"
-                >
-                  <ChevronLeft size={18} />
-                </button>
+                <button onClick={() => setCurrentPage((p) => Math.max(1, p - 1))} disabled={currentPage === 1} className="p-2.5 rounded-xl border bg-white text-slate-500 hover:text-orange-600 disabled:opacity-30"><ChevronLeft size={18} /></button>
                 <div className="flex gap-1.5">
-                  {getPageNumbers().map((page, i) =>
-                    page === "..." ? (
-                      <span key={i} className="px-2 text-slate-300">
-                        <MoreHorizontal size={14} />
-                      </span>
-                    ) : (
-                      <button
-                        key={i}
-                        onClick={() => setCurrentPage(page as number)}
-                        className={`min-w-10 h-10 rounded-xl text-xs font-bold ${currentPage === page ? "bg-orange-500 text-white shadow-lg" : "bg-white text-slate-500 border border-slate-200"}`}
-                      >
-                        {page}
-                      </button>
-                    )
-                  )}
+                  {getPageNumbers().map((page, i) => page === "..." ? <span key={i} className="px-2 text-slate-300"><MoreHorizontal size={14} /></span> : <button key={i} onClick={() => setCurrentPage(page as number)} className={`min-w-10 h-10 rounded-xl text-xs font-bold ${currentPage === page ? "bg-orange-500 text-white shadow-lg" : "bg-white text-slate-500 border border-slate-200"}`}>{page}</button>)}
                 </div>
-                <button
-                  onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                  disabled={currentPage === totalPages}
-                  className="p-2.5 rounded-xl border bg-white text-slate-500 hover:text-orange-600 disabled:opacity-30"
-                >
-                  <ChevronRight size={18} />
-                </button>
+                <button onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages} className="p-2.5 rounded-xl border bg-white text-slate-500 hover:text-orange-600 disabled:opacity-30"><ChevronRight size={18} /></button>
               </div>
             </footer>
           )}
@@ -611,8 +555,10 @@ const ResourceAllocation: React.FC = () => {
 
       {/* Edit Machine Modal */}
       {editingMachine && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
+          {/* Using a relative container for the modal content to handle clicks if needed, 
+              though the backdrop 'fixed' usually suffices with a close button */}
+          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl relative">
             <div className="flex justify-between items-center mb-6">
               <h3 className="text-xl font-bold text-slate-800">Edit Machine Info</h3>
               <button onClick={() => setEditingMachine(null)} className="text-slate-400 hover:text-slate-600"><X size={20} /></button>

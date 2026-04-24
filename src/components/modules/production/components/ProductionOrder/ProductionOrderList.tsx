@@ -218,17 +218,18 @@ const getShiftLabel = (shift: Shift) => {
 const formatDate = (date: string) => {
   if (!date) return "-";
   const d = new Date(date);
-
   const day = String(d.getDate()).padStart(2, "0");
   const month = String(d.getMonth() + 1).padStart(2, "0");
   const year = d.getFullYear();
-
   return `${day}/${month}/${year}`;
 };
 
 const ProductionOrderList: React.FC = () => {
-  const dropdownRef = useRef<HTMLDivElement>(null);
-  const calendarRef = useRef<HTMLDivElement>(null);
+  // Refs for outside click detection
+  const timeDropdownRef = useRef<HTMLDivElement>(null);
+  const statusDropdownRef = useRef<HTMLDivElement>(null);
+  const priorityDropdownRef = useRef<HTMLDivElement>(null);
+  const shiftDropdownRef = useRef<HTMLDivElement>(null);
 
   // State
   const [orders, setOrders] = useState<ProductionOrder[]>(mockOrders);
@@ -283,25 +284,49 @@ const ProductionOrderList: React.FC = () => {
     [orders],
   );
 
-  // Close dropdowns
+  // Close dropdowns on outside click
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
-      )
+      const target = event.target as Node;
+
+      // Handle Time Dropdown & Calendar
+      if (timeDropdownRef.current && !timeDropdownRef.current.contains(target)) {
         setIsTimeDropdownOpen(false);
-      if (
-        calendarRef.current &&
-        !calendarRef.current.contains(event.target as Node)
-      )
         setIsCalendarOpen(false);
+      }
+
+      // Handle Status Dropdown
+      if (
+        activeDropdown === "status" &&
+        statusDropdownRef.current &&
+        !statusDropdownRef.current.contains(target)
+      ) {
+        setActiveDropdown(null);
+      }
+
+      // Handle Priority Dropdown
+      if (
+        activeDropdown === "priority" &&
+        priorityDropdownRef.current &&
+        !priorityDropdownRef.current.contains(target)
+      ) {
+        setActiveDropdown(null);
+      }
+
+      // Handle Shift Dropdown
+      if (
+        activeDropdown === "shift" &&
+        shiftDropdownRef.current &&
+        !shiftDropdownRef.current.contains(target)
+      ) {
+        setActiveDropdown(null);
+      }
     };
+
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+  }, [activeDropdown]);
 
-  //eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     setCurrentPage(1);
   }, [
@@ -341,7 +366,7 @@ const ProductionOrderList: React.FC = () => {
     return timeFilter;
   };
 
-  // Filter orders
+  // Filter logic
   const filteredOrders = useMemo(() => {
     let filtered = [...orders];
     if (searchQuery)
@@ -375,7 +400,7 @@ const ProductionOrderList: React.FC = () => {
       if (timeFilter === "Quarterly")
         return (
           Math.floor(orderDate.getMonth() / 3) ===
-            Math.floor(now.getMonth() / 3) &&
+          Math.floor(now.getMonth() / 3) &&
           orderDate.getFullYear() === now.getFullYear()
         );
       if (timeFilter === "Yearly")
@@ -457,12 +482,12 @@ const ProductionOrderList: React.FC = () => {
               Production Orders
             </h1>
             <p className="text-sm text-gray-500 mt-1 font-medium">
-              Manage and track all production orders{" "}
+              Manage and track all production orders
             </p>
           </div>
 
           {/* Global Time Filter */}
-          <div className="relative" ref={dropdownRef}>
+          <div className="relative" ref={timeDropdownRef}>
             <button
               onClick={() => setIsTimeDropdownOpen(!isTimeDropdownOpen)}
               className="px-4 py-2 rounded-xl border border-slate-200 bg-white text-sm font-medium shadow-sm flex items-center gap-2 text-gray-700"
@@ -475,7 +500,7 @@ const ProductionOrderList: React.FC = () => {
               />
             </button>
             {isTimeDropdownOpen && !isCalendarOpen && (
-              <div className="absolute right-0 mt-2 bg-white border border-slate-100 rounded-2xl shadow-2xl z-50 py-2 min-w-40">
+              <div className="absolute right-0 mt-2 bg-white rounded-2xl shadow-2xl z-50 py-2 min-w-40 overflow-hidden">
                 {["Weekly", "Monthly", "Quarterly", "Yearly", "All Time"].map(
                   (tab) => (
                     <button
@@ -496,10 +521,7 @@ const ProductionOrderList: React.FC = () => {
               </div>
             )}
             {isCalendarOpen && (
-              <div
-                ref={calendarRef}
-                className="absolute right-0 mt-3 bg-white p-6 rounded-2xl shadow-xl border z-50 w-72"
-              >
+              <div className="absolute right-0 mt-3 bg-white p-6 rounded-2xl shadow-2xl z-50 w-72">
                 <div className="space-y-3">
                   <input
                     type="date"
@@ -573,7 +595,7 @@ const ProductionOrderList: React.FC = () => {
             </div>
             <div className="flex flex-wrap gap-3">
               {/* Status Filter */}
-              <div className="relative">
+              <div className="relative" ref={statusDropdownRef}>
                 <button
                   onClick={() =>
                     setActiveDropdown(
@@ -591,7 +613,7 @@ const ProductionOrderList: React.FC = () => {
                   />
                 </button>
                 {activeDropdown === "status" && (
-                  <div className="absolute right-0 mt-2 w-40 bg-white border rounded-2xl shadow-2xl z-50 py-2">
+                  <div className="absolute right-0 mt-2 w-40 bg-white rounded-2xl shadow-2xl z-50 py-2 overflow-hidden">
                     {statusOptions.map((opt) => (
                       <button
                         key={opt}
@@ -607,8 +629,9 @@ const ProductionOrderList: React.FC = () => {
                   </div>
                 )}
               </div>
+
               {/* Priority Filter */}
-              <div className="relative">
+              <div className="relative" ref={priorityDropdownRef}>
                 <button
                   onClick={() =>
                     setActiveDropdown(
@@ -626,7 +649,7 @@ const ProductionOrderList: React.FC = () => {
                   />
                 </button>
                 {activeDropdown === "priority" && (
-                  <div className="absolute right-0 mt-2 w-32 bg-white border rounded-2xl shadow-2xl z-50 py-2">
+                  <div className="absolute right-0 mt-2 w-32 bg-white rounded-2xl shadow-2xl z-50 py-2 overflow-hidden">
                     {priorityOptions.map((opt) => (
                       <button
                         key={opt}
@@ -642,8 +665,9 @@ const ProductionOrderList: React.FC = () => {
                   </div>
                 )}
               </div>
+
               {/* Shift Filter */}
-              <div className="relative">
+              <div className="relative" ref={shiftDropdownRef}>
                 <button
                   onClick={() =>
                     setActiveDropdown(
@@ -661,7 +685,7 @@ const ProductionOrderList: React.FC = () => {
                   />
                 </button>
                 {activeDropdown === "shift" && (
-                  <div className="absolute right-0 mt-2 w-40 bg-white border rounded-2xl shadow-2xl z-50 py-2">
+                  <div className="absolute right-0 mt-2 w-40 bg-white rounded-2xl shadow-2xl z-50 py-2 overflow-hidden">
                     {shiftOptions.map((opt) => (
                       <button
                         key={opt}
@@ -755,7 +779,7 @@ const ProductionOrderList: React.FC = () => {
                         }}
                       />
                     </td>
-                    <td className="px-4 py-4 text-[13px] font-mono font-bold text-slate-800 text-center whitespace-nowrap min-w-[120px]">
+                    <td className="px-4 py-4 text-[13px] font-mono font-bold text-slate-800 text-center whitespace-nowrap min-w-30">
                       {order.productionOrderId}
                     </td>
                     <td className="px-4 py-4 text-[13px] text-slate-700 text-center">
@@ -878,7 +902,7 @@ const ProductionOrderList: React.FC = () => {
       {/* Order Details Modal */}
       {showDetailsModal && selectedOrder && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
-          <div className="bg-white rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto">
+          <div className="bg-white rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
             <div className="sticky top-0 bg-white border-b p-6 flex justify-between">
               <div>
                 <h2 className="text-xl font-bold">

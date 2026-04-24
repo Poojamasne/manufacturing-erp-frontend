@@ -649,7 +649,7 @@ const ProductionPlanningScreen: React.FC = () => {
                 </button>
 
                 {activeDropdown === "priority" && (
-                  <div className="absolute right-0 mt-2 w-32 bg-white border rounded-2xl shadow-2xl z-50 py-2">
+                  <div className="absolute right-0 mt-2 w-32 bg-white rounded-2xl shadow-2xl z-50 py-2">
                     {priorityOptions.map((opt) => (
                       <button
                         key={opt}
@@ -948,7 +948,7 @@ const ProductionPlanningScreen: React.FC = () => {
             </div>
 
             {/* Steps */}
-            <div className="sticky top-[88px] z-10 bg-white p-6 border-b border-gray-200">
+            <div className="sticky top-22 z-10 bg-white p-6 border-b border-gray-200">
               <div className="flex">
                 {[
                   { step: 1, title: "Order Details", icon: Package },

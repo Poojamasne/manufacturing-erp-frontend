@@ -54,11 +54,11 @@ interface MaterialAlert {
 interface RecentActivity {
   id: string;
   type:
-    | "ORDER_CREATED"
-    | "ORDER_STARTED"
-    | "ORDER_COMPLETED"
-    | "MATERIAL_ALERT"
-    | "WORK_ORDER_ASSIGNED";
+  | "ORDER_CREATED"
+  | "ORDER_STARTED"
+  | "ORDER_COMPLETED"
+  | "MATERIAL_ALERT"
+  | "WORK_ORDER_ASSIGNED";
   title: string;
   description: string;
   timestamp: string;
@@ -226,7 +226,7 @@ const ProductionDashboard: React.FC = () => {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   // Filter States
-  const [timeFilter, setTimeFilter] = useState<TimeFilter>("Weekly");
+  const [timeFilter, setTimeFilter] = useState<TimeFilter>("All Time");
   const [customRange, setCustomRange] = useState({ start: "", end: "" });
 
   // UI States
@@ -399,7 +399,7 @@ const ProductionDashboard: React.FC = () => {
             </button>
             {isTimeDropdownOpen && !isCalendarOpen && (
               <div className="absolute right-0 mt-2 bg-white border border-slate-100 rounded-2xl shadow-2xl z-50 py-2 min-w-40">
-                {["Weekly", "Monthly", "Quarterly", "Yearly", "All Time"].map(
+                {["All Time", "Weekly", "Monthly", "Quarterly", "Yearly"].map(
                   (tab) => (
                     <button
                       key={tab}
@@ -765,8 +765,8 @@ Actual: ${day.actual}`}
                       {isNaN(parseDate(activity.timestamp).getTime())
                         ? activity.timestamp
                         : formatDate(
-                            parseDate(activity.timestamp).toISOString(),
-                          )}
+                          parseDate(activity.timestamp).toISOString(),
+                        )}
                     </p>
                   </div>
                   <button

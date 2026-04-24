@@ -15,7 +15,6 @@ import {
   Trash2,
 } from "lucide-react";
 
-
 type TimeFilter = "Weekly" | "Monthly" | "Quarterly" | "Yearly" | "All Time" | "Custom";
 type WorkOrderStatus = "PENDING" | "ASSIGNED" | "IN_PROGRESS" | "COMPLETED" | "BLOCKED";
 type Shift = "MORNING" | "EVENING" | "NIGHT";
@@ -72,18 +71,18 @@ const getShiftLabel = (shift: Shift) => {
 const formatDate = (date: string) => {
   if (!date) return "-";
   const d = new Date(date);
-
   const day = String(d.getDate()).padStart(2, "0");
   const month = String(d.getMonth() + 1).padStart(2, "0");
   const year = d.getFullYear();
-
   return `${day}/${month}/${year}`;
 };
 
 // ==================== Main Component ====================
 const WorkOrderList: React.FC = () => {
-  const dropdownRef = useRef<HTMLDivElement>(null);
-  const calendarRef = useRef<HTMLDivElement>(null);
+  // Refs for outside click detection
+  const timeFilterRef = useRef<HTMLDivElement>(null);
+  const statusFilterRef = useRef<HTMLDivElement>(null);
+  const shiftFilterRef = useRef<HTMLDivElement>(null);
 
   const [workOrders, setWorkOrders] = useState<WorkOrder[]>(mockWorkOrders);
   const [searchQuery, setSearchQuery] = useState("");
@@ -114,16 +113,32 @@ const WorkOrderList: React.FC = () => {
     blocked: workOrders.filter(w => w.status === "BLOCKED").length,
   }), [workOrders]);
 
+  // Handle outside clicks for all dropdowns
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) setIsTimeDropdownOpen(false);
-      if (calendarRef.current && !calendarRef.current.contains(event.target as Node)) setIsCalendarOpen(false);
+      const target = event.target as Node;
+
+      // Time & Calendar Ref
+      if (timeFilterRef.current && !timeFilterRef.current.contains(target)) {
+        setIsTimeDropdownOpen(false);
+        setIsCalendarOpen(false);
+      }
+
+      // Status Ref
+      if (statusFilterRef.current && !statusFilterRef.current.contains(target)) {
+        if (activeDropdown === "status") setActiveDropdown(null);
+      }
+
+      // Shift Ref
+      if (shiftFilterRef.current && !shiftFilterRef.current.contains(target)) {
+        if (activeDropdown === "shift") setActiveDropdown(null);
+      }
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+  }, [activeDropdown]);
 
-  //eslint-disable-next-line react-hooks/exhaustive-deps
+  // Reset pagination on filter change
   useEffect(() => { setCurrentPage(1); }, [searchQuery, statusFilter, shiftFilter, timeFilter, customRange]);
 
   const handleTimeFilterChange = (value: TimeFilter) => {
@@ -216,20 +231,22 @@ const WorkOrderList: React.FC = () => {
           </div>
 
           {/* Global Time Filter */}
-          <div className="relative" ref={dropdownRef}>
+          <div className="relative" ref={timeFilterRef}>
             <button onClick={() => setIsTimeDropdownOpen(!isTimeDropdownOpen)} className="px-4 py-2 rounded-xl border border-slate-200 bg-white text-sm font-medium shadow-sm flex items-center gap-2 text-gray-700">
               <Filter size={16} className="text-orange-500" />
               <span>{getFilterDisplayText()}</span>
               <ChevronDown size={14} className={isTimeDropdownOpen ? "rotate-180" : ""} />
             </button>
             {isTimeDropdownOpen && !isCalendarOpen && (
-              <div className="absolute right-0 mt-2 bg-white border border-slate-100 rounded-2xl shadow-2xl z-50 py-2 min-w-40">
-                {["Weekly", "Monthly", "Quarterly", "Yearly", "All Time"].map(tab => (<button key={tab} onClick={() => handleTimeFilterChange(tab as TimeFilter)} className={`w-full text-left px-4 py-2.5 text-[13px] ${timeFilter === tab ? "text-orange-600 font-bold bg-orange-50/50" : "text-slate-600 hover:bg-slate-50"}`}>{tab}</button>))}
+              <div className="absolute right-0 mt-2 bg-white rounded-2xl shadow-2xl z-50 py-2 min-w-40 overflow-hidden">
+                {["Weekly", "Monthly", "Quarterly", "Yearly", "All Time"].map(tab => (
+                  <button key={tab} onClick={() => handleTimeFilterChange(tab as TimeFilter)} className={`w-full text-left px-4 py-2.5 text-[13px] ${timeFilter === tab ? "text-orange-600 font-bold bg-orange-50/50" : "text-slate-600 hover:bg-slate-50"}`}>{tab}</button>
+                ))}
                 <button onClick={() => handleTimeFilterChange("Custom")} className={`w-full text-left px-4 py-2.5 text-[13px] ${timeFilter === "Custom" ? "text-orange-600 font-bold bg-orange-50/50" : "text-slate-600 hover:bg-slate-50"}`}>Custom</button>
               </div>
             )}
             {isCalendarOpen && (
-              <div ref={calendarRef} className="absolute right-0 mt-3 bg-white p-6 rounded-2xl shadow-xl border z-50 w-72">
+              <div className="absolute right-0 mt-3 bg-white p-6 rounded-2xl shadow-2xl z-50 w-72">
                 <div className="space-y-3">
                   <input type="date" value={customRange.start} onChange={(e) => setCustomRange({ ...customRange, start: e.target.value })} className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500/20" />
                   <input type="date" value={customRange.end} min={customRange.start} onChange={(e) => setCustomRange({ ...customRange, end: e.target.value })} className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500/20" />
@@ -259,20 +276,31 @@ const WorkOrderList: React.FC = () => {
             </div>
             <div className="flex flex-wrap gap-3">
               {/* Status Filter */}
-              <div className="relative">
+              <div className="relative" ref={statusFilterRef}>
                 <button onClick={() => setActiveDropdown(activeDropdown === "status" ? null : "status")} className={`px-4 py-3 rounded-xl border text-[13px] font-bold flex items-center gap-2 ${statusFilter !== "All" ? "bg-orange-50 border-orange-200 text-orange-600" : "bg-white border-slate-200 text-slate-600"}`}>
                   {statusFilter === "All" ? "Status" : statusFilter} <ChevronDown size={14} className={activeDropdown === "status" ? "rotate-180" : ""} />
                 </button>
-                {activeDropdown === "status" && (<div className="absolute right-0 mt-2 w-40 bg-white border rounded-2xl shadow-2xl z-50 py-2">{statusOptions.map(opt => (<button key={opt} onClick={() => { setStatusFilter(opt); setActiveDropdown(null); }} className={`w-full text-left px-4 py-2 text-[13px] hover:bg-slate-50 ${statusFilter === opt ? "text-orange-600 font-bold bg-orange-50/50" : "text-slate-600"}`}>{opt}</button>))}</div>)}
+                {activeDropdown === "status" && (
+                  <div className="absolute right-0 mt-2 w-40 bg-white rounded-2xl shadow-2xl z-50 py-2 overflow-hidden">
+                    {statusOptions.map(opt => (
+                      <button key={opt} onClick={() => { setStatusFilter(opt); setActiveDropdown(null); }} className={`w-full text-left px-4 py-2 text-[13px] hover:bg-slate-50 ${statusFilter === opt ? "text-orange-600 font-bold bg-orange-50/50" : "text-slate-600"}`}>{opt}</button>
+                    ))}
+                  </div>
+                )}
               </div>
               {/* Shift Filter */}
-              <div className="relative">
+              <div className="relative" ref={shiftFilterRef}>
                 <button onClick={() => setActiveDropdown(activeDropdown === "shift" ? null : "shift")} className={`px-4 py-3 rounded-xl border text-[13px] font-bold flex items-center gap-2 ${shiftFilter !== "All" ? "bg-orange-50 border-orange-200 text-orange-600" : "bg-white border-slate-200 text-slate-600"}`}>
                   {shiftFilter === "All" ? "Shift" : getShiftLabel(shiftFilter as Shift)} <ChevronDown size={14} className={activeDropdown === "shift" ? "rotate-180" : ""} />
                 </button>
-                {activeDropdown === "shift" && (<div className="absolute right-0 mt-2 w-40 bg-white border rounded-2xl shadow-2xl z-50 py-2">{shiftOptions.map(opt => (<button key={opt} onClick={() => { setShiftFilter(opt); setActiveDropdown(null);}} className={`w-full text-left px-4 py-2 text-[13px] hover:bg-slate-50 ${shiftFilter === opt ? "text-orange-600 font-bold bg-orange-50/50" : "text-slate-600"}`}>{opt === "All" ? "All" : getShiftLabel(opt as Shift)}</button>))}</div>)}
+                {activeDropdown === "shift" && (
+                  <div className="absolute right-0 mt-2 w-40 bg-white rounded-2xl shadow-2xl z-50 py-2 overflow-hidden">
+                    {shiftOptions.map(opt => (
+                      <button key={opt} onClick={() => { setShiftFilter(opt); setActiveDropdown(null);}} className={`w-full text-left px-4 py-2 text-[13px] hover:bg-slate-50 ${shiftFilter === opt ? "text-orange-600 font-bold bg-orange-50/50" : "text-slate-600"}`}>{opt === "All" ? "All" : getShiftLabel(opt as Shift)}</button>
+                    ))}
+                  </div>
+                )}
               </div>
-              {/* Bulk Delete Button */}
               <button
                 disabled={selectedIds.length === 0}
                 onClick={handleBulkDelete}
@@ -358,7 +386,7 @@ const WorkOrderList: React.FC = () => {
       {/* Work Order Details Modal */}
       {showDetailsModal && selectedOrder && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
-          <div className="bg-white rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto">
+          <div className="bg-white rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
             <div className="sticky top-0 bg-white border-b p-6 flex justify-between"><div><h2 className="text-xl font-bold">{selectedOrder.workOrderId}</h2><p className="text-sm text-gray-500">{selectedOrder.taskName}</p></div><button onClick={() => setShowDetailsModal(false)} className="text-gray-400">✕</button></div>
             <div className="p-6 space-y-6">
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
