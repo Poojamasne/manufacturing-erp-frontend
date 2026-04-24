@@ -1,7 +1,10 @@
 import { Link } from "react-router-dom";
 import { useState, useRef, useEffect } from "react";
+import { useAppSelector } from "../../../../common/ReduxMainHooks";
+import type { RootState } from "../../../../../ApplicationState/Store";
 
 const Navbar = ({ onMenuClick }: { onMenuClick: () => void }) => {
+  const { user } = useAppSelector((state: RootState) => state.auth);
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {
@@ -229,11 +232,11 @@ const Navbar = ({ onMenuClick }: { onMenuClick: () => void }) => {
         {/* Profile */}
         <div className="flex items-center gap-2 sm:gap-3">
           <div className="w-9 h-9 sm:w-10 sm:h-10 bg-white border-2 border-white shadow-sm rounded-full flex items-center justify-center text-xs sm:text-sm font-bold text-[#F59E0B]">
-            PP
+            {user?.name?.split(" ").map((n) => n[0]).join("") || "U"}
           </div>
           <div className="hidden lg:block text-left">
-            <p className="text-xs font-bold text-gray-800">Production Planner</p>
-            <p className="text-[10px] text-gray-400 uppercase">Production Manager</p>
+            <p className="text-xs font-bold text-gray-800">{user?.name || "User"}</p>
+            <p className="text-[10px] text-gray-400 uppercase">{user?.designation || "User"}</p>
           </div>
         </div>
       </div>
