@@ -217,8 +217,8 @@ const EditLead: React.FC = () => {
                         <h1 className="text-3xl font-black text-slate-900 tracking-tight">Edit Lead: {lead?.lead_id}</h1>
                     </div>
                     <div className="flex gap-3 w-full md:w-auto">
-                        <button type="button" onClick={() => navigate("/sales/leads")} className="flex-1 md:flex-none px-6 py-3 rounded-xl font-bold text-sm bg-white border border-slate-200 hover:bg-slate-50 transition-all">Cancel</button>
-                        <button type="button" onClick={handleSubmit} disabled={isSubmitting} className="flex-1 md:flex-none px-8 py-3 rounded-xl font-bold text-sm text-white bg-[#F59E0B] shadow-lg shadow-teal-900/20 hover:bg-[#f67317] transition-all flex items-center justify-center gap-2">
+                        <button type="button" onClick={() => navigate("/sales/leads")} className="flex-1 md:flex-none px-4 py-2 rounded-xl font-bold text-sm bg-white border border-slate-200 hover:bg-slate-50 hover:text-amber-500 transition-all">Cancel</button>
+                        <button type="button" onClick={handleSubmit} disabled={isSubmitting} className="flex-1 md:flex-none px-2.5 py-2 rounded-xl font-bold text-sm text-white bg-[#F59E0B] shadow-lg shadow-amber-500/5 hover:bg-[#f67317] transition-all flex items-center justify-center gap-2">
                             {isSubmitting ? "Updating..." : <><Save size={18} /> Update Lead</>}
                         </button>
                     </div>
@@ -284,17 +284,17 @@ const EditLead: React.FC = () => {
                                     </div>
                                 );
                             })}
-                            <button type="button" onClick={() => setProductRows([...productRows, { id: Date.now(), product_id: "", variant_id: "", quantity: 1, unit_price: 0 }])} className="flex items-center gap-2 text-[#F59E0B] font-black text-xs uppercase tracking-widest px-4 py-2 hover:bg-teal-50 rounded-xl transition-all">
+                            <button type="button" onClick={() => setProductRows([...productRows, { id: Date.now(), product_id: "", variant_id: "", quantity: 1, unit_price: 0 }])} className="flex items-center gap-2 text-[#F59E0B] font-black text-xs uppercase tracking-widest px-4 py-2 hover:bg-[#f3f4e6] rounded-xl transition-all">
                                 <Plus size={16} strokeWidth={3} /> Add Item
                             </button>
                         </div>
 
                         {/* Summary */}
-                        <div className="mt-8 bg-[#F59E0B] rounded-2xl p-6 text-white flex justify-between items-center shadow-xl shadow-teal-900/20">
+                        <div className="mt-8 bg-[#F59E0B] rounded-2xl p-6 text-white flex justify-between items-center shadow-xl shadow-amber-500/5">
                             <div className="flex gap-10">
-                                <div><p className="text-[10px] uppercase font-black text-teal-200 mb-1">Total Units</p><p className="text-2xl font-black">{summary.totalQty}</p></div>
+                                <div><p className="text-[10px] uppercase font-black text-white mb-1">Total Units</p><p className="text-2xl font-black">{summary.totalQty}</p></div>
                                 <div className="w-px h-10 bg-white/10 hidden sm:block" />
-                                <div><p className="text-[10px] uppercase font-black text-teal-200 mb-1">Total Value</p><p className="text-2xl font-black">₹{summary.totalValue.toLocaleString()}</p></div>
+                                <div><p className="text-[10px] uppercase font-black text-white mb-1"> Deal Value</p><p className="text-2xl font-black">₹{summary.totalValue.toLocaleString()}</p></div>
                             </div>
                         </div>
                     </div>
@@ -333,7 +333,7 @@ const EditLead: React.FC = () => {
 
 const SectionTitle: React.FC<{ icon: React.ReactNode; title: string }> = ({ icon, title }) => (
     <div className="flex items-center gap-3 mb-8">
-        <div className="p-2.5 bg-teal-50 text-[#F59E0B] rounded-xl border border-teal-100 shadow-sm">{icon}</div>
+        <div className="p-2.5 bg-[#f3f4e6] text-[#F59E0B] rounded-xl border border-[#f3f4e6] shadow-sm">{icon}</div>
         <h3 className="font-bold text-xl text-slate-800 tracking-tight">{title}</h3>
     </div>
 );

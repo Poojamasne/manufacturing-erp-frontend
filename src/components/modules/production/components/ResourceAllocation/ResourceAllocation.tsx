@@ -61,7 +61,7 @@ const initialOperators: Operator[] = [
 // ==================== Helper Components ====================
 const StatusBadge: React.FC<{ status: string }> = ({ status }) => {
   const styles: { [key: string]: string } = {
-    Available: "text-teal-600 bg-teal-50 border-teal-100",
+    Available: "text-teal-600 bg-[#f3f4e6] border-[#f3f4e6]",
     "In Use": "text-blue-600 bg-blue-50 border-blue-100",
     Maintenance: "text-red-600 bg-red-50 border-red-100",
     Shutdown: "text-slate-600 bg-slate-50 border-slate-100",

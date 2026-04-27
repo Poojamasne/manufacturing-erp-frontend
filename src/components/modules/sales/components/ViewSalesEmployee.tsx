@@ -106,7 +106,7 @@ const ViewSalesEmployee: React.FC = () => {
             <div className="bg-white rounded-3xl border border-slate-100 p-6 shadow-sm">
               <div className="flex justify-between items-center mb-6">
                 <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider">Performance Trends</h3>
-                <div className="text-[10px] font-bold text-[#F59E0B] bg-teal-50 px-3 py-1 rounded-full border border-teal-100">WEEKLY VIEW</div>
+                <div className="text-[10px] font-bold text-[#F59E0B] bg-[#f3f4e6] px-3 py-1 rounded-full border border-[#f3f4e6]">WEEKLY VIEW</div>
               </div>
               <div className="h-64 w-full">
                 <ResponsiveContainer width="100%" height="100%">
@@ -160,7 +160,7 @@ const ViewSalesEmployee: React.FC = () => {
 //eslint-disable-next-line @typescript-eslint/no-explicit-any
 const InfoRow = ({ icon, label, value, className = "" }: any) => (
   <div className="flex items-center gap-3 group">
-    <div className="w-9 h-9 rounded-lg bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-teal-50 group-hover:text-[#F59E0B] transition-all">
+    <div className="w-9 h-9 rounded-lg bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-[#f3f4e6] group-hover:text-[#F59E0B] transition-all">
       {icon}
     </div>
     <div>

@@ -397,7 +397,7 @@ const ShopFloorExecution: React.FC = () => {
           <div className="bg-white p-5 rounded-2xl border-l-4 border-teal-500 shadow-sm">
             <div className="flex items-center justify-between"><p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">Target Progress</p><Activity size={18} className="text-teal-500" /></div>
             <h3 className="text-2xl font-extrabold text-gray-800 mt-1">{overallProgress}%</h3>
-            <div className="mt-2 h-1.5 bg-gray-100 rounded-full overflow-hidden"><div className="h-full bg-teal-500 rounded-full" style={{ width: `${overallProgress}%` }} /></div>
+            <div className="mt-2 h-1.5 bg-gray-100 rounded-full overflow-hidden"><div className="h-full bg-[#f3f4e6]0 rounded-full" style={{ width: `${overallProgress}%` }} /></div>
           </div>
           <div className="bg-white p-5 rounded-2xl border-l-4 border-blue-500 shadow-sm">
             <div className="flex items-center justify-between"><p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">Active Stations</p><Factory size={18} className="text-blue-500" /></div>
@@ -533,7 +533,7 @@ const ShopFloorExecution: React.FC = () => {
                     </div>
                     <div className="w-full bg-gray-200 h-1.5 rounded-full overflow-hidden">
                       <div
-                        className={`h-full transition-all duration-500 ${station.status === "Running" ? "bg-teal-500" :
+                        className={`h-full transition-all duration-500 ${station.status === "Running" ? "bg-[#f3f4e6]0" :
                           station.status === "Warning" ? "bg-amber-500" :
                             station.status === "Down" ? "bg-red-500" : "bg-gray-400"
                           }`}

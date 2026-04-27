@@ -47,7 +47,7 @@ const ReportsAndAnalytics: FC = () => {
   const dispatch = useAppDispatch();
   const { data } = useAppSelector((state: RootState) => state.SalesReport);
 
-  const [range, setRange] = useState<TimeRange>("All Time");
+  const [range, setRange] = useState<TimeRange>("Yearly");
   const [customRange, setCustomRange] = useState({
     start: "",
     end: ""
@@ -194,7 +194,7 @@ const ReportsAndAnalytics: FC = () => {
                     key={tab}
                     onClick={() => handleFilterChange(tab)}
                     className={`outline-none w-full text-left px-4 py-2 text-[13px] transition-colors ${range === tab
-                      ? "text-[#F59E0B] font-bold bg-teal-50/50"
+                      ? "text-[#F59E0B] font-bold bg-[#f3f4e6]/50"
                       : "text-slate-600 hover:bg-slate-50"
                       }`}
                   >

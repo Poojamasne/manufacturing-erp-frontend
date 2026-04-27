@@ -137,7 +137,7 @@ const EditSalesEmployee: React.FC = () => {
                             type="submit"
                             form="employee-form"
                             disabled={isSaving}
-                            className="flex-1 md:flex-none px-8 py-3 rounded-xl font-bold text-sm text-white bg-[#F59E0B] shadow-lg shadow-teal-900/20 hover:bg-[#f67317] transition-all flex items-center justify-center gap-2 disabled:opacity-70"
+                            className="flex-1 md:flex-none px-8 py-3 rounded-xl font-bold text-sm text-white bg-[#F59E0B] shadow-lg shadow-amber-500/5 hover:bg-[#f67317] transition-all flex items-center justify-center gap-2 disabled:opacity-70"
                         >
                             {isSaving ? "Updating..." : <><Save size={18} /> Update Employee</>}
                         </button>
@@ -234,7 +234,7 @@ const EditSalesEmployee: React.FC = () => {
 
 const SectionHeader: React.FC<{ icon: React.ReactNode; title: string }> = ({ icon, title }) => (
     <div className="flex items-center gap-3 mb-6">
-        <div className="p-2.5 bg-teal-50 text-[#F59E0B] rounded-xl border border-teal-100 shadow-sm">
+        <div className="p-2.5 bg-[#f3f4e6] text-[#F59E0B] rounded-xl border border-[#f3f4e6] shadow-sm">
             {icon}
         </div>
         <h3 className="font-bold text-xl text-slate-800 tracking-tight">{title}</h3>

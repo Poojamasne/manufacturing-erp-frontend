@@ -126,7 +126,7 @@ const getPriorityBadge = (priority: Priority) => {
   const styles: Record<Priority, string> = {
     HIGH: "text-red-600 bg-red-50 border-red-100",
     MEDIUM: "text-amber-600 bg-amber-50 border-amber-100",
-    LOW: "text-teal-600 bg-teal-50 border-teal-100"
+    LOW: "text-teal-600 bg-[#f3f4e6] border-[#f3f4e6]"
   };
   return <span className={`px-2 py-1 rounded text-[10px] font-black uppercase border whitespace-nowrap ${styles[priority]}`}>{priority}</span>;
 };

@@ -94,23 +94,23 @@ const ProductionEdit: React.FC = () => {
   };
 
   const validateForm = () => {
-  const newErrors: Record<string, string> = {};
-  if (!formData.stage) newErrors.stage = "Stage is required";
-  if (!formData.status) newErrors.status = "Status is required";
-  
-  // Add date validation
-  if (formData.started_at && formData.completed_at) {
-    const startDate = new Date(formData.started_at);
-    const completedDate = new Date(formData.completed_at);
-    
-    if (completedDate < startDate) {
-      newErrors.completed_at = "Completed date cannot be earlier than start date";
+    const newErrors: Record<string, string> = {};
+    if (!formData.stage) newErrors.stage = "Stage is required";
+    if (!formData.status) newErrors.status = "Status is required";
+
+    // Add date validation
+    if (formData.started_at && formData.completed_at) {
+      const startDate = new Date(formData.started_at);
+      const completedDate = new Date(formData.completed_at);
+
+      if (completedDate < startDate) {
+        newErrors.completed_at = "Completed date cannot be earlier than start date";
+      }
     }
-  }
-  
-  setErrors(newErrors);
-  return Object.keys(newErrors).length === 0;
-};
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleSave = async () => {
     if (!validateForm()) return;
@@ -145,31 +145,31 @@ const ProductionEdit: React.FC = () => {
   //eslint-disable-next-line @typescript-eslint/no-explicit-any
   const updateFormData = (field: string, value: any) => {
     //eslint-disable-next-line @typescript-eslint/no-explicit-any
-  setFormData((prev: any) => ({ ...prev, [field]: value }));
-  
-  
-  if (errors[field]) {
-    const newErrors = { ...errors };
-    delete newErrors[field];
-    setErrors(newErrors);
-  }
-  
-  if (field === 'started_at' || field === 'completed_at') {
-    const newFormData = { ...formData, [field]: value };
-    if (newFormData.started_at && newFormData.completed_at) {
-      const startDate = new Date(newFormData.started_at);
-      const completedDate = new Date(newFormData.completed_at);
-      
-      if (completedDate < startDate) {
-        setErrors(prev => ({ ...prev, completed_at: "Completed date cannot be earlier than start date" }));
-      } else {
-        const newErrors = { ...errors };
-        delete newErrors.completed_at;
-        setErrors(newErrors);
+    setFormData((prev: any) => ({ ...prev, [field]: value }));
+
+
+    if (errors[field]) {
+      const newErrors = { ...errors };
+      delete newErrors[field];
+      setErrors(newErrors);
+    }
+
+    if (field === 'started_at' || field === 'completed_at') {
+      const newFormData = { ...formData, [field]: value };
+      if (newFormData.started_at && newFormData.completed_at) {
+        const startDate = new Date(newFormData.started_at);
+        const completedDate = new Date(newFormData.completed_at);
+
+        if (completedDate < startDate) {
+          setErrors(prev => ({ ...prev, completed_at: "Completed date cannot be earlier than start date" }));
+        } else {
+          const newErrors = { ...errors };
+          delete newErrors.completed_at;
+          setErrors(newErrors);
+        }
       }
     }
-  }
-};
+  };
 
   if (loading && !production?.id) {
     return (
@@ -180,7 +180,7 @@ const ProductionEdit: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+    <div className="min-h-screen bg-linear-to-br from-gray-50 to-gray-100">
       {/* Header Bar */}
       <div className="bg-white border-b border-gray-200 sticky top-0 z-20 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -204,19 +204,19 @@ const ProductionEdit: React.FC = () => {
             <div className="flex gap-3">
               <button
                 onClick={() => navigate("/sales/production")}
-                className="px-6 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                className="px-4 py-2 text-gray-700 hover:text-amber-500 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors"
               >
                 Cancel
               </button>
               <button
                 onClick={handleSave}
                 disabled={isSaving}
-                className="flex items-center gap-2 px-6 py-2 text-white bg-[#F59E0B] rounded-lg hover:bg-[#f67317] transition-colors disabled:opacity-50 shadow-lg shadow-teal-900/20"
+                className="flex items-center gap-1 px-2.5 py-2 text-white bg-[#F59E0B] rounded-xl hover:bg-[#f67317] transition-colors disabled:opacity-50 shadow-lg shadow-amber-500/5"
               >
                 {isSaving ? (
-                  <Loader2 size={18} className="animate-spin" />
+                  <Loader2 size={16} className="animate-spin" />
                 ) : (
-                  <Save size={18} />
+                  <Save size={16} />
                 )}
                 Save Changes
               </button>
@@ -283,11 +283,10 @@ const ProductionEdit: React.FC = () => {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-2 px-6 py-3 text-sm font-medium transition-all whitespace-nowrap ${
-                  activeTab === tab.id
+                className={`flex items-center gap-2 px-6 py-3 text-sm font-medium transition-all whitespace-nowrap ${activeTab === tab.id
                     ? "text-[#F59E0B] border-b-2 border-[#F59E0B]"
                     : "text-gray-500 hover:text-gray-700"
-                }`}
+                  }`}
               >
                 <tab.icon size={18} />
                 {tab.label}
@@ -359,9 +358,8 @@ const ProductionEdit: React.FC = () => {
                     <select
                       value={formData.stage}
                       onChange={(e) => updateFormData("stage", e.target.value)}
-                      className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-[#F59E0B] focus:border-transparent ${
-                        errors.stage ? "border-red-500" : "border-gray-300"
-                      }`}
+                      className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-[#F59E0B] focus:border-transparent ${errors.stage ? "border-red-500" : "border-gray-300"
+                        }`}
                     >
                       {stages.map((stage) => (
                         <option key={stage} value={stage}>
@@ -382,9 +380,8 @@ const ProductionEdit: React.FC = () => {
                     <select
                       value={formData.status}
                       onChange={(e) => updateFormData("status", e.target.value)}
-                      className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-[#F59E0B] focus:border-transparent ${
-                        errors.status ? "border-red-500" : "border-gray-300"
-                      }`}
+                      className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-[#F59E0B] focus:border-transparent ${errors.status ? "border-red-500" : "border-gray-300"
+                        }`}
                     >
                       <option value="Pending">Pending</option>
                       <option value="In Progress">In Progress</option>
@@ -412,23 +409,22 @@ const ProductionEdit: React.FC = () => {
                     />
                   </div>
                   <div>
-  <label className="block text-sm font-medium text-gray-700 mb-2">
-    Expected Completion Date
-  </label>
-  <input
-    type="date"
-    value={formData.completed_at}
-    onChange={(e) => updateFormData("completed_at", e.target.value)}
-    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-[#F59E0B] focus:border-transparent ${
-      errors.completed_at ? "border-red-500" : "border-gray-300"
-    }`}
-  />
-  {errors.completed_at && (
-    <p className="mt-1 text-xs text-red-500 flex items-center gap-1">
-      <AlertCircle size={12} /> {errors.completed_at}
-    </p>
-  )}
-</div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Expected Completion Date
+                    </label>
+                    <input
+                      type="date"
+                      value={formData.completed_at}
+                      onChange={(e) => updateFormData("completed_at", e.target.value)}
+                      className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-[#F59E0B] focus:border-transparent ${errors.completed_at ? "border-red-500" : "border-gray-300"
+                        }`}
+                    />
+                    {errors.completed_at && (
+                      <p className="mt-1 text-xs text-red-500 flex items-center gap-1">
+                        <AlertCircle size={12} /> {errors.completed_at}
+                      </p>
+                    )}
+                  </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Assigned To (User ID)

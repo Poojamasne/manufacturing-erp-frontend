@@ -100,7 +100,7 @@ const MachineDetailView = () => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case "Available":
-        return "bg-teal-500";
+        return "bg-[#f3f4e6]0";
       case "In Use":
         return "bg-blue-500";
       case "Maintenance":
@@ -164,7 +164,7 @@ const MachineDetailView = () => {
               value: `${machine.healthScore}/100`,
               icon: Zap,
               color: "text-teal-600",
-              bg: "bg-teal-50",
+              bg: "bg-[#f3f4e6]",
             },
             {
               label: "Op. Hours",

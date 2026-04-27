@@ -238,7 +238,7 @@ const StatusBadge: React.FC<{ status: string }> = ({ status }) => {
   const styles: { [key: string]: string } = {
     HIGH: "text-red-600 bg-red-50 border-red-100",
     MEDIUM: "text-amber-600 bg-amber-50 border-amber-100",
-    LOW: "text-teal-600 bg-teal-50 border-teal-100",
+    LOW: "text-teal-600 bg-[#f3f4e6] border-[#f3f4e6]",
   };
   return (
     <span

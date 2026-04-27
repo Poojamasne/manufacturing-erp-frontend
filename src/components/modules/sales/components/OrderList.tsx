@@ -321,7 +321,7 @@ const OrderList: React.FC = () => {
                         key={tab}
                         onClick={() => handleFilterChange(tab)}
                         className={`outline-none w-full text-left px-4 py-2.5 text-[13px] transition-colors ${activeTab === tab
-                            ? "text-[#F59E0B] font-bold bg-teal-50/50"
+                            ? "text-[#F59E0B] font-bold bg-[#f3f4e6]/50"
                             : "text-slate-600 hover:bg-slate-50"
                           }`}
                       >
@@ -332,7 +332,7 @@ const OrderList: React.FC = () => {
                   <button
                     onClick={() => handleFilterChange("Custom")}
                     className={`outline-none w-full text-left px-4 py-2.5 text-[13px] transition-colors ${activeTab === "Custom"
-                        ? "text-[#F59E0B] font-bold bg-teal-50/50"
+                        ? "text-[#F59E0B] font-bold bg-[#f3f4e6]/50"
                         : "text-slate-600 hover:bg-slate-50"
                       }`}
                   >
@@ -407,7 +407,7 @@ const OrderList: React.FC = () => {
               <div className="relative min-w-35">
                 <button
                   onClick={() => setIsStatusOpen(!isStatusOpen)}
-                  className={`outline-none w-full flex items-center justify-between gap-2 px-4 py-3 rounded-xl border text-[13px] font-bold transition-all ${statusFilter !== "All" ? "bg-teal-50 border-teal-200 text-[#F59E0B]" : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"}`}
+                  className={`outline-none w-full flex items-center justify-between gap-2 px-4 py-3 rounded-xl border text-[13px] font-bold transition-all ${statusFilter !== "All" ? "bg-[#f3f4e6] border-teal-200 text-[#F59E0B]" : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"}`}
                 >
                   <span className="truncate">
                     {statusFilter === "All" ? "Status" : statusFilter}
@@ -436,7 +436,7 @@ const OrderList: React.FC = () => {
                           setCurrentPage(1);
                           fetchOrders();
                         }}
-                        className={`outline-none w-full text-left px-4 py-2 text-[13px] hover:bg-slate-50 ${statusFilter === s ? "text-[#F59E0B] font-bold bg-teal-50/50" : "text-slate-600"}`}
+                        className={`outline-none w-full text-left px-4 py-2 text-[13px] hover:bg-slate-50 ${statusFilter === s ? "text-[#F59E0B] font-bold bg-[#f3f4e6]/50" : "text-slate-600"}`}
                       >
                         {s}
                       </button>
@@ -498,7 +498,7 @@ const OrderList: React.FC = () => {
                 {orders.map((o: Order) => (
                   <tr
                     key={o.id}
-                    className="group hover:bg-teal-50/20 transition-colors"
+                    className="group hover:bg-[#f3f4e6]/20 transition-colors"
                   >
                     <td className="p-5 text-center">
                       <input
@@ -625,7 +625,7 @@ const OrderList: React.FC = () => {
                       <button
                         key={i}
                         onClick={() => goToPage(page as number)}
-                        className={`min-w-10 h-10 rounded-xl text-xs font-bold transition-all ${currentPage === page ? "bg-[#F59E0B] text-white shadow-lg shadow-teal-900/20 scale-105" : "bg-white text-slate-500 border border-slate-200"}`}
+                        className={`min-w-10 h-10 rounded-xl text-xs font-bold transition-all ${currentPage === page ? "bg-[#F59E0B] text-white shadow-lg shadow-amber-500/5 scale-105" : "bg-white text-slate-500 border border-slate-200"}`}
                       >
                         {page}
                       </button>

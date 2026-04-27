@@ -343,7 +343,7 @@ const LeadList: React.FC = () => {
       case "Medium":
         return base + "text-amber-600 bg-amber-50";
       case "Low":
-        return base + "text-teal-600 bg-teal-50";
+        return base + "text-teal-600 bg-[#f3f4e6]";
       default:
         return base + "text-slate-500 bg-slate-50";
     }
@@ -388,7 +388,7 @@ const LeadList: React.FC = () => {
                         key={tab}
                         onClick={() => handleFilterChange(tab as TimeTab)}
                         className={`outline-none w-full text-left px-4 py-2.5 text-[13px] transition-colors ${activeTab === tab
-                            ? "text-[#F59E0B] font-bold bg-teal-50/50"
+                            ? "text-[#F59E0B] font-bold bg-[#f3f4e6]/50"
                             : "text-slate-600 hover:bg-slate-50"
                           }`}
                       >
@@ -398,7 +398,7 @@ const LeadList: React.FC = () => {
                     <button
                       onClick={() => handleFilterChange("Custom")}
                       className={`outline-none w-full text-left px-4 py-2.5 text-[13px] transition-colors ${activeTab === "Custom"
-                          ? "text-[#F59E0B] font-bold bg-teal-50/50"
+                          ? "text-[#F59E0B] font-bold bg-[#f3f4e6]/50"
                           : "text-slate-600 hover:bg-slate-50"
                         }`}
                     >
@@ -442,7 +442,7 @@ const LeadList: React.FC = () => {
             {/* Create New Lead Button */}
             <button
               onClick={() => navigate("/sales/leads/new-lead")}
-              className="outline-none group flex items-center gap-1 bg-[#F59E0B] hover:bg-[#f67317] text-white px-2.5 py-2 rounded-xl font-bold text-sm shadow-xl shadow-teal-900/20 transition-all active:scale-95 whitespace-nowrap"
+              className="outline-none group flex items-center gap-1 bg-[#F59E0B] hover:bg-[#f67317] text-white px-2.5 py-2 rounded-xl font-bold text-sm shadow-xl shadow-amber-500/5 transition-all active:scale-95 whitespace-nowrap"
             >
               <Plus size={18} />
               <span className="hidden sm:inline">Create New Lead</span>
@@ -506,7 +506,7 @@ const LeadList: React.FC = () => {
                       setOpenDropdown(openDropdown === f.label ? null : f.label)
                     }
                     className={`outline-none w-full flex items-center justify-between gap-2 px-4 py-3 rounded-xl border text-[13px] font-bold transition-all ${f.value !== "All"
-                      ? "bg-teal-50 border-teal-200 text-[#F59E0B]"
+                      ? "bg-[#f3f4e6] border-teal-200 text-[#F59E0B]"
                       : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
                       }`}
                   >
@@ -530,7 +530,7 @@ const LeadList: React.FC = () => {
                             setCurrentPage(1);
                           }}
                           className={`outline-none w-full text-left px-4 py-2 text-[13px] hover:bg-slate-50 ${f.value === opt
-                            ? "text-[#F59E0B] font-bold bg-teal-50/50"
+                            ? "text-[#F59E0B] font-bold bg-[#f3f4e6]/50"
                             : "text-slate-600"
                             }`}
                         >
@@ -597,7 +597,7 @@ const LeadList: React.FC = () => {
                 {paginatedLeads.map((lead) => (
                   <tr
                     key={lead.id}
-                    className="group hover:bg-teal-50/20 transition-colors"
+                    className="group hover:bg-[#f3f4e6]/20 transition-colors"
                   >
                     <td className="p-5 text-center">
                       <input
@@ -725,7 +725,7 @@ const LeadList: React.FC = () => {
                         key={i}
                         onClick={() => goToPage(page as number)}
                         className={`min-w-10 h-10 rounded-xl text-xs font-bold transition-all ${currentPage === page
-                          ? "bg-[#F59E0B] text-white shadow-lg shadow-teal-900/20 scale-105"
+                          ? "bg-[#F59E0B] text-white shadow-lg shadow-amber-500/5 scale-105"
                           : "bg-white text-slate-500 border border-slate-200"
                           }`}
                       >

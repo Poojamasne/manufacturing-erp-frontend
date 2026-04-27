@@ -432,20 +432,20 @@ const QuotationCreate: React.FC = () => {
           <div className="flex gap-3 w-full lg:w-auto">
             <button
               onClick={() => navigate("/sales/quotation")}
-              className="flex-1 lg:flex-initial flex items-center justify-center gap-2 bg-white text-gray-600 hover:text-rose-500 px-5 py-2.5 rounded-xl font-medium text-sm border border-gray-200 hover:bg-gray-50 transition-all"
+              className="flex-1 lg:flex-initial flex items-center justify-center bg-white text-gray-600 hover:text-amber-500 px-4 py-2 rounded-xl font-medium text-sm border border-gray-200 hover:bg-gray-50 transition-all"
             >
                Cancel
             </button>
             <button
               onClick={() => window.print()}
-              className="flex-1 lg:flex-initial flex items-center justify-center gap-2 bg-white text-gray-600 hover:text-[#F59E0B] px-5 py-2.5 rounded-xl font-medium text-sm border border-gray-200 hover:bg-gray-50 transition-all"
+              className="flex-1 lg:flex-initial flex items-center justify-center gap-1 bg-white text-gray-600 hover:text-[#F59E0B] px-2.5 py-2 rounded-xl font-medium text-sm border border-gray-200 hover:bg-gray-50 transition-all"
             >
               <Printer size={18} /> Preview
             </button>
             <button
               onClick={handleSubmit}
               disabled={loading}
-              className="flex-1 lg:flex-initial flex items-center justify-center gap-2 bg-[#F59E0B] text-white px-6 py-2.5 rounded-xl font-bold text-sm shadow-lg shadow-teal-900/20 hover:bg-[#f67317] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 lg:flex-initial flex items-center justify-center gap-2 bg-[#F59E0B] text-white px-2.5 py-2 rounded-xl font-bold text-sm shadow-lg shadow-amber-500/5 hover:bg-[#f67317] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? (
                 <Loader2 size={18} className="animate-spin" />
@@ -955,17 +955,17 @@ const QuotationCreate: React.FC = () => {
         </div>
 
         {/* Action Buttons at the end */}
-        <div className="mt-10 pt-6 border-t border-gray-200 flex flex-col sm:flex-row justify-end gap-3">
+        {/* <div className="mt-10 pt-6 border-t border-gray-200 flex flex-col sm:flex-row justify-end gap-3">
           <button
             onClick={() => window.print()}
             className="flex items-center justify-center gap-2 bg-white text-gray-700 px-6 py-3 rounded-xl font-medium text-sm border border-gray-300 hover:bg-gray-50 transition-all shadow-sm"
           >
             <Printer size={18} /> Preview Quotation
           </button>
-          {/* <button
+          <button
             onClick={handleSubmit}
             disabled={loading}
-            className="flex items-center justify-center gap-2 bg-[#F59E0B] text-white px-6 py-3 rounded-xl font-bold text-sm shadow-lg shadow-teal-900/20 hover:bg-[#f67317] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex items-center justify-center gap-2 bg-[#F59E0B] text-white px-6 py-3 rounded-xl font-bold text-sm shadow-lg shadow-amber-500/5 hover:bg-[#f67317] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? (
               <Loader2 size={18} className="animate-spin" />
@@ -973,8 +973,8 @@ const QuotationCreate: React.FC = () => {
               <Save size={18} />
             )}
             {loading ? "Saving..." : "Save Quotation"}
-          </button> */}
-        </div>
+          </button>
+        </div> */}
       </div>
     </div>
   );

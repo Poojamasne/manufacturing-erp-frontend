@@ -236,7 +236,7 @@ const SalesEmployees: React.FC = () => {
                         setCurrentPage(1);
                       }}
                       className={`outline-none w-full text-left px-4 py-2.5 text-[13px] transition-colors ${statusFilter === option
-                        ? "text-[#F59E0B] font-bold bg-teal-50/50"
+                        ? "text-[#F59E0B] font-bold bg-[#f3f4e6]/50"
                         : "text-slate-600 hover:bg-slate-50"
                         }`}
                     >
@@ -254,7 +254,7 @@ const SalesEmployees: React.FC = () => {
             {/* Add Button */}
             <button
               onClick={() => navigate("/sales/employees/add-employee")}
-              className="outline-none group flex items-center gap-1 bg-[#F59E0B] hover:bg-[#f67317] text-white px-2.5 py-2 rounded-xl font-bold text-sm shadow-xl shadow-teal-900/20 transition-all active:scale-95 whitespace-nowrap"
+              className="outline-none group flex items-center gap-1 bg-[#F59E0B] hover:bg-[#f67317] text-white px-2.5 py-2 rounded-xl font-bold text-sm shadow-xl shadow-amber-500/5 transition-all active:scale-95 whitespace-nowrap"
             >
               <UserPlus size={18} />
               Add Sales Employee
@@ -310,7 +310,9 @@ const SalesEmployees: React.FC = () => {
                     />
                   </th>
                   <th className="px-4 py-4 text-[13px] text-slate-800 uppercase tracking-widest border-b border-slate-100 text-center">
-                    NAME & ID
+                    ID
+                  </th><th className="px-4 py-4 text-[13px] text-slate-800 uppercase tracking-widest border-b border-slate-100 text-center">
+                    NAME
                   </th>
                   <th className="px-4 py-4 text-[13px] text-slate-800 uppercase tracking-widest border-b border-slate-100 text-center">
                     DESIGNATION
@@ -333,7 +335,7 @@ const SalesEmployees: React.FC = () => {
                 {paginatedData.map((emp) => (
                   <tr
                     key={emp.id}
-                    className="group hover:bg-teal-50/20 transition-colors"
+                    className="group hover:bg-[#f3f4e6]/20 transition-colors"
                   >
                     <td className="p-5 text-center">
                       <input
@@ -351,12 +353,18 @@ const SalesEmployees: React.FC = () => {
                     </td>
                     <td className="px-4 py-4 text-center">
                       <div>
+
+                        <p className="text-[13px] font-medium text-gray-800 uppercase tracking-wider">
+                          {emp.user_id}
+                        </p>
+                      </div>
+                    </td>
+                    <td className="px-4 py-4 text-center">
+                      <div>
                         <p className="text-[13px] font-bold text-slate-800">
                           {emp.name}
                         </p>
-                        <p className="text-[10px] font-bold text-[#F59E0B] uppercase tracking-wider">
-                          {emp.user_id}
-                        </p>
+
                       </div>
                     </td>
                     <td className="px-4 py-4 text-center">
@@ -485,7 +493,7 @@ const SalesEmployees: React.FC = () => {
                       <button
                         key={i}
                         onClick={() => goToPage(page as number)}
-                        className={`min-w-10 h-10 rounded-xl text-xs font-bold transition-all ${currentPage === page ? "bg-[#F59E0B] text-white shadow-lg shadow-teal-900/20 scale-105" : "bg-white text-slate-500 border border-slate-200"}`}
+                        className={`min-w-10 h-10 rounded-xl text-xs font-bold transition-all ${currentPage === page ? "bg-[#F59E0B] text-white shadow-lg shadow-amber-500/5 scale-105" : "bg-white text-slate-500 border border-slate-200"}`}
                       >
                         {page}
                       </button>

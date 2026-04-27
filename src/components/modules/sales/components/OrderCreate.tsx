@@ -275,14 +275,14 @@ if (lineItems.some((item) => item.unit_price <= 0)) {
           <div className="flex gap-3 w-full lg:w-auto">
             <button
               onClick={() => window.print()}
-              className="flex-1 lg:flex-initial flex items-center justify-center gap-2 bg-white text-gray-600 px-5 py-2.5 rounded-xl font-medium text-sm border border-gray-200 hover:bg-gray-50"
+              className="flex-1 lg:flex-initial flex items-center justify-center gap-1 bg-white text-gray-600 hover:text-amber-500 px-4 py-2 rounded-xl font-medium text-sm border border-gray-200 hover:bg-gray-50"
             >
               <Printer size={18} /> Preview
             </button>
             <button
               onClick={handleSubmit}
               disabled={loading}
-              className="flex-1 lg:flex-initial flex items-center justify-center gap-2 bg-[#F59E0B] text-white px-6 py-2.5 rounded-xl font-bold text-sm shadow-lg hover:bg-[#f67317] disabled:opacity-50"
+              className="flex-1 lg:flex-initial flex items-center justify-center gap-2 bg-[#F59E0B] text-white px-2.5 py-2 rounded-xl font-bold text-sm shadow-lg hover:bg-[#f67317] disabled:opacity-50"
             >
               {loading ? (
                 <Loader2 size={18} className="animate-spin" />
@@ -360,7 +360,7 @@ if (lineItems.some((item) => item.unit_price <= 0)) {
                           onClick={() => handleQuotationSelect(quotation)}
                           className={`p-4 border rounded-xl cursor-pointer transition-all ${
                             selectedQuotation?.id === quotation.id
-                              ? "border-[#F59E0B] bg-teal-50 ring-2 ring-teal-500/20"
+                              ? "border-[#F59E0B] bg-[#f3f4e6] ring-2 ring-teal-500/20"
                               : "border-gray-200 hover:border-teal-300 hover:bg-gray-50"
                           }`}
                         >
@@ -648,7 +648,7 @@ if (lineItems.some((item) => item.unit_price <= 0)) {
           )}
         </div>
 
-        <div className="mt-10 pt-6 border-t border-gray-200 flex flex-col sm:flex-row justify-end gap-3">
+        {/* <div className="mt-10 pt-6 border-t border-gray-200 flex flex-col sm:flex-row justify-end gap-3">
           <button
             onClick={() => window.print()}
             className="flex items-center justify-center gap-2 bg-white text-gray-700 px-6 py-3 rounded-xl font-medium text-sm border border-gray-300 hover:bg-gray-50"
@@ -667,7 +667,7 @@ if (lineItems.some((item) => item.unit_price <= 0)) {
             )}
             {loading ? "Creating..." : "Create Order"}
           </button>
-        </div>
+        </div> */}
       </div>
     </div>
   );

@@ -322,7 +322,7 @@ const LeadForm: React.FC = () => {
             <button
               type="button"
               onClick={() => navigate("/sales/leads")}
-              className="flex-1 md:flex-none px-6 py-3.5 rounded-2xl font-bold text-sm bg-white border border-slate-200 hover:bg-slate-50 transition-all text-slate-600"
+              className="flex-1 md:flex-none px-2.5 py-2 rounded-xl font-bold text-sm bg-white border border-slate-200 hover:bg-slate-50 transition-all text-slate-600 hover:text-amber-500"
             >
               Cancel
             </button>
@@ -330,7 +330,7 @@ const LeadForm: React.FC = () => {
               type="button"
               onClick={handleSubmit}
               disabled={isSubmitting}
-              className="flex-1 md:flex-none px-8 py-3.5 rounded-2xl font-bold text-sm text-white bg-[#F59E0B] shadow-lg shadow-teal-900/20 hover:bg-[#f67317] disabled:opacity-70 transition-all flex items-center justify-center gap-2"
+              className="flex-1 md:flex-none px-2.5 py-2 rounded-xl font-bold text-sm text-white bg-[#F59E0B] shadow-lg shadow-amber-500/5 hover:bg-[#f67317] disabled:opacity-70 transition-all flex items-center justify-center gap-1"
             >
               {isSubmitting ? (
                 "Processing..."
@@ -534,18 +534,18 @@ const LeadForm: React.FC = () => {
                     },
                   ])
                 }
-                className="flex items-center gap-2 text-[#F59E0B] font-bold text-xs uppercase tracking-widest px-4 py-2 hover:bg-teal-50 rounded-xl transition-all"
+                className="flex items-center gap-2 text-[#F59E0B] font-bold text-xs uppercase tracking-widest px-4 py-2 hover:bg-[#f3f4e6] rounded-xl transition-all"
               >
                 <Plus size={16} strokeWidth={2.5} /> Add Another Item
               </button>
             </div>
 
             {/* Summary Bar */}
-            <div className="mt-8 bg-[#F59E0B] rounded-2xl p-6 text-white flex flex-col sm:flex-row justify-between items-center gap-6 shadow-xl shadow-teal-900/20 border border-white/10">
+            <div className="mt-8 bg-[#F59E0B] rounded-2xl p-6 text-white flex flex-col sm:flex-row justify-between items-center gap-6 shadow-xl shadow-amber-500/5 border border-white/10">
               <div className="flex gap-10">
                 <div>
-                  <p className="text-[10px] uppercase font-black text-teal-200 tracking-wider mb-1">
-                    Items Total
+                  <p className="text-[10px] uppercase font-black text-white tracking-wider mb-1">
+                    Total Units
                   </p>
                   <p className="text-2xl font-black">
                     {summary.totalQty}{" "}
@@ -556,7 +556,7 @@ const LeadForm: React.FC = () => {
                 </div>
                 <div className="w-px h-10 bg-white/10 hidden sm:block" />
                 <div>
-                  <p className="text-[10px] uppercase font-black text-teal-200 tracking-wider mb-1">
+                  <p className="text-[10px] uppercase font-black text-white tracking-wider mb-1">
                     Deal Value
                   </p>
                   <p className="text-2xl font-black">
@@ -683,7 +683,7 @@ const SectionTitle: React.FC<{ icon: React.ReactNode; title: string }> = ({
   title,
 }) => (
   <div className="flex items-center gap-3 mb-8">
-    <div className="p-2.5 bg-teal-50 text-[#F59E0B] rounded-xl border border-teal-100 shadow-sm">
+    <div className="p-2.5 bg-[#f3f4e6] text-[#F59E0B] rounded-xl border border-[#f3f4e6] shadow-sm">
       {icon}
     </div>
     <h3 className="font-bold text-xl text-slate-800 tracking-tight">{title}</h3>

@@ -221,7 +221,7 @@ const QuotationView: React.FC = () => {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                             <div className="bg-slate-50/50 p-8 rounded-4xl border border-slate-100">
                                 <div className="flex items-center gap-2 mb-6">
-                                    <div className="p-2 bg-teal-50 text-[#F59E0B] rounded-lg border border-teal-100"><Building2 size={18}/></div>
+                                    <div className="p-2 bg-[#f3f4e6] text-[#F59E0B] rounded-lg border border-[#f3f4e6]"><Building2 size={18}/></div>
                                     <h3 className="font-black text-xs text-slate-800 uppercase tracking-widest">Billing Entity</h3>
                                 </div>
                                 <h4 className="font-black text-xl text-[#F59E0B] mb-2">{quotationData.company_name || 'N/A'}</h4>
@@ -234,7 +234,7 @@ const QuotationView: React.FC = () => {
 
                             <div className="bg-slate-50/50 p-8 rounded-4xl border border-slate-100">
                                 <div className="flex items-center gap-2 mb-6">
-                                    <div className="p-2 bg-teal-50 text-[#F59E0B] rounded-lg border border-teal-100"><Calendar size={18}/></div>
+                                    <div className="p-2 bg-[#f3f4e6] text-[#F59E0B] rounded-lg border border-[#f3f4e6]"><Calendar size={18}/></div>
                                     <h3 className="font-black text-xs text-slate-800 uppercase tracking-widest">Reference Details</h3>
                                 </div>
                                 <div className="grid grid-cols-2 gap-y-6">
@@ -261,7 +261,7 @@ const QuotationView: React.FC = () => {
                         {/* Line Items Table */}
                         <div className="space-y-6">
                             <div className="flex items-center gap-2">
-                                <div className="p-2 bg-teal-50 text-[#F59E0B] rounded-lg border border-teal-100"><List size={18}/></div>
+                                <div className="p-2 bg-[#f3f4e6] text-[#F59E0B] rounded-lg border border-[#f3f4e6]"><List size={18}/></div>
                                 <h3 className="font-black text-xs text-slate-800 uppercase tracking-widest">Scope of Supply</h3>
                             </div>
                             
@@ -302,7 +302,7 @@ const QuotationView: React.FC = () => {
 
                         {/* Financial Breakdown */}
                         <div className="flex justify-end">
-                            <div className="w-full lg:w-1/2 bg-[#fafffe] p-10 rounded-[2.5rem] border border-teal-100/50 space-y-5 shadow-sm">
+                            <div className="w-full lg:w-1/2 bg-[#fafffe] p-10 rounded-[2.5rem] border border-[#f3f4e6]/50 space-y-5 shadow-sm">
                                 <div className="flex justify-between items-center text-xs">
                                     <span className="text-slate-400 font-black uppercase tracking-widest">Subtotal (Net)</span>
                                     <span className="font-bold text-slate-700">{formatINR(quotationData.subtotal || 0)}</span>
@@ -318,7 +318,7 @@ const QuotationView: React.FC = () => {
                                     <span className="font-bold text-slate-700">+ {formatINR(quotationData.tax || 0)}</span>
                                 </div>
 
-                                <div className="pt-6 border-t border-teal-100 flex justify-between items-center">
+                                <div className="pt-6 border-t border-[#f3f4e6] flex justify-between items-center">
                                     <span className="font-black text-slate-800 text-sm uppercase tracking-widest">Final Amount</span>
                                     <div className="text-right">
                                         <span className="font-black text-3xl text-[#F59E0B] tracking-tighter">

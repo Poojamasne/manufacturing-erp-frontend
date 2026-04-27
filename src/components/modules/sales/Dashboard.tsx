@@ -195,7 +195,7 @@ export const Dashboard = () => {
                     key={tab}
                     onClick={() => handleFilterChange(tab as TimeTab)}
                     className={`outline-none w-full text-left px-4 py-2.5 text-[13px] transition-colors ${filter === tab
-                      ? "text-[#F59E0B] font-bold bg-teal-50/50"
+                      ? "text-[#F59E0B] font-bold bg-[#f3f4e6]/50"
                       : "text-slate-600 hover:bg-slate-50"
                       }`}
                   >
@@ -205,7 +205,7 @@ export const Dashboard = () => {
                 <button
                   onClick={() => handleFilterChange("Custom")}
                   className={`outline-none w-full text-left px-4 py-2.5 text-[13px] transition-colors ${filter === "Custom"
-                    ? "text-[#F59E0B] font-bold bg-teal-50/50"
+                    ? "text-[#F59E0B] font-bold bg-[#f3f4e6]/50"
                     : "text-slate-600 hover:bg-slate-50"
                     }`}
                 >
