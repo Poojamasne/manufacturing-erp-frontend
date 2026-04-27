@@ -20,7 +20,7 @@ const ViewSalesEmployee: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
 
-  const { employee, loading } = useAppSelector((state: RootState) => state.SalesEmployee);
+  const { employee, loading } = useAppSelector((state: RootState) => state.SalesEmployee as { employee: any; loading: boolean });
 
   useEffect(() => {
     if (id) dispatch(getEmployee(id));
@@ -43,7 +43,7 @@ const ViewSalesEmployee: React.FC = () => {
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
             <div className="flex items-center gap-2 text-slate-400 text-sm mb-1">
-              <button onClick={() => navigate("/sales/employees")} className="hover:text-[#005d52] transition-colors">Employees</button>
+              <button onClick={() => navigate("/sales/employees")} className="hover:text-[#F59E0B] transition-colors">Employees</button>
               <ChevronRight size={14} />
               <span className="text-slate-600 font-semibold">{employee.user_id}</span>
             </div>
@@ -57,11 +57,11 @@ const ViewSalesEmployee: React.FC = () => {
           {/* LEFT: PROFILE CARD */}
           <div className="lg:col-span-4 space-y-6">
             <div className="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden">
-              <div className="h-28 bg-[#005d52] relative" />
+              <div className="h-28 bg-[#F59E0B] relative" />
               <div className="px-6 pb-8 text-center">
                 <div className="relative -mt-14 mb-4 inline-block">
                   <div className="w-28 h-28 bg-white p-1.5 rounded-2xl shadow-xl">
-                    <div className="w-full h-full rounded-xl bg-[#d1e9e7] flex items-center justify-center text-2xl font-bold text-[#005d52]">
+                    <div className="w-full h-full rounded-xl bg-[#f3f4e6] flex items-center justify-center text-2xl font-bold text-[#F59E0B]">
                       {initials}
                     </div>
                   </div>
@@ -69,7 +69,7 @@ const ViewSalesEmployee: React.FC = () => {
                 </div>
 
                 <h2 className="text-xl font-bold text-slate-900">{employee.name}</h2>
-                <p className="text-xs font-bold text-[#005d52] uppercase tracking-wider mt-1">{employee.designation}</p>
+                <p className="text-xs font-bold text-[#F59E0B] uppercase tracking-wider mt-1">{employee.designation}</p>
 
                 <div className="mt-8 space-y-4 text-left">
                   <InfoRow icon={<Mail size={16} />} label="Email Address" value={employee.email} />
@@ -106,7 +106,7 @@ const ViewSalesEmployee: React.FC = () => {
             <div className="bg-white rounded-3xl border border-slate-100 p-6 shadow-sm">
               <div className="flex justify-between items-center mb-6">
                 <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider">Performance Trends</h3>
-                <div className="text-[10px] font-bold text-[#005d52] bg-teal-50 px-3 py-1 rounded-full border border-teal-100">WEEKLY VIEW</div>
+                <div className="text-[10px] font-bold text-[#F59E0B] bg-teal-50 px-3 py-1 rounded-full border border-teal-100">WEEKLY VIEW</div>
               </div>
               <div className="h-64 w-full">
                 <ResponsiveContainer width="100%" height="100%">
@@ -117,7 +117,7 @@ const ViewSalesEmployee: React.FC = () => {
                     <Tooltip cursor={{ fill: '#f8fafc' }} contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }} />
                     <Bar dataKey="sales" radius={[4, 4, 0, 0]} barSize={30}>
                       {MOCK_CHART_DATA.map((_, i) => (
-                        <Cell key={i} fill={i === MOCK_CHART_DATA.length - 1 ? "#005d52" : "#d1e9e7"} />
+                        <Cell key={i} fill={i === MOCK_CHART_DATA.length - 1 ? "#F59E0B" : "#f3f4e6"} />
                       ))}
                     </Bar>
                   </BarChart>
@@ -128,7 +128,7 @@ const ViewSalesEmployee: React.FC = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="bg-white rounded-3xl border border-slate-100 p-6 shadow-sm">
                 <h3 className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2">
-                  <Award size={14} className="text-[#005d52]" /> Competencies
+                  <Award size={14} className="text-[#F59E0B]" /> Competencies
                 </h3>
                 <div className="flex flex-wrap gap-2">
                   {["CRM Specialist", "Account Management", "Negotiation"].map(tag => (
@@ -160,7 +160,7 @@ const ViewSalesEmployee: React.FC = () => {
 //eslint-disable-next-line @typescript-eslint/no-explicit-any
 const InfoRow = ({ icon, label, value, className = "" }: any) => (
   <div className="flex items-center gap-3 group">
-    <div className="w-9 h-9 rounded-lg bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-teal-50 group-hover:text-[#005d52] transition-all">
+    <div className="w-9 h-9 rounded-lg bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-teal-50 group-hover:text-[#F59E0B] transition-all">
       {icon}
     </div>
     <div>
@@ -178,7 +178,7 @@ const StatCard = ({ label, value, icon, trend, positive }: any) => (
       <h4 className="text-xl font-bold text-slate-900">{value}</h4>
       <p className={`text-[10px] font-bold mt-1 ${positive ? 'text-green-500' : 'text-slate-400'}`}>{trend}</p>
     </div>
-    <div className="w-12 h-12 bg-slate-50 rounded-xl flex items-center justify-center text-[#005d52]">
+    <div className="w-12 h-12 bg-slate-50 rounded-xl flex items-center justify-center text-[#F59E0B]">
       {icon}
     </div>
   </div>

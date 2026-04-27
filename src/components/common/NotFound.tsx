@@ -27,7 +27,7 @@ const NotFound: React.FC = () => {
       {/* BUTTON */}
       <button
         onClick={() => navigate(-1 || "/")}
-        className="mt-6 mb-1 bg-[#005d52] text-white px-6 py-2.5 rounded-lg font-medium shadow-sm hover:bg-[#005d52f7] cursor-pointer active:scale-95 transition-all duration-200"
+        className="mt-6 mb-1 bg-[#F59E0B] text-white px-6 py-2.5 rounded-lg font-medium shadow-sm hover:bg-[#F59E0Bf7] cursor-pointer active:scale-95 transition-all duration-200"
       >
         Go to Back
       </button>

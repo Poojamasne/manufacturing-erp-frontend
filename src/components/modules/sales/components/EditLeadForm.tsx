@@ -210,7 +210,7 @@ const EditLead: React.FC = () => {
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
                     <div>
                         <div className="flex items-center gap-2 text-slate-400 mb-1 text-sm font-medium">
-                            <button type="button" onClick={() => navigate("/sales/leads")} className="hover:text-[#005d52]">Leads</button>
+                            <button type="button" onClick={() => navigate("/sales/leads")} className="hover:text-[#F59E0B]">Leads</button>
                             <ChevronRight size={14} />
                             <span className="text-slate-600 font-bold uppercase text-[10px] tracking-widest">Update Record</span>
                         </div>
@@ -218,7 +218,7 @@ const EditLead: React.FC = () => {
                     </div>
                     <div className="flex gap-3 w-full md:w-auto">
                         <button type="button" onClick={() => navigate("/sales/leads")} className="flex-1 md:flex-none px-6 py-3 rounded-xl font-bold text-sm bg-white border border-slate-200 hover:bg-slate-50 transition-all">Cancel</button>
-                        <button type="button" onClick={handleSubmit} disabled={isSubmitting} className="flex-1 md:flex-none px-8 py-3 rounded-xl font-bold text-sm text-white bg-[#005d52] shadow-lg shadow-teal-900/20 hover:bg-[#004a41] transition-all flex items-center justify-center gap-2">
+                        <button type="button" onClick={handleSubmit} disabled={isSubmitting} className="flex-1 md:flex-none px-8 py-3 rounded-xl font-bold text-sm text-white bg-[#F59E0B] shadow-lg shadow-teal-900/20 hover:bg-[#f67317] transition-all flex items-center justify-center gap-2">
                             {isSubmitting ? "Updating..." : <><Save size={18} /> Update Lead</>}
                         </button>
                     </div>
@@ -273,7 +273,7 @@ const EditLead: React.FC = () => {
                                         <div className="md:col-span-2">
                                             <div className="flex flex-col gap-1.5 px-1">
                                                 <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Unit Price</span>
-                                                <div className="h-12 flex items-center bg-white px-4 rounded-xl border border-slate-200 text-sm font-bold text-[#005d52]">
+                                                <div className="h-12 flex items-center bg-white px-4 rounded-xl border border-slate-200 text-sm font-bold text-[#F59E0B]">
                                                     ₹{row.unit_price.toLocaleString()}
                                                 </div>
                                             </div>
@@ -284,13 +284,13 @@ const EditLead: React.FC = () => {
                                     </div>
                                 );
                             })}
-                            <button type="button" onClick={() => setProductRows([...productRows, { id: Date.now(), product_id: "", variant_id: "", quantity: 1, unit_price: 0 }])} className="flex items-center gap-2 text-[#005d52] font-black text-xs uppercase tracking-widest px-4 py-2 hover:bg-teal-50 rounded-xl transition-all">
+                            <button type="button" onClick={() => setProductRows([...productRows, { id: Date.now(), product_id: "", variant_id: "", quantity: 1, unit_price: 0 }])} className="flex items-center gap-2 text-[#F59E0B] font-black text-xs uppercase tracking-widest px-4 py-2 hover:bg-teal-50 rounded-xl transition-all">
                                 <Plus size={16} strokeWidth={3} /> Add Item
                             </button>
                         </div>
 
                         {/* Summary */}
-                        <div className="mt-8 bg-[#005d52] rounded-2xl p-6 text-white flex justify-between items-center shadow-xl shadow-teal-900/20">
+                        <div className="mt-8 bg-[#F59E0B] rounded-2xl p-6 text-white flex justify-between items-center shadow-xl shadow-teal-900/20">
                             <div className="flex gap-10">
                                 <div><p className="text-[10px] uppercase font-black text-teal-200 mb-1">Total Units</p><p className="text-2xl font-black">{summary.totalQty}</p></div>
                                 <div className="w-px h-10 bg-white/10 hidden sm:block" />
@@ -322,7 +322,7 @@ const EditLead: React.FC = () => {
                                 <FormInput label="City" name="city" value={formData.city} onChange={handleInputChange} />
                                 <FormInput label="State" name="state" value={formData.state} onChange={handleInputChange} />
                             </div>
-                            <textarea name="address" value={formData.address} onChange={handleInputChange} rows={4} className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 text-sm focus:border-[#005d52] outline-none transition-all resize-none font-bold" placeholder="Full Address..." />
+                            <textarea name="address" value={formData.address} onChange={handleInputChange} rows={4} className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 text-sm focus:border-[#F59E0B] outline-none transition-all resize-none font-bold" placeholder="Full Address..." />
                         </div>
                     </div>
                 </div>
@@ -333,7 +333,7 @@ const EditLead: React.FC = () => {
 
 const SectionTitle: React.FC<{ icon: React.ReactNode; title: string }> = ({ icon, title }) => (
     <div className="flex items-center gap-3 mb-8">
-        <div className="p-2.5 bg-teal-50 text-[#005d52] rounded-xl border border-teal-100 shadow-sm">{icon}</div>
+        <div className="p-2.5 bg-teal-50 text-[#F59E0B] rounded-xl border border-teal-100 shadow-sm">{icon}</div>
         <h3 className="font-bold text-xl text-slate-800 tracking-tight">{title}</h3>
     </div>
 );
@@ -345,7 +345,7 @@ const FormInput: React.FC<any> = ({ label, error, required, ...props }) => (
         <div className="relative group">
             <input {...props}
                 {...("type" in props && props.type === "number" ? { min: 1 } : {})}
-                className={`w-full bg-slate-50 border ${error ? 'border-red-300 ring-4 ring-red-50' : 'border-slate-200'} rounded-xl px-4 py-3 text-sm focus:border-[#005d52] outline-none transition-all font-bold placeholder:font-normal`} />
+                className={`w-full bg-slate-50 border ${error ? 'border-red-300 ring-4 ring-red-50' : 'border-slate-200'} rounded-xl px-4 py-3 text-sm focus:border-[#F59E0B] outline-none transition-all font-bold placeholder:font-normal`} />
             {error && <AlertCircle className="absolute right-3 top-1/2 -translate-y-1/2 text-red-400 animate-pulse" size={16} />}
         </div>
         {error && <p className="text-[10px] text-red-500 font-bold uppercase px-1">{error}</p>}
@@ -357,7 +357,7 @@ const FormSelect: React.FC<any> = ({ label, options, error, required, ...props }
     <div className="flex flex-col gap-1.5">
         <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">{label} {required && <span className="text-red-500">*</span>}</label>
         <div className="relative group">
-            <select {...props} className={`w-full bg-slate-50 border ${error ? 'border-red-300 ring-4 ring-red-50' : 'border-slate-200'} rounded-xl px-4 py-3 text-sm appearance-none outline-none focus:border-[#005d52] transition-all font-bold cursor-pointer`}>
+            <select {...props} className={`w-full bg-slate-50 border ${error ? 'border-red-300 ring-4 ring-red-50' : 'border-slate-200'} rounded-xl px-4 py-3 text-sm appearance-none outline-none focus:border-[#F59E0B] transition-all font-bold cursor-pointer`}>
                 <option value="">Select option</option>
                 {options.map((o: any) => <option key={o.v} value={o.v}>{o.l}</option>)}
             </select>

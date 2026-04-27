@@ -48,7 +48,7 @@ const QuotationList: React.FC = () => {
   const calendarRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const { quotations, loading, error } = useAppSelector(
+  const { quotations, error } = useAppSelector(
     (state: RootState) => state.SalesQuotation,
   );
 
@@ -167,9 +167,20 @@ const QuotationList: React.FC = () => {
   };
 
   const getFilterDisplayText = () => {
+    const formatDate = (dateStr: any) => {
+      const date = new Date(dateStr);
+
+      const day = date.getDate();
+      const year = date.getFullYear();
+      const month = date.toLocaleString("default", { month: "long" });
+
+      return `${day} ${month} ${year}`;
+    };
+
     if (activeTab === "Custom" && customRange.start && customRange.end) {
       return `${formatDate(customRange.start)} to ${formatDate(customRange.end)}`;
     }
+
     return activeTab;
   };
 
@@ -290,13 +301,13 @@ const QuotationList: React.FC = () => {
   };
 
   const formatDate = (dateStr: string | null) => {
-  if (!dateStr) return "N/A";
-  const d = new Date(dateStr);
-  const month = String(d.getMonth() + 1).padStart(2, "0");
-  const day = String(d.getDate()).padStart(2, "0");
-  const year = d.getFullYear();
-  return `${month}/${day}/${year}`;
-};
+    if (!dateStr) return "N/A";
+    const d = new Date(dateStr);
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    const year = d.getFullYear();
+    return `${month}/${day}/${year}`;
+  };
 
   const formatCurrency = (amount: string | number | undefined | null) => {
     if (amount === undefined || amount === null) return "₹0";
@@ -318,15 +329,8 @@ const QuotationList: React.FC = () => {
 
   const errorMessage = getSafeErrorMessage();
 
-  if (loading && quotationsArray.length === 0) {
-    return (
-      <div className="min-h-screen bg-[#F8FAFC] flex items-center justify-center">
-        <Loader2 size={48} className="animate-spin text-[#005d52]" />
-      </div>
-    );
-  }
 
-  if (errorMessage && !loading) {
+  if (errorMessage) {
     return (
       <div className="min-h-screen bg-[#F8FAFC] flex items-center justify-center p-8">
         <div className="bg-red-50 border border-red-200 rounded-2xl p-8 max-w-md text-center">
@@ -337,7 +341,7 @@ const QuotationList: React.FC = () => {
           <p className="text-red-600 break-words">{errorMessage}</p>
           <button
             onClick={() => fetchQuotations()}
-            className="mt-6 px-6 py-2 bg-[#005d52] text-white rounded-xl hover:bg-[#004a41] transition-colors"
+            className="mt-6 px-6 py-2 bg-[#F59E0B] text-white rounded-xl hover:bg-[#f67317] transition-colors"
           >
             Try Again
           </button>
@@ -349,7 +353,7 @@ const QuotationList: React.FC = () => {
   return (
     <div className="min-h-screen bg-[#f4f7f6] p-4 sm:p-6 lg:p-8 text-slate-900 font-sans">
       <div className="max-w-7xl mx-auto">
-        <header className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 mb-10">
+        <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-10">
           <div>
             <h1 className="text-3xl font-extrabold text-slate-800 tracking-tight">
               Quotations
@@ -358,100 +362,93 @@ const QuotationList: React.FC = () => {
               Draft, track and manage client commercial proposals.
             </p>
           </div>
-          <button
-            onClick={() => navigate(`/sales/quotation/quotation-create`)}
-            className="outline-none group flex items-center gap-2 bg-[#005d52] hover:bg-[#004a41] text-white px-6 py-3.5 rounded-2xl font-bold text-sm shadow-xl shadow-teal-900/20 transition-all active:scale-95"
-          >
-            <Plus size={18} />
-            Create Quotation
-          </button>
-        </header>
 
-        {/* Time Filters */}
-        <section className="relative mb-8 flex justify-end">
-          <div className="relative" ref={dropdownRef}>
-            <button
-              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-              className="px-4 py-2 rounded-xl border border-slate-200 bg-white text-sm font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-[#005d52]/20 flex items-center gap-2 text-gray-700"
-            >
-              <Filter size={16} className="text-[#005d52]" />
-              <span>{getFilterDisplayText()}</span>
-              <ChevronDown
-                size={14}
-                className={`transition-transform ${isDropdownOpen ? "rotate-180" : ""}`}
-              />
-            </button>
-
-            {isDropdownOpen && !isCalendarOpen && (
-              <div className="absolute right-0 mt-2 bg-white border border-slate-100 rounded-2xl shadow-2xl z-50 py-2 min-w-[160px]">
-                {(
-                  [
-                    "Weekly",
-                    "Monthly",
-                    "Quarterly",
-                    "Yearly",
-                    "All Time",
-                  ] as TimeTab[]
-                ).map((tab) => (
-                  <button
-                    key={tab}
-                    onClick={() => handleFilterChange(tab)}
-                    className={`outline-none w-full text-left px-4 py-2.5 text-[13px] transition-colors ${
-                      activeTab === tab
-                        ? "text-[#005d52] font-bold bg-teal-50/50"
-                        : "text-slate-600 hover:bg-slate-50"
-                    }`}
-                  >
-                    {tab}
-                  </button>
-                ))}
-                <button
-                  onClick={() => handleFilterChange("Custom")}
-                  className={`outline-none w-full text-left px-4 py-2.5 text-[13px] transition-colors ${
-                    activeTab === "Custom"
-                      ? "text-[#005d52] font-bold bg-teal-50/50"
-                      : "text-slate-600 hover:bg-slate-50"
-                  }`}
-                >
-                  Custom
-                </button>
-              </div>
-            )}
-
-            {isCalendarOpen && (
-              <div
-                ref={calendarRef}
-                className="absolute right-0 mt-3 bg-white p-6 rounded-2xl shadow-xl border z-50 w-72"
+          {/* Button Container - Aligned in a row */}
+          <div className="flex items-center gap-3">
+            {/* Time Filters */}
+            <div className="relative" ref={dropdownRef}>
+              <button
+                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                className="px-4 py-2 rounded-xl border border-slate-200 bg-white text-sm font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-[#F59E0B]/20 flex items-center gap-1 text-gray-700 transition-all active:scale-95"
               >
-                <div className="space-y-3">
-                  <input
-                    type="date"
-                    value={customRange.start}
-                    onChange={(e) =>
-                      setCustomRange({ ...customRange, start: e.target.value })
-                    }
-                    className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#005d52]/20"
-                  />
-                  <input
-                    type="date"
-                    value={customRange.end}
-                    min={customRange.start}
-                    onChange={(e) =>
-                      setCustomRange({ ...customRange, end: e.target.value })
-                    }
-                    className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#005d52]/20"
-                  />
+                <Filter size={16} className="text-[#F59E0B]" />
+                <span>{getFilterDisplayText()}</span>
+                <ChevronDown
+                  size={14}
+                  className={`transition-transform ${isDropdownOpen ? "rotate-180" : ""}`}
+                />
+              </button>
+
+              {/* Dropdown Menu */}
+              {isDropdownOpen && !isCalendarOpen && (
+                <div className="absolute right-0 mt-2 bg-white border border-slate-100 rounded-2xl shadow-2xl z-50 py-2 min-w-[160px]">
+                  {(["All Time","Weekly", "Monthly", "Quarterly", "Yearly"] as TimeTab[]).map((tab) => (
+                    <button
+                      key={tab}
+                      onClick={() => handleFilterChange(tab)}
+                      className={`outline-none w-full text-left px-4 py-2.5 text-[13px] transition-colors ${activeTab === tab
+                          ? "text-[#F59E0B] font-bold bg-teal-50/50"
+                          : "text-slate-600 hover:bg-slate-50"
+                        }`}
+                    >
+                      {tab}
+                    </button>
+                  ))}
                   <button
-                    onClick={handleCustomApply}
-                    className="w-full bg-[#005d52] text-white py-2 rounded-lg text-sm hover:bg-[#004a40] transition-colors"
+                    onClick={() => handleFilterChange("Custom")}
+                    className={`outline-none w-full text-left px-4 py-2.5 text-[13px] transition-colors ${activeTab === "Custom"
+                        ? "text-[#F59E0B] font-bold bg-teal-50/50"
+                        : "text-slate-600 hover:bg-slate-50"
+                      }`}
                   >
-                    Apply Range
+                    Custom
                   </button>
                 </div>
-              </div>
-            )}
+              )}
+
+              {/* Custom Date Range Popup */}
+              {isCalendarOpen && (
+                <div
+                  ref={calendarRef}
+                  className="absolute right-0 mt-3 bg-white p-6 rounded-2xl shadow-xl border z-50 w-72"
+                >
+                  <div className="space-y-3">
+                    <input
+                      type="date"
+                      value={customRange.start}
+                      onChange={(e) => setCustomRange({ ...customRange, start: e.target.value })}
+                      className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#F59E0B]/20"
+                    />
+                    <input
+                      type="date"
+                      value={customRange.end}
+                      min={customRange.start}
+                      onChange={(e) => setCustomRange({ ...customRange, end: e.target.value })}
+                      className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#F59E0B]/20"
+                    />
+                    <button
+                      onClick={handleCustomApply}
+                      className="w-full bg-[#F59E0B] text-white py-2 rounded-lg text-sm hover:bg-[#f67317] transition-colors font-bold"
+                    >
+                      Apply Range
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Create Quotation Button */}
+            <button
+              onClick={() => navigate(`/sales/quotation/quotation-create`)}
+              className="outline-none flex items-center gap-1 bg-[#F59E0B] hover:bg-[#f67317] text-white px-2.5 py-2 rounded-xl font-bold text-sm shadow-lg shadow-orange-900/10 transition-all active:scale-95 whitespace-nowrap"
+            >
+              <Plus size={18} />
+              Create Quotation
+            </button>
           </div>
-        </section>
+        </header>
+
+
 
         {/* Main Data Container */}
         <div className="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
@@ -475,7 +472,7 @@ const QuotationList: React.FC = () => {
               <div className="relative min-w-35">
                 <button
                   onClick={() => setIsStatusOpen(!isStatusOpen)}
-                  className={`outline-none w-full flex items-center justify-between gap-2 px-4 py-3 rounded-xl border text-[13px] font-bold transition-all ${statusFilter !== "All" ? "bg-teal-50 border-teal-200 text-[#005d52]" : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"}`}
+                  className={`outline-none w-full flex items-center justify-between gap-2 px-4 py-3 rounded-xl border text-[13px] font-bold transition-all ${statusFilter !== "All" ? "bg-teal-50 border-teal-200 text-[#F59E0B]" : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"}`}
                 >
                   <span className="truncate">
                     {statusFilter === "All" ? "Status" : statusFilter}
@@ -504,7 +501,7 @@ const QuotationList: React.FC = () => {
                           setIsStatusOpen(false);
                           setCurrentPage(1);
                         }}
-                        className={`outline-none w-full text-left px-4 py-2 text-[13px] hover:bg-slate-50 ${statusFilter === s ? "text-[#005d52] font-bold bg-teal-50/50" : "text-slate-600"}`}
+                        className={`outline-none w-full text-left px-4 py-2 text-[13px] hover:bg-slate-50 ${statusFilter === s ? "text-[#F59E0B] font-bold bg-teal-50/50" : "text-slate-600"}`}
                       >
                         {s}
                       </button>
@@ -516,11 +513,10 @@ const QuotationList: React.FC = () => {
               <button
                 disabled={selectedIds.length === 0 || deleting}
                 onClick={handleBulkDelete}
-                className={`p-3 rounded-xl transition-all ${
-                  selectedIds.length === 0 || deleting
-                    ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                    : "bg-rose-600 text-white hover:bg-rose-700 shadow-sm"
-                }`}
+                className={`p-3 rounded-xl transition-all ${selectedIds.length === 0 || deleting
+                  ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                  : "bg-rose-600 text-white hover:bg-rose-700 shadow-sm"
+                  }`}
               >
                 {deleting ? (
                   <Loader2 size={20} className="animate-spin" />
@@ -539,7 +535,7 @@ const QuotationList: React.FC = () => {
                   <th className="w-12 p-5 text-center border-b border-slate-100">
                     <input
                       type="checkbox"
-                      className="accent-[#005d52] w-4 h-4 cursor-pointer"
+                      className="accent-[#F59E0B] w-4 h-4 cursor-pointer"
                       checked={
                         paginatedQuotations.length > 0 &&
                         selectedIds.length === paginatedQuotations.length
@@ -579,7 +575,7 @@ const QuotationList: React.FC = () => {
                     <td className="p-5 text-center">
                       <input
                         type="checkbox"
-                        className="accent-[#005d52] w-4 h-4 cursor-pointer"
+                        className="accent-[#F59E0B] w-4 h-4 cursor-pointer"
                         checked={selectedIds.includes(qt.id)}
                         onChange={() =>
                           setSelectedIds((prev) =>
@@ -616,7 +612,7 @@ const QuotationList: React.FC = () => {
                           onClick={() =>
                             navigate(`/sales/quotation/quotation-view/${qt.id}`)
                           }
-                          className="outline-none p-2 hover:bg-white text-slate-500 hover:text-[#005d52] rounded-xl transition-all"
+                          className="outline-none p-2 hover:bg-white text-slate-500 hover:text-[#F59E0B] rounded-xl transition-all"
                         >
                           <Eye size={16} />
                         </button>
@@ -634,7 +630,7 @@ const QuotationList: React.FC = () => {
               </tbody>
             </table>
 
-            {!loading && filteredQuotations.length === 0 && (
+            {filteredQuotations.length === 0 && (
               <div className="py-32 flex flex-col items-center justify-center text-center">
                 <div className="p-6 bg-slate-50 rounded-full mb-4">
                   <FileText className="text-slate-200" size={40} />
@@ -675,7 +671,7 @@ const QuotationList: React.FC = () => {
                 <button
                   onClick={handlePrevPage}
                   disabled={currentPage === 1}
-                  className="p-2.5 rounded-xl border border-slate-200 bg-white text-slate-500 hover:text-[#005d52] disabled:opacity-30 transition-all"
+                  className="p-2.5 rounded-xl border border-slate-200 bg-white text-slate-500 hover:text-[#F59E0B] disabled:opacity-30 transition-all"
                 >
                   <ChevronLeft size={18} strokeWidth={2.5} />
                 </button>
@@ -690,7 +686,7 @@ const QuotationList: React.FC = () => {
                       <button
                         key={i}
                         onClick={() => goToPage(page as number)}
-                        className={`min-w-10 h-10 rounded-xl text-xs font-bold transition-all ${currentPage === page ? "bg-[#005d52] text-white shadow-lg shadow-teal-900/20 scale-105" : "bg-white text-slate-500 border border-slate-200"}`}
+                        className={`min-w-10 h-10 rounded-xl text-xs font-bold transition-all ${currentPage === page ? "bg-[#F59E0B] text-white shadow-lg shadow-teal-900/20 scale-105" : "bg-white text-slate-500 border border-slate-200"}`}
                       >
                         {page}
                       </button>
@@ -701,7 +697,7 @@ const QuotationList: React.FC = () => {
                 <button
                   onClick={handleNextPage}
                   disabled={currentPage === totalPages || totalPages === 0}
-                  className="p-2.5 rounded-xl border border-slate-200 bg-white text-slate-500 hover:text-[#005d52] disabled:opacity-30 transition-all"
+                  className="p-2.5 rounded-xl border border-slate-200 bg-white text-slate-500 hover:text-[#F59E0B] disabled:opacity-30 transition-all"
                 >
                   <ChevronRight size={18} strokeWidth={2.5} />
                 </button>

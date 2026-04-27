@@ -167,6 +167,9 @@ export const getQuotations = (params?: { status?: string; search?: string; page?
             title: "Loading Quotations...",
             text: "Please wait while we fetch the data.",
             allowOutsideClick: false,
+            customClass:{
+                loader: 'lead-loader'
+            },
             didOpen: () => {
                 Swal.showLoading();
             }

@@ -403,9 +403,9 @@ export const deleteEmployee = (id: string, navigate: NavigateFunction) => async 
             title: "Are you sure?",
             text: "You won't be able to revert this!",
             icon: "warning",
-            iconColor:"#005d52",
+            iconColor:"#F59E0B",
             showCancelButton: true,
-            confirmButtonColor: "#005d52",
+            confirmButtonColor: "#F59E0B",
             cancelButtonColor: "#eb0000",
             confirmButtonText: "Yes, delete it!"
         });

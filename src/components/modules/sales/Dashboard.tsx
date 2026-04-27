@@ -20,32 +20,49 @@ interface StatCardProps {
   svg: string;
 }
 
-type FilterType = "Weekly" | "Monthly" | "Quarterly" | "Yearly" | "Custom";
+type FilterType = "Weekly" | "Monthly" | "Quarterly" | "Yearly" | "All Time" | "Custom";
 
-const COLORS = ["#005d52", "#1a7a6f", "#4fb29b", "#7bc7b5", "#f08552", "#b0d9d9", "#cbd5e1"];
+const COLORS = [
+  "#F59E0B", // primary amber
+  "#FBBF24", // lighter amber
+  "#FCD34D", // soft amber
+  "#F97316", // orange (strong contrast)
+  "#FB923C", // soft orange
+  "#10B981", // teal/green contrast
+  "#6B7280", // neutral gray
+];
 
 const StatCard = ({ title, value, svg }: StatCardProps) => (
   <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm transition-all hover:shadow-md">
     <div className="flex flex-col gap-3">
       <div className="flex items-center justify-between">
-        <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">{title}</p>
-        <div className="p-2 rounded-lg bg-[#e6f4f2] flex items-center justify-center">
+        <p className="text-[11px] font-bold text-gray-800 uppercase tracking-widest">{title}</p>
+        <div className="p-2 rounded-lg bg-[#f3f4e6] flex items-center justify-center">
           <img
             src={svg}
             alt=""
             className="w-6 h-6 opacity-80"
-            style={{ filter: "invert(23%) sepia(21%) saturate(1100%) hue-rotate(120deg) brightness(90%)" }}
+            style={{
+              filter:
+                "invert(62%) sepia(90%) saturate(1200%) hue-rotate(2deg) brightness(100%) contrast(105%)",
+            }}
           />
         </div>
       </div>
-      <h3 className="text-2xl font-extrabold text-gray-800">{value}</h3>
+      <h3 className="text-2xl font-bold tracking-tight text-gray-700">{value}</h3>
     </div>
   </div>
 );
-
+type TimeTab =
+  | "Weekly"
+  | "Monthly"
+  | "Quarterly"
+  | "Yearly"
+  | "All Time"
+  | "Custom";
 export const Dashboard = () => {
   const dispatch = useAppDispatch();
-  const { salesByCategory, stats, pipeline, loading } = useAppSelector(
+  const { salesByCategory, stats, pipeline } = useAppSelector(
     (state: RootState) => state.SalesDashboard
   );
 
@@ -125,22 +142,22 @@ export const Dashboard = () => {
   };
 
   const getFilterDisplayText = () => {
+    const formatDate = (dateStr: any) => {
+      const date = new Date(dateStr);
+
+      const day = date.getDate();
+      const year = date.getFullYear();
+      const month = date.toLocaleString("default", { month: "long" });
+
+      return `${day} ${month} ${year}`;
+    };
+
     if (filter === "Custom" && customRange.start && customRange.end) {
-      return `${customRange.start} to ${customRange.end}`;
+      return `${formatDate(customRange.start)} to ${formatDate(customRange.end)}`;
     }
+
     return filter;
   };
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-[#f4f7f6] flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#005d52] mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading dashboard...</p>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-[#f4f7f6] p-4 sm:p-6 lg:p-8 font-sans text-gray-800">
@@ -160,32 +177,37 @@ export const Dashboard = () => {
           <div className="relative" ref={dropdownRef}>
             <button
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-              className="px-4 py-2 rounded-xl border border-slate-200 bg-white text-sm font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-[#005d52]/20 flex items-center gap-2 text-gray-700"
+              className="px-4 py-2 rounded-xl border border-slate-200 bg-white text-sm font-medium shadow-sm hover:border-slate-300 focus:outline-none focus:ring-2 focus:ring-[#F59E0B]/20 flex items-center gap-2 text-gray-700 transition-all active:scale-95"
             >
-              <Filter size={16} className="text-[#005d52]" />
+              <Filter size={18} className="text-[#F59E0B]" />
               <span>{getFilterDisplayText()}</span>
-              <ChevronDown size={14} className={`transition-transform ${isDropdownOpen ? "rotate-180" : ""}`} />
+              <ChevronDown
+                size={16}
+                className={`transition-transform duration-200 ${isDropdownOpen ? "rotate-180" : ""}`}
+              />
             </button>
 
             {/* Dropdown Menu */}
             {isDropdownOpen && !isCalendarOpen && (
-              <div className="absolute right-0 mt-2 bg-white border border-slate-100 rounded-2xl shadow-2xl z-50 py-2 min-w-[160px] animate-in fade-in zoom-in-95">
-                {(["Weekly", "Monthly", "Quarterly", "Yearly"] as FilterType[]).map((tab) => (
+              <div className="absolute right-0 mt-2 bg-white border border-slate-100 rounded-2xl shadow-2xl z-50 py-2 min-w-40">
+                {["All Time", "Weekly", "Monthly", "Quarterly", "Yearly"].map((tab) => (
                   <button
                     key={tab}
-                    onClick={() => handleFilterChange(tab)}
-                    className={`outline-none w-full text-left px-4 py-2.5 text-[13px] transition-colors ${
-                      filter === tab ? "text-[#005d52] font-bold bg-teal-50/50" : "text-slate-600 hover:bg-slate-50"
-                    }`}
+                    onClick={() => handleFilterChange(tab as TimeTab)}
+                    className={`outline-none w-full text-left px-4 py-2.5 text-[13px] transition-colors ${filter === tab
+                      ? "text-[#F59E0B] font-bold bg-teal-50/50"
+                      : "text-slate-600 hover:bg-slate-50"
+                      }`}
                   >
                     {tab}
                   </button>
                 ))}
                 <button
                   onClick={() => handleFilterChange("Custom")}
-                  className={`outline-none w-full text-left px-4 py-2.5 text-[13px] transition-colors ${
-                    filter === "Custom" ? "text-[#005d52] font-bold bg-teal-50/50" : "text-slate-600 hover:bg-slate-50"
-                  }`}
+                  className={`outline-none w-full text-left px-4 py-2.5 text-[13px] transition-colors ${filter === "Custom"
+                    ? "text-[#F59E0B] font-bold bg-teal-50/50"
+                    : "text-slate-600 hover:bg-slate-50"
+                    }`}
                 >
                   Custom
                 </button>
@@ -194,7 +216,7 @@ export const Dashboard = () => {
 
             {/* Custom Date Range Popup */}
             {isCalendarOpen && (
-              <div 
+              <div
                 ref={calendarRef}
                 className="absolute right-0 mt-3 bg-white p-6 rounded-2xl shadow-xl border z-50 w-72"
               >
@@ -202,27 +224,19 @@ export const Dashboard = () => {
                   <input
                     type="date"
                     value={customRange.start}
-                    onChange={(e) =>
-                      setCustomRange({ ...customRange, start: e.target.value })
-                    }
-                    className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#005d52]/20"
-                    placeholder="Start Date"
+                    onChange={(e) => setCustomRange({ ...customRange, start: e.target.value })}
+                    className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#F59E0B]/20"
                   />
-
                   <input
                     type="date"
                     value={customRange.end}
                     min={customRange.start}
-                    onChange={(e) =>
-                      setCustomRange({ ...customRange, end: e.target.value })
-                    }
-                    className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#005d52]/20"
-                    placeholder="End Date"
+                    onChange={(e) => setCustomRange({ ...customRange, end: e.target.value })}
+                    className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#F59E0B]/20"
                   />
-
                   <button
                     onClick={handleApplyCustomRange}
-                    className="w-full bg-[#005d52] text-white py-2 rounded-lg text-sm hover:bg-[#004a40] transition-colors"
+                    className="w-full bg-[#F59E0B] text-white py-2 rounded-lg text-sm hover:bg-[#f67317] transition-colors"
                   >
                     Apply Range
                   </button>
@@ -247,26 +261,26 @@ export const Dashboard = () => {
             <h3 className="text-[11px] font-bold text-gray-800 uppercase tracking-widest mb-1">Sales Pipeline</h3>
             <p className="text-sm text-gray-400 font-normal mb-8">Conversion stages distribution</p>
             <div className="h-80 sm:h-96 w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart 
-                  data={pipeline || []} 
-                  margin={{ top: 10, right: 10, left: -25, bottom: 60 }}
+              <ResponsiveContainer width="100%" height="100%" >
+                <BarChart
+                  data={pipeline || []}
+                  margin={{ top: 10, right: 10, left: -25, bottom: 20 }}
                 >
                   <CartesianGrid vertical={false} stroke="#f1f5f9" />
-                  <XAxis 
-                    dataKey="stage" 
-                    axisLine={false} 
-                    tickLine={false} 
+                  <XAxis
+                    dataKey="stage"
+                    axisLine={false}
+                    tickLine={false}
                     tick={{ fill: '#7e899c', fontSize: 11, fontWeight: 500 }}
                     interval={0}
                     angle={0}
                     textAnchor="middle"
-                    dy={10}
-                    height={60}
+                    dy={5}
+                    height={35}
                   />
                   <YAxis axisLine={false} tickLine={false} tick={{ fill: '#7e899c', fontSize: 10 }} />
-                  <Tooltip 
-                    cursor={{ fill: '#f8fafc' }} 
+                  <Tooltip
+                    cursor={{ fill: '#f8fafc' }}
                     contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }}
                   />
                   <Bar dataKey="count" radius={[8, 8, 0, 0]} barSize={isMobile ? 28 : 35}>
@@ -288,36 +302,36 @@ export const Dashboard = () => {
               </div>
               <div className="flex gap-4">
                 <div className="flex items-center gap-2 text-[10px] font-bold text-gray-400 uppercase tracking-widest">
-                  <div className="w-2 h-2 rounded-full bg-[#005d52]" /> Sold
+                  <div className="w-2 h-2 rounded-full bg-[#F59E0B]" /> Sold
                 </div>
                 <div className="flex items-center gap-2 text-[10px] font-bold text-gray-400 uppercase tracking-widest">
-                  <div className="w-2 h-2 rounded-full bg-[#b0d9d9]" /> Target
+                  <div className="w-2 h-2 rounded-full bg-[#F97316]" /> Target
                 </div>
               </div>
             </div>
             <div className="h-80 sm:h-96 w-full">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart 
-                  data={formattedData || []} 
-                  margin={{ top: 10, right: 10, left: -25, bottom: 60 }} 
+                <BarChart
+                  data={formattedData || []}
+                  margin={{ top: 10, right: 10, left: -25, bottom: 20 }}
                   barGap={8}
                 >
                   <CartesianGrid vertical={false} stroke="#f1f5f9" />
-                  <XAxis 
-                    dataKey="category" 
-                    axisLine={false} 
-                    tickLine={false} 
+                  <XAxis
+                    dataKey="category"
+                    axisLine={false}
+                    tickLine={false}
                     tick={{ fill: '#7e899c', fontSize: 11, fontWeight: 500 }}
                     interval={0}
                     angle={0}
                     textAnchor="middle"
-                    dy={10}
-                    height={60}
+                    dy={5}
+                    height={35}
                   />
                   <YAxis axisLine={false} tickLine={false} tick={{ fill: '#7e899c', fontSize: 10 }} />
                   <Tooltip cursor={{ fill: 'transparent' }} />
-                  <Bar dataKey="units_sold" fill="#005d52" radius={[6, 6, 0, 0]} barSize={28} />
-                  <Bar dataKey="target" fill="#b0d9d9" radius={[6, 6, 0, 0]} barSize={28} />
+                  <Bar dataKey="units_sold" fill="#F59E0B" radius={[6, 6, 0, 0]} barSize={28} />
+                  <Bar dataKey="target" fill="#F97316" radius={[6, 6, 0, 0]} barSize={28} />
                 </BarChart>
               </ResponsiveContainer>
             </div>

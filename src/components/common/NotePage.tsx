@@ -72,7 +72,7 @@ const NotesPage = () => {
               </p>
 
               {/* Bottom Accent */}
-              <div className="mt-4 h-1 w-10 bg-[#005d52] rounded-full"></div>
+              <div className="mt-4 h-1 w-10 bg-[#F59E0B] rounded-full"></div>
             </div>
           ))}
 

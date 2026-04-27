@@ -116,7 +116,7 @@ const Login: React.FC = () => {
     <div className="min-h-screen flex items-center justify-center bg-[#f4f7f6] px-4">
       <div className="w-full max-w-4xl bg-white rounded-2xl shadow-xl border border-gray-200 flex flex-col md:flex-row overflow-hidden">
         {/* LEFT PANEL */}
-        <div className="hidden md:flex md:w-1/2 bg-[#005d52] p-8 flex-col justify-between">
+        <div className="hidden md:flex md:w-1/2 bg-[#F59E0B] p-8 flex-col justify-between">
           <div>
             <div className="bg-white/10 p-3 rounded-xl w-fit mb-6">
               <ShieldCheck className="text-white" size={28} />
@@ -124,7 +124,7 @@ const Login: React.FC = () => {
             <h1 className="text-3xl font-semibold text-white leading-snug mb-4">
               Manufacturing ERP System
             </h1>
-            <div className="space-y-3 text-sm text-[#d1e9e7]">
+            <div className="space-y-3 text-sm text-[#f3f4e6]">
               <div className="flex items-center gap-2">
                 <CheckCircle2 size={14} /> Streamlined Business Processes
               </div>
@@ -139,7 +139,7 @@ const Login: React.FC = () => {
               </div>
             </div>
           </div>
-          <p className="text-[10px] text-[#d1e9e7] uppercase tracking-widest">
+          <p className="text-[10px] text-[#f3f4e6] uppercase tracking-widest">
             Secure Access
           </p>
         </div>
@@ -174,7 +174,7 @@ const Login: React.FC = () => {
                 <input
                   type="email"
                   disabled={loading}
-                  className="w-full pl-10 pr-3 py-3 rounded-xl border border-gray-200 text-sm outline-none focus:border-[#005d52] transition-colors disabled:bg-gray-50"
+                  className="w-full pl-10 pr-3 py-3 rounded-xl border border-gray-200 text-sm outline-none focus:border-[#F59E0B] transition-colors disabled:bg-gray-50"
                   placeholder="name@company.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -210,7 +210,7 @@ const Login: React.FC = () => {
                   type={showPassword ? "text" : "password"}
                   disabled={loading}
                   autoComplete="off"
-                  className="w-full pl-10 pr-10 py-3 rounded-xl border border-gray-200 text-sm outline-none focus:border-[#005d52]"
+                  className="w-full pl-10 pr-10 py-3 rounded-xl border border-gray-200 text-sm outline-none focus:border-[#F59E0B]"
                   placeholder="Enter your password"
                   value={password || ""}
                   onChange={(e) => setPassword(e.target.value)}
@@ -247,7 +247,7 @@ const Login: React.FC = () => {
             <button
               type="submit"
               disabled={loading}
-              className="outline-none w-full bg-[#005d52] text-white py-3 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 hover:bg-[#004a42] transition-all disabled:opacity-70 disabled:cursor-not-allowed"
+              className="outline-none w-full bg-[#F59E0B] text-white py-3 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 hover:bg-[#f67317] transition-all disabled:opacity-70 disabled:cursor-not-allowed"
             >
               {loading ? (
                 <Loader2 className="animate-spin" size={18} />

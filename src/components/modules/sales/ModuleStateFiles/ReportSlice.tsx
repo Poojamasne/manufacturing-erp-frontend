@@ -104,6 +104,18 @@ export const exportReportCSV = createAsyncThunk(
     "reports/exportReportCSV",
     async (params: { range: string; startDate?: string; endDate?: string }, { rejectWithValue, getState }) => {
         try {
+            Swal.fire({
+                title: "Exporting Report...",
+                text: "Please wait while we prepare the report.",
+                allowOutsideClick: false,
+                customClass: {
+                    loader: 'lead-loader'
+                },
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
             const state = getState() as RootState;
             const token = state.auth.token || localStorage.getItem("token");
             
@@ -118,7 +130,7 @@ export const exportReportCSV = createAsyncThunk(
                 },
                 responseType: 'blob'
             });
-            
+            Swal.close();
             // Create download link
             const blob = new Blob([response.data], { type: 'text/csv' });
             const link = document.createElement('a');
@@ -135,7 +147,8 @@ export const exportReportCSV = createAsyncThunk(
                 title: 'Exported!',
                 text: 'Report exported successfully',
                 timer: 1500,
-                showConfirmButton: false
+                timerProgressBar: true,
+                showConfirmButton: true
             });
             
             return true;

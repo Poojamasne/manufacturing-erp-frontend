@@ -121,21 +121,31 @@ export const {
 export default SalesProduction.reducer;
 
 // GET production jobs with filters and pagination
-export const getProductions = (params?: { 
-    status?: string; 
+export const getProductions = (params?: {
+    status?: string;
     stage?: string;
-    search?: string; 
-    page?: number; 
+    search?: string;
+    page?: number;
     limit?: number;
     dateRange?: string;
     startDate?: string;
     endDate?: string;
 }) => async (dispatch: AppDispatch, getState: () => RootState) => {
     dispatch(getSalesProductionRequest());
-    
+    Swal.fire({
+        title: "Loading Production Jobs...",
+        text: "Please wait while we fetch the data.",
+        allowOutsideClick: false,
+        customClass: {
+            loader: 'lead-loader'
+        },
+        didOpen: () => {
+            Swal.showLoading();
+        }
+    });
     try {
         const token = getState().auth.token || localStorage.getItem("token");
-        
+
         const queryParams = new URLSearchParams();
         if (params?.status && params.status !== 'All') queryParams.append('status', params.status);
         if (params?.stage && params.stage !== 'All') queryParams.append('stage', params.stage);
@@ -145,19 +155,23 @@ export const getProductions = (params?: {
         if (params?.dateRange && params.dateRange !== 'All Time') queryParams.append('dateRange', params.dateRange);
         if (params?.startDate) queryParams.append('startDate', params.startDate);
         if (params?.endDate) queryParams.append('endDate', params.endDate);
-        
+
         const url = `${import.meta.env.VITE_API_BASE_URL}/sales/production/jobs${queryParams.toString() ? `?${queryParams}` : ''}`;
-        
+
         console.log("Fetching productions from:", url);
-        
+
         const { data } = await axios.get(url, {
             headers: {
                 Authorization: `Bearer ${token}`,
             },
         });
-        
+
         dispatch(getSalesProductionSuccess(data));
+        Swal.close();
+
     } catch (error: any) {
+        Swal.close();
+
         const message = error.response?.data?.message || "Something went wrong";
         dispatch(getSalesProductionFailure(message));
     }
@@ -166,7 +180,17 @@ export const getProductions = (params?: {
 // GET single production job
 export const getProduction = (id: string) => async (dispatch: AppDispatch, getState: () => RootState) => {
     dispatch(getSalesProductionRequest());
-    
+    Swal.fire({
+        title: "Loading Production Job...",
+        text: "Please wait while we fetch the data.",
+        allowOutsideClick: false,
+        customClass: {
+            loader: 'lead-loader'
+        },
+        didOpen: () => {
+            Swal.showLoading();
+        }
+    });
     try {
         const token = getState().auth.token || localStorage.getItem("token");
         const { data } = await axios.get(
@@ -177,9 +201,11 @@ export const getProduction = (id: string) => async (dispatch: AppDispatch, getSt
                 },
             }
         );
-        
+
         dispatch(getSalesSingleProductionSuccess(data));
+        Swal.close();
     } catch (error: any) {
+        Swal.close();
         const message = error.response?.data?.message || "Something went wrong";
         dispatch(getSalesProductionFailure(message));
     }
@@ -188,7 +214,7 @@ export const getProduction = (id: string) => async (dispatch: AppDispatch, getSt
 // UPDATE production job
 export const updateProduction = (id: string, updateData: any) => async (dispatch: AppDispatch, getState: () => RootState) => {
     dispatch(getSalesProductionRequest());
-    
+
     try {
         Swal.fire({
             title: "Updating Production Job...",
@@ -198,9 +224,9 @@ export const updateProduction = (id: string, updateData: any) => async (dispatch
                 Swal.showLoading();
             }
         });
-        
+
         const token = getState().auth.token || localStorage.getItem("token");
-        
+
         const { data } = await axios.put(
             `${import.meta.env.VITE_API_BASE_URL}/sales/production/jobs/${id}`,
             updateData,
@@ -211,9 +237,9 @@ export const updateProduction = (id: string, updateData: any) => async (dispatch
                 },
             }
         );
-        
+
         Swal.close();
-        
+
         await Swal.fire({
             icon: 'success',
             title: 'Updated!',
@@ -221,10 +247,10 @@ export const updateProduction = (id: string, updateData: any) => async (dispatch
             timer: 1500,
             showConfirmButton: false
         });
-        
+
         dispatch(updateSalesProductionSuccess(data));
         dispatch(getProductions());
-        
+
         return data;
     } catch (error: any) {
         Swal.close();
@@ -243,7 +269,7 @@ export const updateProduction = (id: string, updateData: any) => async (dispatch
 // DELETE production job
 export const deleteProduction = (id: string) => async (dispatch: AppDispatch, getState: () => RootState) => {
     dispatch(getSalesProductionRequest());
-    
+
     try {
         const confirmResult = await Swal.fire({
             title: 'Delete Production Job?',
@@ -254,12 +280,12 @@ export const deleteProduction = (id: string) => async (dispatch: AppDispatch, ge
             cancelButtonColor: '#3085d6',
             confirmButtonText: 'Yes, delete it!'
         });
-        
+
         if (!confirmResult.isConfirmed) {
             dispatch(getSalesProductionFailure("Delete cancelled"));
             return;
         }
-        
+
         Swal.fire({
             title: "Deleting...",
             text: "Please wait",
@@ -268,9 +294,9 @@ export const deleteProduction = (id: string) => async (dispatch: AppDispatch, ge
                 Swal.showLoading();
             }
         });
-        
+
         const token = getState().auth.token || localStorage.getItem("token");
-        
+
         await axios.delete(
             `${import.meta.env.VITE_API_BASE_URL}/sales/production/jobs/${id}`,
             {
@@ -279,9 +305,9 @@ export const deleteProduction = (id: string) => async (dispatch: AppDispatch, ge
                 },
             }
         );
-        
+
         Swal.close();
-        
+
         await Swal.fire({
             icon: 'success',
             title: 'Deleted!',
@@ -289,10 +315,10 @@ export const deleteProduction = (id: string) => async (dispatch: AppDispatch, ge
             timer: 2000,
             showConfirmButton: false
         });
-        
+
         dispatch(deleteSalesProductionSuccess(parseInt(id)));
         dispatch(getProductions());
-        
+
     } catch (error: any) {
         Swal.close();
         const message = error.response?.data?.message || "Something went wrong";

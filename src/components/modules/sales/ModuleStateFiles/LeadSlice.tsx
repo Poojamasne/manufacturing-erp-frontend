@@ -247,7 +247,7 @@ export const createLead = (payload: any, navigate: NavigateFunction) => async (d
         
         await Swal.fire({
             icon: "success",
-            iconColor: "#005d52",
+            iconColor: "#F59E0B",
             title: "Lead Created",
             text: data.message || "Lead has been created successfully",
             timer: 1500,
@@ -282,7 +282,7 @@ export const createLead = (payload: any, navigate: NavigateFunction) => async (d
             icon: "error",
             title: "Creation Failed",
             html: `${errorMessage}<br/><small class="text-gray-500">${errorDetails}</small>`,
-            confirmButtonColor: "#005d52"
+            confirmButtonColor: "#F59E0B"
         });
         
         dispatch(failure(errorMessage));
@@ -318,7 +318,7 @@ export const editLead = (id: number, payload: any, navigate: NavigateFunction) =
         toast.success("Lead updated successfully!");
         Swal.fire({
             icon: "success",
-            iconColor: "#005d52",
+            iconColor: "#F59E0B",
             title: "Lead Created",
             text: data.message || "Success",
             timer: 1500,
@@ -340,9 +340,9 @@ export const deleteLead = (id: number) => async (dispatch: AppDispatch, getState
             title: "Are you sure?",
             text: "You won't be able to revert this!",
             icon: "warning",
-            iconColor: "#005d52",
+            iconColor: "#F59E0B",
             showCancelButton: true,
-            confirmButtonColor: "#005d52",
+            confirmButtonColor: "#F59E0B",
             cancelButtonColor: "#eb0000",
             confirmButtonText: "Yes, delete it!"
         });
@@ -376,7 +376,7 @@ export const deleteLead = (id: number) => async (dispatch: AppDispatch, getState
 
         Swal.fire({
             icon: "success",
-            iconColor: "#005d52",
+            iconColor: "#F59E0B",
             title: "Lead Deleted",
             text: data.message || "Success",
             timer: 1500,
@@ -426,7 +426,7 @@ const handleError = (error: any, dispatch: any) => {
                 title: "Validation Error",
                 html: message.replace(/\n/g, '<br/>'),
                 icon: "error",
-                confirmButtonColor: "#005d52",
+                confirmButtonColor: "#F59E0B",
                 confirmButtonText: "OK, I'll fix it"
             });
             break;
@@ -436,7 +436,7 @@ const handleError = (error: any, dispatch: any) => {
                 title: "Session Expired",
                 text: "Your session has expired. Please login again to continue.",
                 icon: "error",
-                confirmButtonColor: "#005d52",
+                confirmButtonColor: "#F59E0B",
                 confirmButtonText: "Login Again"
             }).then(() => {
                 // Optional: Redirect to login page
@@ -449,7 +449,7 @@ const handleError = (error: any, dispatch: any) => {
                 title: "Access Denied",
                 text: "You don't have permission to perform this action.",
                 icon: "error",
-                confirmButtonColor: "#005d52"
+                confirmButtonColor: "#F59E0B"
             });
             break;
 
@@ -458,7 +458,7 @@ const handleError = (error: any, dispatch: any) => {
                 title: "Not Found",
                 text: message,
                 icon: "error",
-                confirmButtonColor: "#005d52"
+                confirmButtonColor: "#F59E0B"
             });
             break;
 
@@ -467,7 +467,7 @@ const handleError = (error: any, dispatch: any) => {
                 title: "Conflict Error",
                 text: message,
                 icon: "error",
-                confirmButtonColor: "#005d52"
+                confirmButtonColor: "#F59E0B"
             });
             break;
 
@@ -476,7 +476,7 @@ const handleError = (error: any, dispatch: any) => {
                 title: "Server Error",
                 text: "Something went wrong on our server. Please try again later.",
                 icon: "error",
-                confirmButtonColor: "#005d52"
+                confirmButtonColor: "#F59E0B"
             });
             break;
 
@@ -485,7 +485,7 @@ const handleError = (error: any, dispatch: any) => {
                 title: "Error",
                 html: message.replace(/\n/g, '<br/>'),
                 icon: "error",
-                confirmButtonColor: "#005d52"
+                confirmButtonColor: "#F59E0B"
             });
     }
 

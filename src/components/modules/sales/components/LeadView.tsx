@@ -82,8 +82,8 @@ const LeadView: React.FC = () => {
         return (
             <div className="min-h-screen flex items-center justify-center bg-[#f4f7f6]">
                 <div className="flex flex-col items-center gap-2">
-                    <Loader2 className="animate-spin text-[#005d52]" size={40} />
-                    <p className="text-sm font-bold text-[#005d52] uppercase tracking-widest">Fetching intelligence...</p>
+                    <Loader2 className="animate-spin text-[#F59E0B]" size={40} />
+                    <p className="text-sm font-bold text-[#F59E0B] uppercase tracking-widest">Fetching intelligence...</p>
                 </div>
             </div>
         );
@@ -99,7 +99,7 @@ const LeadView: React.FC = () => {
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
                     <div>
                         <div className="flex items-center gap-2 text-gray-400 mb-1">
-                            <button onClick={() => navigate("/sales/leads")} className="hover:text-[#005d52] transition-colors">Leads</button>
+                            <button onClick={() => navigate("/sales/leads")} className="hover:text-[#F59E0B] transition-colors">Leads</button>
                             <ChevronRight size={14} />
                             <span className="text-slate-600 font-semibold">{lead.lead_id}</span>
                         </div>
@@ -113,7 +113,7 @@ const LeadView: React.FC = () => {
                         )}
                         <button
                             onClick={() => navigate(`/sales/leads/edit-lead/${lead.id}`)}
-                            className="flex items-center gap-2 bg-[#005d52] text-white px-6 py-2.5 rounded-full font-bold text-sm shadow-lg shadow-teal-900/20 hover:bg-[#004a41] transition-all">
+                            className="flex items-center gap-2 bg-[#F59E0B] text-white px-6 py-2.5 rounded-full font-bold text-sm shadow-lg shadow-teal-900/20 hover:bg-[#f67317] transition-all">
                             <Edit3 size={18} /> Edit Lead
                         </button>
                     </div>
@@ -127,13 +127,13 @@ const LeadView: React.FC = () => {
                         <div className="flex justify-between items-start relative max-w-3xl mx-auto">
                             <div className="absolute top-4 left-0 w-full h-0.5 bg-gray-200 z-0" />
                             <div
-                                className="absolute top-4 left-0 h-0.5 bg-[#005d52] z-0 transition-all duration-500"
+                                className="absolute top-4 left-0 h-0.5 bg-[#F59E0B] z-0 transition-all duration-500"
                                 style={{ width: `${pipelineResult.progress}%` }}
                             />
                             {pipelineResult.correctedStages.map((stage, index) => (
                                 <div key={index} className="relative z-10 flex flex-col items-center group">
-                                    <div className={`w-8 h-8 rounded-full border-4 border-white shadow-sm flex items-center justify-center transition-all ${stage.completed ? 'bg-[#005d52] scale-110' : 'bg-gray-200'}`} />
-                                    <span className={`mt-3 text-[10px] font-bold uppercase tracking-wider ${stage.completed ? 'text-[#005d52]' : 'text-gray-400'}`}>
+                                    <div className={`w-8 h-8 rounded-full border-4 border-white shadow-sm flex items-center justify-center transition-all ${stage.completed ? 'bg-[#F59E0B] scale-110' : 'bg-gray-200'}`} />
+                                    <span className={`mt-3 text-[10px] font-bold uppercase tracking-wider ${stage.completed ? 'text-[#F59E0B]' : 'text-gray-400'}`}>
                                         {stage.name}
                                     </span>
                                 </div>
@@ -146,7 +146,7 @@ const LeadView: React.FC = () => {
                         {/* Section 1: Customer Info */}
                         <section>
                             <div className="flex items-center gap-2 mb-8">
-                                <div className="p-2 bg-[#d1e9e7] text-[#005d52] rounded-lg"><Building2 size={20} /></div>
+                                <div className="p-2 bg-[#f3f4e6] text-[#F59E0B] rounded-lg"><Building2 size={20} /></div>
                                 <h3 className="font-bold text-lg text-gray-800">Entity Information</h3>
                             </div>
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-y-8 gap-x-12">
@@ -164,7 +164,7 @@ const LeadView: React.FC = () => {
                         {/* Section 2: Products */}
                         <section>
                             <div className="flex items-center gap-2 mb-6">
-                                <div className="p-2 bg-[#d1e9e7] text-[#005d52] rounded-lg"><Package size={20} /></div>
+                                <div className="p-2 bg-[#f3f4e6] text-[#F59E0B] rounded-lg"><Package size={20} /></div>
                                 <h3 className="font-bold text-lg text-gray-800">Inventory Interest</h3>
                             </div>
 
@@ -186,7 +186,7 @@ const LeadView: React.FC = () => {
                                                 <td className="p-4 text-gray-500">{p.variant || "Standard"}</td>
                                                 <td className="p-4 text-center font-medium text-gray-800">{p.quantity} Units</td>
                                                 <td className="p-4 text-right text-gray-500">₹ {parseFloat(p.unit_price).toLocaleString()}</td>
-                                                <td className="p-4 text-right font-extrabold text-[#005d52]">₹ {parseFloat(p.total_price).toLocaleString()}</td>
+                                                <td className="p-4 text-right font-extrabold text-[#F59E0B]">₹ {parseFloat(p.total_price).toLocaleString()}</td>
                                             </tr>
                                         )) : (
                                             <tr>
@@ -195,7 +195,7 @@ const LeadView: React.FC = () => {
                                         )}
                                     </tbody>
                                 </table>
-                                <div className="bg-[#005d52] p-4 flex justify-between items-center text-white">
+                                <div className="bg-[#F59E0B] p-4 flex justify-between items-center text-white">
                                     <span className="text-[10px] font-bold uppercase tracking-widest opacity-80">Aggregate Deal Summary</span>
                                     <div className="flex gap-8">
                                         <div className="text-right">
@@ -214,7 +214,7 @@ const LeadView: React.FC = () => {
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
                             <section className="space-y-6">
                                 <div className="flex items-center gap-2 mb-2">
-                                    <div className="p-2 bg-[#d1e9e7] text-[#005d52] rounded-lg"><Calendar size={20} /></div>
+                                    <div className="p-2 bg-[#f3f4e6] text-[#F59E0B] rounded-lg"><Calendar size={20} /></div>
                                     <h3 className="font-bold text-lg text-gray-800">Lead Logistics</h3>
                                 </div>
                                 <div className="grid grid-cols-2 gap-6 p-6 bg-gray-50 rounded-3xl">
@@ -227,7 +227,7 @@ const LeadView: React.FC = () => {
 
                             <section className="space-y-6">
                                 <div className="flex items-center gap-2 mb-2">
-                                    <div className="p-2 bg-[#d1e9e7] text-[#005d52] rounded-lg"><MapPin size={20} /></div>
+                                    <div className="p-2 bg-[#f3f4e6] text-[#F59E0B] rounded-lg"><MapPin size={20} /></div>
                                     <h3 className="font-bold text-lg text-gray-800">Delivery Site</h3>
                                 </div>
                                 <div className="p-6 border border-gray-100 rounded-3xl text-sm text-gray-600 leading-relaxed min-h-35 flex items-center italic">
@@ -239,7 +239,7 @@ const LeadView: React.FC = () => {
                         {/* Section 5: Notes */}
                         <section>
                             <h3 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-4">Internal Intelligence</h3>
-                            <div className="bg-[#f1f8f7] border-l-4 border-[#005d52] p-6 rounded-r-2xl">
+                            <div className="bg-[#f1f8f7] border-l-4 border-[#F59E0B] p-6 rounded-r-2xl">
                                 <p className="text-sm text-gray-700 italic leading-loose">
                                     {lead.notes ? `"${lead.notes}"` : "No specific notes recorded for this lead strategy."}
                                 </p>
@@ -259,12 +259,12 @@ const DetailItem: React.FC<{ label: string; value: string; isHighlight?: boolean
     <div className="flex flex-col gap-1">
         <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{label}</span>
         {isStatus ? (
-            <span className={`w-fit px-3 py-1 rounded-lg text-xs font-bold ${value === 'High' ? 'bg-red-50 text-red-600' : 'bg-[#d1e9e7] text-[#005d52]'
+            <span className={`w-fit px-3 py-1 rounded-lg text-xs font-bold ${value === 'High' ? 'bg-red-50 text-red-600' : 'bg-[#f3f4e6] text-[#F59E0B]'
                 }`}>
                 {value}
             </span>
         ) : (
-            <span className={`text-sm font-medium ${isHighlight ? 'text-[#005d52] font-bold text-base' : 'text-gray-700'}`}>
+            <span className={`text-sm font-medium ${isHighlight ? 'text-[#F59E0B] font-bold text-base' : 'text-gray-700'}`}>
                 {value}
             </span>
         )}

@@ -87,20 +87,30 @@ export const {
 export default SalesOrder.reducer;
 
 // GET order's THUNK with filters and pagination
-export const getOrders = (params?: { 
-    status?: string; 
-    search?: string; 
-    page?: number; 
+export const getOrders = (params?: {
+    status?: string;
+    search?: string;
+    page?: number;
     limit?: number;
     dateRange?: string;
     startDate?: string;
     endDate?: string;
 }) => async (dispatch: AppDispatch, _getState: () => RootState) => {
     dispatch(getSalesOrderRequest());
-    
+    Swal.fire({
+        title: "Loading Orders...",
+        text: "Please wait while we fetch the data.",
+        allowOutsideClick: false,
+        customClass: {
+            loader: 'lead-loader'
+        },
+        didOpen: () => {
+            Swal.showLoading();
+        }
+    });
     try {
         const token = _getState().auth.token || localStorage.getItem("token");
-        
+
         // Build query parameters
         const queryParams = new URLSearchParams();
         if (params?.status && params.status !== 'All') queryParams.append('status', params.status);
@@ -110,17 +120,20 @@ export const getOrders = (params?: {
         if (params?.dateRange && params.dateRange !== 'All Time') queryParams.append('dateRange', params.dateRange);
         if (params?.startDate) queryParams.append('startDate', params.startDate);
         if (params?.endDate) queryParams.append('endDate', params.endDate);
-        
+
         const url = `${import.meta.env.VITE_API_BASE_URL}/sales/orders${queryParams.toString() ? `?${queryParams}` : ''}`;
-        
+
         const { data } = await axios.get(url, {
             headers: {
                 Authorization: `Bearer ${token}`,
             },
         });
-        
+
         dispatch(getSalesOrdersSuccess(data));
+        Swal.close();
     } catch (error: any) {
+        Swal.close();
+
         const status = error.response?.status;
         const message = error.response?.data?.message || "Something went wrong";
 
@@ -152,7 +165,17 @@ export const getOrders = (params?: {
 // GET ORDER THUNK
 export const getOrder = (id: string) => async (dispatch: AppDispatch, _getState: () => RootState) => {
     dispatch(getSalesOrderRequest());
-    
+    Swal.fire({
+        title: "Loading Order...",
+        text: "Please wait while we fetch the data.",
+        allowOutsideClick: false,
+        customClass: {
+            loader: 'lead-loader'
+        },
+        didOpen: () => {
+            Swal.showLoading();
+        }
+    });
     try {
         const token = _getState().auth.token || localStorage.getItem("token");
         const { data } = await axios.get(
@@ -163,9 +186,11 @@ export const getOrder = (id: string) => async (dispatch: AppDispatch, _getState:
                 },
             }
         );
-        
+
         dispatch(getSalesSingleOrderSuccess(data));
+        Swal.close();
     } catch (error: any) {
+        Swal.close();
         const status = error.response?.status;
         const message = error.response?.data?.message || "Something went wrong";
 
@@ -197,7 +222,7 @@ export const getOrder = (id: string) => async (dispatch: AppDispatch, _getState:
 // --- CREATE ORDER THUNK ---
 export const createOrder = (orderData: any) => async (dispatch: AppDispatch, _getState: () => RootState) => {
     dispatch(getSalesOrderRequest());
-    
+
     try {
         Swal.fire({
             title: "Creating Order...",
@@ -207,9 +232,9 @@ export const createOrder = (orderData: any) => async (dispatch: AppDispatch, _ge
                 Swal.showLoading();
             }
         });
-        
+
         const token = _getState().auth.token || localStorage.getItem("token");
-        
+
         const { data } = await axios.post(
             `${import.meta.env.VITE_API_BASE_URL}/sales/orders`,
             orderData,
@@ -220,9 +245,9 @@ export const createOrder = (orderData: any) => async (dispatch: AppDispatch, _ge
                 },
             }
         );
-        
+
         Swal.close();
-        
+
         await Swal.fire({
             icon: 'success',
             title: 'Success!',
@@ -230,7 +255,7 @@ export const createOrder = (orderData: any) => async (dispatch: AppDispatch, _ge
             timer: 2000,
             showConfirmButton: false
         });
-        
+
         return data;
     } catch (error: any) {
         Swal.close();
@@ -248,7 +273,7 @@ export const createOrder = (orderData: any) => async (dispatch: AppDispatch, _ge
 // --- UPDATE ORDER THUNK ---
 export const updateOrder = (id: string, updateData: { status?: string; shipping_address?: string; notes?: string }) => async (dispatch: AppDispatch, _getState: () => RootState) => {
     dispatch(getSalesOrderRequest());
-    
+
     try {
         Swal.fire({
             title: "Updating Order...",
@@ -256,9 +281,9 @@ export const updateOrder = (id: string, updateData: { status?: string; shipping_
             allowOutsideClick: false,
             didOpen: () => Swal.showLoading()
         });
-        
+
         const token = _getState().auth.token || localStorage.getItem("token");
-        
+
         const { data } = await axios.put(
             `${import.meta.env.VITE_API_BASE_URL}/sales/orders/${id}`,
             updateData,
@@ -269,9 +294,9 @@ export const updateOrder = (id: string, updateData: { status?: string; shipping_
                 },
             }
         );
-        
+
         Swal.close();
-        
+
         await Swal.fire({
             icon: 'success',
             title: 'Updated!',
@@ -279,10 +304,10 @@ export const updateOrder = (id: string, updateData: { status?: string; shipping_
             timer: 1500,
             showConfirmButton: false
         });
-        
+
         dispatch(getOrder(id));
         dispatch(getOrders());
-        
+
         return data;
     } catch (error: any) {
         Swal.close();
@@ -300,7 +325,7 @@ export const updateOrder = (id: string, updateData: { status?: string; shipping_
 // --- DELETE ORDER THUNK ---
 export const deleteOrder = (id: string) => async (dispatch: AppDispatch, _getState: () => RootState) => {
     dispatch(getSalesOrderRequest());
-    
+
     try {
         const confirmResult = await Swal.fire({
             title: 'Delete Order?',
@@ -311,12 +336,12 @@ export const deleteOrder = (id: string) => async (dispatch: AppDispatch, _getSta
             cancelButtonColor: '#3085d6',
             confirmButtonText: 'Yes, delete it!'
         });
-        
+
         if (!confirmResult.isConfirmed) {
             dispatch(getSalesOrderFailure("Delete cancelled"));
             return;
         }
-        
+
         Swal.fire({
             title: "Deleting...",
             text: "Please wait",
@@ -325,9 +350,9 @@ export const deleteOrder = (id: string) => async (dispatch: AppDispatch, _getSta
                 Swal.showLoading();
             }
         });
-        
+
         const token = _getState().auth.token || localStorage.getItem("token");
-        
+
         await axios.delete(
             `${import.meta.env.VITE_API_BASE_URL}/sales/orders/${id}`,
             {
@@ -336,9 +361,9 @@ export const deleteOrder = (id: string) => async (dispatch: AppDispatch, _getSta
                 },
             }
         );
-        
+
         Swal.close();
-        
+
         await Swal.fire({
             icon: 'success',
             title: 'Deleted!',
@@ -346,9 +371,9 @@ export const deleteOrder = (id: string) => async (dispatch: AppDispatch, _getSta
             timer: 2000,
             showConfirmButton: false
         });
-        
+
         dispatch(getOrders());
-        
+
     } catch (error: any) {
         Swal.close();
         const message = error.response?.data?.message || "Something went wrong";

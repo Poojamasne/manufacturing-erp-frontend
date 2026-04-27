@@ -1,6 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 import type { AppDispatch, RootState } from "../../../../ApplicationState/Store";
+import Swal from "sweetalert2";
 
 const initialState = {
     pipeline: [],
@@ -56,6 +57,18 @@ export const getDashboardData = (filter?: string, customRange?: { start: string;
         dispatch(request());
         
         try {
+            Swal.fire({
+                        title: "Loading Dashboard Stats...",
+                        text: "Please wait while we fetch the latest data for you.",
+                        allowOutsideClick: false,
+                        customClass: {
+                            loader: 'lead-loader'
+                        },
+                        didOpen: () => {
+                            Swal.showLoading();
+                        },
+                    });
+
             const token = getState().auth.token || localStorage.getItem("token");
             
             // Build URL with query parameters
@@ -80,7 +93,9 @@ export const getDashboardData = (filter?: string, customRange?: { start: string;
             });
 
             dispatch(getSuccess(data));
+            Swal.close();
         } catch (error: any) {
+            Swal.close();
             console.error('Error fetching dashboard data:', error);
             dispatch(failure(error.response?.data?.message || "Something went wrong"));
         }

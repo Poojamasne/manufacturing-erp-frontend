@@ -282,7 +282,7 @@ if (lineItems.some((item) => item.unit_price <= 0)) {
             <button
               onClick={handleSubmit}
               disabled={loading}
-              className="flex-1 lg:flex-initial flex items-center justify-center gap-2 bg-[#005d52] text-white px-6 py-2.5 rounded-xl font-bold text-sm shadow-lg hover:bg-[#004a41] disabled:opacity-50"
+              className="flex-1 lg:flex-initial flex items-center justify-center gap-2 bg-[#F59E0B] text-white px-6 py-2.5 rounded-xl font-bold text-sm shadow-lg hover:bg-[#f67317] disabled:opacity-50"
             >
               {loading ? (
                 <Loader2 size={18} className="animate-spin" />
@@ -307,7 +307,7 @@ if (lineItems.some((item) => item.unit_price <= 0)) {
               <button
                 key={section.id}
                 onClick={() => setActiveSection(section.id)}
-                className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium transition-all ${activeSection === section.id ? "bg-[#d1e9e7] text-[#005d52]" : "text-gray-500 hover:bg-gray-50"}`}
+                className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium transition-all ${activeSection === section.id ? "bg-[#f3f4e6] text-[#F59E0B]" : "text-gray-500 hover:bg-gray-50"}`}
               >
                 <section.icon size={16} />
                 {section.label}
@@ -332,7 +332,7 @@ if (lineItems.some((item) => item.unit_price <= 0)) {
             <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
               <div className="p-6 border-b border-gray-100">
                 <h3 className="font-bold text-lg text-gray-800 flex items-center gap-2">
-                  <FileText size={20} className="text-[#005d52]" />
+                  <FileText size={20} className="text-[#F59E0B]" />
                   Select Quotation
                 </h3>
                 <p className="text-xs text-gray-400 mt-1">
@@ -360,7 +360,7 @@ if (lineItems.some((item) => item.unit_price <= 0)) {
                           onClick={() => handleQuotationSelect(quotation)}
                           className={`p-4 border rounded-xl cursor-pointer transition-all ${
                             selectedQuotation?.id === quotation.id
-                              ? "border-[#005d52] bg-teal-50 ring-2 ring-teal-500/20"
+                              ? "border-[#F59E0B] bg-teal-50 ring-2 ring-teal-500/20"
                               : "border-gray-200 hover:border-teal-300 hover:bg-gray-50"
                           }`}
                         >
@@ -389,7 +389,7 @@ if (lineItems.some((item) => item.unit_price <= 0)) {
                                   Products: {quotation.products?.length || 0}
                                 </span>
                               </div>
-                              <p className="text-sm font-bold text-[#005d52] mt-2">
+                              <p className="text-sm font-bold text-[#F59E0B] mt-2">
                                 Total: ₹
                                 {Number(quotation.total || 0).toLocaleString(
                                   "en-IN",
@@ -397,7 +397,7 @@ if (lineItems.some((item) => item.unit_price <= 0)) {
                               </p>
                             </div>
                             {selectedQuotation?.id === quotation.id && (
-                              <div className="w-6 h-6 bg-[#005d52] rounded-full flex items-center justify-center shadow-md">
+                              <div className="w-6 h-6 bg-[#F59E0B] rounded-full flex items-center justify-center shadow-md">
                                 <div className="w-2 h-2 bg-white rounded-full"></div>
                               </div>
                             )}
@@ -425,7 +425,7 @@ if (lineItems.some((item) => item.unit_price <= 0)) {
             <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
               <div className="p-6 border-b border-gray-100">
                 <h3 className="font-bold text-lg text-gray-800 flex items-center gap-2">
-                  <User size={20} className="text-[#005d52]" />
+                  <User size={20} className="text-[#F59E0B]" />
                   Customer Information
                 </h3>
               </div>
@@ -487,12 +487,12 @@ if (lineItems.some((item) => item.unit_price <= 0)) {
             <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
               <div className="p-6 border-b border-gray-100 flex justify-between items-center">
                 <h3 className="font-bold text-lg text-gray-800 flex items-center gap-2">
-                  <Package size={20} className="text-[#005d52]" />
+                  <Package size={20} className="text-[#F59E0B]" />
                   Order Items
                 </h3>
                 <button
                   onClick={addLineItem}
-                  className="flex items-center gap-2 px-4 py-2 bg-[#d1e9e7] text-[#005d52] rounded-xl text-sm font-medium hover:bg-[#005d52] hover:text-white transition-all"
+                  className="flex items-center gap-2 px-4 py-2 bg-[#f3f4e6] text-[#F59E0B] rounded-xl text-sm font-medium hover:bg-[#F59E0B] hover:text-white transition-all"
                 >
                   <Plus size={16} /> Add Item
                 </button>
@@ -534,7 +534,7 @@ if (lineItems.some((item) => item.unit_price <= 0)) {
                                 ),
                               );
                             }}
-                            className={`w-64 px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#005d52] ${errors.lineItems && !item.product_name ? "border-red-500" : "border-gray-200"}`}
+                            className={`w-64 px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#F59E0B] ${errors.lineItems && !item.product_name ? "border-red-500" : "border-gray-200"}`}
                             placeholder="Product name"
                           />
                         </td>
@@ -558,7 +558,7 @@ if (lineItems.some((item) => item.unit_price <= 0)) {
                                 }),
                               );
                             }}
-                            className="w-24 px-3 py-2 border border-gray-200 rounded-lg text-sm text-right focus:outline-none focus:ring-2 focus:ring-[#005d52]"
+                            className="w-24 px-3 py-2 border border-gray-200 rounded-lg text-sm text-right focus:outline-none focus:ring-2 focus:ring-[#F59E0B]"
                             step="any"
                           />
                         </td>
@@ -582,11 +582,11 @@ if (lineItems.some((item) => item.unit_price <= 0)) {
                                 }),
                               );
                             }}
-                            className="w-32 px-3 py-2 border border-gray-200 rounded-lg text-sm text-right focus:outline-none focus:ring-2 focus:ring-[#005d52]"
+                            className="w-32 px-3 py-2 border border-gray-200 rounded-lg text-sm text-right focus:outline-none focus:ring-2 focus:ring-[#F59E0B]"
                             step="any"
                           />
                         </td>
-                        <td className="p-4 text-right font-bold text-[#005d52]">
+                        <td className="p-4 text-right font-bold text-[#F59E0B]">
                           ₹
                           {item.total.toLocaleString("en-IN", {
                             minimumFractionDigits: 2,
@@ -617,7 +617,7 @@ if (lineItems.some((item) => item.unit_price <= 0)) {
           {activeSection === "summary" && (
             <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-6">
               <h3 className="font-bold text-lg text-gray-800 mb-6 flex items-center gap-2">
-                <ShoppingCart size={20} className="text-[#005d52]" />
+                <ShoppingCart size={20} className="text-[#F59E0B]" />
                 Order Summary
               </h3>
               <div className="space-y-4">
@@ -635,7 +635,7 @@ if (lineItems.some((item) => item.unit_price <= 0)) {
                     <span className="text-lg font-bold text-gray-800">
                       Grand Total
                     </span>
-                    <span className="text-2xl font-bold text-[#005d52]">
+                    <span className="text-2xl font-bold text-[#F59E0B]">
                       ₹
                       {totals.subtotal.toLocaleString("en-IN", {
                         minimumFractionDigits: 2,
@@ -658,7 +658,7 @@ if (lineItems.some((item) => item.unit_price <= 0)) {
           <button
             onClick={handleSubmit}
             disabled={loading}
-            className="flex items-center justify-center gap-2 bg-[#005d52] text-white px-6 py-3 rounded-xl font-bold text-sm shadow-lg hover:bg-[#004a41] disabled:opacity-50"
+            className="flex items-center justify-center gap-2 bg-[#F59E0B] text-white px-6 py-3 rounded-xl font-bold text-sm shadow-lg hover:bg-[#f67317] disabled:opacity-50"
           >
             {loading ? (
               <Loader2 size={18} className="animate-spin" />
@@ -708,7 +708,7 @@ const FormField: React.FC<FormFieldProps> = ({
         onChange={(e) => onChange(e.target.value)}
         rows={rows}
         placeholder={placeholder}
-        className={`w-full px-3 py-2 bg-white border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#005d52] text-sm resize-none ${error ? "border-red-500 bg-red-50" : "border-gray-200"}`}
+        className={`w-full px-3 py-2 bg-white border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#F59E0B] text-sm resize-none ${error ? "border-red-500 bg-red-50" : "border-gray-200"}`}
       />
     ) : (
       <input
@@ -716,7 +716,7 @@ const FormField: React.FC<FormFieldProps> = ({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className={`w-full px-3 py-2 bg-white border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#005d52] text-sm ${error ? "border-red-500 bg-red-50" : "border-gray-200"}`}
+        className={`w-full px-3 py-2 bg-white border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#F59E0B] text-sm ${error ? "border-red-500 bg-red-50" : "border-gray-200"}`}
       />
     )}
     {error && (

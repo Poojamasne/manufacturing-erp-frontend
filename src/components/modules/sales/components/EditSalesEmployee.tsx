@@ -120,11 +120,11 @@ const EditSalesEmployee: React.FC = () => {
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
                     <div>
                         <div className="flex items-center gap-2 text-slate-400 mb-1 text-sm font-medium">
-                            <button onClick={() => navigate("/sales/employees")} className="hover:text-[#005d52] transition-colors">Employee</button>
+                            <button onClick={() => navigate("/sales/employees")} className="hover:text-[#F59E0B] transition-colors">Employee</button>
                             <ChevronRight size={14} />
                             <span className="text-slate-600">Update Profile</span>
                             <ChevronRight size={14} />
-                            <span className="text-[#005d52] font-bold uppercase">{employee?.user_id}</span>
+                            <span className="text-[#F59E0B] font-bold uppercase">{employee?.user_id}</span>
                         </div>
                         <h1 className="text-3xl font-black text-slate-900 tracking-tight">Edit Executive</h1>
                     </div>
@@ -137,7 +137,7 @@ const EditSalesEmployee: React.FC = () => {
                             type="submit"
                             form="employee-form"
                             disabled={isSaving}
-                            className="flex-1 md:flex-none px-8 py-3 rounded-xl font-bold text-sm text-white bg-[#005d52] shadow-lg shadow-teal-900/20 hover:bg-[#004a41] transition-all flex items-center justify-center gap-2 disabled:opacity-70"
+                            className="flex-1 md:flex-none px-8 py-3 rounded-xl font-bold text-sm text-white bg-[#F59E0B] shadow-lg shadow-teal-900/20 hover:bg-[#f67317] transition-all flex items-center justify-center gap-2 disabled:opacity-70"
                         >
                             {isSaving ? "Updating..." : <><Save size={18} /> Update Employee</>}
                         </button>
@@ -217,8 +217,8 @@ const EditSalesEmployee: React.FC = () => {
                         </div>
                     </div>
 
-                    <div className="bg-[#f1f8f7] rounded-3xl p-6 border-l-8 border-[#005d52] flex items-center gap-4">
-                        <ShieldCheck className="text-[#005d52]" size={24} />
+                    <div className="bg-[#f1f8f7] rounded-3xl p-6 border-l-8 border-[#F59E0B] flex items-center gap-4">
+                        <ShieldCheck className="text-[#F59E0B]" size={24} />
                         <div>
                             <p className="text-sm font-bold text-slate-700">Account Security</p>
                             <p className="text-xs text-slate-500">Updating profile details does not affect the employee's password. Password resets must be handled separately.</p>
@@ -234,7 +234,7 @@ const EditSalesEmployee: React.FC = () => {
 
 const SectionHeader: React.FC<{ icon: React.ReactNode; title: string }> = ({ icon, title }) => (
     <div className="flex items-center gap-3 mb-6">
-        <div className="p-2.5 bg-teal-50 text-[#005d52] rounded-xl border border-teal-100 shadow-sm">
+        <div className="p-2.5 bg-teal-50 text-[#F59E0B] rounded-xl border border-teal-100 shadow-sm">
             {icon}
         </div>
         <h3 className="font-bold text-xl text-slate-800 tracking-tight">{title}</h3>
@@ -254,7 +254,7 @@ const FormInput: React.FC<{ label: string; icon: React.ReactNode; placeholder?: 
                 onChange={(e) => onChange(e.target.value)}
                 placeholder={placeholder}
                 required={required}
-                className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-11 pr-4 py-3 text-sm font-bold focus:ring-4 focus:ring-teal-500/5 focus:border-[#005d52] outline-none transition-all placeholder:font-normal"
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-11 pr-4 py-3 text-sm font-bold focus:ring-4 focus:ring-teal-500/5 focus:border-[#F59E0B] outline-none transition-all placeholder:font-normal"
             />
         </div>
     </div>
@@ -268,7 +268,7 @@ const FormSelect: React.FC<{ label: string; options: { label: string; value: str
             <select
                 value={value}
                 onChange={(e) => onChange(e.target.value)}
-                className={`w-full bg-slate-50 border border-slate-200 rounded-xl ${icon ? 'pl-11' : 'pl-4'} pr-10 py-3 text-sm font-bold focus:ring-4 focus:ring-teal-500/5 focus:border-[#005d52] outline-none appearance-none cursor-pointer transition-all`}
+                className={`w-full bg-slate-50 border border-slate-200 rounded-xl ${icon ? 'pl-11' : 'pl-4'} pr-10 py-3 text-sm font-bold focus:ring-4 focus:ring-teal-500/5 focus:border-[#F59E0B] outline-none appearance-none cursor-pointer transition-all`}
             >
                 {options.map((opt) => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
             </select>

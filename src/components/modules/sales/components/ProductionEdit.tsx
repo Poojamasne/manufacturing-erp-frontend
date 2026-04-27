@@ -174,7 +174,7 @@ const ProductionEdit: React.FC = () => {
   if (loading && !production?.id) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <Loader2 className="animate-spin text-[#005d52]" size={48} />
+        <Loader2 className="animate-spin text-[#F59E0B]" size={48} />
       </div>
     );
   }
@@ -211,7 +211,7 @@ const ProductionEdit: React.FC = () => {
               <button
                 onClick={handleSave}
                 disabled={isSaving}
-                className="flex items-center gap-2 px-6 py-2 text-white bg-[#005d52] rounded-lg hover:bg-[#004a41] transition-colors disabled:opacity-50 shadow-lg shadow-teal-900/20"
+                className="flex items-center gap-2 px-6 py-2 text-white bg-[#F59E0B] rounded-lg hover:bg-[#f67317] transition-colors disabled:opacity-50 shadow-lg shadow-teal-900/20"
               >
                 {isSaving ? (
                   <Loader2 size={18} className="animate-spin" />
@@ -285,7 +285,7 @@ const ProductionEdit: React.FC = () => {
                 onClick={() => setActiveTab(tab.id)}
                 className={`flex items-center gap-2 px-6 py-3 text-sm font-medium transition-all whitespace-nowrap ${
                   activeTab === tab.id
-                    ? "text-[#005d52] border-b-2 border-[#005d52]"
+                    ? "text-[#F59E0B] border-b-2 border-[#F59E0B]"
                     : "text-gray-500 hover:text-gray-700"
                 }`}
               >
@@ -302,7 +302,7 @@ const ProductionEdit: React.FC = () => {
             <div className="bg-white rounded-xl shadow-sm overflow-hidden">
               <div className="p-6 border-b border-gray-100">
                 <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-                  <Box size={20} className="text-[#005d52]" />
+                  <Box size={20} className="text-[#F59E0B]" />
                   Production Details
                 </h2>
               </div>
@@ -359,7 +359,7 @@ const ProductionEdit: React.FC = () => {
                     <select
                       value={formData.stage}
                       onChange={(e) => updateFormData("stage", e.target.value)}
-                      className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-[#005d52] focus:border-transparent ${
+                      className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-[#F59E0B] focus:border-transparent ${
                         errors.stage ? "border-red-500" : "border-gray-300"
                       }`}
                     >
@@ -382,7 +382,7 @@ const ProductionEdit: React.FC = () => {
                     <select
                       value={formData.status}
                       onChange={(e) => updateFormData("status", e.target.value)}
-                      className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-[#005d52] focus:border-transparent ${
+                      className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-[#F59E0B] focus:border-transparent ${
                         errors.status ? "border-red-500" : "border-gray-300"
                       }`}
                     >
@@ -408,7 +408,7 @@ const ProductionEdit: React.FC = () => {
                       onChange={(e) =>
                         updateFormData("started_at", e.target.value)
                       }
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#005d52] focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F59E0B] focus:border-transparent"
                     />
                   </div>
                   <div>
@@ -419,7 +419,7 @@ const ProductionEdit: React.FC = () => {
     type="date"
     value={formData.completed_at}
     onChange={(e) => updateFormData("completed_at", e.target.value)}
-    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-[#005d52] focus:border-transparent ${
+    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-[#F59E0B] focus:border-transparent ${
       errors.completed_at ? "border-red-500" : "border-gray-300"
     }`}
   />
@@ -440,7 +440,7 @@ const ProductionEdit: React.FC = () => {
                         updateFormData("assigned_to", e.target.value)
                       }
                       placeholder="Enter user ID"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#005d52] focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F59E0B] focus:border-transparent"
                     />
                   </div>
                   <div>
@@ -465,7 +465,7 @@ const ProductionEdit: React.FC = () => {
           <div className="bg-white rounded-xl shadow-sm overflow-hidden">
             <div className="p-6 border-b border-gray-100">
               <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-                <ClipboardList size={20} className="text-[#005d52]" />
+                <ClipboardList size={20} className="text-[#F59E0B]" />
                 Production Notes
               </h2>
             </div>
@@ -477,7 +477,7 @@ const ProductionEdit: React.FC = () => {
                 rows={6}
                 value={formData.notes || ""}
                 onChange={(e) => updateFormData("notes", e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#005d52] focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F59E0B] focus:border-transparent"
                 placeholder="Add production notes, special instructions, or quality issues..."
               />
             </div>

@@ -51,7 +51,7 @@ const QuotationView: React.FC = () => {
     const navigate = useNavigate();
     const { id } = useParams();
     const dispatch = useAppDispatch();
-    const { quotation, loading, error } = useAppSelector((state: RootState) => state.SalesQuotation);
+    const { quotation,  error } = useAppSelector((state: RootState) => state.SalesQuotation);
     const [updatingStatus, setUpdatingStatus] = useState(false);
 
     useEffect(() => {
@@ -132,13 +132,6 @@ const QuotationView: React.FC = () => {
     const quotationData = (quotation && typeof quotation === 'object' && !Array.isArray(quotation)) ? quotation : {} as QuotationData;
     const hasData = quotationData && Object.keys(quotationData).length > 0 && quotationData.id;
 
-    if (loading) {
-        return (
-            <div className="min-h-screen bg-[#F8FAFC] flex items-center justify-center">
-                <Loader2 size={48} className="animate-spin text-[#005d52]" />
-            </div>
-        );
-    }
 
     // Error state
     if (errorMessage) {
@@ -150,7 +143,7 @@ const QuotationView: React.FC = () => {
                     <p className="text-red-600 break-words">{errorMessage}</p>
                     <button
                         onClick={() => navigate('/sales/quotation')}
-                        className="mt-6 px-6 py-2 bg-[#005d52] text-white rounded-xl hover:bg-[#004a41] transition-colors"
+                        className="mt-6 px-6 py-2 bg-[#F59E0B] text-white rounded-xl hover:bg-[#f67317] transition-colors"
                     >
                         Back to Quotations
                     </button>
@@ -169,7 +162,7 @@ const QuotationView: React.FC = () => {
                     <p className="text-yellow-600">The requested quotation could not be found.</p>
                     <button
                         onClick={() => navigate('/sales/quotation')}
-                        className="mt-6 px-6 py-2 bg-[#005d52] text-white rounded-xl hover:bg-[#004a41] transition-colors"
+                        className="mt-6 px-6 py-2 bg-[#F59E0B] text-white rounded-xl hover:bg-[#f67317] transition-colors"
                     >
                         Back to Quotations
                     </button>
@@ -184,9 +177,9 @@ const QuotationView: React.FC = () => {
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-6">
                     <div>
                         <div className="flex items-center gap-2 text-slate-400 mb-2 text-[10px] font-black uppercase tracking-widest">
-                            <button onClick={() => navigate("/sales/quotation")} className="hover:text-[#005d52] transition-colors">Quotations</button>
+                            <button onClick={() => navigate("/sales/quotation")} className="hover:text-[#F59E0B] transition-colors">Quotations</button>
                             <ChevronRight size={12} />
-                            <span className="text-[#005d52]">{quotationData.quote_id || 'N/A'}</span>
+                            <span className="text-[#F59E0B]">{quotationData.quote_id || 'N/A'}</span>
                         </div>
                         <div className="flex items-center gap-4 flex-wrap">
                             <h1 className="text-3xl font-extrabold text-slate-800 tracking-tight">Quotation Details</h1>
@@ -195,20 +188,20 @@ const QuotationView: React.FC = () => {
                                     value={quotationData.status || 'Draft'}
                                     onChange={(e) => handleStatusUpdate(e.target.value)}
                                     disabled={updatingStatus}
-                                    className="px-3 py-1.5 rounded-lg border text-sm font-medium bg-white focus:outline-none focus:ring-2 focus:ring-[#005d52]"
+                                    className="px-3 py-1.5 rounded-lg border text-sm font-medium bg-white focus:outline-none focus:ring-2 focus:ring-[#F59E0B]"
                                 >
                                     <option value="Draft">Draft</option>
                                     <option value="Sent">Sent</option>
                                     <option value="Accepted">Accepted</option>
                                     <option value="Rejected">Rejected</option>
                                 </select>
-                                {updatingStatus && <Loader2 size={16} className="animate-spin text-[#005d52]" />}
+                                {updatingStatus && <Loader2 size={16} className="animate-spin text-[#F59E0B]" />}
                             </div>
                         </div>
                     </div>
                     
                     <div className="flex gap-3 w-full md:w-auto">
-                        <button onClick={handleExport} className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-white text-slate-600 px-6 py-3.5 rounded-2xl font-bold text-xs border border-slate-200 shadow-sm hover:bg-slate-50 transition-all">
+                        <button onClick={()=>window.print()} className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-white text-slate-600 px-6 py-3.5 rounded-2xl font-bold text-xs border border-slate-200 shadow-sm hover:bg-slate-50 transition-all">
                             <Download size={16} /> Export PDF
                         </button>
                     </div>
@@ -220,7 +213,7 @@ const QuotationView: React.FC = () => {
                         <div className="flex flex-col md:flex-row justify-between items-start border-b border-slate-100 pb-10 gap-8">
                             <div>
                                 <div className="flex items-center gap-2 mb-4">
-                                    <div className="w-10 h-10 bg-[#005d52] rounded-xl flex items-center justify-center text-white">
+                                    <div className="w-10 h-10 bg-[#F59E0B] rounded-xl flex items-center justify-center text-white">
                                         <FileText size={24} />
                                     </div>
                                     <h2 className="text-2xl font-black text-slate-800 tracking-tighter">Manufacturing ERP</h2>
@@ -243,10 +236,10 @@ const QuotationView: React.FC = () => {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                             <div className="bg-slate-50/50 p-8 rounded-4xl border border-slate-100">
                                 <div className="flex items-center gap-2 mb-6">
-                                    <div className="p-2 bg-teal-50 text-[#005d52] rounded-lg border border-teal-100"><Building2 size={18}/></div>
+                                    <div className="p-2 bg-teal-50 text-[#F59E0B] rounded-lg border border-teal-100"><Building2 size={18}/></div>
                                     <h3 className="font-black text-xs text-slate-800 uppercase tracking-widest">Billing Entity</h3>
                                 </div>
-                                <h4 className="font-black text-xl text-[#005d52] mb-2">{quotationData.company_name || 'N/A'}</h4>
+                                <h4 className="font-black text-xl text-[#F59E0B] mb-2">{quotationData.company_name || 'N/A'}</h4>
                                 <div className="text-sm text-slate-600 space-y-1 font-medium">
                                     <p className="flex items-center gap-2"><User size={14} className="text-slate-300"/> {quotationData.contact_person || "Purchase Dept"}</p>
                                     <p className="text-slate-400">{quotationData.email || "N/A"}</p>
@@ -256,7 +249,7 @@ const QuotationView: React.FC = () => {
 
                             <div className="bg-slate-50/50 p-8 rounded-4xl border border-slate-100">
                                 <div className="flex items-center gap-2 mb-6">
-                                    <div className="p-2 bg-teal-50 text-[#005d52] rounded-lg border border-teal-100"><Calendar size={18}/></div>
+                                    <div className="p-2 bg-teal-50 text-[#F59E0B] rounded-lg border border-teal-100"><Calendar size={18}/></div>
                                     <h3 className="font-black text-xs text-slate-800 uppercase tracking-widest">Reference Details</h3>
                                 </div>
                                 <div className="grid grid-cols-2 gap-y-6">
@@ -283,7 +276,7 @@ const QuotationView: React.FC = () => {
                         {/* Line Items Table */}
                         <div className="space-y-6">
                             <div className="flex items-center gap-2">
-                                <div className="p-2 bg-teal-50 text-[#005d52] rounded-lg border border-teal-100"><List size={18}/></div>
+                                <div className="p-2 bg-teal-50 text-[#F59E0B] rounded-lg border border-teal-100"><List size={18}/></div>
                                 <h3 className="font-black text-xs text-slate-800 uppercase tracking-widest">Scope of Supply</h3>
                             </div>
                             
@@ -343,7 +336,7 @@ const QuotationView: React.FC = () => {
                                 <div className="pt-6 border-t border-teal-100 flex justify-between items-center">
                                     <span className="font-black text-slate-800 text-sm uppercase tracking-widest">Final Amount</span>
                                     <div className="text-right">
-                                        <span className="font-black text-3xl text-[#005d52] tracking-tighter">
+                                        <span className="font-black text-3xl text-[#F59E0B] tracking-tighter">
                                             {formatINR(quotationData.total || 0)}
                                         </span>
                                         <p className="text-[9px] font-bold text-teal-600/50 uppercase tracking-widest mt-1">Inclusive of all taxes</p>

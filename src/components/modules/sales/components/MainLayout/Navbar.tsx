@@ -1,8 +1,11 @@
 import { Link } from "react-router-dom";
 import { useState, useRef, useEffect } from "react";
+import type { RootState } from "../../../../../ApplicationState/Store";
+import { useAppSelector } from "../../../../common/ReduxMainHooks";
 
 
 const Navbar = ({ onMenuClick }: { onMenuClick: () => void }) => {
+  const { user } = useAppSelector((state: RootState) => state.auth);
 
 
   useEffect(() => {
@@ -89,7 +92,7 @@ const Navbar = ({ onMenuClick }: { onMenuClick: () => void }) => {
   };
 
   return (
-    <header className="h-16 sm:h-20 bg-[#f4f7f6] border-b border-[#005d5230] flex items-center justify-between px-4 sm:px-6 lg:px-10 sticky top-0 z-30">
+    <header className="h-16 sm:h-20 bg-[#f4f7f6] border-b border-[#F59E0B30] flex items-center justify-between px-4 sm:px-6 lg:px-10 sticky top-0 z-30">
       {/* LEFT */}
       <div className="flex items-center gap-2 sm:gap-4 flex-1">
         <button
@@ -98,7 +101,7 @@ const Navbar = ({ onMenuClick }: { onMenuClick: () => void }) => {
         >
           <span className="text-xl">☰</span>
         </button>
-      
+
       </div>
 
       {/* RIGHT */}
@@ -112,7 +115,7 @@ const Navbar = ({ onMenuClick }: { onMenuClick: () => void }) => {
             <button
               onClick={() => setOpenNote((prev) => !prev)}
               title="Add Note"
-              className="p-2.5 text-gray-500 outline-none hover:bg-white rounded-full transition-all hover:text-[#005d52] active:scale-90"
+              className="p-2.5 text-gray-500 outline-none hover:bg-white rounded-full transition-all hover:text-[#F59E0B] active:scale-90"
             >
               <img src="/icons/note.svg" className="h-5 w-5 opacity-70" alt="" />
             </button>
@@ -121,7 +124,7 @@ const Navbar = ({ onMenuClick }: { onMenuClick: () => void }) => {
             {openNote && (
               <div className="absolute right-0 mt-3 z-50">
 
-                <div className="w-72 bg-white rounded-2xl shadow-xl border border-[#005d52]/10 p-4 animate-[fadeIn_0.2s_ease]">
+                <div className="w-72 bg-white rounded-2xl shadow-xl border border-[#F59E0B]/10 p-4 animate-[fadeIn_0.2s_ease]">
 
                   {/* Header */}
                   <div className="flex justify-between items-center mb-3">
@@ -139,7 +142,7 @@ const Navbar = ({ onMenuClick }: { onMenuClick: () => void }) => {
                     value={note}
                     onChange={(e) => setNote(e.target.value)}
                     placeholder="Write your note..."
-                    className="w-full h-24 resize-none border border-gray-200 rounded-xl p-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#005d52]/20"
+                    className="w-full h-24 resize-none border border-gray-200 rounded-xl p-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#F59E0B]/20"
                   />
 
                   {/* Actions */}
@@ -152,11 +155,11 @@ const Navbar = ({ onMenuClick }: { onMenuClick: () => void }) => {
                     </button>
                     <button
                       onClick={handleSaveNote}
-                      className="px-3 py-1.5 text-xs bg-[#005d52] text-white rounded-lg hover:bg-[#004940]"
+                      className="px-3 py-1.5 text-xs bg-[#F59E0B] text-white rounded-lg hover:bg-[#004940]"
                     >
                       Save
                     </button>
-                    <Link to="/sales/notes" className="px-3 py-1.5 text-xs bg-[#005d52] text-white rounded-lg hover:bg-[#004940]">
+                    <Link to="/sales/notes" className="px-3 py-1.5 text-xs bg-[#F59E0B] text-white rounded-lg hover:bg-[#004940]">
                       View All
                     </Link>
                   </div>
@@ -183,17 +186,17 @@ const Navbar = ({ onMenuClick }: { onMenuClick: () => void }) => {
 
           {/* POPUP */}
           {openNotif && (
-            <div className="absolute right-0 mt-3 w-80 bg-white/90 backdrop-blur-md rounded-2xl shadow-2xl border border-[#005d52]/10 z-50 animate-in zoom-in-95 duration-200 overflow-hidden">
+            <div className="absolute right-0 mt-3 w-80 bg-white/90 backdrop-blur-md rounded-2xl shadow-2xl border border-[#F59E0B]/10 z-50 animate-in zoom-in-95 duration-200 overflow-hidden">
 
               {/* HEADER */}
-              <div className="flex justify-between items-center px-4 py-3 bg-[#f4f7f6] border-b border-[#005d52]/10">
-                <p className="text-sm font-bold text-[#005d52]">
+              <div className="flex justify-between items-center px-4 py-3 bg-[#f4f7f6] border-b border-[#F59E0B]/10">
+                <p className="text-sm font-bold text-[#F59E0B]">
                   Notifications
                 </p>
 
                 <button
                   onClick={handleRefreshNotif}
-                  className="text-[13px] font-bold text-[#005d52]  hover:underline"
+                  className="text-[13px] font-bold text-[#F59E0B]  hover:underline"
                 >
                   Refresh
                 </button>
@@ -210,7 +213,7 @@ const Navbar = ({ onMenuClick }: { onMenuClick: () => void }) => {
                   notifications.map((item) => (
                     <div
                       key={item.id}
-                      className="group flex justify-between items-start gap-3 px-4 py-3 border-b border-gray-100 hover:bg-[#005d52]/5 transition-all"
+                      className="group flex justify-between items-start gap-3 px-4 py-3 border-b border-gray-100 hover:bg-[#F59E0B]/5 transition-all"
                     >
                       {/* TEXT */}
                       <div className="flex gap-2 items-start">
@@ -239,7 +242,7 @@ const Navbar = ({ onMenuClick }: { onMenuClick: () => void }) => {
               </div>
 
               {/* FOOTER */}
-              <div className="flex justify-between items-center px-4 py-2 bg-[#f4f7f6] border-t border-[#005d52]/10">
+              <div className="flex justify-between items-center px-4 py-2 bg-[#f4f7f6] border-t border-[#F59E0B]/10">
                 <span className="text-[10px] text-gray-400 uppercase">
                   {notifications.length} Active
                 </span>
@@ -257,12 +260,12 @@ const Navbar = ({ onMenuClick }: { onMenuClick: () => void }) => {
         <div className="hidden sm:block h-8 w-px bg-gray-200 mx-1"></div>
         {/* Profile */}
         <div className="flex items-center gap-2 sm:gap-3">
-          <div className="w-9 h-9 sm:w-10 sm:h-10 bg-white border-2 border-white shadow-sm rounded-full flex items-center justify-center text-xs sm:text-sm font-bold text-[#005d52]">
-            RJ
+          <div className="w-9 h-9 sm:w-10 sm:h-10 bg-white border-2 border-white shadow-sm rounded-full flex items-center justify-center text-xs sm:text-sm font-bold text-[#F59E0B]">
+            {user?.name?.split(" ").map((n) => n[0]).join("") || "U"}
           </div>
           <div className="hidden lg:block text-left">
-            <p className="text-xs font-bold text-gray-800">Rahul Jagtap</p>
-            <p className="text-[10px] text-gray-400 uppercase">Sales Manager</p>
+            <p className="text-xs font-bold text-gray-800">{user?.name || "User"}</p>
+            <p className="text-[10px] text-gray-400 uppercase">{user?.designation || "User"}</p>
           </div>
         </div>
       </div>

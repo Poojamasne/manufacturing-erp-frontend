@@ -68,7 +68,7 @@ const OpportunityView: React.FC = () => {
     if (loading && !lead) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-[#f4f7f6]">
-                <Loader2 className="animate-spin text-[#005d52]" size={40} />
+                <Loader2 className="animate-spin text-[#F59E0B]" size={40} />
             </div>
         );
     }
@@ -82,7 +82,7 @@ const OpportunityView: React.FC = () => {
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
                     <div>
                         <div className="flex items-center gap-2 text-gray-400 mb-1">
-                            <button onClick={() => navigate("/sales/opportunities")} className="hover:text-[#005d52] transition-colors">Opportunities</button>
+                            <button onClick={() => navigate("/sales/opportunities")} className="hover:text-[#F59E0B] transition-colors">Opportunities</button>
                             <ChevronRight size={14} />
                             <span className="text-slate-600 font-semibold">{lead.lead_id}</span>
                         </div>
@@ -96,7 +96,7 @@ const OpportunityView: React.FC = () => {
                         )}
                         <button
                             onClick={() => navigate(`/sales/opportunities/opportunity-edit/${lead.id}`)}
-                            className="flex items-center gap-2 bg-[#005d52] text-white px-6 py-2.5 rounded-full font-bold text-sm shadow-lg hover:bg-[#004a41] transition-all"
+                            className="flex items-center gap-2 bg-[#F59E0B] text-white px-6 py-2.5 rounded-full font-bold text-sm shadow-lg hover:bg-[#f67317] transition-all"
                         >
                             <Edit3 size={18} /> Edit
                         </button>
@@ -109,13 +109,13 @@ const OpportunityView: React.FC = () => {
                     <div className="bg-gray-50/50 p-8 border-b border-gray-100">
                         <div className="flex justify-between items-start relative max-w-3xl mx-auto">
                             <div className="absolute top-4 left-0 w-full h-0.5 bg-gray-200 z-0" />
-                            <div className="absolute top-4 left-0 h-0.5 bg-[#005d52] z-0 transition-all duration-500" style={{ width: `${pipelineResult.progress}%` }} />
+                            <div className="absolute top-4 left-0 h-0.5 bg-[#F59E0B] z-0 transition-all duration-500" style={{ width: `${pipelineResult.progress}%` }} />
                             {pipelineResult.correctedStages.map((stage, index) => (
                                 <div key={index} className="relative z-10 flex flex-col items-center">
-                                    <div className={`w-8 h-8 rounded-full border-4 border-white shadow-sm flex items-center justify-center ${stage.completed ? 'bg-[#005d52]' : 'bg-gray-200'}`}>
+                                    <div className={`w-8 h-8 rounded-full border-4 border-white shadow-sm flex items-center justify-center ${stage.completed ? 'bg-[#F59E0B]' : 'bg-gray-200'}`}>
                                         {stage.completed && <div className="w-2 h-2 bg-white rounded-full" />}
                                     </div>
-                                    <span className={`mt-3 text-xs font-semibold font-bold uppercase ${stage.completed ? 'text-[#005d52]' : 'text-gray-400'}`}>
+                                    <span className={`mt-3 text-xs font-semibold uppercase ${stage.completed ? 'text-[#F59E0B]' : 'text-gray-400'}`}>
                                         {stage.name}
                                     </span>
                                 </div>
@@ -127,7 +127,7 @@ const OpportunityView: React.FC = () => {
                         {/* Customer Info */}
                         <section>
                             <div className="flex items-center gap-2 mb-8">
-                                <div className="p-2 bg-[#d1e9e7] text-[#005d52] rounded-lg"><Building2 size={18} /></div>
+                                <div className="p-2 bg-[#f3f4e6] text-[#F59E0B] rounded-lg"><Building2 size={18} /></div>
                                 <h3 className="text-lg font-semibold text-gray-800">Customer Information</h3>
                             </div>
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-y-8 gap-x-12">
@@ -145,7 +145,7 @@ const OpportunityView: React.FC = () => {
                         {/* Products */}
                         <section>
                             <div className="flex items-center gap-2 mb-6">
-                                <div className="p-2 bg-[#d1e9e7] text-[#005d52] rounded-lg"><Package size={20} /></div>
+                                <div className="p-2 bg-[#f3f4e6] text-[#F59E0B] rounded-lg"><Package size={20} /></div>
                                 <h3 className="text-lg font-semibold text-gray-800">Products</h3>
                             </div>
                             <div className="rounded-2xl border border-gray-100 overflow-hidden">
@@ -166,14 +166,14 @@ const OpportunityView: React.FC = () => {
                                                 <td className="p-4 text-gray-500">{p.variant || "Standard"}</td>
                                                 <td className="p-4 text-center">{p.quantity}</td>
                                                 <td className="p-4 text-right">₹ {parseFloat(p.unit_price).toLocaleString()}</td>
-                                                <td className="p-4 text-right font-bold text-[#005d52]">₹ {parseFloat(p.total_price).toLocaleString()}</td>
+                                                <td className="p-4 text-right font-bold text-[#F59E0B]">₹ {parseFloat(p.total_price).toLocaleString()}</td>
                                             </tr>
                                         )) : (
                                             <tr><td colSpan={5} className="p-8 text-center text-gray-400">No products</td></tr>
                                         )}
                                     </tbody>
                                 </table>
-                                <div className="bg-[#005d52] p-4 flex justify-between text-white">
+                                <div className="bg-[#F59E0B] p-4 flex justify-between text-white">
                                     <span className="text-xs font-semibold font-bold uppercase">Deal Summary</span>
                                     <div className="flex gap-8">
                                         <div className="text-right">
@@ -193,7 +193,7 @@ const OpportunityView: React.FC = () => {
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
                             <section>
                                 <div className="flex items-center gap-2 mb-4">
-                                    <Calendar size={18} className="text-[#005d52]" />
+                                    <Calendar size={18} className="text-[#F59E0B]" />
                                     <h3 className="font-bold text-gray-800">Timeline</h3>
                                 </div>
                                 <div className="space-y-4 p-6 bg-gray-50 rounded-3xl">
@@ -206,7 +206,7 @@ const OpportunityView: React.FC = () => {
 
                             <section>
                                 <div className="flex items-center gap-2 mb-4">
-                                    <MapPin size={18} className="text-[#005d52]" />
+                                    <MapPin size={18} className="text-[#F59E0B]" />
                                     <h3 className="font-bold text-gray-800">Location</h3>
                                 </div>
                                 <div className="p-6 bg-gray-50 rounded-3xl min-h-[180px]">
@@ -218,7 +218,7 @@ const OpportunityView: React.FC = () => {
                         {/* Notes */}
                         <section>
                             <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-4">Notes</h3>
-                            <div className="bg-[#f1f8f7] border-l-4 border-[#005d52] p-6 rounded-r-2xl">
+                            <div className="bg-[#f1f8f7] border-l-4 border-[#F59E0B] p-6 rounded-r-2xl">
                                 <p className="text-gray-700 italic">{lead.notes || "No notes recorded"}</p>
                             </div>
                         </section>
@@ -231,13 +231,13 @@ const OpportunityView: React.FC = () => {
 
 const DetailItem: React.FC<{ label: string; value: string; isHighlight?: boolean; isStatus?: boolean }> = ({ label, value, isHighlight, isStatus }) => (
     <div className="flex flex-col gap-1">
-        <span className="text-xs font-semibold text-gray-600 text-sm uppercase tracking-wide">{label}</span>
+        <span className="font-semibold text-gray-600 text-sm uppercase tracking-wide">{label}</span>
         {isStatus ? (
             <span className={`w-fit px-3 py-1 rounded-lg text-xs font-bold ${value === 'High' ? 'bg-red-50 text-red-600' : value === 'Medium' ? 'bg-amber-50 text-amber-600' : 'bg-green-50 text-green-600'}`}>
                 {value || "-"}
             </span>
         ) : (
-            <span className={`text-sm font-semibold ${isHighlight ? 'text-[#005d52] text-base' : 'text-gray-700'}`}>
+            <span className={`text-sm font-semibold ${isHighlight ? 'text-[#F59E0B] text-base' : 'text-gray-700'}`}>
                 {value || "-"}
             </span>
         )}

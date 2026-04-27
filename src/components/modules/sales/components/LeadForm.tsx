@@ -304,7 +304,7 @@ const LeadForm: React.FC = () => {
             <div className="flex items-center gap-2 text-gray-400 text-sm mb-1">
               <button
                 onClick={() => navigate("/sales/leads")}
-                className="hover:text-[#005d52] transition-colors font-medium"
+                className="hover:text-[#F59E0B] transition-colors font-medium"
               >
                 Leads
               </button>
@@ -330,7 +330,7 @@ const LeadForm: React.FC = () => {
               type="button"
               onClick={handleSubmit}
               disabled={isSubmitting}
-              className="flex-1 md:flex-none px-8 py-3.5 rounded-2xl font-bold text-sm text-white bg-[#005d52] shadow-lg shadow-teal-900/20 hover:bg-[#004a41] disabled:opacity-70 transition-all flex items-center justify-center gap-2"
+              className="flex-1 md:flex-none px-8 py-3.5 rounded-2xl font-bold text-sm text-white bg-[#F59E0B] shadow-lg shadow-teal-900/20 hover:bg-[#f67317] disabled:opacity-70 transition-all flex items-center justify-center gap-2"
             >
               {isSubmitting ? (
                 "Processing..."
@@ -534,14 +534,14 @@ const LeadForm: React.FC = () => {
                     },
                   ])
                 }
-                className="flex items-center gap-2 text-[#005d52] font-bold text-xs uppercase tracking-widest px-4 py-2 hover:bg-teal-50 rounded-xl transition-all"
+                className="flex items-center gap-2 text-[#F59E0B] font-bold text-xs uppercase tracking-widest px-4 py-2 hover:bg-teal-50 rounded-xl transition-all"
               >
                 <Plus size={16} strokeWidth={2.5} /> Add Another Item
               </button>
             </div>
 
             {/* Summary Bar */}
-            <div className="mt-8 bg-[#005d52] rounded-2xl p-6 text-white flex flex-col sm:flex-row justify-between items-center gap-6 shadow-xl shadow-teal-900/20 border border-white/10">
+            <div className="mt-8 bg-[#F59E0B] rounded-2xl p-6 text-white flex flex-col sm:flex-row justify-between items-center gap-6 shadow-xl shadow-teal-900/20 border border-white/10">
               <div className="flex gap-10">
                 <div>
                   <p className="text-[10px] uppercase font-black text-teal-200 tracking-wider mb-1">
@@ -664,7 +664,7 @@ const LeadForm: React.FC = () => {
                   value={formData.address}
                   onChange={handleInputChange}
                   rows={4}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 text-sm focus:border-[#005d52] focus:ring-4 focus:ring-teal-500/5 outline-none transition-all resize-none font-medium placeholder:font-normal text-slate-800"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 text-sm focus:border-[#F59E0B] focus:ring-4 focus:ring-teal-500/5 outline-none transition-all resize-none font-medium placeholder:font-normal text-slate-800"
                   placeholder="Building, Street, Area info..."
                 />
               </div>
@@ -683,7 +683,7 @@ const SectionTitle: React.FC<{ icon: React.ReactNode; title: string }> = ({
   title,
 }) => (
   <div className="flex items-center gap-3 mb-8">
-    <div className="p-2.5 bg-teal-50 text-[#005d52] rounded-xl border border-teal-100 shadow-sm">
+    <div className="p-2.5 bg-teal-50 text-[#F59E0B] rounded-xl border border-teal-100 shadow-sm">
       {icon}
     </div>
     <h3 className="font-bold text-xl text-slate-800 tracking-tight">{title}</h3>
@@ -715,7 +715,7 @@ const FormInput: React.FC<InputFieldProps> = ({
         {...(props.type === "number" ? { min: 1 } : {})}
         className={`w-full bg-slate-50 border ${
           error ? "border-rose-300 ring-4 ring-rose-50" : "border-slate-200"
-        } rounded-xl px-4 py-3 text-sm focus:border-[#005d52] focus:ring-4 focus:ring-teal-500/5 outline-none transition-all font-medium text-slate-800 group-hover:border-slate-300 placeholder:font-normal placeholder:text-slate-400`}
+        } rounded-xl px-4 py-3 text-sm focus:border-[#F59E0B] focus:ring-4 focus:ring-teal-500/5 outline-none transition-all font-medium text-slate-800 group-hover:border-slate-300 placeholder:font-normal placeholder:text-slate-400`}
       />
       {error && (
         <AlertCircle
@@ -758,7 +758,7 @@ const FormSelect: React.FC<SelectFieldProps> = ({
         {...props}
         className={`w-full bg-slate-50 border ${
           error ? "border-rose-300 ring-4 ring-rose-50" : "border-slate-200"
-        } rounded-xl px-4 py-3 text-sm appearance-none outline-none focus:border-[#005d52] focus:ring-4 focus:ring-teal-500/5 transition-all font-medium text-slate-800 cursor-pointer group-hover:border-slate-300`}
+        } rounded-xl px-4 py-3 text-sm appearance-none outline-none focus:border-[#F59E0B] focus:ring-4 focus:ring-teal-500/5 transition-all font-medium text-slate-800 cursor-pointer group-hover:border-slate-300`}
       >
         <option value="" className="text-slate-400">Select option</option>
         {options.map((o) => (

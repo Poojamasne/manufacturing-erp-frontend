@@ -107,7 +107,7 @@ const FormField: React.FC<FormFieldProps> = ({
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className={`w-full px-3 py-2 bg-white border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#005d52] text-sm ${error ? "border-red-500 bg-red-50" : "border-gray-200"}`}
+        className={`w-full px-3 py-2 bg-white border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#F59E0B] text-sm ${error ? "border-red-500 bg-red-50" : "border-gray-200"}`}
       >
         {options.map((opt) => (
           <option key={opt} value={opt}>
@@ -121,7 +121,7 @@ const FormField: React.FC<FormFieldProps> = ({
         onChange={(e) => onChange(e.target.value)}
         rows={rows}
         placeholder={placeholder}
-        className={`w-full px-3 py-2 bg-white border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#005d52] text-sm resize-none ${error ? "border-red-500 bg-red-50" : "border-gray-200"}`}
+        className={`w-full px-3 py-2 bg-white border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#F59E0B] text-sm resize-none ${error ? "border-red-500 bg-red-50" : "border-gray-200"}`}
       />
     ) : (
       <input
@@ -129,7 +129,7 @@ const FormField: React.FC<FormFieldProps> = ({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className={`w-full px-3 py-2 bg-white border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#005d52] text-sm ${error ? "border-red-500 bg-red-50" : "border-gray-200"}`}
+        className={`w-full px-3 py-2 bg-white border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#F59E0B] text-sm ${error ? "border-red-500 bg-red-50" : "border-gray-200"}`}
       />
     )}
     {error && (
@@ -431,15 +431,21 @@ const QuotationCreate: React.FC = () => {
           </div>
           <div className="flex gap-3 w-full lg:w-auto">
             <button
+              onClick={() => navigate("/sales/quotation")}
+              className="flex-1 lg:flex-initial flex items-center justify-center gap-2 bg-white text-gray-600 hover:text-rose-500 px-5 py-2.5 rounded-xl font-medium text-sm border border-gray-200 hover:bg-gray-50 transition-all"
+            >
+               Cancel
+            </button>
+            <button
               onClick={() => window.print()}
-              className="flex-1 lg:flex-initial flex items-center justify-center gap-2 bg-white text-gray-600 px-5 py-2.5 rounded-xl font-medium text-sm border border-gray-200 hover:bg-gray-50 transition-all"
+              className="flex-1 lg:flex-initial flex items-center justify-center gap-2 bg-white text-gray-600 hover:text-[#F59E0B] px-5 py-2.5 rounded-xl font-medium text-sm border border-gray-200 hover:bg-gray-50 transition-all"
             >
               <Printer size={18} /> Preview
             </button>
             <button
               onClick={handleSubmit}
               disabled={loading}
-              className="flex-1 lg:flex-initial flex items-center justify-center gap-2 bg-[#005d52] text-white px-6 py-2.5 rounded-xl font-bold text-sm shadow-lg shadow-teal-900/20 hover:bg-[#004a41] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 lg:flex-initial flex items-center justify-center gap-2 bg-[#F59E0B] text-white px-6 py-2.5 rounded-xl font-bold text-sm shadow-lg shadow-teal-900/20 hover:bg-[#f67317] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? (
                 <Loader2 size={18} className="animate-spin" />
@@ -465,11 +471,10 @@ const QuotationCreate: React.FC = () => {
               <button
                 key={section.id}
                 onClick={() => setActiveSection(section.id)}
-                className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium transition-all ${
-                  activeSection === section.id
-                    ? "bg-[#d1e9e7] text-[#005d52]"
+                className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium transition-all ${activeSection === section.id
+                    ? "bg-[#F59E0B] text-white"
                     : "text-gray-500 hover:bg-gray-50"
-                }`}
+                  }`}
               >
                 <section.icon size={16} />
                 {section.label}
@@ -491,7 +496,7 @@ const QuotationCreate: React.FC = () => {
             <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
               <div className="p-6 border-b border-gray-100">
                 <h3 className="font-bold text-lg text-gray-800 flex items-center gap-2">
-                  <Building2 size={20} className="text-[#005d52]" />
+                  <Building2 size={20} className="text-[#F59E0B]" />
                   Customer Information
                 </h3>
                 {Object.keys(errors).length > 0 && (
@@ -513,11 +518,10 @@ const QuotationCreate: React.FC = () => {
                           onClick={() =>
                             setFormData({ ...formData, customerType: type })
                           }
-                          className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                            formData.customerType === type
-                              ? "bg-[#005d52] text-white"
+                          className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${formData.customerType === type
+                              ? "bg-[#F59E0B] text-white"
                               : "bg-gray-100 text-gray-600"
-                          }`}
+                            }`}
                         >
                           {type}
                         </button>
@@ -620,12 +624,12 @@ const QuotationCreate: React.FC = () => {
             <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
               <div className="p-6 border-b border-gray-100 flex justify-between items-center">
                 <h3 className="font-bold text-lg text-gray-800 flex items-center gap-2">
-                  <FileText size={20} className="text-[#005d52]" />
+                  <FileText size={20} className="text-[#F59E0B]" />
                   Products & Services
                 </h3>
                 <button
                   onClick={addLineItem}
-                  className="flex items-center gap-2 px-4 py-2 bg-[#d1e9e7] text-[#005d52] rounded-xl text-sm font-medium hover:bg-[#005d52] hover:text-white transition-all"
+                  className="flex items-center gap-2 px-4 py-2 bg-[#f3f4e6] text-[#F59E0B] rounded-xl text-sm font-medium hover:bg-[#F59E0B] hover:text-white transition-all"
                 >
                   <Plus size={16} /> Add Item
                 </button>
@@ -673,7 +677,7 @@ const QuotationCreate: React.FC = () => {
                             onChange={(e) =>
                               updateLineItem(item.id, "product", e.target.value)
                             }
-                            className={`w-48 px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#005d52] ${errors.lineItems && !item.product ? "border-red-500" : "border-gray-200"}`}
+                            className={`w-48 px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#F59E0B] ${errors.lineItems && !item.product ? "border-red-500" : "border-gray-200"}`}
                             placeholder="Product name"
                           />
                         </td>
@@ -688,7 +692,7 @@ const QuotationCreate: React.FC = () => {
                                 e.target.value,
                               )
                             }
-                            className="w-64 px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#005d52]"
+                            className="w-64 px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#F59E0B]"
                             placeholder="Description"
                           />
                         </td>
@@ -703,7 +707,7 @@ const QuotationCreate: React.FC = () => {
                                 parseFloat(e.target.value) || 0,
                               )
                             }
-                            className="w-24 px-3 py-2 border border-gray-200 rounded-lg text-sm text-right focus:outline-none focus:ring-2 focus:ring-[#005d52]"
+                            className="w-24 px-3 py-2 border border-gray-200 rounded-lg text-sm text-right focus:outline-none focus:ring-2 focus:ring-[#F59E0B]"
                             step="any"
                           />
                         </td>
@@ -719,11 +723,10 @@ const QuotationCreate: React.FC = () => {
                                 parseFloat(e.target.value) || 0,
                               )
                             }
-                            className={`w-32 px-3 py-2 border rounded-lg text-sm text-right focus:outline-none focus:ring-2 focus:ring-[#005d52] ${
-                              item.unitPrice <= 0
+                            className={`w-32 px-3 py-2 border rounded-lg text-sm text-right focus:outline-none focus:ring-2 focus:ring-[#F59E0B] ${item.unitPrice <= 0
                                 ? "border-red-500 bg-red-50"
                                 : "border-gray-200"
-                            }`}
+                              }`}
                           />
                         </td>
                         <td className="p-4">
@@ -737,7 +740,7 @@ const QuotationCreate: React.FC = () => {
                                 parseFloat(e.target.value) || 0,
                               )
                             }
-                            className="w-20 px-3 py-2 border border-gray-200 rounded-lg text-sm text-right focus:outline-none focus:ring-2 focus:ring-[#005d52]"
+                            className="w-20 px-3 py-2 border border-gray-200 rounded-lg text-sm text-right focus:outline-none focus:ring-2 focus:ring-[#F59E0B]"
                             step="any"
                             min="0"
                             max="100"
@@ -754,13 +757,13 @@ const QuotationCreate: React.FC = () => {
                                 parseFloat(e.target.value) || 0,
                               )
                             }
-                            className="w-20 px-3 py-2 border border-gray-200 rounded-lg text-sm text-right focus:outline-none focus:ring-2 focus:ring-[#005d52]"
+                            className="w-20 px-3 py-2 border border-gray-200 rounded-lg text-sm text-right focus:outline-none focus:ring-2 focus:ring-[#F59E0B]"
                             step="any"
                             min="0"
                             max="100"
                           />
                         </td>
-                        <td className="p-4 text-right font-bold text-[#005d52]">
+                        <td className="p-4 text-right font-bold text-[#F59E0B]">
                           ₹{" "}
                           {item.total.toLocaleString("en-IN", {
                             minimumFractionDigits: 2,
@@ -792,7 +795,7 @@ const QuotationCreate: React.FC = () => {
             <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
               <div className="p-6 border-b border-gray-100">
                 <h3 className="font-bold text-lg text-gray-800 flex items-center gap-2">
-                  <FileText size={20} className="text-[#005d52]" />
+                  <FileText size={20} className="text-[#F59E0B]" />
                   Terms & Conditions
                 </h3>
               </div>
@@ -906,7 +909,7 @@ const QuotationCreate: React.FC = () => {
                       <span className="text-lg font-bold text-gray-800">
                         Grand Total
                       </span>
-                      <span className="text-2xl font-bold text-[#005d52]">
+                      <span className="text-2xl font-bold text-[#F59E0B]">
                         ₹
                         {totals.grandTotal.toLocaleString("en-IN", {
                           minimumFractionDigits: 2,
@@ -962,7 +965,7 @@ const QuotationCreate: React.FC = () => {
           {/* <button
             onClick={handleSubmit}
             disabled={loading}
-            className="flex items-center justify-center gap-2 bg-[#005d52] text-white px-6 py-3 rounded-xl font-bold text-sm shadow-lg shadow-teal-900/20 hover:bg-[#004a41] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex items-center justify-center gap-2 bg-[#F59E0B] text-white px-6 py-3 rounded-xl font-bold text-sm shadow-lg shadow-teal-900/20 hover:bg-[#f67317] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? (
               <Loader2 size={18} className="animate-spin" />

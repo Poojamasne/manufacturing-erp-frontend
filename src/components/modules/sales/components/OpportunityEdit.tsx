@@ -112,7 +112,7 @@ const OpportunityEdit: React.FC = () => {
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
                     <div>
                         <div className="flex items-center gap-2 text-gray-400 mb-1">
-                            <button onClick={() => navigate(-1)} className="hover:text-[#005d52] transition-colors">Opportunities</button>
+                            <button onClick={() => navigate(-1)} className="hover:text-[#F59E0B] transition-colors">Opportunities</button>
                             <ChevronRight size={14} />
                             <span className="text-gray-800 font-medium">{id || 'OP001'}</span>
                         </div>
@@ -131,14 +131,14 @@ const OpportunityEdit: React.FC = () => {
                                 </button>
                                 <button 
                                     onClick={handleSave}
-                                    className="flex items-center gap-2 bg-[#005d52] text-white px-6 py-2.5 rounded-full font-bold text-sm shadow-lg shadow-teal-900/20 hover:bg-[#004a41] transition-all"
+                                    className="flex items-center gap-2 bg-[#F59E0B] text-white px-6 py-2.5 rounded-full font-bold text-sm shadow-lg shadow-teal-900/20 hover:bg-[#f67317] transition-all"
                                 >
                                     <Save size={18} /> Save Changes
                                 </button>
                             </>
                         ) : (
                             <button 
-                                className="flex items-center gap-2 bg-[#005d52] text-white px-6 py-2.5 rounded-full font-bold text-sm shadow-lg shadow-teal-900/20 hover:bg-[#004a41] transition-all"
+                                className="flex items-center gap-2 bg-[#F59E0B] text-white px-6 py-2.5 rounded-full font-bold text-sm shadow-lg shadow-teal-900/20 hover:bg-[#f67317] transition-all"
                                 onClick={() => setIsEditing(true)}
                             >
                                 <Edit3 size={18} /> Edit
@@ -155,7 +155,7 @@ const OpportunityEdit: React.FC = () => {
                         <div className="flex justify-between items-start relative max-w-3xl mx-auto">
                             <div className="absolute top-4 left-0 w-full h-0.5 bg-gray-200 z-0" />
                             <div 
-                                className="absolute top-4 left-0 h-0.5 bg-[#005d52] z-0 transition-all duration-300"
+                                className="absolute top-4 left-0 h-0.5 bg-[#F59E0B] z-0 transition-all duration-300"
                                 style={{ width: `${getProgressPercentage()}%` }}
                             />
 
@@ -163,11 +163,11 @@ const OpportunityEdit: React.FC = () => {
                                 <div key={index} className="relative z-10 flex flex-col items-center group">
                                     <div 
                                         className={`w-8 h-8 rounded-full border-4 border-white shadow-sm flex items-center justify-center transition-all ${
-                                            stage.completed ? 'bg-[#005d52] scale-110' : 'bg-gray-200'
+                                            stage.completed ? 'bg-[#F59E0B] scale-110' : 'bg-gray-200'
                                         }`}
                                     />
                                     <span className={`mt-3 text-[10px] font-bold uppercase tracking-wider ${
-                                        stage.completed ? 'text-[#005d52]' : 'text-gray-400'
+                                        stage.completed ? 'text-[#F59E0B]' : 'text-gray-400'
                                     }`}>
                                         {stage.name}
                                     </span>
@@ -181,7 +181,7 @@ const OpportunityEdit: React.FC = () => {
                         {/* Section 1: Customer Info */}
                         <section>
                             <div className="flex items-center gap-2 mb-8">
-                                <div className="p-2 bg-[#d1e9e7] text-[#005d52] rounded-lg"><Building2 size={20}/></div>
+                                <div className="p-2 bg-[#f3f4e6] text-[#F59E0B] rounded-lg"><Building2 size={20}/></div>
                                 <h3 className="font-bold text-lg text-gray-800">Customer Details</h3>
                             </div>
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -246,7 +246,7 @@ const OpportunityEdit: React.FC = () => {
                         {/* Section 2: Deal Info */}
                         <section>
                             <div className="flex items-center gap-2 mb-6">
-                                <div className="p-2 bg-[#d1e9e7] text-[#005d52] rounded-lg"><IndianRupee size={20}/></div>
+                                <div className="p-2 bg-[#f3f4e6] text-[#F59E0B] rounded-lg"><IndianRupee size={20}/></div>
                                 <h3 className="font-bold text-lg text-gray-800">Deal Summary</h3>
                             </div>
                             
@@ -312,7 +312,7 @@ const OpportunityEdit: React.FC = () => {
                         {/* Section 3: Location */}
                         <section>
                             <div className="flex items-center gap-2 mb-6">
-                                <div className="p-2 bg-[#d1e9e7] text-[#005d52] rounded-lg"><MapPin size={20}/></div>
+                                <div className="p-2 bg-[#f3f4e6] text-[#F59E0B] rounded-lg"><MapPin size={20}/></div>
                                 <h3 className="font-bold text-lg text-gray-800">Location</h3>
                             </div>
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -350,7 +350,7 @@ const OpportunityEdit: React.FC = () => {
                         {/* Section 4: Internal Notes */}
                         <section>
                             <div className="flex items-center gap-2 mb-6">
-                                <div className="p-2 bg-[#d1e9e7] text-[#005d52] rounded-lg"><FileText size={20}/></div>
+                                <div className="p-2 bg-[#f3f4e6] text-[#F59E0B] rounded-lg"><FileText size={20}/></div>
                                 <h3 className="font-bold text-lg text-gray-800">Internal Notes</h3>
                             </div>
                             {isEditing ? (
@@ -358,11 +358,11 @@ const OpportunityEdit: React.FC = () => {
                                     value={formData.internalNotes}
                                     onChange={(e) => handleInputChange('internalNotes', e.target.value)}
                                     rows={5}
-                                    className="w-full p-4 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#005d52] focus:border-transparent resize-none"
+                                    className="w-full p-4 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#F59E0B] focus:border-transparent resize-none"
                                     placeholder="Add internal notes here..."
                                 />
                             ) : (
-                                <div className="bg-[#f1f8f7] border-l-4 border-[#005d52] p-6 rounded-r-2xl">
+                                <div className="bg-[#f1f8f7] border-l-4 border-[#F59E0B] p-6 rounded-r-2xl">
                                     <p className="text-sm text-gray-700 italic leading-loose">
                                         "{formData.internalNotes}"
                                     </p>
@@ -411,7 +411,7 @@ const FormField: React.FC<FormFieldProps> = ({
                     <select
                         value={value}
                         onChange={(e) => onChange(e.target.value)}
-                        className={`w-full px-3 py-2 bg-white border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#005d52] focus:border-transparent text-sm ${
+                        className={`w-full px-3 py-2 bg-white border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#F59E0B] focus:border-transparent text-sm ${
                             error ? 'border-red-500' : 'border-gray-200'
                         }`}
                     >
@@ -424,7 +424,7 @@ const FormField: React.FC<FormFieldProps> = ({
                         type={type}
                         value={value}
                         onChange={(e) => onChange(e.target.value)}
-                        className={`w-full px-3 py-2 bg-white border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#005d52] focus:border-transparent text-sm ${
+                        className={`w-full px-3 py-2 bg-white border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#F59E0B] focus:border-transparent text-sm ${
                             error ? 'border-red-500' : 'border-gray-200'
                         }`}
                     />
