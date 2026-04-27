@@ -47,7 +47,7 @@ const ReportsAndAnalytics: FC = () => {
   const dispatch = useAppDispatch();
   const { data } = useAppSelector((state: RootState) => state.SalesReport);
 
-  const [range, setRange] = useState<TimeRange>("Yearly");
+  const [range, setRange] = useState<TimeRange>("All Time");
   const [customRange, setCustomRange] = useState({
     start: "",
     end: ""

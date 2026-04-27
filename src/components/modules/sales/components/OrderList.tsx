@@ -156,7 +156,7 @@ const OrderList: React.FC = () => {
   };
 
   // Get display text for filter button
-   const getFilterDisplayText = () => {
+  const getFilterDisplayText = () => {
     const formatDate = (dateStr: any) => {
       const date = new Date(dateStr);
 
@@ -275,108 +275,113 @@ const OrderList: React.FC = () => {
     }
   };
 
-
+  const formatDate = (date: string) => {
+    if (!date) return "";
+    const d = new Date(date);
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    const year = d.getFullYear();
+    return `${day}/${month}/${year}`;
+  };
   return (
     <div className="min-h-screen bg-[#f4f7f6] p-4 sm:p-6 lg:p-8 text-slate-900 font-sans">
       <div className="max-w-7xl mx-auto">
         <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-10">
-  <div>
-    <h1 className="text-3xl font-extrabold text-slate-800 tracking-tight">
-      Orders
-    </h1>
-    <p className="text-sm text-gray-500 mt-1 font-medium">
-      Fulfillment tracking and order history management.
-    </p>
-  </div>
+          <div>
+            <h1 className="text-3xl font-extrabold text-slate-800 tracking-tight">
+              Orders
+            </h1>
+            <p className="text-sm text-gray-500 mt-1 font-medium">
+              Fulfillment tracking and order history management.
+            </p>
+          </div>
 
-  {/* Button Group Container */}
-  <div className="flex items-center gap-3">
-    {/* --- Filter Dropdown --- */}
-    <div className="relative" ref={dropdownRef}>
-      <button
-        onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-        className="px-4 py-2 rounded-xl border border-slate-200 bg-white text-sm font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-[#F59E0B]/20 flex items-center gap-1 text-gray-700 transition-all active:scale-95"
-      >
-        <Filter size={16} className="text-[#F59E0B]" />
-        <span>{getFilterDisplayText()}</span>
-        <ChevronDown
-          size={14}
-          className={`transition-transform ${isDropdownOpen ? "rotate-180" : ""}`}
-        />
-      </button>
-
-      {/* Dropdown Menu */}
-      {isDropdownOpen && !isCalendarOpen && (
-        <div className="absolute right-0 mt-2 bg-white border border-slate-100 rounded-2xl shadow-2xl z-50 py-2 min-w-40">
-          {([ "All Time","Weekly", "Monthly", "Quarterly", "Yearly"] as TimeTab[]).map(
-            (tab) => (
+          {/* Button Group Container */}
+          <div className="flex items-center gap-3">
+            {/* --- Filter Dropdown --- */}
+            <div className="relative" ref={dropdownRef}>
               <button
-                key={tab}
-                onClick={() => handleFilterChange(tab)}
-                className={`outline-none w-full text-left px-4 py-2.5 text-[13px] transition-colors ${
-                  activeTab === tab
-                    ? "text-[#F59E0B] font-bold bg-teal-50/50"
-                    : "text-slate-600 hover:bg-slate-50"
-                }`}
+                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                className="px-4 py-2 rounded-xl border border-slate-200 bg-white text-sm font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-[#F59E0B]/20 flex items-center gap-1 text-gray-700 transition-all active:scale-95"
               >
-                {tab}
+                <Filter size={16} className="text-[#F59E0B]" />
+                <span>{getFilterDisplayText()}</span>
+                <ChevronDown
+                  size={14}
+                  className={`transition-transform ${isDropdownOpen ? "rotate-180" : ""}`}
+                />
               </button>
-            )
-          )}
-          <button
-            onClick={() => handleFilterChange("Custom")}
-            className={`outline-none w-full text-left px-4 py-2.5 text-[13px] transition-colors ${
-              activeTab === "Custom"
-                ? "text-[#F59E0B] font-bold bg-teal-50/50"
-                : "text-slate-600 hover:bg-slate-50"
-            }`}
-          >
-            Custom
-          </button>
-        </div>
-      )}
 
-      {/* Custom Date Range Popup */}
-      {isCalendarOpen && (
-        <div
-          ref={calendarRef}
-          className="absolute right-0 mt-3 bg-white p-6 rounded-2xl shadow-xl border z-50 w-72"
-        >
-          <div className="space-y-3">
-            <input
-              type="date"
-              value={customRange.start}
-              onChange={(e) => setCustomRange({ ...customRange, start: e.target.value })}
-              className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#F59E0B]/20"
-            />
-            <input
-              type="date"
-              value={customRange.end}
-              min={customRange.start}
-              onChange={(e) => setCustomRange({ ...customRange, end: e.target.value })}
-              className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#F59E0B]/20"
-            />
+              {/* Dropdown Menu */}
+              {isDropdownOpen && !isCalendarOpen && (
+                <div className="absolute right-0 mt-2 bg-white border border-slate-100 rounded-2xl shadow-2xl z-50 py-2 min-w-40">
+                  {(["All Time", "Weekly", "Monthly", "Quarterly", "Yearly"] as TimeTab[]).map(
+                    (tab) => (
+                      <button
+                        key={tab}
+                        onClick={() => handleFilterChange(tab)}
+                        className={`outline-none w-full text-left px-4 py-2.5 text-[13px] transition-colors ${activeTab === tab
+                            ? "text-[#F59E0B] font-bold bg-teal-50/50"
+                            : "text-slate-600 hover:bg-slate-50"
+                          }`}
+                      >
+                        {tab}
+                      </button>
+                    )
+                  )}
+                  <button
+                    onClick={() => handleFilterChange("Custom")}
+                    className={`outline-none w-full text-left px-4 py-2.5 text-[13px] transition-colors ${activeTab === "Custom"
+                        ? "text-[#F59E0B] font-bold bg-teal-50/50"
+                        : "text-slate-600 hover:bg-slate-50"
+                      }`}
+                  >
+                    Custom
+                  </button>
+                </div>
+              )}
+
+              {/* Custom Date Range Popup */}
+              {isCalendarOpen && (
+                <div
+                  ref={calendarRef}
+                  className="absolute right-0 mt-3 bg-white p-6 rounded-2xl shadow-xl border z-50 w-72"
+                >
+                  <div className="space-y-3">
+                    <input
+                      type="date"
+                      value={customRange.start}
+                      onChange={(e) => setCustomRange({ ...customRange, start: e.target.value })}
+                      className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#F59E0B]/20"
+                    />
+                    <input
+                      type="date"
+                      value={customRange.end}
+                      min={customRange.start}
+                      onChange={(e) => setCustomRange({ ...customRange, end: e.target.value })}
+                      className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#F59E0B]/20"
+                    />
+                    <button
+                      onClick={handleCustomApply}
+                      className="w-full bg-[#F59E0B] text-white py-2 rounded-lg text-sm font-bold hover:bg-[#f67317] transition-colors"
+                    >
+                      Apply Range
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* --- Create Order Button --- */}
             <button
-              onClick={handleCustomApply}
-              className="w-full bg-[#F59E0B] text-white py-2 rounded-lg text-sm font-bold hover:bg-[#f67317] transition-colors"
+              onClick={() => navigate("/sales/orders/create")}
+              className="outline-none flex items-center gap-1 bg-[#F59E0B] hover:bg-[#f67317] text-white px-4 py-2 rounded-xl font-bold text-sm shadow-xl shadow-orange-900/10 transition-all active:scale-95 whitespace-nowrap"
             >
-              Apply Range
+              <Plus size={18} />
+              Create Order
             </button>
           </div>
-        </div>
-      )}
-    </div>
-
-    {/* --- Create Order Button --- */}
-    <button
-      onClick={() => navigate("/sales/orders/create")}
-      className="outline-none flex items-center gap-1 bg-[#F59E0B] hover:bg-[#f67317] text-white px-4 py-2 rounded-xl font-bold text-sm shadow-xl shadow-orange-900/10 transition-all active:scale-95 whitespace-nowrap"
-    >
-      <Plus size={18} />
-      Create Order
-    </button>
-  </div>
-</header>
+        </header>
 
 
 
@@ -514,7 +519,7 @@ const OrderList: React.FC = () => {
                     </td>
                     <td className="px-4 py-4 text-[13px] text-slate-600 text-center whitespace-nowrap">
                       {o.order_date
-                        ? new Date(o.order_date).toLocaleDateString("en-US")
+                        ? formatDate(o.order_date)
                         : "—"}
                     </td>
                     <td className="px-4 py-4 text-[13px] font-medium text-slate-800 text-center">

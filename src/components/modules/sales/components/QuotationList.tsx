@@ -300,13 +300,13 @@ const QuotationList: React.FC = () => {
     }
   };
 
-  const formatDate = (dateStr: string | null) => {
-    if (!dateStr) return "N/A";
-    const d = new Date(dateStr);
+  const formatDate = (date: string) => {
+    if (!date) return "";
+    const d = new Date(date);
     const month = String(d.getMonth() + 1).padStart(2, "0");
     const day = String(d.getDate()).padStart(2, "0");
     const year = d.getFullYear();
-    return `${month}/${day}/${year}`;
+    return `${day}/${month}/${year}`;
   };
 
   const formatCurrency = (amount: string | number | undefined | null) => {
@@ -382,13 +382,13 @@ const QuotationList: React.FC = () => {
               {/* Dropdown Menu */}
               {isDropdownOpen && !isCalendarOpen && (
                 <div className="absolute right-0 mt-2 bg-white border border-slate-100 rounded-2xl shadow-2xl z-50 py-2 min-w-40">
-                  {(["All Time","Weekly", "Monthly", "Quarterly", "Yearly"] as TimeTab[]).map((tab) => (
+                  {(["All Time", "Weekly", "Monthly", "Quarterly", "Yearly"] as TimeTab[]).map((tab) => (
                     <button
                       key={tab}
                       onClick={() => handleFilterChange(tab)}
                       className={`outline-none w-full text-left px-4 py-2.5 text-[13px] transition-colors ${activeTab === tab
-                          ? "text-[#F59E0B] font-bold bg-teal-50/50"
-                          : "text-slate-600 hover:bg-slate-50"
+                        ? "text-[#F59E0B] font-bold bg-teal-50/50"
+                        : "text-slate-600 hover:bg-slate-50"
                         }`}
                     >
                       {tab}
@@ -397,8 +397,8 @@ const QuotationList: React.FC = () => {
                   <button
                     onClick={() => handleFilterChange("Custom")}
                     className={`outline-none w-full text-left px-4 py-2.5 text-[13px] transition-colors ${activeTab === "Custom"
-                        ? "text-[#F59E0B] font-bold bg-teal-50/50"
-                        : "text-slate-600 hover:bg-slate-50"
+                      ? "text-[#F59E0B] font-bold bg-teal-50/50"
+                      : "text-slate-600 hover:bg-slate-50"
                       }`}
                   >
                     Custom

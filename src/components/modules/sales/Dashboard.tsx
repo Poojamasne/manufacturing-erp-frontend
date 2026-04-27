@@ -74,7 +74,7 @@ export const Dashboard = () => {
     target: Number(item.target) || Math.round(Number(item.units_sold) * 1.2),
   }));
 
-  const [filter, setFilter] = useState<FilterType>("Weekly");
+  const [filter, setFilter] = useState<FilterType>("All Time");
   const [customRange, setCustomRange] = useState({ start: "", end: "" });
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);

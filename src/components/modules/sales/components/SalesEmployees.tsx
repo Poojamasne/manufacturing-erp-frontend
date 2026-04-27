@@ -183,7 +183,7 @@ const SalesEmployees: React.FC = () => {
     const month = String(d.getMonth() + 1).padStart(2, "0");
     const day = String(d.getDate()).padStart(2, "0");
     const year = d.getFullYear();
-    return `${month}/${day}/${year}`;
+    return `${day}/${month}/${year}`;
   };
 
   // Get display text for filter button
@@ -236,8 +236,8 @@ const SalesEmployees: React.FC = () => {
                         setCurrentPage(1);
                       }}
                       className={`outline-none w-full text-left px-4 py-2.5 text-[13px] transition-colors ${statusFilter === option
-                          ? "text-[#F59E0B] font-bold bg-teal-50/50"
-                          : "text-slate-600 hover:bg-slate-50"
+                        ? "text-[#F59E0B] font-bold bg-teal-50/50"
+                        : "text-slate-600 hover:bg-slate-50"
                         }`}
                     >
                       {option === "Active"

@@ -72,29 +72,44 @@ export const fetchReportData = createAsyncThunk(
     "reports/fetchReportData",
     async (params: { range: string; startDate?: string; endDate?: string }, { rejectWithValue, getState }) => {
         try {
+            Swal.fire({
+                title: "Loading Reports...",
+                text: "Please wait while we fetch the report data.",
+                allowOutsideClick: false,
+                customClass: {
+                    loader: 'lead-loader'
+                },
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
             const state = getState() as RootState;
             const token = state.auth.token || localStorage.getItem("token");
-            
+
             // Adjust URL based on your backend route
             let url = `${import.meta.env.VITE_API_BASE_URL}/sales/data?range=${params.range}`;
             if (params.range === "Custom" && params.startDate && params.endDate) {
                 url += `&startDate=${params.startDate}&endDate=${params.endDate}`;
             }
-            
+
             const response = await axios.get(url, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
             });
-            
+
             if (response.data.success) {
+                Swal.close();
                 return response.data.data;
             } else {
+                Swal.close();
                 return rejectWithValue(response.data.message || "Failed to fetch report data");
             }
         } catch (error: any) {
+            Swal.close();
 
-        
+
+
             return rejectWithValue(error.response?.data?.message || "Error fetching report data");
         }
     }
@@ -118,12 +133,12 @@ export const exportReportCSV = createAsyncThunk(
 
             const state = getState() as RootState;
             const token = state.auth.token || localStorage.getItem("token");
-            
+
             let url = `${import.meta.env.VITE_API_BASE_URL}/sales/export?range=${params.range}`;
             if (params.range === "Custom" && params.startDate && params.endDate) {
                 url += `&startDate=${params.startDate}&endDate=${params.endDate}`;
             }
-            
+
             const response = await axios.get(url, {
                 headers: {
                     Authorization: `Bearer ${token}`,
@@ -141,7 +156,7 @@ export const exportReportCSV = createAsyncThunk(
             link.click();
             link.remove();
             window.URL.revokeObjectURL(url_);
-            
+
             Swal.fire({
                 icon: 'success',
                 title: 'Exported!',
@@ -150,7 +165,7 @@ export const exportReportCSV = createAsyncThunk(
                 timerProgressBar: true,
                 showConfirmButton: true
             });
-            
+
             return true;
         } catch (error: any) {
             Swal.fire({
