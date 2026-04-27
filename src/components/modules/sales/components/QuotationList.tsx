@@ -338,7 +338,7 @@ const QuotationList: React.FC = () => {
           <h2 className="text-xl font-bold text-red-700 mb-2">
             Error Loading Quotations
           </h2>
-          <p className="text-red-600 break-words">{errorMessage}</p>
+          <p className="text-red-600 wrap-break-word">{errorMessage}</p>
           <button
             onClick={() => fetchQuotations()}
             className="mt-6 px-6 py-2 bg-[#F59E0B] text-white rounded-xl hover:bg-[#f67317] transition-colors"
@@ -381,7 +381,7 @@ const QuotationList: React.FC = () => {
 
               {/* Dropdown Menu */}
               {isDropdownOpen && !isCalendarOpen && (
-                <div className="absolute right-0 mt-2 bg-white border border-slate-100 rounded-2xl shadow-2xl z-50 py-2 min-w-[160px]">
+                <div className="absolute right-0 mt-2 bg-white border border-slate-100 rounded-2xl shadow-2xl z-50 py-2 min-w-40">
                   {(["All Time","Weekly", "Monthly", "Quarterly", "Yearly"] as TimeTab[]).map((tab) => (
                     <button
                       key={tab}

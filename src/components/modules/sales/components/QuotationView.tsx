@@ -10,7 +10,6 @@ import {
     Loader2
 } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
-import html2pdf from 'html2pdf.js';
 import { getQuotation, updateQuotationStatus, clearSalesErrors } from "../ModuleStateFiles/QuotationSlice";
 import { useAppDispatch, useAppSelector } from "../../../common/ReduxMainHooks";
 import type { RootState } from "../../../../ApplicationState/Store";
@@ -106,20 +105,6 @@ const QuotationView: React.FC = () => {
 
   
 
-    const handleExport = () => {
-        const element = document.getElementById('quotation-pdf-content');
-        if (element && quotation) {
-            const opt = {
-                margin: [0.3, 0.3, 0.3, 0.3] as [number, number, number, number],
-                filename: `Quotation_${quotation.quote_id || 'document'}.pdf`,
-                image: { type: 'jpeg' as const, quality: 0.98 },
-                html2canvas: { scale: 2, useCORS: true },
-                jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' as const }
-            };
-            html2pdf().set(opt).from(element).save();
-        }
-    };
-
     const getErrorMessage = (): string | null => {
         if (!error) return null;
         if (typeof error === 'string') return error;
@@ -140,7 +125,7 @@ const QuotationView: React.FC = () => {
                 <div className="bg-red-50 border border-red-200 rounded-2xl p-8 max-w-md text-center">
                     <div className="text-red-500 text-6xl mb-4">⚠️</div>
                     <h2 className="text-xl font-bold text-red-700 mb-2">Error Loading Quotation</h2>
-                    <p className="text-red-600 break-words">{errorMessage}</p>
+                    <p className="text-red-600 wrap-break-word">{errorMessage}</p>
                     <button
                         onClick={() => navigate('/sales/quotation')}
                         className="mt-6 px-6 py-2 bg-[#F59E0B] text-white rounded-xl hover:bg-[#f67317] transition-colors"

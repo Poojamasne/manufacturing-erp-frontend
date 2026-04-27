@@ -2,12 +2,9 @@ import React, { useEffect, useState, useMemo } from 'react';
 import { 
     ChevronRight, 
     Building2, 
-    List, 
     Truck, 
-    CheckCircle, 
     Loader2, 
     Download, 
-    User, 
     MapPin, 
     Package,
     Clock
