@@ -301,8 +301,15 @@ const SalesEmployees: React.FC = () => {
                   <th className="w-12 p-5 text-center border-b border-slate-100">
                     <input
                       type="checkbox"
-                      className="accent-[#F59E0B] w-4 h-4 cursor-pointer"
-                      checked={
+                      className="
+      h-4 w-4 cursor-pointer appearance-none rounded border border-slate-300 
+      bg-white transition-all relative
+      checked:bg-[#F59E0B] checked:border-[#F59E0B]
+      /* The Checkmark (Pseudo-element) */
+      after:content-[''] after:absolute after:opacity-0 checked:after:opacity-100
+      after:left-[5px] after:top-[1px] after:w-[4px] after:h-[8px]
+      after:border-white after:border-r-2 after:border-b-2 after:rotate-45
+    "                      checked={
                         paginatedData.length > 0 &&
                         selectedIds.length === paginatedData.length
                       }
@@ -340,8 +347,15 @@ const SalesEmployees: React.FC = () => {
                     <td className="p-5 text-center">
                       <input
                         type="checkbox"
-                        className="accent-[#F59E0B] w-4 h-4 cursor-pointer"
-                        checked={selectedIds.includes(emp.id)}
+                        className="
+      h-4 w-4 cursor-pointer appearance-none rounded border border-slate-300 
+      bg-white transition-all relative
+      checked:bg-[#F59E0B] checked:border-[#F59E0B]
+      /* The Checkmark (Pseudo-element) */
+      after:content-[''] after:absolute after:opacity-0 checked:after:opacity-100
+      after:left-[5px] after:top-[1px] after:w-[4px] after:h-[8px]
+      after:border-white after:border-r-2 after:border-b-2 after:rotate-45
+    "                        checked={selectedIds.includes(emp.id)}
                         onChange={() =>
                           setSelectedIds((prev) =>
                             prev.includes(emp.id)

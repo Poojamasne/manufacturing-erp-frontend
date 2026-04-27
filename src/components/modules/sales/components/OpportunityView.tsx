@@ -32,8 +32,10 @@ const OpportunityView: React.FC = () => {
     // Opportunity stages
     const opportunityStages = [
         { name: 'Qualified', key: 'Qualified' },
+        { name: 'Contacted', key: 'Contacted' },
         { name: 'In Progress', key: 'In Progress' },
         { name: 'Quotation', key: 'Quotation' },
+        { name: 'Converted', key: 'Converted' },
         { name: 'Won', key: 'Won' },
         { name: 'Lost', key: 'Lost' },
     ];
@@ -151,7 +153,7 @@ const OpportunityView: React.FC = () => {
                             <div className="rounded-2xl border border-gray-100 overflow-hidden">
                                 <table className="w-full text-left border-collapse">
                                     <thead>
-                                        <tr className="bg-gray-50 text-xs font-semibold font-bold text-gray-400 uppercase">
+                                        <tr className="bg-gray-50 text-xs font-bold text-gray-400 uppercase">
                                             <th className="p-4">Product</th>
                                             <th className="p-4">Variant</th>
                                             <th className="p-4 text-center">Qty</th>
@@ -174,7 +176,7 @@ const OpportunityView: React.FC = () => {
                                     </tbody>
                                 </table>
                                 <div className="bg-[#F59E0B] p-4 flex justify-between text-white">
-                                    <span className="text-xs font-semibold font-bold uppercase">Deal Summary</span>
+                                    <span className="text-xs font-bold uppercase">Deal Summary</span>
                                     <div className="flex gap-8">
                                         <div className="text-right">
                                             <p className="text-xs font-semibold uppercase opacity-70">Total Qty</p>
@@ -209,7 +211,7 @@ const OpportunityView: React.FC = () => {
                                     <MapPin size={18} className="text-[#F59E0B]" />
                                     <h3 className="font-bold text-gray-800">Location</h3>
                                 </div>
-                                <div className="p-6 bg-gray-50 rounded-3xl min-h-[180px]">
+                                <div className="p-6 bg-gray-50 rounded-3xl min-h-45">
                                     <p className="text-gray-600">{lead.address ? `${lead.address}, ${lead.city}, ${lead.state}` : "Address not provided"}</p>
                                 </div>
                             </section>

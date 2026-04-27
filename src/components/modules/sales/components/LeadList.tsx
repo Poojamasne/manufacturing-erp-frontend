@@ -279,22 +279,22 @@ const LeadList: React.FC = () => {
 
   // Get display text for filter button
   const getFilterDisplayText = () => {
-  const formatDate = (dateStr: string | number | Date) => {
-    const date = new Date(dateStr);
+    const formatDate = (dateStr: string | number | Date) => {
+      const date = new Date(dateStr);
 
-    const day = date.getDate();
-    const year = date.getFullYear();
-    const month = date.toLocaleString("default", { month: "long" });
+      const day = date.getDate();
+      const year = date.getFullYear();
+      const month = date.toLocaleString("default", { month: "long" });
 
-    return `${day} ${month} ${year}`;
+      return `${day} ${month} ${year}`;
+    };
+
+    if (activeTab === "Custom" && customRange.start && customRange.end) {
+      return `${formatDate(customRange.start)} to ${formatDate(customRange.end)}`;
+    }
+
+    return activeTab;
   };
-
-  if (activeTab === "Custom" && customRange.start && customRange.end) {
-    return `${formatDate(customRange.start)} to ${formatDate(customRange.end)}`;
-  }
-
-  return activeTab;
-};
 
   const formatDate = (date: string) => {
     if (!date) return "";
@@ -388,8 +388,8 @@ const LeadList: React.FC = () => {
                         key={tab}
                         onClick={() => handleFilterChange(tab as TimeTab)}
                         className={`outline-none w-full text-left px-4 py-2.5 text-[13px] transition-colors ${activeTab === tab
-                            ? "text-[#F59E0B] font-bold bg-[#f3f4e6]/50"
-                            : "text-slate-600 hover:bg-slate-50"
+                          ? "text-[#F59E0B] font-bold bg-[#f3f4e6]/50"
+                          : "text-slate-600 hover:bg-slate-50"
                           }`}
                       >
                         {tab}
@@ -398,14 +398,14 @@ const LeadList: React.FC = () => {
                     <button
                       onClick={() => handleFilterChange("Custom")}
                       className={`outline-none w-full text-left px-4 py-2.5 text-[13px] transition-colors ${activeTab === "Custom"
-                          ? "text-[#F59E0B] font-bold bg-[#f3f4e6]/50"
-                          : "text-slate-600 hover:bg-slate-50"
+                        ? "text-[#F59E0B] font-bold bg-[#f3f4e6]/50"
+                        : "text-slate-600 hover:bg-slate-50"
                         }`}
                     >
                       Custom
                     </button>
                   </div>
-                )}  
+                )}
 
                 {/* Custom Date Range Popup */}
                 {isCalendarOpen && (
@@ -562,8 +562,15 @@ const LeadList: React.FC = () => {
                   <th className="w-16 p-5 text-center border-b border-slate-100">
                     <input
                       type="checkbox"
-                      className="accent-[#F59E0B] w-4 h-4 cursor-pointer"
-                      checked={
+                      className="
+      h-4 w-4 cursor-pointer appearance-none rounded border border-slate-300 
+      bg-white transition-all relative
+      checked:bg-[#F59E0B] checked:border-[#F59E0B]
+      /* The Checkmark (Pseudo-element) */
+      after:content-[''] after:absolute after:opacity-0 checked:after:opacity-100
+      after:left-[5px] after:top-[1px] after:w-[4px] after:h-[8px]
+      after:border-white after:border-r-2 after:border-b-2 after:rotate-45
+    "                      checked={
                         paginatedLeads.length > 0 &&
                         selectedIds.length === paginatedLeads.length
                       }
@@ -602,8 +609,15 @@ const LeadList: React.FC = () => {
                     <td className="p-5 text-center">
                       <input
                         type="checkbox"
-                        className="accent-[#F59E0B] w-4 h-4 cursor-pointer"
-                        checked={selectedIds.includes(lead.id)}
+                        className="
+      h-4 w-4 cursor-pointer appearance-none rounded border border-slate-300 
+      bg-white transition-all relative
+      checked:bg-[#F59E0B] checked:border-[#F59E0B]
+      /* The Checkmark (Pseudo-element) */
+      after:content-[''] after:absolute after:opacity-0 checked:after:opacity-100
+      after:left-[5px] after:top-[1px] after:w-[4px] after:h-[8px]
+      after:border-white after:border-r-2 after:border-b-2 after:rotate-45
+    "                        checked={selectedIds.includes(lead.id)}
                         onChange={() =>
                           setSelectedIds((prev) =>
                             prev.includes(lead.id)
