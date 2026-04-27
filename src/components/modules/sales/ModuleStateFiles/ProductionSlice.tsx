@@ -220,6 +220,9 @@ export const updateProduction = (id: string, updateData: any) => async (dispatch
             title: "Updating Production Job...",
             text: "Please wait...",
             allowOutsideClick: false,
+            customClass:{
+                loader: 'lead-loader'
+            },
             didOpen: () => {
                 Swal.showLoading();
             }
@@ -242,6 +245,7 @@ export const updateProduction = (id: string, updateData: any) => async (dispatch
 
         await Swal.fire({
             icon: 'success',
+            iconColor:"#F59E0B",
             title: 'Updated!',
             text: 'Production job updated successfully',
             timer: 1500,
@@ -310,6 +314,7 @@ export const deleteProduction = (id: string) => async (dispatch: AppDispatch, ge
 
         await Swal.fire({
             icon: 'success',
+            iconColor:"#F59E0B",
             title: 'Deleted!',
             text: 'Production job has been deleted successfully.',
             timer: 2000,

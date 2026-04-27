@@ -130,14 +130,14 @@ const EditSalesEmployee: React.FC = () => {
                     </div>
 
                     <div className="flex gap-3 w-full md:w-auto">
-                        <button type="button" onClick={() => navigate(-1)} className="flex-1 md:flex-none px-6 py-3 rounded-xl font-bold text-sm text-slate-600 bg-white border border-slate-200 hover:bg-slate-50 transition-all">
+                        <button type="button" onClick={() => navigate(-1)} className="flex-1 md:flex-none px-4 py-2 rounded-xl font-bold text-sm text-slate-600 hover:text-amber-500 bg-white border border-slate-200 hover:bg-slate-50 transition-all">
                             Cancel
                         </button>
                         <button
                             type="submit"
                             form="employee-form"
                             disabled={isSaving}
-                            className="flex-1 md:flex-none px-8 py-3 rounded-xl font-bold text-sm text-white bg-[#F59E0B] shadow-lg shadow-amber-500/5 hover:bg-[#f67317] transition-all flex items-center justify-center gap-2 disabled:opacity-70"
+                            className="flex-1 md:flex-none px-2.5 py-2 gap-1 rounded-xl font-bold text-sm text-white bg-[#F59E0B] shadow-lg shadow-amber-500/5 hover:bg-[#f67317] transition-all flex items-center justify-center disabled:opacity-70"
                         >
                             {isSaving ? "Updating..." : <><Save size={18} /> Update Employee</>}
                         </button>

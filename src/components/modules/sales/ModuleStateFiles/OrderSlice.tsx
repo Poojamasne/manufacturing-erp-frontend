@@ -228,6 +228,9 @@ export const createOrder = (orderData: any) => async (dispatch: AppDispatch, _ge
             title: "Creating Order...",
             text: "Please wait while we create the order.",
             allowOutsideClick: false,
+            customClass: {
+                loader: 'lead-loader'
+            },
             didOpen: () => {
                 Swal.showLoading();
             }
@@ -250,6 +253,7 @@ export const createOrder = (orderData: any) => async (dispatch: AppDispatch, _ge
 
         await Swal.fire({
             icon: 'success',
+            iconColor: "#F59E0B",
             title: 'Success!',
             text: 'Order created successfully',
             timer: 2000,

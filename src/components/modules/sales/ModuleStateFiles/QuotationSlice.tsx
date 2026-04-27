@@ -58,7 +58,7 @@ const SalesQuotation = createSlice({
             state.loading = false;
             let quotationsData = [];
             let paginationData = { page: 1, limit: 10, total: 0, pages: 0 };
-            
+
             if (action.payload?.data) {
                 quotationsData = Array.isArray(action.payload.data) ? action.payload.data : [];
                 paginationData = action.payload.pagination || paginationData;
@@ -67,27 +67,27 @@ const SalesQuotation = createSlice({
             } else {
                 quotationsData = [];
             }
-            
+
             state.quotations = quotationsData;
             state.pagination = paginationData;
             state.error = null;
         },
 
         // In getSalesSingleQuotationSuccess reducer, add:
-getSalesSingleQuotationSuccess: (state, action) => {
-    state.loading = false;
-    const quotationData = action.payload?.data;
-    if (quotationData && typeof quotationData === 'object' && !Array.isArray(quotationData)) {
-        state.quotation = {
-            ...state.quotation,
-            ...quotationData,
-            products: quotationData.products || []
-        };
-    } else {
-        state.quotation = initialState.quotation;
-    }
-    state.error = null;
-},
+        getSalesSingleQuotationSuccess: (state, action) => {
+            state.loading = false;
+            const quotationData = action.payload?.data;
+            if (quotationData && typeof quotationData === 'object' && !Array.isArray(quotationData)) {
+                state.quotation = {
+                    ...state.quotation,
+                    ...quotationData,
+                    products: quotationData.products || []
+                };
+            } else {
+                state.quotation = initialState.quotation;
+            }
+            state.error = null;
+        },
 
         createSalesQuotationSuccess: (state, action) => {
             state.loading = false;
@@ -159,46 +159,46 @@ export default SalesQuotation.reducer;
 
 // ==================== THUNKS ====================
 
-export const getQuotations = (params?: { status?: string; search?: string; page?: number; limit?: number }) => 
+export const getQuotations = (params?: { status?: string; search?: string; page?: number; limit?: number }) =>
     async (dispatch: AppDispatch, getState: () => RootState) => {
-    dispatch(getSalesQuotationRequest());
-    try {
-        Swal.fire({
-            title: "Loading Quotations...",
-            text: "Please wait while we fetch the data.",
-            allowOutsideClick: false,
-            customClass:{
-                loader: 'lead-loader'
-            },
-            didOpen: () => {
-                Swal.showLoading();
-            }
-        });
-        
-        const token = getState().auth.token || localStorage.getItem("token");
-        
-        const queryParams = new URLSearchParams();
-        if (params?.status && params.status !== 'All') queryParams.append('status', params.status);
-        if (params?.search) queryParams.append('search', params.search);
-        if (params?.page) queryParams.append('page', params.page.toString());
-        if (params?.limit) queryParams.append('limit', params.limit.toString());
-        
-        const url = `${import.meta.env.VITE_API_BASE_URL}/sales/quotations${queryParams.toString() ? `?${queryParams}` : ''}`;
-        
-        const { data } = await axios.get(url, {
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
-        });
-        
-        dispatch(getSalesQuotationsSuccess(data));
-        Swal.close();
-    } catch (error: any) {
-        Swal.close();
-        const message = error.response?.data?.message || error.message || "Something went wrong";
-        dispatch(getSalesQuotationFailure(message));
-    }
-};
+        dispatch(getSalesQuotationRequest());
+        try {
+            Swal.fire({
+                title: "Loading Quotations...",
+                text: "Please wait while we fetch the data.",
+                allowOutsideClick: false,
+                customClass: {
+                    loader: 'lead-loader'
+                },
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            const token = getState().auth.token || localStorage.getItem("token");
+
+            const queryParams = new URLSearchParams();
+            if (params?.status && params.status !== 'All') queryParams.append('status', params.status);
+            if (params?.search) queryParams.append('search', params.search);
+            if (params?.page) queryParams.append('page', params.page.toString());
+            if (params?.limit) queryParams.append('limit', params.limit.toString());
+
+            const url = `${import.meta.env.VITE_API_BASE_URL}/sales/quotations${queryParams.toString() ? `?${queryParams}` : ''}`;
+
+            const { data } = await axios.get(url, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            dispatch(getSalesQuotationsSuccess(data));
+            Swal.close();
+        } catch (error: any) {
+            Swal.close();
+            const message = error.response?.data?.message || error.message || "Something went wrong";
+            dispatch(getSalesQuotationFailure(message));
+        }
+    };
 
 export const getQuotation = (id: string) => async (dispatch: AppDispatch, getState: () => RootState) => {
     dispatch(getSalesQuotationRequest());
@@ -207,11 +207,14 @@ export const getQuotation = (id: string) => async (dispatch: AppDispatch, getSta
             title: "Loading Quotation Details...",
             text: "Please wait while we fetch the data.",
             allowOutsideClick: false,
+            customClass: {
+                loader: 'lead-loader'
+            },
             didOpen: () => {
                 Swal.showLoading();
             }
         });
-        
+
         const token = getState().auth.token || localStorage.getItem("token");
         const { data } = await axios.get(
             `${import.meta.env.VITE_API_BASE_URL}/sales/quotations/${id}`,
@@ -221,7 +224,7 @@ export const getQuotation = (id: string) => async (dispatch: AppDispatch, getSta
                 },
             }
         );
-        
+
         dispatch(getSalesSingleQuotationSuccess(data));
         Swal.close();
     } catch (error: any) {
@@ -238,11 +241,14 @@ export const createQuotation = (quotationData: any) => async (dispatch: AppDispa
             title: "Creating Quotation...",
             text: "Please wait while we save the data.",
             allowOutsideClick: false,
+            customClass: {
+                loader: 'lead-loader'
+            },
             didOpen: () => {
                 Swal.showLoading();
             }
         });
-        
+
         const token = getState().auth.token || localStorage.getItem("token");
         const { data } = await axios.post(
             `${import.meta.env.VITE_API_BASE_URL}/sales/quotations`,
@@ -254,26 +260,27 @@ export const createQuotation = (quotationData: any) => async (dispatch: AppDispa
                 },
             }
         );
-        
+
         dispatch(createSalesQuotationSuccess(data));
-        
+
         // Close the loading modal
         Swal.close();
-        
+
         // Show success message
         await Swal.fire({
             title: "Success!",
+            iconColor: "#F59E0B",
             text: "Quotation created successfully",
             icon: "success",
             timer: 2000,
             showConfirmButton: false
         });
-        
+
         return data;
     } catch (error: any) {
         Swal.close();
         const message = error.response?.data?.message || error.message || "Failed to create quotation";
-        
+
         await Swal.fire({
             title: "Error!",
             text: message,
@@ -293,11 +300,14 @@ export const updateQuotation = (id: string, updateData: any) => async (dispatch:
             title: "Updating Quotation...",
             text: "Please wait while we update the data.",
             allowOutsideClick: false,
+            customClass: {
+                loader: 'lead-loader'
+            },
             didOpen: () => {
                 Swal.showLoading();
             }
         });
-        
+
         const token = getState().auth.token || localStorage.getItem("token");
         const { data } = await axios.put(
             `${import.meta.env.VITE_API_BASE_URL}/sales/quotations/${id}`,
@@ -309,12 +319,13 @@ export const updateQuotation = (id: string, updateData: any) => async (dispatch:
                 },
             }
         );
-        
+
         dispatch(updateSalesQuotationSuccess(data));
         Swal.fire({
             title: "Success!",
             text: "Quotation updated successfully",
             icon: "success",
+            iconColor: "#F59E0B",
             timer: 2000,
             showConfirmButton: false
         });
@@ -355,11 +366,14 @@ export const deleteQuotation = (id: string) => async (dispatch: AppDispatch, get
             title: "Deleting Quotation...",
             text: "Please wait",
             allowOutsideClick: false,
+            customClass: {
+                loader: 'lead-loader'
+            },
             didOpen: () => {
                 Swal.showLoading();
             }
         });
-        
+
         const token = getState().auth.token || localStorage.getItem("token");
         await axios.delete(
             `${import.meta.env.VITE_API_BASE_URL}/sales/quotations/${id}`,
@@ -369,21 +383,22 @@ export const deleteQuotation = (id: string) => async (dispatch: AppDispatch, get
                 },
             }
         );
-        
+
         dispatch(deleteSalesQuotationSuccess(parseInt(id)));
-        
+
         // Close loading modal
         Swal.close();
-        
+
         // Show success message and wait for it
         await Swal.fire({
             title: "Deleted!",
+            iconColor: "#F59E0B",
             text: "Quotation has been deleted successfully.",
             icon: "success",
             timer: 2000,
             showConfirmButton: false
         });
-        
+
         return true;
     } catch (error: any) {
         Swal.close();
@@ -399,58 +414,62 @@ export const deleteQuotation = (id: string) => async (dispatch: AppDispatch, get
     }
 };
 
-export const updateQuotationStatus = ({ id, status }: { id: string; status: string }) => 
+export const updateQuotationStatus = ({ id, status }: { id: string; status: string }) =>
     async (dispatch: AppDispatch, getState: () => RootState) => {
-    dispatch(getSalesQuotationRequest());
-    try {
-        Swal.fire({
-            title: "Updating Status...",
-            text: "Please wait",
-            allowOutsideClick: false,
-            didOpen: () => {
-                Swal.showLoading();
-            }
-        });
-        
-        const token = getState().auth.token || localStorage.getItem("token");
-        
-        // CHANGE THIS: Use PUT instead of PATCH, and use the correct endpoint
-        const { data } = await axios.put(
-            `${import.meta.env.VITE_API_BASE_URL}/sales/quotations/${id}`,  // ← Changed from PATCH to PUT, removed /status
-            { status },  // ← Send status in body
-            {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                    'Content-Type': 'application/json'
+        dispatch(getSalesQuotationRequest());
+        try {
+            Swal.fire({
+                title: "Updating Status...",
+                text: "Please wait",
+                allowOutsideClick: false,
+                customClass: {
+                    loader: 'lead-loader'
                 },
-            }
-        );
-        
-        dispatch(updateSalesQuotationSuccess(data));
-        
-        Swal.close();
-        Swal.fire({
-            title: "Success!",
-            text: `Quotation status updated to ${status}`,
-            icon: "success",
-            timer: 2000,
-            showConfirmButton: false
-        });
-        
-        return data;
-    } catch (error: any) {
-        Swal.close();
-        const message = error.response?.data?.message || error.message || "Failed to update status";
-        Swal.fire({
-            title: "Error!",
-            text: message,
-            icon: "error",
-            confirmButtonText: "OK"
-        });
-        dispatch(getSalesQuotationFailure(message));
-        throw error;
-    }
-};
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            const token = getState().auth.token || localStorage.getItem("token");
+
+            // CHANGE THIS: Use PUT instead of PATCH, and use the correct endpoint
+            const { data } = await axios.put(
+                `${import.meta.env.VITE_API_BASE_URL}/sales/quotations/${id}`,  // ← Changed from PATCH to PUT, removed /status
+                { status },  // ← Send status in body
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                }
+            );
+
+            dispatch(updateSalesQuotationSuccess(data));
+
+            Swal.close();
+            Swal.fire({
+                title: "Success!",
+                text: `Quotation status updated to ${status}`,
+                icon: "success",
+                iconColor: "#F59E0B",
+                timer: 2000,
+                showConfirmButton: false
+            });
+
+            return data;
+        } catch (error: any) {
+            Swal.close();
+            const message = error.response?.data?.message || error.message || "Failed to update status";
+            Swal.fire({
+                title: "Error!",
+                text: message,
+                icon: "error",
+                confirmButtonText: "OK"
+            });
+            dispatch(getSalesQuotationFailure(message));
+            throw error;
+        }
+    };
 
 export const bulkDeleteQuotations = (ids: string[]) => async (dispatch: AppDispatch, getState: () => RootState) => {
     dispatch(getSalesQuotationRequest());
@@ -474,13 +493,16 @@ export const bulkDeleteQuotations = (ids: string[]) => async (dispatch: AppDispa
             title: "Deleting Quotations...",
             text: "Please wait",
             allowOutsideClick: false,
+            customClass: {
+                loader: 'lead-loader'
+            },
             didOpen: () => {
                 Swal.showLoading();
             }
         });
-        
+
         const token = getState().auth.token || localStorage.getItem("token");
-        
+
         for (const id of ids) {
             await axios.delete(
                 `${import.meta.env.VITE_API_BASE_URL}/sales/quotations/${id}`,
@@ -492,11 +514,12 @@ export const bulkDeleteQuotations = (ids: string[]) => async (dispatch: AppDispa
             );
             dispatch(deleteSalesQuotationSuccess(parseInt(id)));
         }
-        
+
         Swal.fire({
             title: "Deleted!",
             text: `${ids.length} quotation(s) have been deleted.`,
             icon: "success",
+            iconColor: "#F59E0B",
             timer: 2000,
             showConfirmButton: false
         });

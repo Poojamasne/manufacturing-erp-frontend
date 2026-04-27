@@ -160,6 +160,7 @@ export const exportReportCSV = createAsyncThunk(
             Swal.fire({
                 icon: 'success',
                 title: 'Exported!',
+                iconColor:"#F59E0B",
                 text: 'Report exported successfully',
                 timer: 1500,
                 timerProgressBar: true,

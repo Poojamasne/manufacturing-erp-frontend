@@ -58,7 +58,7 @@ const Sidebar: React.FC = () => {
             className={`h-5 w-5 ${isActive("/sales/leads") ? "brightness-0 invert" : "opacity-60"}`}
             alt=""
           />
-          <span className={`${isActive("/sales/leads") ? "font-bold" : "font-semibold"} text-sm`}>Lead</span>
+          <span className={`${isActive("/sales/leads") ? "font-bold" : "font-semibold"} text-sm`}>Leads</span>
         </button>
 
         {/* Employees */}
