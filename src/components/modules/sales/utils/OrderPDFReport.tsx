@@ -1,126 +1,143 @@
-import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer';
+import {
+  Document,
+  Page,
+  Text,
+  View,
+  StyleSheet,
+  Font,
+} from "@react-pdf/renderer";
+import NotoSans from '/fonts/NotoSans-Regular.ttf';
+
+// Registering your working local font
+Font.register({
+  family: 'NotoSans',
+  src: NotoSans,
+});
 
 const styles = StyleSheet.create({
   page: { 
     padding: 30, 
-    backgroundColor: '#f4f7f6', // Matches your app's min-h-screen background
-    fontFamily: 'Helvetica' 
+    backgroundColor: '#f8fafc', // Light slate background
+    fontFamily: "NotoSans" 
   },
-  // Main Rounded Container (matches your .bg-white.rounded-[2.5rem])
-  container: {
+  // Main Container
+  mainCard: {
     backgroundColor: '#FFFFFF',
-    borderRadius: 25,
+    borderRadius: 20,
     padding: 25,
     borderWidth: 1,
-    borderColor: '#f1f5f9',
+    borderColor: '#e2e8f0',
   },
-  // Header section
+  // Header Section
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 30,
+    borderBottomWidth: 2,
+    borderBottomColor: '#F59E0B',
+    paddingBottom: 15,
   },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#1e293b', // Slate 800
-    letterSpacing: -0.5,
+  title: { 
+    fontSize: 22, 
+    color: '#1e293b', 
+    letterSpacing: -0.5 
   },
-  subtitle: {
-    fontSize: 10,
-    color: '#64748b', // Slate 500
-    marginTop: 2,
+  refNumber: { 
+    fontSize: 10, 
+    color: '#64748b', 
+    marginTop: 2 
   },
   
-  // Status Badges (Matching your getStatusStyle function)
-  badge: {
-    padding: '4 10',
+  // Status Badge
+  statusBadge: {
+    padding: '5 12',
     borderRadius: 8,
     fontSize: 8,
-    fontWeight: 'bold',
-    letterSpacing: 1,
     textTransform: 'uppercase',
     borderWidth: 1,
   },
-  // Dynamic badge styles logic will be applied in the component
 
-  // Info Section
-  infoSection: {
+  // Info Grid
+  infoGrid: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginBottom: 30,
-    paddingHorizontal: 10,
   },
-  infoGroup: { width: '30%' },
+  infoCol: { width: '30%' },
   label: { 
-    fontSize: 8, 
+    fontSize: 7, 
     color: '#64748b', 
     textTransform: 'uppercase', 
-    letterSpacing: 1,
-    marginBottom: 4,
-    fontWeight: 'bold' 
+    marginBottom: 5,
+    fontWeight: 'normal'
   },
-  value: { fontSize: 11, color: '#0f172a', lineHeight: 1.4 },
+  value: { 
+    fontSize: 10, 
+    color: '#1e293b', 
+    lineHeight: 1.4 
+  },
 
-  // Table Styling (Matching your <table> structure)
-  table: {
-    marginTop: 10,
-    borderRadius: 15,
-    overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: '#f1f5f9',
-  },
+  // Table Styling
   tableHeader: {
     flexDirection: 'row',
-    backgroundColor: '#f8fafc', // Matches bg-slate-50/50
-    padding: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f1f5f9',
+    backgroundColor: '#1e293b', // Dark slate header
+    padding: 10,
+    borderRadius: 6,
+    marginBottom: 5,
   },
-  tableHeaderText: {
-    fontSize: 9,
-    fontWeight: 'bold',
-    color: '#1e293b',
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
+  tableHeaderText: { 
+    fontSize: 8, 
+    color: '#FFFFFF', 
+    textTransform: 'uppercase' 
   },
   tableRow: {
     flexDirection: 'row',
-    backgroundColor: '#FFFFFF',
-    padding: 12,
     borderBottomWidth: 1,
     borderBottomColor: '#f1f5f9',
+    padding: 10,
     alignItems: 'center',
   },
-  tableCell: { fontSize: 10, color: '#334155' },
+  tableCell: { 
+    fontSize: 9, 
+    color: '#334155' 
+  },
 
-  // Footer / Totals (Matches your Footer Pagination style)
+  // Summary Section
   summaryContainer: {
-    marginTop: 20,
-    backgroundColor: '#f8fafc', // bg-slate-50/50
-    borderRadius: 15,
-    padding: 15,
+    marginTop: 25,
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
+    alignItems: 'flex-start',
+  },
+  notesBox: {
+    width: '55%',
+    padding: 12,
+    backgroundColor: '#f1f5f9',
+    borderRadius: 12,
+  },
+  totalBox: {
+    width: '35%',
+    padding: 12,
+    backgroundColor: '#fffbeb', // Light amber tint
+    borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#f1f5f9',
+    borderColor: '#fef3c7',
   },
-  totalLabel: {
-    fontSize: 10,
-    fontWeight: 'bold',
-    color: '#1e293b',
-    textTransform: 'uppercase',
-    letterSpacing: 1,
+  totalLabel: { 
+    fontSize: 9, 
+    color: '#92400e', 
+    textAlign: 'right',
+    textTransform: 'uppercase'
   },
-  totalValue: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#F59E0B', // Your Amber theme color
+  totalValue: { 
+    fontSize: 18, 
+    color: '#F59E0B', 
+    textAlign: 'right', 
+    marginTop: 5 
   },
 
-  signature: {
+  footer: {
     position: 'absolute',
     bottom: 30,
     left: 30,
@@ -129,110 +146,102 @@ const styles = StyleSheet.create({
     color: '#94a3b8',
     fontSize: 8,
     borderTopWidth: 1,
-    borderTopColor: '#f1f5f9',
+    borderTopColor: '#e2e8f0',
     paddingTop: 10,
-  }
+  },
 });
 
 export const OrderPDFReport = ({ order }: { order: any }) => {
-  // Helper to match your exact app status colors
-  const getBadgeStyle = (status: string) => {
+  // Helper for Currency
+  const formatINR = (amt: any) => 
+    `₹${Number(amt).toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
+
+  // Helper for dynamic status theme
+  const getBadgeTheme = (status: string) => {
     switch (status) {
-      case "Pending":
-        return { backgroundColor: '#fffbeb', color: '#d97706', borderColor: '#fef3c7' };
-      case "Processing":
-        return { backgroundColor: '#eff6ff', color: '#2563eb', borderColor: '#dbeafe' };
-      case "Delivered":
-        return { backgroundColor: '#ecfdf5', color: '#059669', borderColor: '#d1fae5' };
-      case "Cancelled":
-        return { backgroundColor: '#fff1f2', color: '#e11d48', borderColor: '#ffe4e6' };
-      default:
-        return { backgroundColor: '#f8fafc', color: '#64748b', borderColor: '#f1f5f9' };
+      case "Pending": return { bg: '#fffbeb', text: '#d97706', border: '#fef3c7' };
+      case "Processing": return { bg: '#eff6ff', text: '#2563eb', border: '#dbeafe' };
+      case "Delivered": return { bg: '#ecfdf5', text: '#059669', border: '#d1fae5' };
+      case "Cancelled": return { bg: '#fff1f2', text: '#e11d48', border: '#ffe4e6' };
+      default: return { bg: '#f8fafc', text: '#64748b', border: '#e2e8f0' };
     }
   };
 
-  const badgeTheme = getBadgeStyle(order.status);
+  const badge = getBadgeTheme(order.status);
 
   return (
-    <Document>
+    <Document title={`Order-${order.order_id}`}>
       <Page size="A4" style={styles.page}>
-        <View style={styles.container}>
-          {/* HEADER */}
+        <View style={styles.mainCard}>
+          {/* Header */}
           <View style={styles.header}>
             <View>
-              <Text style={styles.title}>Order Report</Text>
-              <Text style={styles.subtitle}>Reference: {order.order_id}</Text>
+              <Text style={styles.title}>ORDER REPORT</Text>
+              <Text style={styles.refNumber}>Ref: {order.order_id}</Text>
             </View>
-            <View style={[styles.badge, badgeTheme]}>
+            <View style={[styles.statusBadge, { backgroundColor: badge.bg, color: badge.text, borderColor: badge.border }]}>
               <Text>{order.status}</Text>
             </View>
           </View>
 
-          {/* INFO GRID */}
-          <View style={styles.infoSection}>
-            <View style={styles.infoGroup}>
-              <Text style={styles.label}>Customer</Text>
+          {/* Info Grid */}
+          <View style={styles.infoGrid}>
+            <View style={styles.infoCol}>
+              <Text style={styles.label}>Bill To</Text>
               <Text style={[styles.value, { fontWeight: 'bold' }]}>{order.customer_name}</Text>
               <Text style={styles.value}>{order.email}</Text>
               <Text style={styles.value}>{order.phone}</Text>
             </View>
-            <View style={styles.infoGroup}>
+            <View style={styles.infoCol}>
               <Text style={styles.label}>Shipping Address</Text>
               <Text style={styles.value}>{order.shipping_address || "N/A"}</Text>
             </View>
-            <View style={styles.infoGroup}>
-              <Text style={styles.label}>Sales Representative</Text>
-              <Text style={styles.value}>{order.sales_rep_name}</Text>
+            <View style={styles.infoCol}>
+              <Text style={styles.label}>Order Details</Text>
+              <Text style={styles.value}>Executive: {order.sales_rep_name}</Text>
               <Text style={[styles.label, { marginTop: 8 }]}>Order Date</Text>
               <Text style={styles.value}>
-                {order.order_date ? new Date(order.order_date).toLocaleDateString('en-GB') : '-'}
+                {order.order_date ? new Date(order.order_date).toLocaleDateString('en-IN') : '-'}
               </Text>
             </View>
           </View>
 
-          {/* TABLE */}
-          <View style={styles.table}>
-            <View style={styles.tableHeader}>
-              <Text style={[styles.tableHeaderText, { width: '50%' }]}>Product</Text>
-              <Text style={[styles.tableHeaderText, { width: '10%', textAlign: 'center' }]}>Qty</Text>
-              <Text style={[styles.tableHeaderText, { width: '20%', textAlign: 'right' }]}>Unit Price</Text>
-              <Text style={[styles.tableHeaderText, { width: '20%', textAlign: 'right' }]}>Total</Text>
-            </View>
-
-            {order.items?.map((item: any, i: number) => (
-              <View key={i} style={styles.tableRow}>
-                <Text style={[styles.tableCell, { width: '50%', fontWeight: 'bold' }]}>{item.product_name}</Text>
-                <Text style={[styles.tableCell, { width: '10%', textAlign: 'center' }]}>{item.quantity}</Text>
-                <Text style={[styles.tableCell, { width: '20%', textAlign: 'right' }]}>
-                  ₹{Number(item.unit_price).toLocaleString('en-IN')}
-                </Text>
-                <Text style={[styles.tableCell, { width: '20%', textAlign: 'right', color: '#1e293b', fontWeight: 'bold' }]}>
-                  ₹{Number(item.total_price).toLocaleString('en-IN')}
-                </Text>
-              </View>
-            ))}
+          {/* Product Table */}
+          <View style={styles.tableHeader}>
+            <Text style={[styles.tableHeaderText, { width: '50%' }]}>Product Description</Text>
+            <Text style={[styles.tableHeaderText, { width: '10%', textAlign: 'center' }]}>Qty</Text>
+            <Text style={[styles.tableHeaderText, { width: '20%', textAlign: 'right' }]}>Unit Price</Text>
+            <Text style={[styles.tableHeaderText, { width: '20%', textAlign: 'right' }]}>Total</Text>
           </View>
 
-          {/* TOTALS SUMMARY */}
+          {order.items?.map((item: any, i: number) => (
+            <View key={i} style={styles.tableRow}>
+              <Text style={[styles.tableCell, { width: '50%' }]}>{item.product_name}</Text>
+              <Text style={[styles.tableCell, { width: '10%', textAlign: 'center' }]}>{item.quantity}</Text>
+              <Text style={[styles.tableCell, { width: '20%', textAlign: 'right' }]}>{formatINR(item.unit_price)}</Text>
+              <Text style={[styles.tableCell, { width: '20%', textAlign: 'right' }]}>{formatINR(item.total_price)}</Text>
+            </View>
+          ))}
+
+          {/* Summary */}
           <View style={styles.summaryContainer}>
-            <View>
+            <View style={styles.notesBox}>
               <Text style={styles.label}>Notes</Text>
-              <Text style={[styles.value, { fontSize: 9, color: '#64748b', maxWidth: 250 }]}>
-                {order.notes || "No additional notes for this order."}
+              <Text style={{ fontSize: 8, color: '#64748b', lineHeight: 1.4 }}>
+                {order.notes || "No additional instructions provided. This order is subject to standard terms and conditions."}
               </Text>
             </View>
-            <View style={{ alignItems: 'flex-end' }}>
-              <Text style={styles.totalLabel}>Total Amount</Text>
-              <Text style={styles.totalValue}>
-                ₹{Number(order.total_amount).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
-              </Text>
+
+            <View style={styles.totalBox}>
+              <Text style={styles.totalLabel}>Grand Total</Text>
+              <Text style={styles.totalValue}>{formatINR(order.total_amount)}</Text>
             </View>
           </View>
         </View>
 
-        {/* FOOTER */}
-        <Text style={styles.signature}>
-          Generated on {new Date().toLocaleString()} • Professional Sales Fulfillment Report
+        <Text style={styles.footer}>
+          This is a computer-generated document. No signature required. 
+          Generated on {new Date().toLocaleString('en-IN')}
         </Text>
       </Page>
     </Document>

@@ -126,15 +126,8 @@ const ProductionEdit: React.FC = () => {
         notes: formData.notes || null,
       };
 
-      // Remove .unwrap() and handle the promise directly
-      const result = await dispatch(updateProduction(id!, updateData));
-      if (result.meta.requestStatus === 'fulfilled') {
-        setShowSuccess(true);
-        setTimeout(() => setShowSuccess(false), 3000);
-        setTimeout(() => {
-          navigate("/sales/production");
-        }, 2000);
-      }
+      await dispatch(updateProduction(id!, updateData, navigate));
+
     } catch (error) {
       console.error("Save failed:", error);
     } finally {
@@ -204,7 +197,7 @@ const ProductionEdit: React.FC = () => {
               <button
                 onClick={handleSave}
                 disabled={isSaving}
-                className="flex items-center gap-1 px-2.5 py-2 text-white bg-[#F59E0B] rounded-xl hover:bg-[#f67317] transition-colors disabled:opacity-50 shadow-lg shadow-amber-500/5"
+                className="flex items-center gap-1 px-2.5 py-2 outline-none text-white bg-[#F59E0B] rounded-xl hover:bg-[#f67317] transition-colors disabled:opacity-50 shadow-lg shadow-amber-500/5"
               >
                 {isSaving ? (
                   <Loader2 size={16} className="animate-spin" />
@@ -277,8 +270,8 @@ const ProductionEdit: React.FC = () => {
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
                 className={`flex items-center gap-2 px-6 py-3 text-sm font-medium transition-all whitespace-nowrap ${activeTab === tab.id
-                    ? "text-[#F59E0B] border-b-2 border-[#F59E0B]"
-                    : "text-gray-500 hover:text-gray-700"
+                  ? "text-[#F59E0B] border-b-2 border-[#F59E0B]"
+                  : "text-gray-500 hover:text-gray-700"
                   }`}
               >
                 <tab.icon size={18} />
@@ -351,7 +344,7 @@ const ProductionEdit: React.FC = () => {
                     <select
                       value={formData.stage}
                       onChange={(e) => updateFormData("stage", e.target.value)}
-                      className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-[#F59E0B] focus:border-transparent ${errors.stage ? "border-red-500" : "border-gray-300"
+                      className={`w-full px-3 py-2 border rounded-lg focus:ring-2 outline-none focus:ring-[#F59E0B] focus:border-transparent ${errors.stage ? "border-red-500" : "border-gray-300"
                         }`}
                     >
                       {stages.map((stage) => (
@@ -373,7 +366,7 @@ const ProductionEdit: React.FC = () => {
                     <select
                       value={formData.status}
                       onChange={(e) => updateFormData("status", e.target.value)}
-                      className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-[#F59E0B] focus:border-transparent ${errors.status ? "border-red-500" : "border-gray-300"
+                      className={`w-full px-3 py-2 border rounded-lg focus:ring-2 outline-none focus:ring-[#F59E0B] focus:border-transparent ${errors.status ? "border-red-500" : "border-gray-300"
                         }`}
                     >
                       <option value="Pending">Pending</option>
@@ -398,7 +391,7 @@ const ProductionEdit: React.FC = () => {
                       onChange={(e) =>
                         updateFormData("started_at", e.target.value)
                       }
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F59E0B] focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-[#F59E0B] focus:border-transparent"
                     />
                   </div>
                   <div>
@@ -409,7 +402,7 @@ const ProductionEdit: React.FC = () => {
                       type="date"
                       value={formData.completed_at}
                       onChange={(e) => updateFormData("completed_at", e.target.value)}
-                      className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-[#F59E0B] focus:border-transparent ${errors.completed_at ? "border-red-500" : "border-gray-300"
+                      className={`w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-[#F59E0B] focus:border-transparent ${errors.completed_at ? "border-red-500" : "border-gray-300"
                         }`}
                     />
                     {errors.completed_at && (
@@ -429,7 +422,7 @@ const ProductionEdit: React.FC = () => {
                         updateFormData("assigned_to", e.target.value)
                       }
                       placeholder="Enter user ID"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F59E0B] focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-[#F59E0B] focus:border-transparent"
                     />
                   </div>
                   <div>
@@ -466,7 +459,7 @@ const ProductionEdit: React.FC = () => {
                 rows={6}
                 value={formData.notes || ""}
                 onChange={(e) => updateFormData("notes", e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F59E0B] focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-[#F59E0B] focus:border-transparent"
                 placeholder="Add production notes, special instructions, or quality issues..."
               />
             </div>

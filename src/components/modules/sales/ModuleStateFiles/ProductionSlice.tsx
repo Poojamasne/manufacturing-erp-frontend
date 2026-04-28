@@ -2,6 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 import type { AppDispatch, RootState } from "../../../../ApplicationState/Store";
 import Swal from "sweetalert2";
+import type { NavigateFunction } from "react-router-dom";
 
 // Define the ProductionJob interface
 interface ProductionJob {
@@ -212,15 +213,15 @@ export const getProduction = (id: string) => async (dispatch: AppDispatch, getSt
 };
 
 // UPDATE production job
-export const updateProduction = (id: string, updateData: any) => async (dispatch: AppDispatch, getState: () => RootState) => {
+export const updateProduction = (id: string, updateData: any, navigate: NavigateFunction) => async (dispatch: AppDispatch, getState: () => RootState) => {
     dispatch(getSalesProductionRequest());
 
     try {
         Swal.fire({
-            title: "Updating Production Job...",
+            title: "Updating the Production Job...",
             text: "Please wait...",
             allowOutsideClick: false,
-            customClass:{
+            customClass: {
                 loader: 'lead-loader'
             },
             didOpen: () => {
@@ -245,7 +246,7 @@ export const updateProduction = (id: string, updateData: any) => async (dispatch
 
         await Swal.fire({
             icon: 'success',
-            iconColor:"#F59E0B",
+            iconColor: "#F59E0B",
             title: 'Updated!',
             text: 'Production job updated successfully',
             timer: 1500,
@@ -254,8 +255,7 @@ export const updateProduction = (id: string, updateData: any) => async (dispatch
 
         dispatch(updateSalesProductionSuccess(data));
         dispatch(getProductions());
-
-        return data;
+        navigate("/sales/production");
     } catch (error: any) {
         Swal.close();
         const message = error.response?.data?.message || "Something went wrong";
@@ -294,7 +294,7 @@ export const deleteProduction = (id: string) => async (dispatch: AppDispatch, ge
             title: "Deleting...",
             text: "Please wait",
             allowOutsideClick: false,
-            customClass:{
+            customClass: {
                 loader: 'lead-loader'
             },
             didOpen: () => {
@@ -317,7 +317,7 @@ export const deleteProduction = (id: string) => async (dispatch: AppDispatch, ge
 
         await Swal.fire({
             icon: 'success',
-            iconColor:"#F59E0B",
+            iconColor: "#F59E0B",
             title: 'Deleted!',
             text: 'Production job has been deleted successfully.',
             timer: 2000,
