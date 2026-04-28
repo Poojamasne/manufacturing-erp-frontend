@@ -37,7 +37,7 @@ const ProductionEdit: React.FC = () => {
 
   const [activeTab, setActiveTab] = useState("details");
   const [isSaving, setIsSaving] = useState(false);
-  const [showSuccess, setShowSuccess] = useState(false);
+  const [showSuccess, _setShowSuccess] = useState(false);
   //eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [formData, setFormData] = useState<any>({});
   const [errors, setErrors] = useState<Record<string, string>>({});
