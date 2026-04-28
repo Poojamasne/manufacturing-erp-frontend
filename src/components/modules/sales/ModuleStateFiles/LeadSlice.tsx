@@ -290,7 +290,7 @@ export const createLead = (payload: any, navigate: NavigateFunction) => async (d
 };
 
 // EDIT LEAD
-export const editLead = (id: number, payload: any, navigate: NavigateFunction) => async (dispatch: AppDispatch, getState: () => RootState) => {
+export const editLead = (id: number, payload: any, navigate?: NavigateFunction) => async (dispatch: AppDispatch, getState: () => RootState) => {
     dispatch(request());
     try {
         Swal.fire({
@@ -324,7 +324,7 @@ export const editLead = (id: number, payload: any, navigate: NavigateFunction) =
             timer: 1500,
             showConfirmButton: false,
         });
-        navigate("/sales/leads");
+        navigate && navigate("/sales/leads");
         Swal.close();
     } catch (error: any) {
         Swal.close();
@@ -343,7 +343,7 @@ export const deleteLead = (id: number) => async (dispatch: AppDispatch, getState
             iconColor: "#F59E0B",
             showCancelButton: true,
             confirmButtonColor: "#F59E0B",
-            cancelButtonColor: "#eb0000",
+            cancelButtonColor: "#6B7280",
             confirmButtonText: "Yes, delete it!"
         });
 
@@ -354,6 +354,9 @@ export const deleteLead = (id: number) => async (dispatch: AppDispatch, getState
             title: "Deleting Lead...",
             text: "Please wait...",
             allowOutsideClick: false,
+                customClass: {
+                loader: 'lead-loader'
+            },
             didOpen: () => {
                 Swal.showLoading();
             }

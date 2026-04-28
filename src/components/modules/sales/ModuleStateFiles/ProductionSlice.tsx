@@ -280,8 +280,8 @@ export const deleteProduction = (id: string) => async (dispatch: AppDispatch, ge
             text: "This action cannot be undone!",
             icon: 'warning',
             showCancelButton: true,
-            confirmButtonColor: '#d33',
-            cancelButtonColor: '#3085d6',
+            confirmButtonColor: '#F59E0B',
+            cancelButtonColor: '#6B7280',
             confirmButtonText: 'Yes, delete it!'
         });
 
@@ -294,6 +294,9 @@ export const deleteProduction = (id: string) => async (dispatch: AppDispatch, ge
             title: "Deleting...",
             text: "Please wait",
             allowOutsideClick: false,
+            customClass:{
+                loader: 'lead-loader'
+            },
             didOpen: () => {
                 Swal.showLoading();
             }

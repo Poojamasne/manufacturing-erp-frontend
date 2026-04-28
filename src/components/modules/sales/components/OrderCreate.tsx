@@ -360,8 +360,8 @@ if (lineItems.some((item) => item.unit_price <= 0)) {
                           onClick={() => handleQuotationSelect(quotation)}
                           className={`p-4 border rounded-xl cursor-pointer transition-all ${
                             selectedQuotation?.id === quotation.id
-                              ? "border-[#F59E0B] bg-[#f3f4e6] ring-2 ring-teal-500/20"
-                              : "border-gray-200 hover:border-teal-300 hover:bg-gray-50"
+                              ? "border-[#F59E0B] bg-[#f3f4e6] ring-2 ring-[#F59E0B]/80"
+                              : "border-gray-200 hover:border-[#F59E0B]/50 hover:bg-gray-50"
                           }`}
                         >
                           <div className="flex justify-between items-start">

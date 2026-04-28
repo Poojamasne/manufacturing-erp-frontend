@@ -406,7 +406,7 @@ export const deleteEmployee = (id: string, navigate: NavigateFunction) => async 
             iconColor:"#F59E0B",
             showCancelButton: true,
             confirmButtonColor: "#F59E0B",
-            cancelButtonColor: "#eb0000",
+            cancelButtonColor: "#6B7280",
             confirmButtonText: "Yes, delete it!"
         });
 

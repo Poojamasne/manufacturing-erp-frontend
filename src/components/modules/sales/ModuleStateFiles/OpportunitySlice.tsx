@@ -3,7 +3,6 @@ import axios from "axios";
 import type { AppDispatch, RootState } from "../../../../ApplicationState/Store";
 import Swal from "sweetalert2";
 import toast from "react-hot-toast";
-import type { NavigateFunction } from "react-router-dom";
 
 const initialState = {
     opportunities: [],
@@ -213,7 +212,7 @@ export const getOpportunity = (id: string) => async (dispatch: AppDispatch, getS
 };
 
 // GET OPPORTUNITY THUNK
-export const updateOpportunity = (id: string | number, payload: any, navigate: NavigateFunction) => async (dispatch: AppDispatch, getState: () => RootState) => {
+export const updateOpportunity = (id: string | number, payload: any) => async (dispatch: AppDispatch, getState: () => RootState) => {
     dispatch(getSalesOpportunityRequest());
     Swal.fire({
         title: 'Updating Opportunity...',
@@ -253,8 +252,7 @@ export const updateOpportunity = (id: string | number, payload: any, navigate: N
             showCloseButton: false,
 
         });
-        navigate("/sales/opportunities");
-    } catch (error: any) {
+        } catch (error: any) {
         const status = error.response?.status;
         const message =
             error.response?.data?.message || "Something went wrong";

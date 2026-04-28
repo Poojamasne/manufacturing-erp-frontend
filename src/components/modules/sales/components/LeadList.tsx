@@ -562,15 +562,8 @@ const LeadList: React.FC = () => {
                   <th className="w-16 p-5 text-center border-b border-slate-100">
                     <input
                       type="checkbox"
-                      className="
-      h-4 w-4 cursor-pointer appearance-none rounded border border-slate-300 
-      bg-white transition-all relative
-      checked:bg-[#F59E0B] checked:border-[#F59E0B]
-      /* The Checkmark (Pseudo-element) */
-      after:content-[''] after:absolute after:opacity-0 checked:after:opacity-100
-      after:left-[5px] after:top-[1px] after:w-[4px] after:h-[8px]
-      after:border-white after:border-r-2 after:border-b-2 after:rotate-45
-    "                      checked={
+                      className="h-4 w-4 cursor-pointer appearance-none rounded border border-slate-300 bg-white transition-all relative checked:bg-[#F59E0B] checked:border-[#F59E0B] after:content-[''] after:absolute after:opacity-0 checked:after:opacity-100 after:left-1.25 after:top-px after:w-1 after:h-2 after:border-white after:border-r-2 after:border-b-2 after:rotate-45"
+                      checked={
                         paginatedLeads.length > 0 &&
                         selectedIds.length === paginatedLeads.length
                       }
@@ -609,15 +602,8 @@ const LeadList: React.FC = () => {
                     <td className="p-5 text-center">
                       <input
                         type="checkbox"
-                        className="
-      h-4 w-4 cursor-pointer appearance-none rounded border border-slate-300 
-      bg-white transition-all relative
-      checked:bg-[#F59E0B] checked:border-[#F59E0B]
-      /* The Checkmark (Pseudo-element) */
-      after:content-[''] after:absolute after:opacity-0 checked:after:opacity-100
-      after:left-[5px] after:top-[1px] after:w-[4px] after:h-[8px]
-      after:border-white after:border-r-2 after:border-b-2 after:rotate-45
-    "                        checked={selectedIds.includes(lead.id)}
+                        className="h-4 w-4 cursor-pointer appearance-none rounded border border-slate-300 bg-white transition-all relative checked:bg-[#F59E0B] checked:border-[#F59E0B] after:content-[''] after:absolute after:opacity-0 checked:after:opacity-100 after:left-1.25 after:top-px after:w-1 after:h-2 after:border-white after:border-r-2 after:border-b-2 after:rotate-45"
+                        checked={selectedIds.includes(lead.id)}
                         onChange={() =>
                           setSelectedIds((prev) =>
                             prev.includes(lead.id)

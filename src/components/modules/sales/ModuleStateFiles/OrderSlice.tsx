@@ -2,6 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 import type { AppDispatch, RootState } from "../../../../ApplicationState/Store";
 import Swal from "sweetalert2";
+import toast from "react-hot-toast";
 
 const initialState = {
     orders: [],
@@ -68,6 +69,7 @@ const SalesOrder = createSlice({
             state.loading = false;
             const payload = action.payload;
             state.error = typeof payload === "string" ? payload : payload?.message || "Something went wrong";
+            toast.error(action.payload);
         },
 
         clearSalesErrors: (state) => {
@@ -283,6 +285,9 @@ export const updateOrder = (id: string, updateData: { status?: string; shipping_
             title: "Updating Order...",
             text: "Please wait...",
             allowOutsideClick: false,
+            customClass: {
+                loader: 'lead-loader'
+            },
             didOpen: () => Swal.showLoading()
         });
 
@@ -303,6 +308,7 @@ export const updateOrder = (id: string, updateData: { status?: string; shipping_
 
         await Swal.fire({
             icon: 'success',
+            iconColor: '#F59E0B',
             title: 'Updated!',
             text: 'Order updated successfully',
             timer: 1500,
@@ -336,8 +342,8 @@ export const deleteOrder = (id: string) => async (dispatch: AppDispatch, _getSta
             text: "This action cannot be undone!",
             icon: 'warning',
             showCancelButton: true,
-            confirmButtonColor: '#d33',
-            cancelButtonColor: '#3085d6',
+            confirmButtonColor: '#F59E0B',
+            cancelButtonColor: '#6B7280',
             confirmButtonText: 'Yes, delete it!'
         });
 
@@ -347,9 +353,12 @@ export const deleteOrder = (id: string) => async (dispatch: AppDispatch, _getSta
         }
 
         Swal.fire({
-            title: "Deleting...",
-            text: "Please wait",
+            title: "Deleting Order...",
+            text: "Please wait...",
             allowOutsideClick: false,
+            customClass: {
+                loader: 'lead-loader'
+            },
             didOpen: () => {
                 Swal.showLoading();
             }
@@ -371,6 +380,7 @@ export const deleteOrder = (id: string) => async (dispatch: AppDispatch, _getSta
         await Swal.fire({
             icon: 'success',
             title: 'Deleted!',
+            iconColor: '#F59E0B',
             text: 'Order has been deleted successfully.',
             timer: 2000,
             showConfirmButton: false

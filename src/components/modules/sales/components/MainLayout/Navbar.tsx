@@ -155,11 +155,11 @@ const Navbar = ({ onMenuClick }: { onMenuClick: () => void }) => {
                     </button>
                     <button
                       onClick={handleSaveNote}
-                      className="px-3 py-1.5 text-xs bg-[#F59E0B] text-white rounded-lg hover:bg-[#004940]"
+                      className="px-3 py-1.5 text-xs bg-[#F59E0B] text-white rounded-lg hover:bg-[#f67317]"
                     >
                       Save
                     </button>
-                    <Link to="/sales/notes" className="px-3 py-1.5 text-xs bg-[#F59E0B] text-white rounded-lg hover:bg-[#004940]">
+                    <Link to="/sales/notes" className="px-3 py-1.5 text-xs bg-[#F59E0B] text-white rounded-lg hover:bg-[#f67317]">
                       View All
                     </Link>
                   </div>

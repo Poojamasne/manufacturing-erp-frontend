@@ -1,8 +1,19 @@
-import React, { useMemo, useEffect } from 'react';
-import { ChevronRight, Calendar, Building2, Package, MapPin, Edit3, Loader2, IndianRupee } from 'lucide-react';
+import React, { useMemo, useEffect, useState, useRef } from 'react';
+import {
+    ChevronRight,
+    Calendar,
+    Building2,
+    Package,
+    MapPin,
+    Edit3,
+    Loader2,
+    IndianRupee,
+    X
+} from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from "../../../common/ReduxMainHooks";
 import { getLead, clearErrors } from "../ModuleStateFiles/LeadSlice";
+import { editLead } from "../ModuleStateFiles/LeadSlice";
 import type { RootState } from "../../../../ApplicationState/Store";
 
 interface Product {
@@ -18,7 +29,17 @@ const OpportunityView: React.FC = () => {
     const navigate = useNavigate();
     const { id } = useParams<{ id: string }>();
     const dispatch = useAppDispatch();
+    const modalRef = useRef<HTMLDivElement>(null);
+
+    // Redux State
     const { lead, loading } = useAppSelector((state: RootState) => state.SalesLeads);
+
+    // Update Modal States
+    const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
+    const [updateForm, setUpdateForm] = useState({
+        status: "",
+        priority: ""
+    });
 
     useEffect(() => {
         if (id) {
@@ -28,6 +49,17 @@ const OpportunityView: React.FC = () => {
             dispatch(clearErrors());
         };
     }, [dispatch, id]);
+
+    // Handle outside click for modal
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (isUpdateModalOpen && modalRef.current && !modalRef.current.contains(event.target as Node)) {
+                setIsUpdateModalOpen(false);
+            }
+        };
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, [isUpdateModalOpen]);
 
     // Opportunity stages
     const opportunityStages = [
@@ -67,6 +99,44 @@ const OpportunityView: React.FC = () => {
         return { qty, val };
     }, [lead]);
 
+    // --- Modal Handlers ---
+    const handleOpenUpdateModal = () => {
+        if (!lead) return;
+        setUpdateForm({
+            status: lead.status,
+            priority: lead.priority
+        });
+        setIsUpdateModalOpen(true);
+    };
+
+    const handleeditLead = async () => {
+        if (!lead) return;
+
+        // Helper to format dates for payload (YYYY-MM-DD)
+        const formatForPayload = (d: string | null) => {
+            if (!d) return null;
+            try {
+                return new Date(d).toISOString().split("T")[0];
+            } catch (e) {
+                return null;
+            }
+        };
+
+        const payload = {
+            ...lead,
+            status: updateForm.status,
+            priority: updateForm.priority,
+            expected_close_date: formatForPayload(lead.expected_close_date),
+            followup_date: formatForPayload(lead.followup_date)
+        };
+
+        await dispatch(editLead(Number(lead.id), payload));
+
+        setIsUpdateModalOpen(false);
+        // Refresh the lead data
+        dispatch(getLead(Number(id)));
+    };
+
     if (loading && !lead) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-[#f4f7f6]">
@@ -90,14 +160,17 @@ const OpportunityView: React.FC = () => {
                         </div>
                         <h1 className="text-2xl font-bold text-gray-800">Opportunity Details</h1>
                     </div>
-                    <div className="flex gap-3">
+                    <div className="flex flex-wrap gap-3">
+
+
                         {lead.status === "Won" && (
                             <button className="flex items-center gap-2 bg-white text-gray-600 px-5 py-2.5 rounded-full font-bold text-sm border border-gray-200 shadow-sm hover:bg-gray-50 transition-all">
                                 <IndianRupee size={18} /> Create Order
                             </button>
                         )}
+
                         <button
-                            onClick={() => navigate(`/sales/opportunities/opportunity-edit/${lead.id}`)}
+                            onClick={handleOpenUpdateModal}
                             className="flex items-center gap-2 bg-[#F59E0B] text-white px-6 py-2.5 rounded-full font-bold text-sm shadow-lg hover:bg-[#f67317] transition-all"
                         >
                             <Edit3 size={18} /> Edit
@@ -109,15 +182,15 @@ const OpportunityView: React.FC = () => {
                 <div className="bg-white rounded-4xl shadow-sm border border-gray-100 overflow-hidden">
                     {/* Pipeline Visualizer */}
                     <div className="bg-gray-50/50 p-8 border-b border-gray-100">
-                        <div className="flex justify-between items-start relative max-w-3xl mx-auto">
+                        <div className="flex justify-between items-start relative max-w-3xl mx-auto overflow-x-auto pb-4 sm:pb-0">
                             <div className="absolute top-4 left-0 w-full h-0.5 bg-gray-200 z-0" />
                             <div className="absolute top-4 left-0 h-0.5 bg-[#F59E0B] z-0 transition-all duration-500" style={{ width: `${pipelineResult.progress}%` }} />
                             {pipelineResult.correctedStages.map((stage, index) => (
-                                <div key={index} className="relative z-10 flex flex-col items-center">
+                                <div key={index} className="relative z-10 flex flex-col items-center min-w-20">
                                     <div className={`w-8 h-8 rounded-full border-4 border-white shadow-sm flex items-center justify-center ${stage.completed ? 'bg-[#F59E0B]' : 'bg-gray-200'}`}>
                                         {stage.completed && <div className="w-2 h-2 bg-white rounded-full" />}
                                     </div>
-                                    <span className={`mt-3 text-xs font-semibold uppercase ${stage.completed ? 'text-[#F59E0B]' : 'text-gray-400'}`}>
+                                    <span className={`mt-3 text-[10px] sm:text-xs font-semibold uppercase text-center ${stage.completed ? 'text-[#F59E0B]' : 'text-gray-400'}`}>
                                         {stage.name}
                                     </span>
                                 </div>
@@ -227,6 +300,74 @@ const OpportunityView: React.FC = () => {
                     </div>
                 </div>
             </div>
+
+            {/* --- UPDATE MODAL --- */}
+            {isUpdateModalOpen && lead && (
+                <div className="fixed inset-0 z-100 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm transition-all">
+                    <div
+                        ref={modalRef}
+                        className="bg-white w-full max-w-md rounded-[2.5rem] shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200"
+                    >
+                        <div className="bg-[#f3f4e6]/50 px-8 py-6 flex justify-between items-center border-b border-teal-100">
+                            <div>
+                                <h3 className="text-xl font-extrabold text-slate-800">Quick Update</h3>
+                                <p className="text-[11px] text-[#F59E0B] font-bold uppercase tracking-[0.2em] mt-1">
+                                    {lead.lead_id} • {lead.company_name}
+                                </p>
+                            </div>
+                            <button
+                                onClick={() => setIsUpdateModalOpen(false)}
+                                className="p-2 hover:bg-white rounded-full text-slate-400 hover:text-slate-600 transition-colors"
+                            >
+                                <X size={20} />
+                            </button>
+                        </div>
+
+                        <div className="p-8 space-y-6">
+                            <div className="space-y-2">
+                                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Priority</label>
+                                <select
+                                    value={updateForm.priority}
+                                    onChange={(e) => setUpdateForm({ ...updateForm, priority: e.target.value })}
+                                    className="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:ring-4 focus:ring-[#F59E0B]/10 focus:border-[#F59E0B] outline-none transition-all text-sm font-bold text-slate-700"
+                                >
+                                    <option value="High">High</option>
+                                    <option value="Medium">Medium</option>
+                                    <option value="Low">Low</option>
+                                </select>
+                            </div>
+
+                            <div className="space-y-2">
+                                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Pipeline Status</label>
+                                <select
+                                    value={updateForm.status}
+                                    onChange={(e) => setUpdateForm({ ...updateForm, status: e.target.value })}
+                                    className="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:ring-4 focus:ring-[#F59E0B]/10 focus:border-[#F59E0B] outline-none transition-all text-sm font-bold text-slate-700"
+                                >
+                                    {opportunityStages.map((stage) => (
+                                        <option key={stage.key} value={stage.key}>{stage.name}</option>
+                                    ))}
+                                </select>
+                            </div>
+                        </div>
+
+                        <div className="p-8 pt-0 flex gap-3">
+                            <button
+                                onClick={() => setIsUpdateModalOpen(false)}
+                                className="flex-1 px-6 py-4 rounded-2xl text-[13px] font-bold text-slate-500 bg-slate-100 hover:bg-slate-200 transition-all uppercase tracking-widest"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={handleeditLead}
+                                className="flex-1 px-6 py-4 rounded-2xl text-[13px] font-bold text-white bg-[#F59E0B] hover:bg-[#d98b06] shadow-lg shadow-amber-200 transition-all uppercase tracking-widest"
+                            >
+                                Save Changes
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
@@ -235,7 +376,9 @@ const DetailItem: React.FC<{ label: string; value: string; isHighlight?: boolean
     <div className="flex flex-col gap-1">
         <span className="font-semibold text-gray-600 text-sm uppercase tracking-wide">{label}</span>
         {isStatus ? (
-            <span className={`w-fit px-3 py-1 rounded-lg text-xs font-bold ${value === 'High' ? 'bg-red-50 text-red-600' : value === 'Medium' ? 'bg-amber-50 text-amber-600' : 'bg-green-50 text-green-600'}`}>
+            <span className={`w-fit px-3 py-1 rounded-lg text-xs font-bold ${value === 'High' || value === 'Lost' ? 'bg-red-50 text-red-600' :
+                    value === 'Medium' || value === 'Qualified' || value === 'In Progress' ? 'bg-amber-50 text-amber-600' :
+                        'bg-green-50 text-green-600'}`}>
                 {value || "-"}
             </span>
         ) : (

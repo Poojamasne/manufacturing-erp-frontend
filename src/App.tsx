@@ -29,7 +29,6 @@ import OpportunityView from "./components/modules/sales/components/OpportunityVi
 import LeadForm from "./components/modules/sales/components/LeadForm";
 import LeadView from "./components/modules/sales/components/LeadView";
 import NotesPage from "./components/common/NotePage";
-import OpportunityEdit from "./components/modules/sales/components/OpportunityEdit";
 import QuotationCreate from "./components/modules/sales/components/QuotationCreate";
 import ProductionEdit from "./components/modules/sales/components/ProductionEdit";
 import EditLeadForm from "./components/modules/sales/components/EditLeadForm";
@@ -116,10 +115,6 @@ function App() {
             {
               path: "opportunities/opportunity-view/:id",
               element: <OpportunityView />,
-            },
-            {
-              path: "opportunities/opportunity-edit/:id",
-              element: <OpportunityEdit />
             },
             {
               path: "quotation",
