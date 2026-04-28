@@ -1,18 +1,17 @@
 import React, { useEffect, useState, useMemo } from 'react';
-import { 
-    ChevronRight, 
-    Building2, 
-    Truck, 
-    Loader2, 
-    Download, 
-    MapPin, 
+import {
+    ChevronRight,
+    Building2,
+    Truck,
+    Loader2,
+    Download,
+    MapPin,
     Package,
     Clock
 } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
-import html2pdf from 'html2pdf.js';
 
-import { getOrder, clearSalesErrors, updateOrderStatus } from "../ModuleStateFiles/OrderSlice";
+import { getOrder, clearSalesErrors, updateOrderStatus, getOrderForReport } from "../ModuleStateFiles/OrderSlice";
 import { useAppDispatch, useAppSelector } from "../../../common/ReduxMainHooks";
 import type { RootState } from "../../../../ApplicationState/Store";
 
@@ -63,17 +62,17 @@ const OrderView: React.FC = () => {
     const pipelineResult = useMemo(() => {
         const status = order?.status || 'Pending';
         const stages = getOrderStages(status);
-        
+
         // Find last completed index to calculate progress bar width
         const lastCompletedIndex = [...stages].reverse().findIndex(s => s.completed);
         const currentIndex = lastCompletedIndex >= 0 ? (stages.length - 1) - lastCompletedIndex : 0;
-        
+
         const progress = (currentIndex / (stages.length - 1)) * 100;
 
-        return { 
-            progress, 
-            stages, 
-            isCancelled: status === "Cancelled" 
+        return {
+            progress,
+            stages,
+            isCancelled: status === "Cancelled"
         };
     }, [order]);
 
@@ -92,42 +91,32 @@ const OrderView: React.FC = () => {
 
     const formatINR = (amount: string | number) => {
         const val = typeof amount === 'string' ? parseFloat(amount) : amount;
-        return new Intl.NumberFormat('en-IN', { 
-            style: 'currency', 
-            currency: 'INR', 
-            maximumFractionDigits: 0 
+        return new Intl.NumberFormat('en-IN', {
+            style: 'currency',
+            currency: 'INR',
+            maximumFractionDigits: 0
         }).format(val || 0);
     };
 
     const formatDate = (dateStr: string | null) => {
         if (!dateStr) return "N/A";
-        return new Date(dateStr).toLocaleDateString('en-GB', { 
-            day: '2-digit', 
-            month: 'short', 
-            year: 'numeric' 
+        return new Date(dateStr).toLocaleDateString('en-GB', {
+            day: '2-digit',
+            month: 'short',
+            year: 'numeric'
         });
     };
 
-    const handleExport = () => {
-        const element = document.getElementById('order-pdf-content');
-        if (element && order) {
-            const opt = {
-                margin: [0.3, 0.3, 0.3, 0.3] as [number, number, number, number],
-                filename: `Order_${order.order_id}.pdf`,
-                image: { type: 'jpeg' as const, quality: 0.98 },
-                html2canvas: { scale: 2, useCORS: true },
-                jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' as const }
-            };
-            html2pdf().set(opt).from(element).save();
-        }
+    const handleExport = (orderID: string | number) => {
+        dispatch(getOrderForReport(orderID));
+
     };
 
-    if (!order) return null;
 
     return (
         <div className="min-h-screen bg-[#f4f7f6] p-4 sm:p-6 lg:p-8 font-sans text-gray-900">
             <div className="max-w-5xl mx-auto">
-                
+
                 {/* Header */}
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
                     <div>
@@ -140,10 +129,10 @@ const OrderView: React.FC = () => {
                     </div>
 
                     <div className="flex gap-3 w-full sm:w-auto">
-                        <button onClick={handleExport} className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-white text-gray-600 px-5 py-2.5 rounded-full font-bold text-sm border border-gray-200 shadow-sm hover:bg-gray-50 transition-all">
+                        <button onClick={() => handleExport(order?.id)} className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-white text-gray-600 px-5 py-2.5 rounded-full font-bold text-sm border border-gray-200 shadow-sm hover:bg-gray-50 transition-all">
                             <Download size={18} /> Export
                         </button>
-                        
+
                         <div className="relative flex-1 sm:flex-none outline-none">
                             <select
                                 value={order.status || 'Pending'}
@@ -164,34 +153,32 @@ const OrderView: React.FC = () => {
                 </div>
 
                 <div id="order-pdf-content" className="bg-white rounded-4xl shadow-sm border border-gray-100 overflow-hidden">
-                    
+
                     {/* Integrated Pipeline Visualizer using getOrderStages */}
                     <div className="bg-gray-50/50 p-10 border-b border-gray-100">
                         <div className="relative max-w-2xl mx-auto">
                             {/* Track Background */}
                             <div className="absolute top-4 left-0 w-full h-1 bg-gray-200 z-0 rounded-full" />
-                            
+
                             {/* Progress Track */}
-                            <div 
-                                className={`absolute top-4 left-0 h-1 z-0 transition-all duration-700 rounded-full ${pipelineResult.isCancelled ? 'bg-red-500' : 'bg-[#F59E0B]'}`} 
-                                style={{ width: `${pipelineResult.progress}%` }} 
+                            <div
+                                className={`absolute top-4 left-0 h-1 z-0 transition-all duration-700 rounded-full ${pipelineResult.isCancelled ? 'bg-red-500' : 'bg-[#F59E0B]'}`}
+                                style={{ width: `${pipelineResult.progress}%` }}
                             />
 
                             <div className="flex justify-between items-start relative z-10">
                                 {pipelineResult.stages.map((stage, index) => (
                                     <div key={index} className="flex flex-col items-center">
-                                        <div className={`w-8 h-8 rounded-full border-4 border-white shadow-sm flex items-center justify-center transition-colors duration-500 ${
-                                            stage.completed 
-                                                ? (pipelineResult.isCancelled && stage.name === "Cancelled" ? 'bg-red-500' : 'bg-[#F59E0B]') 
-                                                : 'bg-gray-200'
-                                        }`}>
+                                        <div className={`w-8 h-8 rounded-full border-4 border-white shadow-sm flex items-center justify-center transition-colors duration-500 ${stage.completed
+                                            ? (pipelineResult.isCancelled && stage.name === "Cancelled" ? 'bg-red-500' : 'bg-[#F59E0B]')
+                                            : 'bg-gray-200'
+                                            }`}>
                                             {stage.completed && <div className="w-2 h-2 bg-white rounded-full" />}
                                         </div>
-                                        <span className={`mt-3 text-[10px] font-bold uppercase tracking-widest ${
-                                            stage.completed 
-                                                ? (pipelineResult.isCancelled && stage.name === "Cancelled" ? 'text-red-500' : 'text-[#F59E0B]') 
-                                                : 'text-gray-400'
-                                        }`}>
+                                        <span className={`mt-3 text-[10px] font-bold uppercase tracking-widest ${stage.completed
+                                            ? (pipelineResult.isCancelled && stage.name === "Cancelled" ? 'text-red-500' : 'text-[#F59E0B]')
+                                            : 'text-gray-400'
+                                            }`}>
                                             {stage.name}
                                         </span>
                                     </div>
@@ -281,9 +268,9 @@ const OrderView: React.FC = () => {
                                     <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Fulfillment Intelligence</h4>
                                     <p className="text-sm text-gray-700 leading-relaxed italic">
                                         {order.notes || (
-                                            pipelineResult.isCancelled 
-                                            ? "Record marked as cancelled. Logistic processes and inventory allocation halted."
-                                            : "Inventory check and quality audit in progress. Consignment is scheduled for dispatch shortly."
+                                            pipelineResult.isCancelled
+                                                ? "Record marked as cancelled. Logistic processes and inventory allocation halted."
+                                                : "Inventory check and quality audit in progress. Consignment is scheduled for dispatch shortly."
                                         )}
                                     </p>
                                 </div>
@@ -291,11 +278,6 @@ const OrderView: React.FC = () => {
                         </section>
                     </div>
 
-                    <div className="p-6 bg-gray-50 text-center border-t border-gray-100">
-                        <p className="text-[9px] font-bold text-gray-400 uppercase tracking-[0.3em]">
-                            Automated Document • Order Lifecycle Registry • {new Date().toLocaleDateString()}
-                        </p>
-                    </div>
                 </div>
             </div>
         </div>
@@ -306,11 +288,10 @@ const DetailItem: React.FC<{ label: string; value: string | null; isStatus?: boo
     <div className="flex flex-col gap-1">
         <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">{label}</span>
         {isStatus ? (
-            <span className={`w-fit px-3 py-1 rounded-full text-[10px] font-bold border ${
-                value === 'Delivered' ? 'bg-green-50 text-green-600 border-green-100' : 
-                value === 'Cancelled' ? 'bg-red-50 text-red-600 border-red-100' : 
-                'bg-blue-50 text-blue-600 border-blue-100'
-            }`}>
+            <span className={`w-fit px-3 py-1 rounded-full text-[10px] font-bold border ${value === 'Delivered' ? 'bg-green-50 text-green-600 border-green-100' :
+                value === 'Cancelled' ? 'bg-red-50 text-red-600 border-red-100' :
+                    'bg-blue-50 text-blue-600 border-blue-100'
+                }`}>
                 {value || "-"}
             </span>
         ) : (

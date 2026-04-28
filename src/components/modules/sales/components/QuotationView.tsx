@@ -10,7 +10,7 @@ import {
     Loader2
 } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { getQuotation, updateQuotationStatus, clearSalesErrors } from "../ModuleStateFiles/QuotationSlice";
+import { getQuotation, updateQuotationStatus, clearSalesErrors, getQuotationForReport } from "../ModuleStateFiles/QuotationSlice";
 import { useAppDispatch, useAppSelector } from "../../../common/ReduxMainHooks";
 import type { RootState } from "../../../../ApplicationState/Store";
 
@@ -173,7 +173,7 @@ const QuotationView: React.FC = () => {
                                     value={quotationData.status || 'Draft'}
                                     onChange={(e) => handleStatusUpdate(e.target.value)}
                                     disabled={updatingStatus}
-                                    className="px-3 py-1.5 rounded-lg border text-sm font-medium bg-white focus:outline-none focus:ring-2 focus:ring-[#F59E0B]"
+                                    className="px-3 py-1.5 rounded-lg border border-amber-500 text-sm font-medium bg-white focus:outline-none focus:ring-2 focus:ring-[#F59E0B]"
                                 >
                                     <option value="Draft">Draft</option>
                                     <option value="Sent">Sent</option>
@@ -186,7 +186,7 @@ const QuotationView: React.FC = () => {
                     </div>
                     
                     <div className="flex gap-3 w-full md:w-auto">
-                        <button onClick={()=>window.print()} className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-white text-slate-600 px-6 py-3.5 rounded-2xl font-bold text-xs border border-slate-200 shadow-sm hover:bg-slate-50 transition-all">
+                        <button onClick={()=> quotationData?.id && dispatch(getQuotationForReport(quotationData.id))} className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-white text-slate-600 px-6 py-3.5 rounded-2xl font-bold text-xs border border-slate-200 shadow-sm hover:bg-slate-50 transition-all">
                             <Download size={16} /> Export PDF
                         </button>
                     </div>

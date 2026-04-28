@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import {
   ChevronLeft,
   Save,
-  Plus,
   Trash2,
   IndianRupee,
   User,
@@ -120,18 +119,18 @@ const OrderCreate: React.FC = () => {
     }
   };
 
-  const addLineItem = () => {
-    setLineItems((prev) => [
-      ...prev,
-      {
-        id: Date.now().toString(),
-        product_name: "",
-        quantity: 1,
-        unit_price: 0,
-        total: 0,
-      },
-    ]);
-  };
+  // const addLineItem = () => {
+  //   setLineItems((prev) => [
+  //     ...prev,
+  //     {
+  //       id: Date.now().toString(),
+  //       product_name: "",
+  //       quantity: 1,
+  //       unit_price: 0,
+  //       total: 0,
+  //     },
+  //   ]);
+  // };
 
   const removeLineItem = (id: string) => {
     if (lineItems.length > 1) {
@@ -490,12 +489,12 @@ if (lineItems.some((item) => item.unit_price <= 0)) {
                   <Package size={20} className="text-[#F59E0B]" />
                   Order Items
                 </h3>
-                <button
+                {/* <button
                   onClick={addLineItem}
                   className="flex items-center gap-2 px-4 py-2 bg-[#f3f4e6] text-[#F59E0B] rounded-xl text-sm font-medium hover:bg-[#F59E0B] hover:text-white transition-all"
                 >
                   <Plus size={16} /> Add Item
-                </button>
+                </button> */}
               </div>
               <div className="overflow-x-auto">
                 <table className="w-full">
@@ -507,12 +506,7 @@ if (lineItems.some((item) => item.unit_price <= 0)) {
                       <th className="p-4 text-right text-xs font-bold text-gray-400 uppercase">
                         Quantity
                       </th>
-                      <th className="p-4 text-right text-xs font-bold text-gray-400 uppercase">
-                        Unit Price
-                      </th>
-                      <th className="p-4 text-right text-xs font-bold text-gray-400 uppercase">
-                        Total
-                      </th>
+                      
                       <th className="p-4 text-center text-xs font-bold text-gray-400 uppercase">
                         Actions
                       </th>
@@ -562,36 +556,7 @@ if (lineItems.some((item) => item.unit_price <= 0)) {
                             step="any"
                           />
                         </td>
-                        <td className="p-4">
-                          <input
-                            type="number"
-                            value={item.unit_price}
-                            onChange={(e) => {
-                              setLineItems((prev) =>
-                                prev.map((i) => {
-                                  if (i.id === item.id) {
-                                    const newPrice =
-                                      parseFloat(e.target.value) || 0;
-                                    return {
-                                      ...i,
-                                      unit_price: newPrice,
-                                      total: i.quantity * newPrice,
-                                    };
-                                  }
-                                  return i;
-                                }),
-                              );
-                            }}
-                            className="w-32 px-3 py-2 border border-gray-200 rounded-lg text-sm text-right focus:outline-none focus:ring-2 focus:ring-[#F59E0B]"
-                            step="any"
-                          />
-                        </td>
-                        <td className="p-4 text-right font-bold text-[#F59E0B]">
-                          ₹
-                          {item.total.toLocaleString("en-IN", {
-                            minimumFractionDigits: 2,
-                          })}
-                        </td>
+                       
                         <td className="p-4 text-center">
                           <button
                             onClick={() => removeLineItem(item.id)}

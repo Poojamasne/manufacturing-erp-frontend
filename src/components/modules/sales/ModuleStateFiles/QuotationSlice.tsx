@@ -2,6 +2,9 @@ import { createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 import type { AppDispatch, RootState } from "../../../../ApplicationState/Store";
 import Swal from "sweetalert2";
+import type { NavigateFunction } from "react-router-dom";
+import { pdf } from "@react-pdf/renderer";
+import { QuotationPDFReport } from "../utils/QuotationPDFReport";
 
 const initialState = {
     quotations: [] as any[],
@@ -234,7 +237,55 @@ export const getQuotation = (id: string) => async (dispatch: AppDispatch, getSta
     }
 };
 
-export const createQuotation = (quotationData: any) => async (dispatch: AppDispatch, getState: () => RootState) => {
+
+export const getQuotationForReport = (id: string|number) => async (dispatch: AppDispatch, getState: () => RootState) => {
+    dispatch(getSalesQuotationRequest());
+    try {
+        Swal.fire({
+            title: "Generating Quotation Report...",
+            text: "Please wait while we generate the report.",
+            allowOutsideClick: false,
+            customClass: {
+                loader: 'lead-loader'
+            },
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
+        const token = getState().auth.token || localStorage.getItem("token");
+        const { data } = await axios.get(
+            `${import.meta.env.VITE_API_BASE_URL}/sales/quotations/${id}`,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            }
+        );
+
+        dispatch(getSalesSingleQuotationSuccess(data));
+        const quotationData = data?.data || data;
+
+        const blob = await pdf(<QuotationPDFReport data={quotationData} />).toBlob();
+
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = `Quotation_${quotationData?.id || 'Report'}.pdf`;
+
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        URL.revokeObjectURL(url);
+        Swal.close();
+    } catch (error: any) {
+        Swal.close();
+        const message = error.response?.data?.message || error.message || "Failed to fetch quotation";
+        dispatch(getSalesQuotationFailure(message));
+    }
+};
+export const createQuotation = (quotationData: any, navigate: NavigateFunction) => async (dispatch: AppDispatch, getState: () => RootState) => {
     dispatch(getSalesQuotationRequest());
     try {
         Swal.fire({
@@ -262,7 +313,7 @@ export const createQuotation = (quotationData: any) => async (dispatch: AppDispa
         );
 
         dispatch(createSalesQuotationSuccess(data));
-
+        navigate(`/sales/quotation/quotation-view/${data?.data?.id}`);
         // Close the loading modal
         Swal.close();
 
@@ -352,19 +403,19 @@ export const deleteQuotation = (id: string) => async (dispatch: AppDispatch, get
             text: "You won't be able to revert this!",
             icon: "warning",
             showCancelButton: true,
-            confirmButtonColor: "#d33",
-            cancelButtonColor: "#3085d6",
+            confirmButtonColor: "#F59E0B",
+            cancelButtonColor: "#6B7280",
             confirmButtonText: "Yes, delete it!"
         });
 
         if (!result.isConfirmed) {
-            dispatch(clearSalesErrors());
-            return;
+            // dispatch(clearSalesErrors());
+            return false;
         }
 
         Swal.fire({
             title: "Deleting Quotation...",
-            text: "Please wait",
+            text: "Please wait...",
             allowOutsideClick: false,
             customClass: {
                 loader: 'lead-loader'
@@ -420,7 +471,7 @@ export const updateQuotationStatus = ({ id, status }: { id: string; status: stri
         try {
             Swal.fire({
                 title: "Updating Status...",
-                text: "Please wait",
+                text: "Please wait...",
                 allowOutsideClick: false,
                 customClass: {
                     loader: 'lead-loader'
@@ -479,14 +530,14 @@ export const bulkDeleteQuotations = (ids: string[]) => async (dispatch: AppDispa
             text: `You are about to delete ${ids.length} quotation(s). This action cannot be undone!`,
             icon: "warning",
             showCancelButton: true,
-            confirmButtonColor: "#d33",
-            cancelButtonColor: "#3085d6",
+            confirmButtonColor: "#F59E0B",
+            cancelButtonColor: "#6B7280",
             confirmButtonText: "Yes, delete them!"
         });
 
         if (!result.isConfirmed) {
-            dispatch(clearSalesErrors());
-            return;
+            // dispatch(clearSalesErrors());
+            return false;
         }
 
         Swal.fire({

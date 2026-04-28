@@ -15,9 +15,11 @@ import {
 import { useNavigate } from "react-router-dom";
 import {
   getOrders,
+  getOrderForReport,
   clearSalesErrors,
   deleteOrder,
 } from "../ModuleStateFiles/OrderSlice";
+
 import { useAppDispatch, useAppSelector } from "../../../common/ReduxMainHooks";
 import type { RootState } from "../../../../ApplicationState/Store";
 
@@ -259,6 +261,10 @@ const OrderList: React.FC = () => {
     const year = d.getFullYear();
     return `${day}/${month}/${year}`;
   };
+
+  const handleDownloadPDF = (orderID: number | string) => {
+    dispatch(getOrderForReport(orderID));
+  }
   return (
     <div className="min-h-screen bg-[#f4f7f6] p-4 sm:p-6 lg:p-8 text-slate-900 font-sans">
       <div className="max-w-7xl mx-auto">
@@ -521,6 +527,7 @@ const OrderList: React.FC = () => {
                           <Eye size={16} />
                         </button>
                         <button
+                          onClick={() => handleDownloadPDF(o.id)}
                           title="Download"
                           className="outline-none p-2 hover:bg-white text-slate-500 hover:text-blue-600 rounded-xl transition-all"
                         >

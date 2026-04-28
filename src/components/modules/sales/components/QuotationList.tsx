@@ -117,9 +117,11 @@ const QuotationList: React.FC = () => {
   const handleDelete = async (id: number) => {
     setDeleting(true);
     try {
-      await dispatch(deleteQuotation(id.toString()));
-      fetchQuotations();
-      setSelectedIds((prev) => prev.filter((pid) => pid !== id));
+      let res = await dispatch(deleteQuotation(id.toString()));
+      if (res !== false) {
+        fetchQuotations();
+        setSelectedIds((prev) => prev.filter((pid) => pid !== id));
+      }
     } catch (err) {
       console.error("Delete failed:", err);
     } finally {
@@ -131,11 +133,13 @@ const QuotationList: React.FC = () => {
     if (selectedIds.length === 0) return;
     setDeleting(true);
     try {
-      await dispatch(
+      let res = await dispatch(
         bulkDeleteQuotations(selectedIds.map((id) => id.toString())),
       );
-      setSelectedIds([]);
-      fetchQuotations();
+      if (res !== false) {
+        setSelectedIds([]);
+        fetchQuotations();
+      }
     } catch (err) {
       console.error("Bulk delete failed:", err);
     } finally {

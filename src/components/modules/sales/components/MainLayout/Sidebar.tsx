@@ -16,8 +16,8 @@ const Sidebar: React.FC = () => {
     <div className="w-64 bg-white h-screen border-r border-[#F59E0B30] flex flex-col sticky top-0 overflow-hidden">
 
       <div className="shrink-0 p-6 py-[21.5px] flex items-center gap-3 border-b border-[#F59E0B30] bg-white z-10">
-        <Link to="/sales/dashboard" className="bg-[#F59E0B] p-2 rounded-xl text-white shadow-md">
-          <img src="/icons/SalesDashboard.svg" className="h-5 w-5" alt="Logo" />
+        <Link to="/sales/dashboard" className="bg-[#F59E0B] p-2 rounded-xl text-white shadow-md outline-none">
+          <img src="/icons/SalesDashboard.svg" className="h-5 w-5 outline-none" alt="Logo" />
         </Link>
         <span className="font-bold text-xl text-gray-800 tracking-tight">Sales</span>
       </div>

@@ -348,9 +348,9 @@ const ReportsAndAnalytics: FC = () => {
               <thead>
                 <tr className="bg-gray-50/30 border-b border-gray-100">
                   <th className="px-8 py-5 text-[13px] font-bold text-gray-800 uppercase tracking-widest border-r border-gray-100">Representative</th>
-                  <th className="px-8 py-5 text-[13px] font-bold text-gray-800 uppercase tracking-widest text-center border-r border-gray-100">Leads</th>
-                  <th className="px-8 py-5 text-[13px] font-bold text-gray-800 uppercase tracking-widest text-center border-r border-gray-100">Conversion</th>
-                  <th className="px-8 py-5 text-[13px] font-bold text-gray-800 uppercase tracking-widest text-center">Revenue</th>
+                  <th className="px-8 py-5 text-[13px] font-bold text-gray-800 uppercase tracking-widest text-center border-r border-gray-100">Target</th>
+                  <th className="px-8 py-5 text-[13px] font-bold text-gray-800 uppercase tracking-widest text-center border-r border-gray-100">Achieved</th>
+                  <th className="px-8 py-5 text-[13px] font-bold text-gray-800 uppercase tracking-widest text-center">Growth %</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50">
@@ -361,10 +361,10 @@ const ReportsAndAnalytics: FC = () => {
                       <span className="text-[13px] text-gray-800">{person.name}</span>
                     </td>
                     <td className="px-8 py-5 text-center text-sm text-gray-800 font-normal border-r border-gray-100">{person.leads}</td>
+                    <td className="px-8 py-5 text-center text-[13px] text-gray-800">{person.revenue}</td>
                     <td className="px-8 py-5 text-center border-r border-gray-100">
                       <span className="px-3 py-1 bg-[#f3f4e6] text-[#F59E0B] rounded-full text-[13px]">{person.conversion}</span>
                     </td>
-                    <td className="px-8 py-5 text-center text-[13px] text-gray-800">{person.revenue}</td>
                   </tr>
                 ))}
               </tbody>

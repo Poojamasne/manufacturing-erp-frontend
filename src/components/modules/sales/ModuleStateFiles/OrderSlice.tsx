@@ -3,7 +3,8 @@ import axios from "axios";
 import type { AppDispatch, RootState } from "../../../../ApplicationState/Store";
 import Swal from "sweetalert2";
 import toast from "react-hot-toast";
-
+import { pdf } from "@react-pdf/renderer";
+import { OrderPDFReport } from "../utils/OrderPDFReport";
 const initialState = {
     orders: [],
     order: {
@@ -190,6 +191,77 @@ export const getOrder = (id: string) => async (dispatch: AppDispatch, _getState:
         );
 
         dispatch(getSalesSingleOrderSuccess(data));
+        Swal.close();
+    } catch (error: any) {
+        Swal.close();
+        const status = error.response?.status;
+        const message = error.response?.data?.message || "Something went wrong";
+
+        switch (status) {
+            case 400:
+                dispatch(getSalesOrderFailure(message || "Invalid request"));
+                break;
+            case 401:
+                dispatch(getSalesOrderFailure(message || "Please provide a valid token"));
+                break;
+            case 403:
+                dispatch(getSalesOrderFailure(message || "Unauthorized access"));
+                break;
+            case 404:
+                dispatch(getSalesOrderFailure(message || "No Sales Orders found"));
+                break;
+            case 409:
+                dispatch(getSalesOrderFailure(message || "Conflict error"));
+                break;
+            case 500:
+                dispatch(getSalesOrderFailure("Server error"));
+                break;
+            default:
+                dispatch(getSalesOrderFailure(message));
+        }
+    }
+};
+// GET ORDER THUNK
+export const getOrderForReport = (id: number | string) => async (dispatch: AppDispatch, _getState: () => RootState) => {
+    dispatch(getSalesOrderRequest());
+    Swal.fire({
+        title: "Generating PDF...",
+        text: "Please wait while we generate the report.",
+        allowOutsideClick: false,
+        customClass: {
+            loader: 'lead-loader'
+        },
+        didOpen: () => {
+            Swal.showLoading();
+        }
+    });
+
+    try {
+        const token = _getState().auth.token || localStorage.getItem("token");
+        const { data } = await axios.get(
+            `${import.meta.env.VITE_API_BASE_URL}/sales/orders/${id}`,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            }
+        );
+
+        dispatch(getSalesSingleOrderSuccess(data));
+        const orderData = data?.data || data;
+
+        const blob = await pdf(<OrderPDFReport order={orderData} />).toBlob();
+
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = `Order_${orderData?.order_id || 'Report'}.pdf`;
+
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        URL.revokeObjectURL(url);
         Swal.close();
     } catch (error: any) {
         Swal.close();

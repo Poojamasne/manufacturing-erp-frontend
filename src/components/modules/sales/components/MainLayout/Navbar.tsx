@@ -178,7 +178,7 @@ const Navbar = ({ onMenuClick }: { onMenuClick: () => void }) => {
             <img src="/icons/Bell.svg" className="h-5 w-5 sm:h-6 sm:w-6 opacity-70" alt="" />
 
             {notifications.length > 0 && (
-              <span className="absolute top-2 right-2 h-3 w-3 sm:h-3.5 sm:w-3.5 bg-[#e63946] text-[8px] text-white rounded-full flex items-center justify-center border-2 border-[#f4f7f6] font-bold">
+              <span className="absolute top-2 right-2 h-3 w-3 sm:h-3.5 sm:w-3.5 bg-[#F59E0B] text-[8px] text-white rounded-full flex items-center justify-center border-2 border-[#f4f7f6] font-bold">
                 {notifications.length}
               </span>
             )}
@@ -217,7 +217,7 @@ const Navbar = ({ onMenuClick }: { onMenuClick: () => void }) => {
                     >
                       {/* TEXT */}
                       <div className="flex gap-2 items-start">
-                        <div className="mt-1 h-2 w-2 rounded-full bg-[#00f2ff]" />
+                        <div className="mt-1 h-2 w-2 rounded-full bg-[#F59E0B]" />
 
                         <div>
                           <p className="text-sm text-gray-700 leading-tight">
@@ -249,7 +249,7 @@ const Navbar = ({ onMenuClick }: { onMenuClick: () => void }) => {
 
                 <button
                   onClick={() => setNotifications([])}
-                  className="text-[10px] text-red-500 font-bold hover:underline"
+                  className="text-[10px] text-[#F59E0B] font-bold hover:underline"
                 >
                   Clear All
                 </button>
