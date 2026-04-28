@@ -7,7 +7,6 @@ import {
     MapPin,
     Edit3,
     Loader2,
-    IndianRupee,
     X
 } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -161,13 +160,6 @@ const OpportunityView: React.FC = () => {
                         <h1 className="text-2xl font-bold text-gray-800">Opportunity Details</h1>
                     </div>
                     <div className="flex flex-wrap gap-3">
-
-
-                        {lead.status === "Won" && (
-                            <button className="flex items-center gap-2 bg-white text-gray-600 px-5 py-2.5 rounded-full font-bold text-sm border border-gray-200 shadow-sm hover:bg-gray-50 transition-all">
-                                <IndianRupee size={18} /> Create Order
-                            </button>
-                        )}
 
                         <button
                             onClick={handleOpenUpdateModal}
@@ -377,8 +369,8 @@ const DetailItem: React.FC<{ label: string; value: string; isHighlight?: boolean
         <span className="font-semibold text-gray-600 text-sm uppercase tracking-wide">{label}</span>
         {isStatus ? (
             <span className={`w-fit px-3 py-1 rounded-lg text-xs font-bold ${value === 'High' || value === 'Lost' ? 'bg-red-50 text-red-600' :
-                    value === 'Medium' || value === 'Qualified' || value === 'In Progress' ? 'bg-amber-50 text-amber-600' :
-                        'bg-green-50 text-green-600'}`}>
+                value === 'Medium' || value === 'Qualified' || value === 'In Progress' ? 'bg-amber-50 text-amber-600' :
+                    'bg-green-50 text-green-600'}`}>
                 {value || "-"}
             </span>
         ) : (
