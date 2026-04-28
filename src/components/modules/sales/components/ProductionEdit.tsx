@@ -31,7 +31,7 @@ const ProductionEdit: React.FC = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const dispatch = useAppDispatch();
-  const { production, loading } = useAppSelector(
+  const { production } = useAppSelector(
     (state: RootState) => state.SalesProduction,
   );
 
@@ -171,13 +171,6 @@ const ProductionEdit: React.FC = () => {
     }
   };
 
-  if (loading && !production?.id) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <Loader2 className="animate-spin text-[#F59E0B]" size={48} />
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-linear-to-br from-gray-50 to-gray-100">
