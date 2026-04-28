@@ -9,7 +9,7 @@ import {
   Phone,
   Mail,
   FileText,
-  Printer,
+  // Printer,
   Loader2,
   MapPin,
   Package,
@@ -272,12 +272,12 @@ if (lineItems.some((item) => item.unit_price <= 0)) {
             </div>
           </div>
           <div className="flex gap-3 w-full lg:w-auto">
-            <button
+            {/* <button
               onClick={() => window.print()}
               className="flex-1 lg:flex-initial flex items-center justify-center gap-1 bg-white text-gray-600 hover:text-amber-500 px-4 py-2 rounded-xl font-medium text-sm border border-gray-200 hover:bg-gray-50"
             >
               <Printer size={18} /> Preview
-            </button>
+            </button> */}
             <button
               onClick={handleSubmit}
               disabled={loading}

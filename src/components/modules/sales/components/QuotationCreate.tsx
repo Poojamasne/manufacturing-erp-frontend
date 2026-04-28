@@ -9,7 +9,7 @@ import {
   Building2,
   User,
   FileText,
-  Printer,
+  // Printer,
   Loader2,
 } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "../../../common/ReduxMainHooks";
@@ -306,7 +306,7 @@ const QuotationCreate: React.FC = () => {
 
   const sections = [
     { id: "customer", label: "Customer Details", icon: Building2 },
-    { id: "items", label: "Line Items", icon: FileText },
+    { id: "items", label: "Products", icon: FileText },
     { id: "terms", label: "Terms & Conditions", icon: FileText },
     { id: "summary", label: "Summary", icon: IndianRupee },
   ];
@@ -326,7 +326,7 @@ const QuotationCreate: React.FC = () => {
           </div>
           <div className="flex gap-3 w-full lg:w-auto">
             <button onClick={() => navigate("/sales/quotation")} className="flex-1 lg:flex-initial bg-white text-gray-600 px-4 py-2 rounded-xl font-medium border border-gray-200 hover:bg-gray-50 transition-all text-sm">Cancel</button>
-            <button onClick={() => window.print()} className="flex-1 lg:flex-initial flex items-center justify-center gap-1 bg-white text-gray-600 px-2.5 py-2 rounded-xl font-medium border border-gray-200 hover:bg-gray-50 transition-all text-sm"><Printer size={18} /> Preview</button>
+            {/* <button onClick={() => window.print()} className="flex-1 lg:flex-initial flex items-center justify-center gap-1 bg-white text-gray-600 px-2.5 py-2 rounded-xl font-medium border border-gray-200 hover:bg-gray-50 transition-all text-sm"><Printer size={18} /> Preview</button> */}
             <button onClick={handleSubmit} disabled={loading} className="flex-1 lg:flex-initial flex items-center justify-center gap-2 bg-[#F59E0B] text-white px-2.5 py-2 rounded-xl font-bold text-sm shadow-lg hover:bg-[#f67317] transition-all disabled:opacity-50">
               {loading ? <Loader2 size={18} className="animate-spin" /> : <Save size={18} />} {loading ? "Saving..." : "Save Quotation"}
             </button>
@@ -363,7 +363,7 @@ const QuotationCreate: React.FC = () => {
           {activeSection === "items" && (
             <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
               <div className="p-6 border-b border-gray-100 flex justify-between items-center">
-                <h3 className="font-bold text-lg text-gray-800 flex items-center gap-2"><FileText size={20} className="text-[#F59E0B]" /> Products & Services</h3>
+                <h3 className="font-bold text-lg text-gray-800 flex items-center gap-2"><FileText size={20} className="text-[#F59E0B]" /> Products Selection</h3>
                 <button onClick={addLineItem} className="flex items-varientcenter gap-2 px-4 py-2 bg-[#f3f4e6] text-[#F59E0B] rounded-xl text-sm font-medium hover:bg-[#F59E0B] hover:text-white transition-all"><Plus size={16} /> Add Item</button>
               </div>
               <div className="overflow-x-auto">
