@@ -4,6 +4,9 @@ import type { AppDispatch, RootState } from "../../../../ApplicationState/Store"
 import Swal from "sweetalert2";
 import type { NavigateFunction } from "react-router-dom";
 import toast from "react-hot-toast";
+import { WonLeadsPDFReport } from "../utils/LeadsWonOverviewReport";
+import { pdf } from "@react-pdf/renderer";
+import { LostLeadsPDFReport } from "../utils/LeadsLostOverviewReport";
 
 const initialState = {
     lead: {
@@ -88,7 +91,7 @@ const leadSlice = createSlice({
             state.lead = action.payload?.data || action.payload;
         },
         // DELETE LEAD
-        deleteLeadSuccess: (state, ) => {
+        deleteLeadSuccess: (state,) => {
             state.loading = false;
             state.lead = {
                 "id": "",
@@ -176,6 +179,103 @@ export const getLeads =
         }
     };
 
+// GET ALL LEADS FOR WON OVERVIEW REPORT
+export const getLeadsForWonOverviewReport =
+    () => async (dispatch: AppDispatch, getState: () => RootState) => {
+        dispatch(request());
+        Swal.fire({
+            title: "Generating Won Overview Report...",
+            text: "Please wait while we generate the report.",
+            allowOutsideClick: false,
+            customClass: {
+                loader: 'lead-loader'
+            },
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
+        try {
+            const token = getState().auth.token || localStorage.getItem("token");
+
+            const { data } = await axios.get(
+                `${import.meta.env.VITE_API_BASE_URL}/sales/leads`,
+                {
+                    headers: { Authorization: `Bearer ${token}` },
+                }
+            );
+
+            dispatch(getLeadsSuccess(data));
+
+            const leads = data?.data || data;
+
+            const blob = await pdf(<WonLeadsPDFReport leads={leads} />).toBlob();
+
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = `Won_Leads_Report_${new Date().toISOString().split("T")[0] || 'Report'}.pdf`;
+
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            URL.revokeObjectURL(url);
+            Swal.close();
+        } catch (error: any) {
+            Swal.close();
+            handleError(error, dispatch);
+        }
+    };
+// GET ALL LEADS FOR LOST OVERVIEW REPORT
+export const getLeadsForLostOverviewReport =
+    () => async (dispatch: AppDispatch, getState: () => RootState) => {
+        dispatch(request());
+        Swal.fire({
+            title: "Generating Lost Overview Report...",
+            text: "Please wait while we generate the report.",
+            allowOutsideClick: false,
+            customClass: {
+                loader: 'lead-loader'
+            },
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
+        try {
+            const token = getState().auth.token || localStorage.getItem("token");
+
+            const { data } = await axios.get(
+                `${import.meta.env.VITE_API_BASE_URL}/sales/leads`,
+                {
+                    headers: { Authorization: `Bearer ${token}` },
+                }
+            );
+
+            dispatch(getLeadsSuccess(data));
+
+            const leads = data?.data || data;
+
+            const blob = await pdf(<LostLeadsPDFReport leads={leads} />).toBlob();
+
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = `Lost_Leads_Report_${new Date().toISOString().split("T")[0] || 'Report'}.pdf`;
+
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            URL.revokeObjectURL(url);
+            Swal.close();
+        } catch (error: any) {
+            Swal.close();
+            handleError(error, dispatch);
+        }
+    };
+
 // GET SINGLE LEAD
 export const getLead =
     (id: number) => async (dispatch: AppDispatch, getState: () => RootState) => {
@@ -214,7 +314,7 @@ export const getLead =
 // In LeadSlice.ts - Replace the createLead function
 export const createLead = (payload: any, navigate: NavigateFunction) => async (dispatch: AppDispatch, getState: () => RootState) => {
     dispatch(request());
-    
+
     try {
         Swal.fire({
             title: "Creating Lead...",
@@ -233,18 +333,18 @@ export const createLead = (payload: any, navigate: NavigateFunction) => async (d
             `${import.meta.env.VITE_API_BASE_URL}/sales/leads`,
             payload,
             {
-                headers: { 
+                headers: {
                     Authorization: `Bearer ${token}`,
                     'Content-Type': 'application/json'
                 },
             }
         );
-        
+
         console.log("API Response:", data);
-        
+
         dispatch(createLeadSuccess(data));
         toast.success("Lead created successfully!");
-        
+
         await Swal.fire({
             icon: "success",
             iconColor: "#F59E0B",
@@ -253,38 +353,38 @@ export const createLead = (payload: any, navigate: NavigateFunction) => async (d
             timer: 1500,
             showConfirmButton: false,
         });
-        
+
         navigate("/sales/leads");
     } catch (error: any) {
         console.error("Full error object:", error);
         console.error("Error response:", error.response);
         console.error("Error data:", error.response?.data);
-        
+
         Swal.close();
-        
+
         // Extract detailed error message
         let errorMessage = "Failed to create lead";
         let errorDetails = "";
-        
+
         if (error.response?.data) {
             const errorData = error.response.data;
             errorMessage = errorData.message || errorMessage;
             errorDetails = errorData.error || errorData.details || "";
-            
+
             // Handle validation errors
             if (errorData.errors) {
                 const validationErrors = Object.values(errorData.errors).flat().join("\n");
                 errorDetails = validationErrors;
             }
         }
-        
+
         Swal.fire({
             icon: "error",
             title: "Creation Failed",
             html: `${errorMessage}<br/><small class="text-gray-500">${errorDetails}</small>`,
             confirmButtonColor: "#F59E0B"
         });
-        
+
         dispatch(failure(errorMessage));
     }
 };
@@ -354,7 +454,7 @@ export const deleteLead = (id: number) => async (dispatch: AppDispatch, getState
             title: "Deleting Lead...",
             text: "Please wait...",
             allowOutsideClick: false,
-                customClass: {
+            customClass: {
                 loader: 'lead-loader'
             },
             didOpen: () => {
@@ -397,27 +497,27 @@ export const deleteLead = (id: number) => async (dispatch: AppDispatch, getState
 const handleError = (error: any, dispatch: any) => {
     const status = error.response?.status;
     let message = error.response?.data?.message || "Something went wrong";
-    
-   
+
+
     if (message.includes("Variant with ID")) {
         // Extract variant name from message if possible
         const variantMatch = message.match(/Variant with ID (.+?) not found/);
         const variantName = variantMatch ? variantMatch[1] : "selected";
         message = `The variant "${variantName}" is no longer available in the system.\n\nPlease remove this product row and re-add it with a valid variant selection.`;
     }
-    
+
     // ✅ Check for product-related errors
     else if (message.includes("Product with ID")) {
         const productMatch = message.match(/Product with ID (.+?) not found/);
         const productName = productMatch ? productMatch[1] : "selected";
         message = `The product "${productName}" is no longer available in the system.\n\nPlease remove this product row and select a valid product.`;
     }
-    
+
     // ✅ Check for duplicate entry errors
     else if (message.includes("Duplicate entry")) {
         message = "A lead with this information already exists. Please check for duplicates.";
     }
-    
+
     // ✅ Check for validation errors
     else if (message.includes("validation failed")) {
         message = "Please check all required fields are filled correctly.";

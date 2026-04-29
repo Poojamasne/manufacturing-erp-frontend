@@ -16,8 +16,10 @@ import {
 } from "recharts";
 import { Filter, ChevronDown, Download } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "../../../common/ReduxMainHooks";
-import { fetchReportData, exportReportCSV, clearReportErrors } from "../ModuleStateFiles/ReportSlice";
+import { fetchReportData } from "../ModuleStateFiles/ReportSlice";
 import type { RootState } from "../../../../ApplicationState/Store";
+import { getLeadsForLostOverviewReport, getLeadsForWonOverviewReport } from "../ModuleStateFiles/LeadSlice";
+import { getProductsForOverviewReport } from "../ModuleStateFiles/ProductSlice";
 
 type TimeRange = "All Time" | "Weekly" | "Monthly" | "Quarterly" | "Yearly" | "Custom";
 
@@ -48,14 +50,19 @@ const ReportsAndAnalytics: FC = () => {
   const { data } = useAppSelector((state: RootState) => state.SalesReport);
 
   const [range, setRange] = useState<TimeRange>("Yearly");
+  const [selectedReport, setSelectedReport] = useState("Won Leads Report"); // Added selection state
   const [customRange, setCustomRange] = useState({
     start: "",
     end: ""
   });
+
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isReportDropdownOpen, setIsReportDropdownOpen] = useState(false); // Added report dropdown state
+
   const calendarRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const reportDropdownRef = useRef<HTMLDivElement>(null); // Added report ref
 
   useEffect(() => {
     if (range === "Custom") {
@@ -71,16 +78,14 @@ const ReportsAndAnalytics: FC = () => {
     }
   }, [dispatch, range, customRange.start, customRange.end]);
 
-  useEffect(() => {
-    return () => {
-      dispatch(clearReportErrors());
-    };
-  }, [dispatch]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setIsDropdownOpen(false);
+      }
+      if (reportDropdownRef.current && !reportDropdownRef.current.contains(event.target as Node)) {
+        setIsReportDropdownOpen(false);
       }
       if (calendarRef.current && !calendarRef.current.contains(event.target as Node)) {
         setIsCalendarOpen(false);
@@ -90,18 +95,23 @@ const ReportsAndAnalytics: FC = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const handleExport = () => {
-    if (range === "Custom" && customRange.start && customRange.end) {
-      dispatch(exportReportCSV({
-        range,
-        startDate: customRange.start,
-        endDate: customRange.end
-      }));
-    } else {
-      dispatch(exportReportCSV({ range }));
+  const handleExport = (reportType: string) => {
+    setSelectedReport(reportType);
+    setIsReportDropdownOpen(false);
+    if (reportType === "Employee Report") {
+      alert("Employee Report generation is not implemented yet.");
+     };
+    if (reportType === "Products Report") {
+      dispatch(getProductsForOverviewReport());
+    }
+    if (reportType === "Won Leads Report") {
+      dispatch(getLeadsForWonOverviewReport())
+    }
+
+    if (reportType === "Lost Leads Report") {
+      dispatch(getLeadsForLostOverviewReport())
     }
   };
-
   const handleFilterChange = (newRange: TimeRange) => {
     if (newRange === "Custom") {
       setIsCalendarOpen(true);
@@ -125,30 +135,28 @@ const ReportsAndAnalytics: FC = () => {
   };
 
   const rangeOptions: TimeRange[] = [
-    "All Time",
-    "Weekly",
-    "Monthly",
-    "Quarterly",
-    "Yearly",
-    "Custom",
+    "All Time", "Weekly", "Monthly", "Quarterly", "Yearly", "Custom",
   ];
 
-  // Get display text for filter button
+  const reportOptions = [
+    "Won Leads Report",
+    "Lost Leads Report",
+    "Employee Report",
+    "Products Report"
+  ];
+
   const getFilterDisplayText = () => {
     const formatDate = (dateStr: string | number | Date) => {
       const date = new Date(dateStr);
-
       const day = date.getDate();
       const year = date.getFullYear();
       const month = date.toLocaleString("default", { month: "long" });
-
       return `${day} ${month} ${year}`;
     };
 
     if (range === "Custom" && customRange.start && customRange.end) {
       return `${formatDate(customRange.start)} to ${formatDate(customRange.end)}`;
     }
-
     return range;
   };
 
@@ -164,7 +172,6 @@ const ReportsAndAnalytics: FC = () => {
     <div className="min-h-screen bg-[#f4f7f6] p-4 sm:p-6 lg:p-8 font-sans text-gray-900">
       <div className="max-w-7xl mx-auto">
 
-        {/* REFACTORED HEADER: Title, Export, and Filter in one row */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
           <div>
             <h1 className="text-3xl font-extrabold text-slate-800 tracking-tight">
@@ -187,29 +194,25 @@ const ReportsAndAnalytics: FC = () => {
                 <ChevronDown size={14} className={`transition-transform duration-200 ${isDropdownOpen ? "rotate-180" : ""}`} />
               </button>
 
-              {/* Dropdown Menu */}
               {isDropdownOpen && !isCalendarOpen && (
-                <div className="absolute right-0 mt-2 bg-white border border-slate-100 rounded-2xl shadow-2xl z-50 py-2 w-fit min-w-35">                  {rangeOptions.map((tab) => (
-                  <button
-                    key={tab}
-                    onClick={() => handleFilterChange(tab)}
-                    className={`outline-none w-full text-left px-4 py-2 text-[13px] transition-colors ${range === tab
-                      ? "text-[#F59E0B] font-bold bg-[#f3f4e6]/50"
-                      : "text-slate-600 hover:bg-slate-50"
-                      }`}
-                  >
-                    {tab}
-                  </button>
-                ))}
+                <div className="absolute right-0 mt-2 bg-white border border-slate-100 rounded-2xl shadow-2xl z-50 py-2 w-fit min-w-35">
+                  {rangeOptions.map((tab) => (
+                    <button
+                      key={tab}
+                      onClick={() => handleFilterChange(tab)}
+                      className={`outline-none w-full text-left px-4 py-2 text-[13px] transition-colors ${range === tab
+                        ? "text-[#F59E0B] font-bold bg-[#f3f4e6]/50"
+                        : "text-slate-600 hover:bg-slate-50"
+                        }`}
+                    >
+                      {tab}
+                    </button>
+                  ))}
                 </div>
               )}
 
-              {/* Custom Date Range Popup */}
               {isCalendarOpen && (
-                <div
-                  ref={calendarRef}
-                  className="absolute right-0 mt-3 bg-white p-6 rounded-2xl shadow-xl border z-50 w-72"
-                >
+                <div ref={calendarRef} className="absolute right-0 mt-3 bg-white p-6 rounded-2xl shadow-xl border z-50 w-72">
                   <div className="space-y-3">
                     <input
                       type="date"
@@ -234,14 +237,38 @@ const ReportsAndAnalytics: FC = () => {
                 </div>
               )}
             </div>
-            {/* Export CSV Button */}
-            <button
-              onClick={handleExport}
-              className="flex items-center gap-1 px-2.5 py-2 bg-[#F59E0B] text-white rounded-xl text-sm font-bold hover:bg-[#d98c0a] transition-all shadow-sm active:scale-95"
-            >
-              <Download size={16} />
-              <span className="hidden sm:inline">Export CSV</span>
-            </button>
+
+            {/* Reports Selection Dropdown (Replaced Export Button) */}
+            <div className="relative" ref={reportDropdownRef}>
+              <button
+                onClick={() => setIsReportDropdownOpen(!isReportDropdownOpen)}
+                className="outline-none flex items-center gap-1 px-4 py-2 bg-[#F59E0B] text-white rounded-xl text-sm font-bold hover:bg-[#f67317] transition-all shadow-sm active:scale-95"
+              >
+                <Download size={16} />
+                <span className="min-w-30 text-left">
+                  {/* {selectedReport} */}
+                  Download Reports
+                </span>
+                <ChevronDown size={14} className={`transition-transform duration-200 ${isReportDropdownOpen ? "rotate-180" : ""}`} />
+              </button>
+
+              {isReportDropdownOpen && (
+                <div className="absolute right-0 mt-2 p-0 bg-white border border-slate-100 rounded-2xl shadow-2xl z-50 py-2 min-w-25">
+                  {reportOptions.map((option) => (
+                    <button
+                      key={option}
+                      onClick={() => handleExport(option)}
+                      className={`outline-none text-right px-4 py-2 text-[13px] transition-colors ${selectedReport === option
+                        ? "text-[#F59E0B] font-bold bg-[#f3f4e6]/50"
+                        : "text-slate-600 hover:bg-slate-50"
+                        }`}
+                    >
+                      {option}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         </div>
 

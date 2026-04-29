@@ -125,12 +125,12 @@ const OrderView: React.FC = () => {
                             <ChevronRight size={14} />
                             <span className="text-slate-600 font-semibold">{order.order_id}</span>
                         </div>
-                        <h1 className="text-2xl font-bold text-gray-800">Order Lifecycle</h1>
+                        <h1 className="text-2xl font-bold text-gray-800">Order Details</h1>
                     </div>
 
                     <div className="flex gap-3 w-full sm:w-auto">
-                        <button onClick={() => handleExport(order?.id)} className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-white text-gray-600 px-5 py-2.5 rounded-full font-bold text-sm border border-gray-200 shadow-sm hover:bg-gray-50 transition-all">
-                            <Download size={18} /> Export
+                        <button onClick={() => handleExport(order?.id)} className="flex-1 sm:flex-none flex items-center justify-center gap-1 bg-white text-gray-600  hover:text-[#F59E0B] px-4 py-2 rounded-xl font-bold text-sm border border-gray-200 shadow-sm hover:bg-gray-50 transition-all">
+                            <Download size={18} /> Download Report
                         </button>
 
                         <div className="relative flex-1 sm:flex-none outline-none">
@@ -138,7 +138,7 @@ const OrderView: React.FC = () => {
                                 value={order.status || 'Pending'}
                                 onChange={(e) => handleStatusUpdate(e.target.value)}
                                 disabled={isUpdating}
-                                className="outline-none w-full bg-[#F59E0B] text-white px-6 py-2.5 rounded-full font-bold text-sm shadow-lg hover:bg-[#f67317] transition-all disabled:opacity-50 cursor-pointer appearance-none pr-10"
+                                className="outline-none w-full bg-[#F59E0B] text-white px-4 py-2 rounded-xl font-bold text-sm shadow-lg hover:bg-[#f67317] transition-all disabled:opacity-50 cursor-pointer appearance-none pr-10"
                             >
                                 <option value="Pending">Order Place</option>
                                 <option value="Processing">Processing</option>
