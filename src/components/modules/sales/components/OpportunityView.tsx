@@ -163,7 +163,7 @@ const OpportunityView: React.FC = () => {
 
                         <button
                             onClick={handleOpenUpdateModal}
-                            className="flex items-center gap-1 bg-[#F59E0B] text-white px-4 py-2 rounded-xl font-bold text-sm shadow-lg hover:bg-[#f67317] transition-all"
+                            className="outline-none flex items-center gap-1 bg-[#F59E0B] text-white px-4 py-2 rounded-xl font-bold text-sm shadow-lg hover:bg-[#f67317] transition-all"
                         >
                             <Edit3 size={18} /> Edit Opportunity
                         </button>
@@ -309,7 +309,7 @@ const OpportunityView: React.FC = () => {
                             </div>
                             <button
                                 onClick={() => setIsUpdateModalOpen(false)}
-                                className="p-2 hover:bg-white rounded-full text-slate-400 hover:text-slate-600 transition-colors"
+                                className="outline-none p-2 hover:bg-white rounded-full text-slate-400 hover:text-slate-600 transition-colors"
                             >
                                 <X size={20} />
                             </button>
@@ -346,13 +346,13 @@ const OpportunityView: React.FC = () => {
                         <div className="p-8 pt-0 flex gap-3">
                             <button
                                 onClick={() => setIsUpdateModalOpen(false)}
-                                className="flex-1 px-6 py-4 rounded-2xl text-[13px] font-bold text-slate-500 bg-slate-100 hover:bg-slate-200 transition-all uppercase tracking-widest"
+                                className="outline-none flex-1 px-4 py-2 rounded-xl text-[13px] font-bold text-slate-500 bg-slate-100 hover:bg-slate-200 transition-all uppercase tracking-widest"
                             >
                                 Cancel
                             </button>
                             <button
                                 onClick={handleeditLead}
-                                className="flex-1 px-6 py-4 rounded-2xl text-[13px] font-bold text-white bg-[#F59E0B] hover:bg-[#d98b06] shadow-lg shadow-amber-200 transition-all uppercase tracking-widest"
+                                className="outline-none flex-1 px-4 py-2 rounded-xl text-[13px] font-bold text-white bg-[#F59E0B] hover:bg-[#d98b06] shadow-lg shadow-amber-200 transition-all uppercase tracking-widest"
                             >
                                 Save Changes
                             </button>

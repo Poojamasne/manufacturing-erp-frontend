@@ -217,8 +217,8 @@ const EditLead: React.FC = () => {
                         <h1 className="text-3xl font-black text-slate-900 tracking-tight">Edit Lead: {lead?.lead_id}</h1>
                     </div>
                     <div className="flex gap-3 w-full md:w-auto">
-                        <button type="button" onClick={() => navigate(`/sales/leads/view-lead/${id}`)} className="flex-1 md:flex-none px-4 py-2 rounded-xl font-bold text-sm bg-white border border-slate-200 hover:bg-slate-50 hover:text-amber-500 transition-all">Cancel</button>
-                        <button type="button" onClick={handleSubmit} disabled={isSubmitting} className="flex-1 md:flex-none px-2.5 py-2 rounded-xl font-bold text-sm text-white bg-[#F59E0B] shadow-lg shadow-amber-500/5 hover:bg-[#f67317] transition-all flex items-center justify-center gap-2">
+                        <button onClick={() => navigate(`/sales/leads/view-lead/${id}`)} className="flex-1 md:flex-none px-4 py-2 focus:outline-none rounded-xl font-bold text-sm bg-white border border-slate-200 hover:bg-slate-50 hover:text-amber-500 transition-all">Cancel</button>
+                        <button onClick={handleSubmit} disabled={isSubmitting} className="flex-1 md:flex-none px-2.5 py-2 rounded-xl focus:outline-none font-bold text-sm text-white bg-[#F59E0B] shadow-lg shadow-amber-500/5 hover:bg-[#f67317] transition-all flex items-center justify-center gap-2">
                             {isSubmitting ? "Updating..." : <><Save size={18} /> Update Lead</>}
                         </button>
                     </div>
@@ -279,12 +279,12 @@ const EditLead: React.FC = () => {
                                             </div>
                                         </div>
                                         <div className="md:col-span-1 flex justify-center pb-2">
-                                            <button type="button" onClick={() => productRows.length > 1 && setProductRows(prev => prev.filter(r => r.id !== row.id))} className="p-2 text-slate-300 hover:text-red-500 transition-colors"><Trash2 size={20} /></button>
+                                            <button onClick={() => productRows.length > 1 && setProductRows(prev => prev.filter(r => r.id !== row.id))} className="p-2 text-slate-300 hover:text-red-500 transition-colors"><Trash2 size={20} /></button>
                                         </div>
                                     </div>
                                 );
                             })}
-                            <button type="button" onClick={() => setProductRows([...productRows, { id: Date.now(), product_id: "", variant_id: "", quantity: 1, unit_price: 0 }])} className="flex items-center gap-2 text-[#F59E0B] font-black text-xs uppercase tracking-widest px-4 py-2 hover:bg-[#f3f4e6] rounded-xl transition-all">
+                            <button onClick={() => setProductRows([...productRows, { id: Date.now(), product_id: "", variant_id: "", quantity: 1, unit_price: 0 }])} className="flex items-center gap-2 text-[#F59E0B] font-black text-xs uppercase tracking-widest px-4 py-2 hover:bg-[#f3f4e6] rounded-xl transition-all">
                                 <Plus size={16} strokeWidth={3} /> Add Item
                             </button>
                         </div>

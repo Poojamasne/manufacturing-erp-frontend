@@ -148,7 +148,7 @@ const QuotationView: React.FC = () => {
                                 <button
                                     onClick={() => setIsStatusDropdownOpen(!isStatusDropdownOpen)}
                                     disabled={updatingStatus}
-                                    className="flex items-center justify-between gap-3 px-4 py-2 rounded-xl border border-slate-200 bg-white text-sm font-bold shadow-sm hover:bg-slate-50 transition-all min-w-35"
+                                    className="outline-none flex items-center justify-between gap-3 px-4 py-2 rounded-xl border border-slate-200 bg-white text-sm font-bold shadow-sm hover:bg-slate-50 transition-all min-w-35"
                                 >
                                     <span className={quotationData.status === 'Rejected' ? 'text-rose-600' : 'text-[#F59E0B]'}>
                                         {updatingStatus ? "Updating..." : quotationData.status || 'Draft'}
@@ -177,7 +177,7 @@ const QuotationView: React.FC = () => {
                             {/* Export Button */}
                             <button
                                 onClick={() => quotationData?.id && dispatch(getQuotationForReport(quotationData.id))}
-                                className="flex items-center justify-center gap-2 bg-white text-gray-600 hover:text-[#F59E0B] px-4 py-2 rounded-xl font-bold text-sm border border-gray-200 shadow-sm hover:bg-gray-50 transition-all whitespace-nowrap"
+                                className="outline-none flex items-center justify-center gap-2 bg-white text-gray-600 hover:text-[#F59E0B] px-4 py-2 rounded-xl font-bold text-sm border border-gray-200 shadow-sm hover:bg-gray-50 transition-all whitespace-nowrap"
                             >
                                 <Download size={16} /> Export Quotation
                             </button>

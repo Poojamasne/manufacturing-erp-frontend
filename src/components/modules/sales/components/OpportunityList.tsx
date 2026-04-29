@@ -621,7 +621,7 @@ const OpportunityList: React.FC = () => {
               </div>
               <button
                 onClick={() => setIsUpdateModalOpen(false)}
-                className="p-2 hover:bg-white rounded-full text-slate-400 hover:text-slate-600 transition-colors"
+                className="outline-none p-2 hover:bg-white rounded-full text-slate-400 hover:text-slate-600 transition-colors"
               >
                 <X size={20} />
               </button>
@@ -668,13 +668,13 @@ const OpportunityList: React.FC = () => {
             <div className="p-8 pt-0 flex gap-3">
               <button
                 onClick={() => setIsUpdateModalOpen(false)}
-                className="flex-1 px-4 py-2 rounded-xl text-[13px] font-bold text-slate-500 bg-slate-100 hover:bg-slate-200 transition-all uppercase tracking-widest"
+                className="outline-none flex-1 px-4 py-2 rounded-xl text-[13px] font-bold text-slate-500 bg-slate-100 hover:bg-slate-200 transition-all uppercase tracking-widest"
               >
                 Cancel
               </button>
               <button
                 onClick={handleUpdateOpportunity}
-                className="flex-1 px-2.5 py-2 rounded-xl text-[13px] font-bold text-white bg-[#F59E0B] hover:bg-[#d98b06] shadow-sm shadow-amber-200 transition-all active:scale-95 uppercase tracking-widest"
+                className="outline-none flex-1 px-2.5 py-2 rounded-xl text-[13px] font-bold text-white bg-[#F59E0B] hover:bg-[#d98b06] shadow-sm shadow-amber-200 transition-all active:scale-95 uppercase tracking-widest"
               >
                 Save Update
               </button>

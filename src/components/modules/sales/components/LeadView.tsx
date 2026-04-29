@@ -95,7 +95,7 @@ const LeadView: React.FC = () => {
                     <div className="mt-3.25">
                         <button
                             onClick={() => navigate(`/sales/leads/edit-lead/${lead.id}`)}
-                            className="flex items-center gap-1 bg-[#F59E0B] text-white px-4 py-2 rounded-xl font-bold text-sm shadow-lg shadow-amber-500/5 hover:bg-[#f67317] transition-all">
+                            className="outline-none flex items-center gap-1 bg-[#F59E0B] text-white px-4 py-2 rounded-xl font-bold text-sm shadow-lg shadow-amber-500/5 hover:bg-[#f67317] transition-all">
                             <Edit3 size={18} /> Edit Lead
                         </button>
                     </div>

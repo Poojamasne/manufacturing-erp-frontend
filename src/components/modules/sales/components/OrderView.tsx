@@ -143,7 +143,7 @@ const OrderView: React.FC = () => {
                                 <button
                                     onClick={() => setIsStatusDropdownOpen(!isStatusDropdownOpen)}
                                     disabled={isUpdating}
-                                    className="flex items-center justify-between gap-3 px-4 py-2 rounded-xl border border-slate-200 bg-white text-sm font-bold shadow-sm hover:bg-slate-50 transition-all min-w-40"
+                                    className="outline-none flex items-center justify-between gap-3 px-4 py-2 rounded-xl border border-slate-200 bg-white text-sm font-bold shadow-sm hover:bg-slate-50 transition-all min-w-40"
                                 >
                                     <span className={order.status === 'Cancelled' ? 'text-rose-600' : 'text-[#F59E0B]'}>
                                         {isUpdating ? "Updating..." : (order.status === 'Pending' ? 'Order Place' : order.status || 'Order Place')}
@@ -176,7 +176,7 @@ const OrderView: React.FC = () => {
                             {/* Download Button */}
                             <button
                                 onClick={() => handleExport(order?.id)}
-                                className="flex items-center justify-center gap-2 bg-white text-gray-600 hover:text-[#F59E0B] px-4 py-2 rounded-xl font-bold text-sm border border-gray-200 shadow-sm hover:bg-gray-50 transition-all whitespace-nowrap"
+                                className="outline-none flex items-center justify-center gap-2 bg-white text-gray-600 hover:text-[#F59E0B] px-4 py-2 rounded-xl font-bold text-sm border border-gray-200 shadow-sm hover:bg-gray-50 transition-all whitespace-nowrap"
                             >
                                 <Download size={16} /> Download Report
                             </button>
@@ -184,7 +184,7 @@ const OrderView: React.FC = () => {
                     </div>
                 </div>
 
-                <div id="order-pdf-content" className="bg-white rounded-4xl shadow-sm border border-gray-100 overflow-hidden">
+                <div className="bg-white rounded-4xl shadow-sm border border-gray-100 overflow-hidden">
                     {/* Integrated Pipeline Visualizer */}
                     <div className="bg-gray-50/50 p-10 border-b border-gray-100">
                         <div className="relative max-w-2xl mx-auto">

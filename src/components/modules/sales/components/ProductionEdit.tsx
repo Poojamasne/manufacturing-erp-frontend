@@ -190,7 +190,7 @@ const ProductionEdit: React.FC = () => {
             <div className="flex gap-3">
               <button
                 onClick={() => navigate("/sales/production")}
-                className="px-4 py-2 text-gray-700 hover:text-amber-500 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors"
+                className="outline-none px-4 py-2 text-gray-700 hover:text-amber-500 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors"
               >
                 Cancel
               </button>

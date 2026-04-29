@@ -30,8 +30,10 @@ const Navbar = ({ onMenuClick }: { onMenuClick: () => void }) => {
 
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {
-      if (e.key === "Escape")
+      if (e.key === "Escape") {
         setOpenNote(false);
+        setOpenNotif(false);
+      }
     };
     document.addEventListener("keydown", handleEsc);
     return () => document.removeEventListener("keydown", handleEsc);
