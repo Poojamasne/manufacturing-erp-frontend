@@ -88,7 +88,7 @@ const LeadView: React.FC = () => {
                         <div className="flex items-center gap-2 text-gray-400">
                             <button onClick={() => navigate("/sales/leads")} className="hover:text-[#F59E0B] transition-colors">Leads</button>
                             <ChevronRight size={14} />
-                            <span className="text-slate-600 font-semibold">{lead.lead_id}</span>
+                            <span className="text-slate-600 font-semibold">{lead?.id}</span>
                         </div>
                         <h1 className="text-2xl font-bold text-gray-800">Lead Details</h1>
                     </div>

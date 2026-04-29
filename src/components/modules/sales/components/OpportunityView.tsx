@@ -155,7 +155,7 @@ const OpportunityView: React.FC = () => {
                         <div className="flex items-center gap-2 text-gray-400 mb-1">
                             <button onClick={() => navigate("/sales/opportunities")} className="hover:text-[#F59E0B] transition-colors">Opportunities</button>
                             <ChevronRight size={14} />
-                            <span className="text-slate-600 font-semibold">{lead.lead_id}</span>
+                            <span className="text-slate-600 font-semibold">{lead?.id}</span>
                         </div>
                         <h1 className="text-2xl font-bold text-gray-800">Opportunity Details</h1>
                     </div>
@@ -163,9 +163,9 @@ const OpportunityView: React.FC = () => {
 
                         <button
                             onClick={handleOpenUpdateModal}
-                            className="flex items-center gap-2 bg-[#F59E0B] text-white px-6 py-2.5 rounded-full font-bold text-sm shadow-lg hover:bg-[#f67317] transition-all"
+                            className="flex items-center gap-1 bg-[#F59E0B] text-white px-4 py-2 rounded-xl font-bold text-sm shadow-lg hover:bg-[#f67317] transition-all"
                         >
-                            <Edit3 size={18} /> Edit
+                            <Edit3 size={18} /> Edit Opportunity
                         </button>
                     </div>
                 </div>
@@ -300,7 +300,7 @@ const OpportunityView: React.FC = () => {
                         ref={modalRef}
                         className="bg-white w-full max-w-md rounded-[2.5rem] shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200"
                     >
-                        <div className="bg-[#f3f4e6]/50 px-8 py-6 flex justify-between items-center border-b border-teal-100">
+                        <div className="bg-[#f3f4e6]/50 px-8 py-6 flex justify-between items-center border-b border-amber-300">
                             <div>
                                 <h3 className="text-xl font-extrabold text-slate-800">Quick Update</h3>
                                 <p className="text-[11px] text-[#F59E0B] font-bold uppercase tracking-[0.2em] mt-1">

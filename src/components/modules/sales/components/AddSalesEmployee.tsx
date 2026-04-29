@@ -67,8 +67,8 @@ const AddSalesEmployee: React.FC = () => {
             {/* SUCCESS NOTIFICATION TOAST */}
             {showSuccess && (
                 <div className="fixed top-6 right-6 z-100 animate-in slide-in-from-right duration-300">
-                    <div className="relative flex items-center gap-4 p-5 rounded-2xl shadow-2xl bg-white border-l-4 border-teal-500 min-w-[320px]">
-                        <CheckCircle2 className="text-teal-500" size={20} />
+                    <div className="relative flex items-center gap-4 p-5 rounded-2xl shadow-2xl bg-white border-l-4 border-amber-500 min-w-[320px]">
+                        <CheckCircle2 className="text-amber-500" size={20} />
                         <div>
                             <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">System</h4>
                             <p className="text-sm font-bold text-slate-700">Executive onboarded successfully.</p>

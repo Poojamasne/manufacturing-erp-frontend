@@ -93,10 +93,10 @@ const EditLead: React.FC = () => {
         return () => { dispatch(clearErrors()); };
     }, [dispatch, id]);
 
-   
+
     useEffect(() => {
         if (lead && lead.id && String(lead.id) === id) {
-            
+
             const formatDate = (date: string) => date ? date.split("T")[0] : "";
 
             setFormData({
@@ -117,13 +117,13 @@ const EditLead: React.FC = () => {
                 assigned_to: lead.assigned_to ? Number(lead.assigned_to) : "",
             });
 
-            
+
             if (lead.products && lead.products.length > 0) {
                 //eslint-disable-next-line @typescript-eslint/no-explicit-any
                 const mappedRows: ProductRow[] = lead.products.map((p: any) => ({
                     id: p.id || Date.now() + Math.random(),
                     product_id: String(p.product_id),
-                    variant_id: String(p.variant_id || p.variant), 
+                    variant_id: String(p.variant_id || p.variant),
                     quantity: Number(p.quantity),
                     unit_price: Number(p.unit_price)
                 }));
@@ -200,7 +200,7 @@ const EditLead: React.FC = () => {
         dispatch(editLead(Number(id), payload, navigate)).finally(() => setIsSubmitting(false));
     };
 
-    if (loading && !formData.company_name) return null; 
+    if (loading && !formData.company_name) return null;
 
     return (
         <div className="min-h-screen bg-[#f8fafc] p-4 sm:p-6 lg:p-8 font-sans text-slate-900">
@@ -209,10 +209,10 @@ const EditLead: React.FC = () => {
                 {/* Header */}
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
                     <div>
-                        <div className="flex items-center gap-2 text-slate-400 mb-1 text-sm font-medium">
-                            <button type="button" onClick={() => navigate("/sales/leads")} className="hover:text-[#F59E0B]">Leads</button>
+                        <div className="flex items-center gap-2 text-gray-400">
+                            <button onClick={() => navigate("/sales/leads")} className="hover:text-[#F59E0B] transition-colors">Leads</button>
                             <ChevronRight size={14} />
-                            <span className="text-slate-600 font-bold uppercase text-[10px] tracking-widest">Update Record</span>
+                            <span className="text-slate-600 font-semibold">{lead?.id}</span>
                         </div>
                         <h1 className="text-3xl font-black text-slate-900 tracking-tight">Edit Lead: {lead?.lead_id}</h1>
                     </div>
@@ -308,7 +308,7 @@ const EditLead: React.FC = () => {
                                     label="Assign Employee" name="assigned_to" value={formData.assigned_to} onChange={handleInputChange} required error={errors.assigned_to}
                                     options={employees?.map(emp => ({ l: `${emp.name} (${emp.designation})`, v: emp.id })) || []}
                                 />
-                                <FormSelect label="Status" name="status" value={formData?.status} onChange={handleInputChange} options={[{ l: "New", v: "New" }, { l: "Contacted", v: "Contacted" }, { l: "Not Contacted", v: "Not Contacted" }, { l: "Won", v: "Won" },  { l: "Qualified", v: "Qualified" }, { l: "Quotation", v: "Quotation" }, { l: "Negotiation", v: "Negotiation" },{l: "Lost", v: "Lost"}]} />
+                                <FormSelect label="Status" name="status" value={formData?.status} onChange={handleInputChange} options={[{ l: "New", v: "New" }, { l: "Contacted", v: "Contacted" }, { l: "Not Contacted", v: "Not Contacted" }, { l: "Won", v: "Won" }, { l: "Qualified", v: "Qualified" }, { l: "Quotation", v: "Quotation" }, { l: "Negotiation", v: "Negotiation" }, { l: "Lost", v: "Lost" }]} />
                                 <FormSelect label="Priority" name="priority" value={formData.priority} onChange={handleInputChange} options={[{ l: "High", v: "High" }, { l: "Medium", v: "Medium" }, { l: "Low", v: "Low" }]} />
                                 <FormInput label="Follow-up Date" name="followup_date" type="date" value={formData.followup_date} onChange={handleInputChange} />
                                 <FormInput label="Closing Date (Est)" name="expected_close_date" type="date" value={formData.expected_close_date} onChange={handleInputChange} />

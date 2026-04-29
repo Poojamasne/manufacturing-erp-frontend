@@ -42,10 +42,10 @@ const ViewSalesEmployee: React.FC = () => {
         {/* BREADCRUMBS & ACTIONS */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
-            <div className="flex items-center gap-2 text-slate-400 text-sm mb-1">
+            <div className="flex items-center gap-2 text-gray-400">
               <button onClick={() => navigate("/sales/employees")} className="hover:text-[#F59E0B] transition-colors">Employees</button>
               <ChevronRight size={14} />
-              <span className="text-slate-600 font-semibold">{employee.user_id}</span>
+              <span className="text-slate-600 font-semibold">{employee?.id}</span>
             </div>
             <h1 className="text-2xl font-bold text-slate-900">Profile Overview</h1>
           </div>

@@ -126,10 +126,10 @@ const OrderView: React.FC = () => {
             <div className="max-w-5xl mx-auto">
                 {/* Header Section */}
                 <div className="mb-10">
-                    <div className="flex items-center gap-2 text-slate-400 mb-2 text-[10px] font-black uppercase tracking-widest">
+                    <div className="flex items-center gap-2 text-gray-400">
                         <button onClick={() => navigate("/sales/orders")} className="hover:text-[#F59E0B] transition-colors">Orders</button>
-                        <ChevronRight size={12} />
-                        <span className="text-[#F59E0B]">{order.order_id || 'N/A'}</span>
+                        <ChevronRight size={14} />
+                        <span className="text-slate-600 font-semibold">{order?.id}</span>
                     </div>
 
                     <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">

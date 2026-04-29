@@ -30,7 +30,7 @@ const EditSalesEmployee: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
-    
+
     // Select data from Redux
     const { employee, loading } = useAppSelector((state: RootState) => state.SalesEmployee);
 
@@ -71,17 +71,17 @@ const EditSalesEmployee: React.FC = () => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!id) return;
-        
+
         setIsSaving(true);
         try {
             const payload = {
                 ...formData,
                 is_active: Number(formData.is_active) // Convert back to number for API
             };
-            
+
             // Dispatch Edit Action
             await dispatch(editEmployee(Number(id), payload, navigate));
-            
+
             setShowSuccess(true);
             setTimeout(() => setShowSuccess(false), 3000);
         } catch (error) {
@@ -101,8 +101,8 @@ const EditSalesEmployee: React.FC = () => {
             {/* SUCCESS NOTIFICATION TOAST */}
             {showSuccess && (
                 <div className="fixed top-6 right-6 z-100 animate-in slide-in-from-right duration-300">
-                    <div className="relative flex items-center gap-4 p-5 rounded-2xl shadow-2xl bg-white border-l-4 border-teal-500 min-w-[320px]">
-                        <CheckCircle2 className="text-teal-500" size={20} />
+                    <div className="relative flex items-center gap-4 p-5 rounded-2xl shadow-2xl bg-white border-l-4 border-amber-500 min-w-[320px]">
+                        <CheckCircle2 className="text-amber-500" size={20} />
                         <div>
                             <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">System Sync</h4>
                             <p className="text-sm font-bold text-slate-700">Record updated successfully.</p>
@@ -119,12 +119,10 @@ const EditSalesEmployee: React.FC = () => {
                 {/* TOP NAVIGATION & HEADER */}
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
                     <div>
-                        <div className="flex items-center gap-2 text-slate-400 mb-1 text-sm font-medium">
-                            <button onClick={() => navigate("/sales/employees")} className="hover:text-[#F59E0B] transition-colors">Employee</button>
+                        <div className="flex items-center gap-2 text-gray-400">
+                            <button onClick={() => navigate("/sales/employees")} className="hover:text-[#F59E0B] transition-colors">Employees</button>
                             <ChevronRight size={14} />
-                            <span className="text-slate-600">Update Profile</span>
-                            <ChevronRight size={14} />
-                            <span className="text-[#F59E0B] font-bold uppercase">{employee?.user_id}</span>
+                            <span className="text-slate-600 font-semibold">{employee?.id}</span>
                         </div>
                         <h1 className="text-3xl font-black text-slate-900 tracking-tight">Edit Executive</h1>
                     </div>
