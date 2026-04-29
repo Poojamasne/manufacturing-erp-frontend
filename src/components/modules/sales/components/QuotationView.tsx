@@ -8,13 +8,14 @@ import {
     User,
     FileText,
     Loader2,
-    ChevronDown // Added ChevronDown
+    ChevronDown 
 } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { getQuotation, updateQuotationStatus, clearSalesErrors, getQuotationForReport } from "../ModuleStateFiles/QuotationSlice";
 import { useAppDispatch, useAppSelector } from "../../../common/ReduxMainHooks";
 import type { RootState } from "../../../../ApplicationState/Store";
 
+// ... (Interfaces remain the same)
 interface QuotationItem {
     id?: number;
     product_name: string;
@@ -54,8 +55,8 @@ const QuotationView: React.FC = () => {
     const { quotation } = useAppSelector((state: RootState) => state.SalesQuotation);
 
     const [updatingStatus, setUpdatingStatus] = useState(false);
-    const [isStatusDropdownOpen, setIsStatusDropdownOpen] = useState(false); // Dropdown State
-    const statusDropdownRef = useRef<HTMLDivElement>(null); // Ref for outside click
+    const [isStatusDropdownOpen, setIsStatusDropdownOpen] = useState(false);
+    const statusDropdownRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         if (id) {
@@ -66,7 +67,6 @@ const QuotationView: React.FC = () => {
         };
     }, [dispatch, id]);
 
-    // Close dropdown on outside click
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
             if (statusDropdownRef.current && !statusDropdownRef.current.contains(event.target as Node)) {
@@ -83,7 +83,7 @@ const QuotationView: React.FC = () => {
         try {
             await dispatch(updateQuotationStatus({ id, status: newStatus }));
             dispatch(getQuotation(id));
-            setIsStatusDropdownOpen(false); // Close dropdown after update
+            setIsStatusDropdownOpen(false);
         } catch (err) {
             console.error('Status update failed:', err);
         } finally {
@@ -119,21 +119,30 @@ const QuotationView: React.FC = () => {
     const quotationData = (quotation && typeof quotation === 'object' && !Array.isArray(quotation)) ? quotation : {} as QuotationData;
     const hasData = quotationData && Object.keys(quotationData).length > 0 && quotationData.id;
 
-    if (!hasData) return null; // Simplified for brevity
+    if (!hasData) return null;
 
     return (
         <div className="min-h-screen bg-[#F8FAFC] p-4 md:p-10 font-sans text-slate-900">
             <div className="max-w-5xl mx-auto">
-                <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-6">
-                    <div>
-                        <div className="flex items-center gap-2 text-slate-400 mb-2 text-[10px] font-black uppercase tracking-widest">
-                            <button onClick={() => navigate("/sales/quotation")} className="hover:text-[#F59E0B] transition-colors">Quotations</button>
-                            <ChevronRight size={12} />
-                            <span className="text-[#F59E0B]">{quotationData.quote_id || 'N/A'}</span>
-                        </div>
-                        <div className="flex items-center gap-4 flex-wrap">
-                            <h1 className="text-3xl font-extrabold text-slate-800 tracking-tight">Quotation Details</h1>
+                
+                {/* Header Section */}
+                <div className="mb-10">
+                    {/* Breadcrumbs - Always Top Left */}
+                    <div className="flex items-center gap-2 text-slate-400 mb-4 text-[10px] font-black uppercase tracking-widest">
+                        <button onClick={() => navigate("/sales/quotation")} className="hover:text-[#F59E0B] transition-colors">Quotations</button>
+                        <ChevronRight size={12} />
+                        <span className="text-[#F59E0B]">{quotationData.quote_id || 'N/A'}</span>
+                    </div>
 
+                    {/* Main Header Action Row */}
+                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                        {/* Heading Left */}
+                        <h1 className="text-3xl font-extrabold text-slate-800 tracking-tight">
+                            Quotation Details
+                        </h1>
+
+                        {/* Buttons Right */}
+                        <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
                             {/* CUSTOM STATUS DROPDOWN */}
                             <div className="relative" ref={statusDropdownRef}>
                                 <button
@@ -148,12 +157,12 @@ const QuotationView: React.FC = () => {
                                 </button>
 
                                 {isStatusDropdownOpen && (
-                                    <div className="absolute left-0 mt-2 bg-white border border-slate-100 rounded-2xl shadow-2xl z-60 py-2 w-full min-w-35">
+                                    <div className="absolute right-0 mt-2 bg-white border border-slate-100 rounded-2xl shadow-2xl z-50 py-2 w-full min-w-35">
                                         {['Draft', 'Sent', 'Accepted', 'Rejected'].map((status) => (
                                             <button
                                                 key={status}
                                                 onClick={() => handleStatusUpdate(status)}
-                                                className={`outline-none w-full text-left px-4 py-2.5 text-[13px] transition-colors ${quotationData.status === status
+                                                className={`outline-none w-full text-left px-4 py-2 text-[13px] transition-colors ${quotationData.status === status
                                                     ? "text-[#F59E0B] font-bold bg-[#f3f4e6]/50"
                                                     : "text-slate-600 hover:bg-slate-50"
                                                     }`}
@@ -164,42 +173,20 @@ const QuotationView: React.FC = () => {
                                     </div>
                                 )}
                             </div>
-                        </div>
-                    </div>
 
-                    <div className="flex gap-3 w-full md:w-auto">
-                        <button onClick={() => quotationData?.id && dispatch(getQuotationForReport(quotationData.id))} className="flex-1 md:flex-none outline-none flex items-center justify-center gap-1 bg-white text-slate-600 hover:text-[#F59E0B] px-4 py-2 rounded-xl font-bold text-xs border border-slate-200 shadow-sm hover:bg-slate-50 transition-all">
-                            <Download size={16} /> Export Quotation
-                        </button>
+                            {/* Export Button */}
+                            <button 
+                                onClick={() => quotationData?.id && dispatch(getQuotationForReport(quotationData.id))} 
+                                className="flex items-center justify-center gap-2 bg-white text-gray-600 hover:text-[#F59E0B] px-4 py-2 rounded-xl font-bold text-sm border border-gray-200 shadow-sm hover:bg-gray-50 transition-all whitespace-nowrap"
+                            >
+                                <Download size={16} /> Export Quotation
+                            </button>
+                        </div>
                     </div>
                 </div>
 
                 {/* Main Content Card */}
                 <div id="quotation-pdf-content" className="relative bg-white rounded-[2.5rem] shadow-2xl shadow-slate-200/40 border border-slate-100 overflow-hidden">
-
-                    {/* REJECTED WATERMARK - Appears diagonally when status is Rejected */}
-                    {/* {quotationData.status === 'Rejected' && (
-                        <div className="absolute inset-0 z-50 pointer-events-none flex items-center justify-center overflow-hidden">
-                            <div
-                                className="text-[8rem] md:text-[7rem] font-black text-rose-600/10 border-12 border-rose-600/10 px-20 py-10 rounded-[4rem] uppercase tracking-[2rem] select-none -rotate-35"
-                                style={{ transformOrigin: 'center' }}
-                            >
-                                REJECTED
-                            </div>
-                        </div>
-                    )}
-
-                    {quotationData.status === 'Accepted' && (
-                        <div className="absolute inset-0 z-50 pointer-events-none flex items-center justify-center overflow-hidden">
-                            <div
-                                className="text-[8rem] md:text-[7rem] font-black text-green-500/10 border-12 border-green-600/10 px-20 py-10 rounded-[4rem] uppercase tracking-[2rem] select-none -rotate-35"
-                                style={{ transformOrigin: 'center' }}
-                            >
-                                ACCEPTED
-                            </div>
-                        </div>
-                    )} */}
-
                     <div className="relative z-10 p-10 md:p-14 space-y-12 bg-white/80 backdrop-blur-[2px]">
                         {/* Document Branding Header */}
                         <div className="flex flex-col md:flex-row justify-between items-start border-b border-slate-100 pb-10 gap-8">
@@ -275,7 +262,7 @@ const QuotationView: React.FC = () => {
                             <div className="border border-slate-100 rounded-3xl overflow-hidden shadow-sm bg-white">
                                 <table className="w-full text-left">
                                     <thead className="bg-slate-50 border-b border-slate-100">
-                                        <tr className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
+                                        <tr className="text-[13px] font-black text-slate-500 uppercase tracking-widest">
                                             <th className="p-5">Product Description</th>
                                             <th className="p-5 text-center">Quantity</th>
                                             <th className="p-5 text-right">Unit Price</th>
@@ -347,10 +334,5 @@ const QuotationView: React.FC = () => {
         </div>
     );
 };
-
-// Simple Text component for the watermark to avoid TS errors if just using div
-// const Text: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({ children, ...props }) => (
-//     <div {...props}>{children}</div>
-// );
 
 export default QuotationView;

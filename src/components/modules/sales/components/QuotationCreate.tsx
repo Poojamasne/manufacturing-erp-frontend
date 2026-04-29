@@ -364,7 +364,7 @@ const QuotationCreate: React.FC = () => {
             <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
               <div className="p-6 border-b border-gray-100 flex justify-between items-center">
                 <h3 className="font-bold text-lg text-gray-800 flex items-center gap-2"><FileText size={20} className="text-[#F59E0B]" /> Products Selection</h3>
-                <button onClick={addLineItem} className="flex items-varientcenter gap-2 px-4 py-2 bg-[#f3f4e6] text-[#F59E0B] rounded-xl text-sm font-medium hover:bg-[#F59E0B] hover:text-white transition-all"><Plus size={16} /> Add Item</button>
+                <button onClick={addLineItem} className="flex items-center gap-2 px-4 py-2 bg-[#f3f4e6] text-[#F59E0B] rounded-xl text-sm font-medium hover:bg-[#F59E0B] hover:text-white transition-all"><Plus size={16} /> Add Item</button>
               </div>
               <div className="overflow-x-auto">
                 <table className="w-full">
