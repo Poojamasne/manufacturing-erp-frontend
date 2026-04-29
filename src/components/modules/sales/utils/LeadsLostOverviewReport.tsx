@@ -69,10 +69,11 @@ const styles = StyleSheet.create({
   },
   infoCol: { width: '30%' },
   label: { 
-    fontSize: 7, 
+    fontSize: 11, 
     color: '#64748b', 
     textTransform: 'uppercase', 
     marginBottom: 5,
+    fontWeight: '900'
   },
   value: { 
     fontSize: 10, 
@@ -187,7 +188,7 @@ export const LostLeadsPDFReport = ({ leads }: { leads: any[] }) => {
               <Text style={[styles.value, { color: '#e11d48' }]}>{formatINR(totalPotentialLost)}</Text>
             </View>
             <View style={styles.infoCol}>
-              <Text style={styles.label}>Avg. Opportunity Value</Text>
+              <Text style={styles.label}>{"Avg. Opportunity \n Value"}</Text>
               <Text style={styles.value}>
                 {lostLeads.length > 0 ? formatINR(totalPotentialLost / lostLeads.length) : '₹0.00'}
               </Text>

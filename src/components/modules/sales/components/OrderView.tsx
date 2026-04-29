@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo, useRef } from 'react'; // Added useRef
 import {
     ChevronRight,
     Building2,
@@ -7,7 +7,8 @@ import {
     Download,
     MapPin,
     Package,
-    Clock
+    Clock,
+    ChevronDown // Added ChevronDown
 } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 
@@ -20,6 +21,8 @@ const OrderView: React.FC = () => {
     const { id } = useParams();
     const dispatch = useAppDispatch();
     const [isUpdating, setIsUpdating] = useState(false);
+    const [isStatusDropdownOpen, setIsStatusDropdownOpen] = useState(false); // New state
+    const statusDropdownRef = useRef<HTMLDivElement>(null); // New ref
 
     const { order } = useAppSelector((state: RootState) => state.SalesOrder);
 
@@ -30,7 +33,17 @@ const OrderView: React.FC = () => {
         return () => { dispatch(clearSalesErrors()); };
     }, [dispatch, id]);
 
-    // Your specific Stage Logic
+    // Handle outside click to close dropdown
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (statusDropdownRef.current && !statusDropdownRef.current.contains(event.target as Node)) {
+                setIsStatusDropdownOpen(false);
+            }
+        };
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
+
     const getOrderStages = (status: string) => {
         const stages = [
             { name: 'Order Placed', completed: true },
@@ -58,15 +71,11 @@ const OrderView: React.FC = () => {
         return stages;
     };
 
-    // Pipeline Calculation
     const pipelineResult = useMemo(() => {
         const status = order?.status || 'Pending';
         const stages = getOrderStages(status);
-
-        // Find last completed index to calculate progress bar width
         const lastCompletedIndex = [...stages].reverse().findIndex(s => s.completed);
         const currentIndex = lastCompletedIndex >= 0 ? (stages.length - 1) - lastCompletedIndex : 0;
-
         const progress = (currentIndex / (stages.length - 1)) * 100;
 
         return {
@@ -82,6 +91,7 @@ const OrderView: React.FC = () => {
         try {
             await dispatch(updateOrderStatus(id, newStatus));
             dispatch(getOrder(id));
+            setIsStatusDropdownOpen(false); // Close after update
         } catch (error) {
             console.error("Status update failed:", error);
         } finally {
@@ -109,14 +119,11 @@ const OrderView: React.FC = () => {
 
     const handleExport = (orderID: string | number) => {
         dispatch(getOrderForReport(orderID));
-
     };
-
 
     return (
         <div className="min-h-screen bg-[#f4f7f6] p-4 sm:p-6 lg:p-8 font-sans text-gray-900">
             <div className="max-w-5xl mx-auto">
-
                 {/* Header */}
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
                     <div>
@@ -133,39 +140,53 @@ const OrderView: React.FC = () => {
                             <Download size={18} /> Download Report
                         </button>
 
-                        <div className="relative flex-1 sm:flex-none outline-none">
-                            <select
-                                value={order.status || 'Pending'}
-                                onChange={(e) => handleStatusUpdate(e.target.value)}
+                        {/* CUSTOM DROPDOWN REPLACEMENT */}
+                        <div className="relative flex-1 sm:flex-none" ref={statusDropdownRef}>
+                            <button
+                                onClick={() => setIsStatusDropdownOpen(!isStatusDropdownOpen)}
                                 disabled={isUpdating}
-                                className="outline-none w-full bg-[#F59E0B] text-white px-4 py-2 rounded-xl font-bold text-sm shadow-lg hover:bg-[#f67317] transition-all disabled:opacity-50 cursor-pointer appearance-none pr-10"
+                                className="flex items-center justify-between gap-2 w-full min-w-40 text-[#F59E0B] bg-white px-4 py-2 rounded-xl font-bold text-sm shadow-lg border border-gray-100 hover:bg-gray-50 transition-all disabled:opacity-50"
                             >
-                                <option value="Pending">Order Place</option>
-                                <option value="Processing">Processing</option>
-                                <option value="Delivered">Delivered</option>
-                                <option value="Cancelled">Cancelled</option>
-                            </select>
-                            <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
-                                {isUpdating ? <Loader2 size={14} className="animate-spin" /> : <ChevronRight size={14} className="rotate-90" />}
-                            </div>
+                                <span className="truncate">
+                                    {isUpdating ? "Updating..." : (order.status === 'Pending' ? 'Order Place' : order.status || 'Order Place')}
+                                </span>
+                                {isUpdating ? (
+                                    <Loader2 size={14} className="animate-spin" />
+                                ) : (
+                                    <ChevronDown size={14} className={`transition-transform duration-200 ${isStatusDropdownOpen ? "rotate-180" : ""}`} />
+                                )}
+                            </button>
+
+                            {isStatusDropdownOpen && (
+                                <div className="absolute right-0 mt-2 bg-white border border-slate-100 rounded-2xl shadow-2xl z-50 py-2 w-full min-w-40">
+                                    {["Pending", "Processing", "Delivered", "Cancelled"].map((status) => (
+                                        <button
+                                            key={status}
+                                            onClick={() => handleStatusUpdate(status)}
+                                            className={`outline-none w-full text-left px-4 py-2.5 text-[13px] transition-colors ${
+                                                (order.status || 'Pending') === status
+                                                ? "text-[#F59E0B] font-bold bg-[#f3f4e6]/50"
+                                                : "text-slate-600 hover:bg-slate-50"
+                                            }`}
+                                        >
+                                            {status === 'Pending' ? 'Order Place' : status}
+                                        </button>
+                                    ))}
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>
 
                 <div id="order-pdf-content" className="bg-white rounded-4xl shadow-sm border border-gray-100 overflow-hidden">
-
-                    {/* Integrated Pipeline Visualizer using getOrderStages */}
+                    {/* Integrated Pipeline Visualizer */}
                     <div className="bg-gray-50/50 p-10 border-b border-gray-100">
                         <div className="relative max-w-2xl mx-auto">
-                            {/* Track Background */}
                             <div className="absolute top-4 left-0 w-full h-1 bg-gray-200 z-0 rounded-full" />
-
-                            {/* Progress Track */}
                             <div
                                 className={`absolute top-4 left-0 h-1 z-0 transition-all duration-700 rounded-full ${pipelineResult.isCancelled ? 'bg-red-500' : 'bg-[#F59E0B]'}`}
                                 style={{ width: `${pipelineResult.progress}%` }}
                             />
-
                             <div className="flex justify-between items-start relative z-10">
                                 {pipelineResult.stages.map((stage, index) => (
                                     <div key={index} className="flex flex-col items-center">
@@ -277,7 +298,6 @@ const OrderView: React.FC = () => {
                             </div>
                         </section>
                     </div>
-
                 </div>
             </div>
         </div>

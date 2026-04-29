@@ -103,7 +103,7 @@ const LeadView: React.FC = () => {
                             <ChevronRight size={14} />
                             <span className="text-slate-600 font-semibold">{lead.lead_id}</span>
                         </div>
-                        <h1 className="text-2xl font-bold text-gray-800">Lead Intelligence Detail</h1>
+                        <h1 className="text-2xl font-bold text-gray-800">Lead Detail</h1>
                     </div>
                     <div className="flex gap-3">
                         {lead.status === "Won" && (

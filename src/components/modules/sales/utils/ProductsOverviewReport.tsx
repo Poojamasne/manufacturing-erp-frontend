@@ -69,10 +69,11 @@ const styles = StyleSheet.create({
   },
   infoCol: { width: '30%' },
   label: { 
-    fontSize: 7, 
+    fontSize: 11, 
     color: '#64748b', 
     textTransform: 'uppercase', 
     marginBottom: 5,
+    fontWeight: '900'
   },
   value: { 
     fontSize: 10, 
@@ -217,7 +218,7 @@ export const ProductPDFReport = ({ products }: { products: any[] }) => {
               <View key={i} style={styles.tableRow}>
                 <View style={{ width: '40%' }}>
                   <Text style={[styles.tableCell, { fontWeight: 'bold' }]}>{product.product_name}</Text>
-                  <Text style={{ fontSize: 7, color: '#64748b' }}>{product.category}</Text>
+                  <Text style={{ fontSize: 8, color: '#64748b' }}>{product.category}</Text>
                 </View>
                 
                 <Text style={[styles.tableCell, { width: '15%', textAlign: 'center' }]}>
@@ -232,7 +233,7 @@ export const ProductPDFReport = ({ products }: { products: any[] }) => {
                   <Text style={[styles.tableCell, { fontWeight: 'bold' }]}>
                     {formatINR(productVal)}
                   </Text>
-                  <Text style={{ fontSize: 6, color: '#94a3b8' }}>
+                  <Text style={{ fontSize: 8, color: '#94a3b8' }}>
                     Base: {formatINR(product.base_price)}
                   </Text>
                 </View>

@@ -66,11 +66,11 @@ const styles = StyleSheet.create({
   },
   infoCol: { width: '30%' },
   label: { 
-    fontSize: 7, 
+    fontSize: 11, 
     color: '#64748b', 
     textTransform: 'uppercase', 
     marginBottom: 5,
-    fontWeight: 'normal'
+    fontWeight: '900'
   },
   value: { 
     fontSize: 10, 
@@ -180,7 +180,7 @@ export const OrderPDFReport = ({ order }: { order: any }) => {
               <Text style={styles.refNumber}>Ref: {order.order_id}</Text>
             </View>
             <View style={[styles.statusBadge, { backgroundColor: badge.bg, color: badge.text, borderColor: badge.border }]}>
-              <Text>{order.status}</Text>
+              <Text>Status: {order.status}</Text>
             </View>
           </View>
 

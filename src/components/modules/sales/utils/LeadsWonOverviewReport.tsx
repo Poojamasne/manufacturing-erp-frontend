@@ -69,10 +69,11 @@ const styles = StyleSheet.create({
   },
   infoCol: { width: '30%' },
   label: { 
-    fontSize: 7, 
+    fontSize: 11, 
     color: '#64748b', 
     textTransform: 'uppercase', 
     marginBottom: 5,
+    fontWeight: '900'
   },
   value: { 
     fontSize: 10, 
@@ -207,7 +208,7 @@ export const WonLeadsPDFReport = ({ leads }: { leads: any[] }) => {
               <View key={i} style={styles.tableRow}>
                 <View style={{ width: '15%' }}>
                   <Text style={styles.tableCell}>{lead.lead_id}</Text>
-                  <Text style={{ fontSize: 6, color: '#94a3b8' }}>
+                  <Text style={{ fontSize: 8, color: '#94a3b8' }}>
                     {new Date(lead.created_at).toLocaleDateString('en-IN')}
                   </Text>
                 </View>
