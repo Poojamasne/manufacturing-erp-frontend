@@ -225,7 +225,7 @@ export const getOrder = (id: string) => async (dispatch: AppDispatch, _getState:
 export const getOrderForReport = (id: number | string) => async (dispatch: AppDispatch, _getState: () => RootState) => {
     dispatch(getSalesOrderRequest());
     Swal.fire({
-        title: "Generating PDF...",
+        title: "Generating Order Report...",
         text: "Please wait while we generate the report.",
         allowOutsideClick: false,
         customClass: {
