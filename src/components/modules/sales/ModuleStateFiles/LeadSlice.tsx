@@ -533,7 +533,7 @@ const handleError = (error: any, dispatch: any) => {
                 html: message.replace(/\n/g, '<br/>'),
                 icon: "error",
                 confirmButtonColor: "#F59E0B",
-                confirmButtonText: "OK, I'll fix it"
+                confirmButtonText: "OK"
             });
             break;
 
