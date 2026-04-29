@@ -320,6 +320,9 @@ export const createLead = (payload: any, navigate: NavigateFunction) => async (d
             title: "Creating Lead...",
             text: "Please wait while we create the lead.",
             allowOutsideClick: false,
+            customClass: {
+                loader: 'lead-loader'
+            },
             didOpen: () => {
                 Swal.showLoading();
             }
