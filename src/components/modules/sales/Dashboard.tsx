@@ -24,12 +24,12 @@ type FilterType = "Weekly" | "Monthly" | "Quarterly" | "Yearly" | "All Time" | "
 
 const COLORS = [
   "#F59E0B", // primary amber
-  "#FBBF24", // lighter amber
-  "#FCD34D", // soft amber
-  "#F97316", // orange (strong contrast)
-  "#FB923C", // soft orange
   "#10B981", // teal/green contrast
+  "#FCD34D", // soft amber
+  "#FBBF24", // lighter amber
+  "#F97316", // orange (strong contrast)
   "#6B7280", // neutral gray
+  "#FB923C", // soft orange
 ];
 
 const StatCard = ({ title, value, svg }: StatCardProps) => (
@@ -80,7 +80,8 @@ export const Dashboard = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const calendarRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 640);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 700);
+  const [isMobileForCategory, setIsMobileForCategory] = useState(window.innerWidth < 780);
 
   // Fetch data when filter or custom range changes
   useEffect(() => {
@@ -96,9 +97,14 @@ export const Dashboard = () => {
   }, [dispatch, filter, customRange.start, customRange.end]);
 
   useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth < 640);
+    const handleResize = () => setIsMobile(window.innerWidth < 700);
+    const handleResizeForCategory = () => setIsMobileForCategory(window.innerWidth < 780);
     window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
+    window.addEventListener("resize", handleResizeForCategory);
+    return () => {
+      window.removeEventListener("resize", handleResize);
+      window.removeEventListener("resize", handleResizeForCategory);
+    };
   }, []);
 
   // Close dropdown and calendar when clicking outside
@@ -271,14 +277,15 @@ export const Dashboard = () => {
                     dataKey="stage"
                     axisLine={false}
                     tickLine={false}
-                    tick={{ fill: '#7e899c', fontSize: 11, fontWeight: 500 }}
+                    tick={{ fill: '#7e899c', fontSize: 10, fontWeight: 650 }}
                     interval={0}
-                    angle={0}
-                    textAnchor="middle"
-                    dy={5}
-                    height={35}
+                    angle={isMobile ? -90 : 0}
+                    textAnchor={isMobile ? "end" : "middle"}
+                    dy={isMobile ? 10 : 5}
+                    dx={isMobile ? -5 : 0}
+                    height={isMobile ? 90 : 35}
                   />
-                  <YAxis axisLine={false} tickLine={false} tick={{ fill: '#7e899c', fontSize: 10 }} />
+                  <YAxis axisLine={false} tickLine={false} tick={{ fill: '#7e899c', fontSize: 10, fontWeight: 650 }} />
                   <Tooltip
                     cursor={{ fill: '#f8fafc' }}
                     contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }}
@@ -321,14 +328,15 @@ export const Dashboard = () => {
                     dataKey="category"
                     axisLine={false}
                     tickLine={false}
-                    tick={{ fill: '#7e899c', fontSize: 11, fontWeight: 500 }}
+                    tick={{ fill: '#7e899c', fontSize: 10, fontWeight: 650 }}
                     interval={0}
-                    angle={0}
-                    textAnchor="middle"
-                    dy={5}
-                    height={35}
+                    angle={isMobileForCategory ? -90 : 0}
+                    textAnchor={isMobileForCategory ? "end" : "middle"}
+                    dy={isMobileForCategory ? 10 : 5}
+                    dx={isMobileForCategory ? -5 : 0}
+                    height={isMobileForCategory ? 90 : 35}
                   />
-                  <YAxis axisLine={false} tickLine={false} tick={{ fill: '#7e899c', fontSize: 10 }} />
+                  <YAxis axisLine={false} tickLine={false} tick={{ fill: '#7e899c', fontSize: 10, fontWeight: 650 }} />
                   <Tooltip cursor={{ fill: 'transparent' }} />
                   <Bar dataKey="units_sold" fill="#F59E0B" radius={[6, 6, 0, 0]} barSize={28} />
                   <Bar dataKey="target" fill="#F97316" radius={[6, 6, 0, 0]} barSize={28} />

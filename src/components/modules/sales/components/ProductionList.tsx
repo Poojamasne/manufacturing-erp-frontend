@@ -448,7 +448,7 @@ const ProductionList: React.FC = () => {
               <div className="relative min-w-35">
                 <button
                   onClick={() => setIsStatusOpen(!isStatusOpen)}
-                  className={`outline-none w-full flex items-center justify-between gap-2 px-4 py-3 rounded-xl border text-[13px] font-bold transition-all ${statusFilter !== "All" ? "bg-[#f3f4e6] border-teal-200 text-[#F59E0B]" : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"}`}
+                  className={`outline-none w-full flex items-center justify-between gap-2 px-4 py-3 rounded-xl border text-[13px] font-bold transition-all ${statusFilter !== "All" ? "bg-[#f3f4e6] border-amber-400 text-[#F59E0B]" : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"}`}
                 >
                   <span className="truncate">
                     {statusFilter === "All" ? "Status" : statusFilter}
@@ -481,7 +481,7 @@ const ProductionList: React.FC = () => {
               <div className="relative min-w-35">
                 <button
                   onClick={() => setIsStageOpen(!isStageOpen)}
-                  className={`outline-none w-full flex items-center justify-between gap-2 px-4 py-3 rounded-xl border text-[13px] font-bold transition-all ${stageFilter !== "All" ? "bg-[#f3f4e6] border-teal-200 text-[#F59E0B]" : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"}`}
+                  className={`outline-none w-full flex items-center justify-between gap-2 px-4 py-3 rounded-xl border text-[13px] font-bold transition-all ${stageFilter !== "All" ? "bg-[#f3f4e6] border-amber-400 text-[#F59E0B]" : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"}`}
                 >
                   <span className="truncate">
                     {stageFilter === "All" ? "Stage" : stageFilter}

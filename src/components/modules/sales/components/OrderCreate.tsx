@@ -169,16 +169,16 @@ const OrderCreate: React.FC = () => {
     if (!formData.shipping_address.trim())
       newErrors.shipping_address = "Shipping address is required";
     if (lineItems.some((item) => !item.product_name.trim())) {
-  newErrors.lineItems = "Please ensure all products have names";
-}
+      newErrors.lineItems = "Please ensure all products have names";
+    }
 
-if (lineItems.some((item) => item.quantity <= 0)) {
-  newErrors.lineItems = "Quantity must be greater than 0";
-}
+    if (lineItems.some((item) => item.quantity <= 0)) {
+      newErrors.lineItems = "Quantity must be greater than 0";
+    }
 
-if (lineItems.some((item) => item.unit_price <= 0)) {
-  newErrors.lineItems = "Unit price must be greater than 0";
-}
+    if (lineItems.some((item) => item.unit_price <= 0)) {
+      newErrors.lineItems = "Unit price must be greater than 0";
+    }
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
@@ -215,15 +215,7 @@ if (lineItems.some((item) => item.unit_price <= 0)) {
         unit_price: item.unit_price,
       })),
     };
-
-    try {
-      await dispatch(createOrder(orderData));
-      setTimeout(() => {
-        navigate("/sales/orders");
-      }, 2500);
-    } catch (err) {
-      setSubmitError(typeof err === "string" ? err : "Failed to create order");
-    }
+    await dispatch(createOrder(orderData, navigate));
   };
 
   const sections = [
@@ -357,11 +349,10 @@ if (lineItems.some((item) => item.unit_price <= 0)) {
                         <div
                           key={quotation.id}
                           onClick={() => handleQuotationSelect(quotation)}
-                          className={`p-4 border rounded-xl cursor-pointer transition-all ${
-                            selectedQuotation?.id === quotation.id
-                              ? "border-[#F59E0B] bg-[#f3f4e6] ring-2 ring-[#F59E0B]/80"
-                              : "border-gray-200 hover:border-[#F59E0B]/50 hover:bg-gray-50"
-                          }`}
+                          className={`p-4 border rounded-xl cursor-pointer transition-all ${selectedQuotation?.id === quotation.id
+                            ? "border-[#F59E0B] bg-[#f3f4e6] ring-2 ring-[#F59E0B]/80"
+                            : "border-gray-200 hover:border-[#F59E0B]/50 hover:bg-gray-50"
+                            }`}
                         >
                           <div className="flex justify-between items-start">
                             <div className="flex-1">
@@ -506,7 +497,7 @@ if (lineItems.some((item) => item.unit_price <= 0)) {
                       <th className="p-4 text-right text-xs font-bold text-gray-400 uppercase">
                         Quantity
                       </th>
-                      
+
                       <th className="p-4 text-center text-xs font-bold text-gray-400 uppercase">
                         Actions
                       </th>
@@ -518,6 +509,7 @@ if (lineItems.some((item) => item.unit_price <= 0)) {
                         <td className="p-4">
                           <input
                             type="text"
+                            readOnly
                             value={item.product_name}
                             onChange={(e) => {
                               setLineItems((prev) =>
@@ -528,20 +520,20 @@ if (lineItems.some((item) => item.unit_price <= 0)) {
                                 ),
                               );
                             }}
-                            className={`w-64 px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#F59E0B] ${errors.lineItems && !item.product_name ? "border-red-500" : "border-gray-200"}`}
+                            className={`w-64 px-3 cursor-not-allowed py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#F59E0B] ${errors.lineItems && !item.product_name ? "border-red-500" : "border-gray-200"}`}
                             placeholder="Product name"
                           />
                         </td>
-                        <td className="p-4">
+                        <td className="p-4 text-right">
                           <input
                             type="number"
                             value={item.quantity}
+                            min={0}
                             onChange={(e) => {
                               setLineItems((prev) =>
                                 prev.map((i) => {
                                   if (i.id === item.id) {
-                                    const newQuantity =
-                                      parseFloat(e.target.value) || 0;
+                                    const newQuantity = parseFloat(e.target.value) || 0;
                                     return {
                                       ...i,
                                       quantity: newQuantity,
@@ -556,7 +548,7 @@ if (lineItems.some((item) => item.unit_price <= 0)) {
                             step="any"
                           />
                         </td>
-                       
+
                         <td className="p-4 text-center">
                           <button
                             onClick={() => removeLineItem(item.id)}

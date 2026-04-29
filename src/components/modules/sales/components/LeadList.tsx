@@ -506,7 +506,7 @@ const LeadList: React.FC = () => {
                       setOpenDropdown(openDropdown === f.label ? null : f.label)
                     }
                     className={`outline-none w-full flex items-center justify-between gap-2 px-4 py-3 rounded-xl border text-[13px] font-bold transition-all ${f.value !== "All"
-                      ? "bg-[#f3f4e6] border-teal-200 text-[#F59E0B]"
+                      ? "bg-[#f3f4e6] border-amber-400 text-[#F59E0B]"
                       : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
                       }`}
                   >

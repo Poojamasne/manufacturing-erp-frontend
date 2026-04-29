@@ -5,6 +5,7 @@ import Swal from "sweetalert2";
 import toast from "react-hot-toast";
 import { pdf } from "@react-pdf/renderer";
 import { OrderPDFReport } from "../utils/OrderPDFReport";
+import type { NavigateFunction } from "react-router-dom";
 const initialState = {
     orders: [],
     order: {
@@ -294,7 +295,7 @@ export const getOrderForReport = (id: number | string) => async (dispatch: AppDi
 };
 
 // --- CREATE ORDER THUNK ---
-export const createOrder = (orderData: any) => async (dispatch: AppDispatch, _getState: () => RootState) => {
+export const createOrder = (orderData: any, navigate: NavigateFunction) => async (dispatch: AppDispatch, _getState: () => RootState) => {
     dispatch(getSalesOrderRequest());
 
     try {
@@ -334,7 +335,7 @@ export const createOrder = (orderData: any) => async (dispatch: AppDispatch, _ge
             showConfirmButton: false
         });
 
-        return data;
+        navigate("/sales/orders/order-view/" + data?.data?.id);
     } catch (error: any) {
         Swal.close();
         const message = error.response?.data?.message || "Something went wrong";

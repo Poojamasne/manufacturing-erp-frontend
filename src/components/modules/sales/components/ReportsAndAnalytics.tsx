@@ -40,7 +40,7 @@ const THEME = {
   primary: "#F59E0B",
   secondary: "#4fb29b",
   lightTeal: "#f3f4e6",
-  target: "#b0d9d9",
+  target: "#FCD34D",
   production: "#f08552",
   chart: ["#F59E0B", "#4fb29b", "#b0d9d9", "#f08552"],
 };
@@ -63,6 +63,13 @@ const ReportsAndAnalytics: FC = () => {
   const calendarRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const reportDropdownRef = useRef<HTMLDivElement>(null); // Added report ref
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 705);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 705);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   useEffect(() => {
     if (range === "Custom") {
@@ -100,7 +107,7 @@ const ReportsAndAnalytics: FC = () => {
     setIsReportDropdownOpen(false);
     if (reportType === "Employee Report") {
       alert("Employee Report generation is not implemented yet.");
-     };
+    };
     if (reportType === "Products Report") {
       dispatch(getProductsForOverviewReport());
     }
@@ -298,10 +305,21 @@ const ReportsAndAnalytics: FC = () => {
           </div>
           <div className="h-80 w-full">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={currentData.products} margin={{ left: -20 }} barGap={8}>
+              <BarChart data={currentData.products} margin={{ left: -20, bottom: 58 }} barGap={8}>
                 <CartesianGrid vertical={false} stroke="#f1f5f9" />
-                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: "#7e899c", fontSize: 10 }} dy={10} />
-                <YAxis axisLine={false} tickLine={false} tick={{ fill: "#7e899c", fontSize: 10 }} />
+                <XAxis
+                  dataKey="name"
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fill: "#7e899c", fontSize: 10, fontWeight: 650 }}
+                  interval={0}
+                  angle={isMobile ? -90 : 0}
+                  textAnchor={isMobile ? "end" : "middle"}
+                  dy={isMobile ? 10 : 10}
+                  dx={isMobile ? -5 : 0}
+                  height={isMobile ? 90 : 35}
+                />
+                <YAxis axisLine={false} tickLine={false} tick={{ fill: "#7e899c", fontSize: 10, fontWeight: 650 }} />
                 <Tooltip cursor={{ fill: "#f8fafc" }} contentStyle={{ borderRadius: "16px", border: "none" }} />
                 <Bar dataKey="target" fill={THEME.target} radius={[4, 4, 0, 0]} barSize={25} />
                 <Bar dataKey="sold" fill={THEME.primary} radius={[4, 4, 0, 0]} barSize={25} />
@@ -317,7 +335,7 @@ const ReportsAndAnalytics: FC = () => {
             <h3 className="font-bold text-lg text-gray-800 mb-8">Revenue Growth Trend</h3>
             <div className="h-full w-full">
               <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={currentData.revenue} margin={{ left: -20 }}>
+                <AreaChart data={currentData.revenue} margin={{ left: -4 }}>
                   <defs>
                     <linearGradient id="pGradient" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="5%" stopColor={THEME.primary} stopOpacity={0.2} />
@@ -325,8 +343,8 @@ const ReportsAndAnalytics: FC = () => {
                     </linearGradient>
                   </defs>
                   <CartesianGrid vertical={false} stroke="#f1f5f9" />
-                  <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: "#7e899c", fontSize: 10 }} dy={10} />
-                  <YAxis axisLine={false} tickLine={false} tick={{ fill: "#7e899c", fontSize: 10 }} />
+                  <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: "#7e899c", fontSize: 10 , fontWeight: 650 }} dy={10} />
+                  <YAxis axisLine={false} tickLine={false} tick={{ fill: "#7e899c", fontSize: 10, fontWeight: 650 }} />
                   <Tooltip formatter={(value) => [`₹${Number(value).toLocaleString('en-IN')}`, 'Revenue']} contentStyle={{ borderRadius: "16px", border: "none", boxShadow: "0 10px 15px -3px rgb(0 0 0 / 0.1)" }} />
                   <Area type="monotone" dataKey="val" stroke={THEME.primary} strokeWidth={4} fill="url(#pGradient)" />
                 </AreaChart>
@@ -356,7 +374,7 @@ const ReportsAndAnalytics: FC = () => {
                       <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: THEME.chart[i % THEME.chart.length] }} />
                       <span className="text-gray-400 uppercase tracking-widest">{s.name}</span>
                     </div>
-                    <span className="text-gray-800">{Math.round((s.value / currentData.sources.reduce((a: number, b: any) => a + b.value, 0)) * 100)}%</span>
+                    <span className="text-gray-600">{Math.round((s.value / currentData.sources.reduce((a: number, b: any) => a + b.value, 0)) * 100)}%</span>
                   </div>
                 ))}
               </div>
