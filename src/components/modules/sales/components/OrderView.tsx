@@ -124,56 +124,62 @@ const OrderView: React.FC = () => {
     return (
         <div className="min-h-screen bg-[#f4f7f6] p-4 sm:p-6 lg:p-8 font-sans text-gray-900">
             <div className="max-w-5xl mx-auto">
-                {/* Header */}
-                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
-                    <div>
-                        <div className="flex items-center gap-2 text-gray-400 mb-1">
-                            <button onClick={() => navigate("/sales/orders")} className="hover:text-[#F59E0B] transition-colors">Orders</button>
-                            <ChevronRight size={14} />
-                            <span className="text-slate-600 font-semibold">{order.order_id}</span>
-                        </div>
-                        <h1 className="text-2xl font-bold text-gray-800">Order Details</h1>
+                {/* Header Section */}
+                <div className="mb-10">
+                    <div className="flex items-center gap-2 text-slate-400 mb-2 text-[10px] font-black uppercase tracking-widest">
+                        <button onClick={() => navigate("/sales/orders")} className="hover:text-[#F59E0B] transition-colors">Orders</button>
+                        <ChevronRight size={12} />
+                        <span className="text-[#F59E0B]">{order.order_id || 'N/A'}</span>
                     </div>
 
-                    <div className="flex gap-3 w-full sm:w-auto">
-                        <button onClick={() => handleExport(order?.id)} className="flex-1 sm:flex-none flex items-center justify-center gap-1 bg-white text-gray-600  hover:text-[#F59E0B] px-4 py-2 rounded-xl font-bold text-sm border border-gray-200 shadow-sm hover:bg-gray-50 transition-all">
-                            <Download size={18} /> Download Report
-                        </button>
+                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                        <h1 className="text-3xl font-extrabold text-slate-800 tracking-tight">
+                            Order Details
+                        </h1>
 
-                        {/* CUSTOM DROPDOWN REPLACEMENT */}
-                        <div className="relative flex-1 sm:flex-none" ref={statusDropdownRef}>
-                            <button
-                                onClick={() => setIsStatusDropdownOpen(!isStatusDropdownOpen)}
-                                disabled={isUpdating}
-                                className="flex items-center justify-between gap-2 w-full min-w-40 text-[#F59E0B] bg-white px-4 py-2 rounded-xl font-bold text-sm shadow-lg border border-gray-100 hover:bg-gray-50 transition-all disabled:opacity-50"
-                            >
-                                <span className="truncate">
-                                    {isUpdating ? "Updating..." : (order.status === 'Pending' ? 'Order Place' : order.status || 'Order Place')}
-                                </span>
-                                {isUpdating ? (
-                                    <Loader2 size={14} className="animate-spin" />
-                                ) : (
-                                    <ChevronDown size={14} className={`transition-transform duration-200 ${isStatusDropdownOpen ? "rotate-180" : ""}`} />
+                        <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
+                            {/* CUSTOM STATUS DROPDOWN */}
+                            <div className="relative" ref={statusDropdownRef}>
+                                <button
+                                    onClick={() => setIsStatusDropdownOpen(!isStatusDropdownOpen)}
+                                    disabled={isUpdating}
+                                    className="flex items-center justify-between gap-3 px-4 py-2 rounded-xl border border-slate-200 bg-white text-sm font-bold shadow-sm hover:bg-slate-50 transition-all min-w-40"
+                                >
+                                    <span className={order.status === 'Cancelled' ? 'text-rose-600' : 'text-[#F59E0B]'}>
+                                        {isUpdating ? "Updating..." : (order.status === 'Pending' ? 'Order Place' : order.status || 'Order Place')}
+                                    </span>
+                                    {isUpdating ? (
+                                        <Loader2 size={14} className="animate-spin" />
+                                    ) : (
+                                        <ChevronDown size={14} className={`transition-transform duration-200 ${isStatusDropdownOpen ? 'rotate-180' : ''}`} />
+                                    )}
+                                </button>
+
+                                {isStatusDropdownOpen && (
+                                    <div className="absolute right-0 mt-2 bg-white border border-slate-100 rounded-2xl shadow-2xl z-50 py-2 w-full min-w-40">
+                                        {["Pending", "Processing", "Delivered", "Cancelled"].map((status) => (
+                                            <button
+                                                key={status}
+                                                onClick={() => handleStatusUpdate(status)}
+                                                className={`outline-none w-full text-left px-4 py-2.5 text-[13px] transition-colors ${(order.status || 'Pending') === status
+                                                    ? "text-[#F59E0B] font-bold bg-[#f3f4e6]/50"
+                                                    : "text-slate-600 hover:bg-slate-50"
+                                                    }`}
+                                            >
+                                                {status === 'Pending' ? 'Order Place' : status}
+                                            </button>
+                                        ))}
+                                    </div>
                                 )}
-                            </button>
+                            </div>
 
-                            {isStatusDropdownOpen && (
-                                <div className="absolute right-0 mt-2 bg-white border border-slate-100 rounded-2xl shadow-2xl z-50 py-2 w-full min-w-40">
-                                    {["Pending", "Processing", "Delivered", "Cancelled"].map((status) => (
-                                        <button
-                                            key={status}
-                                            onClick={() => handleStatusUpdate(status)}
-                                            className={`outline-none w-full text-left px-4 py-2.5 text-[13px] transition-colors ${
-                                                (order.status || 'Pending') === status
-                                                ? "text-[#F59E0B] font-bold bg-[#f3f4e6]/50"
-                                                : "text-slate-600 hover:bg-slate-50"
-                                            }`}
-                                        >
-                                            {status === 'Pending' ? 'Order Place' : status}
-                                        </button>
-                                    ))}
-                                </div>
-                            )}
+                            {/* Download Button */}
+                            <button
+                                onClick={() => handleExport(order?.id)}
+                                className="flex items-center justify-center gap-2 bg-white text-gray-600 hover:text-[#F59E0B] px-4 py-2 rounded-xl font-bold text-sm border border-gray-200 shadow-sm hover:bg-gray-50 transition-all whitespace-nowrap"
+                            >
+                                <Download size={16} /> Download Report
+                            </button>
                         </div>
                     </div>
                 </div>

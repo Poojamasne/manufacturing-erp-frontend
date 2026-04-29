@@ -1,5 +1,5 @@
 import React, { useMemo, useEffect } from 'react';
-import { ChevronRight, Calendar, Building2, Package, MapPin, Edit3,  Loader2, IndianRupee } from 'lucide-react';
+import { ChevronRight, Calendar, Building2, Package, MapPin, Edit3 } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 // 1. Redux Imports
 import { useAppDispatch, useAppSelector } from "../../../common/ReduxMainHooks";
@@ -21,7 +21,7 @@ const LeadView: React.FC = () => {
 
     // 2. Redux State & Dispatch
     const dispatch = useAppDispatch();
-    const { lead, loading } = useAppSelector((state: RootState) => state.SalesLeads);
+    const { lead } = useAppSelector((state: RootState) => state.SalesLeads);
 
     // 3. Fetch Lead Data on mount
     useEffect(() => {
@@ -77,19 +77,6 @@ const LeadView: React.FC = () => {
         return { qty, val };
     }, [lead]);
 
-    // 4. Loading State UI
-    if (loading && !lead) {
-        return (
-            <div className="min-h-screen flex items-center justify-center bg-[#f4f7f6]">
-                <div className="flex flex-col items-center gap-2">
-                    <Loader2 className="animate-spin text-[#F59E0B]" size={40} />
-                    <p className="text-sm font-bold text-[#F59E0B] uppercase tracking-widest">Fetching intelligence...</p>
-                </div>
-            </div>
-        );
-    }
-
-    if (!lead) return null;
 
     return (
         <div className="min-h-screen bg-[#f4f7f6] p-4 sm:p-6 lg:p-8 font-sans text-gray-900">
@@ -98,22 +85,17 @@ const LeadView: React.FC = () => {
                 {/* Header & Navigation */}
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
                     <div>
-                        <div className="flex items-center gap-2 text-gray-400 mb-1">
+                        <div className="flex items-center gap-2 text-gray-400">
                             <button onClick={() => navigate("/sales/leads")} className="hover:text-[#F59E0B] transition-colors">Leads</button>
                             <ChevronRight size={14} />
                             <span className="text-slate-600 font-semibold">{lead.lead_id}</span>
                         </div>
-                        <h1 className="text-2xl font-bold text-gray-800">Lead Detail</h1>
+                        <h1 className="text-2xl font-bold text-gray-800">Lead Details</h1>
                     </div>
-                    <div className="flex gap-3">
-                        {lead.status === "Won" && (
-                            <button className="flex items-center gap-2 bg-white text-gray-600 px-5 py-2.5 rounded-full font-bold text-sm border border-gray-200 shadow-sm hover:bg-gray-50 transition-all">
-                                <IndianRupee size={18} /> Create Opportunity
-                            </button>
-                        )}
+                    <div className="mt-3.25">
                         <button
                             onClick={() => navigate(`/sales/leads/edit-lead/${lead.id}`)}
-                            className="flex items-center gap-2 bg-[#F59E0B] text-white px-6 py-2.5 rounded-full font-bold text-sm shadow-lg shadow-amber-500/5 hover:bg-[#f67317] transition-all">
+                            className="flex items-center gap-1 bg-[#F59E0B] text-white px-4 py-2 rounded-xl font-bold text-sm shadow-lg shadow-amber-500/5 hover:bg-[#f67317] transition-all">
                             <Edit3 size={18} /> Edit Lead
                         </button>
                     </div>

@@ -217,7 +217,7 @@ const EditLead: React.FC = () => {
                         <h1 className="text-3xl font-black text-slate-900 tracking-tight">Edit Lead: {lead?.lead_id}</h1>
                     </div>
                     <div className="flex gap-3 w-full md:w-auto">
-                        <button type="button" onClick={() => navigate("/sales/leads")} className="flex-1 md:flex-none px-4 py-2 rounded-xl font-bold text-sm bg-white border border-slate-200 hover:bg-slate-50 hover:text-amber-500 transition-all">Cancel</button>
+                        <button type="button" onClick={() => navigate(`/sales/leads/view-lead/${id}`)} className="flex-1 md:flex-none px-4 py-2 rounded-xl font-bold text-sm bg-white border border-slate-200 hover:bg-slate-50 hover:text-amber-500 transition-all">Cancel</button>
                         <button type="button" onClick={handleSubmit} disabled={isSubmitting} className="flex-1 md:flex-none px-2.5 py-2 rounded-xl font-bold text-sm text-white bg-[#F59E0B] shadow-lg shadow-amber-500/5 hover:bg-[#f67317] transition-all flex items-center justify-center gap-2">
                             {isSubmitting ? "Updating..." : <><Save size={18} /> Update Lead</>}
                         </button>
