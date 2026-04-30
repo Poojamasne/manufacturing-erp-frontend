@@ -224,10 +224,10 @@ const ProductionReports: React.FC = () => {
   // Filter orders
   const filteredOrders = useMemo(() => {
     let filtered = [...productionOrders];
-    
+
     if (searchQuery) {
-      filtered = filtered.filter(o => 
-        o.productionOrderId.toLowerCase().includes(searchQuery.toLowerCase()) || 
+      filtered = filtered.filter(o =>
+        o.productionOrderId.toLowerCase().includes(searchQuery.toLowerCase()) ||
         o.productName.toLowerCase().includes(searchQuery.toLowerCase()) ||
         o.salesOrderId.toLowerCase().includes(searchQuery.toLowerCase())
       );
@@ -235,7 +235,7 @@ const ProductionReports: React.FC = () => {
     if (statusFilter !== "All") filtered = filtered.filter(o => o.status === statusFilter);
     if (priorityFilter !== "All") filtered = filtered.filter(o => o.priority === priorityFilter);
     if (shiftFilter !== "All") filtered = filtered.filter(o => o.shift === shiftFilter);
-    
+
     filtered = filtered.filter((order) => {
       const orderDate = new Date(order.createdAt);
       const now = new Date();
@@ -266,9 +266,9 @@ const ProductionReports: React.FC = () => {
     else setSelectedIds(paginatedOrders.map(o => o.id));
   };
 
-  const handleViewDetails = (order: ProductionOrder) => { 
-    setSelectedOrder(order); 
-    setShowDetailsModal(true); 
+  const handleViewDetails = (order: ProductionOrder) => {
+    setSelectedOrder(order);
+    setShowDetailsModal(true);
   };
 
   //eslint-disable-next-line react-hooks/exhaustive-deps
@@ -288,9 +288,9 @@ const ProductionReports: React.FC = () => {
   };
 
   const handleCreatePO = (materialName: string) => {
-    setMaterialAlerts(prev => 
-      prev.map(m => m.materialName === materialName && m.shortage > 0 
-        ? { ...m, shortage: 0, status: "OK" } 
+    setMaterialAlerts(prev =>
+      prev.map(m => m.materialName === materialName && m.shortage > 0
+        ? { ...m, shortage: 0, status: "OK" }
         : m
       )
     );
@@ -308,7 +308,7 @@ const ProductionReports: React.FC = () => {
   return (
     <div className="min-h-screen bg-[#f4f7f6] p-4 sm:p-6 lg:p-8 text-slate-900 font-sans">
       <div className="max-w-7xl mx-auto">
-        
+
         {/* Success Toast Message */}
         {successMessage && (
           <div className="fixed top-4 right-4 z-50 animate-in slide-in-from-top-2 fade-in duration-300">
@@ -332,22 +332,22 @@ const ProductionReports: React.FC = () => {
 
           {/* Global Time Filter */}
           <div className="relative" ref={dropdownRef}>
-            <button 
-              onClick={() => setIsTimeDropdownOpen(!isTimeDropdownOpen)} 
-              className="px-4 py-2 rounded-xl border border-slate-200 bg-white text-sm font-medium shadow-sm flex items-center gap-2 text-gray-700"
+            <button
+              onClick={() => setIsTimeDropdownOpen(!isTimeDropdownOpen)}
+              className="px-4 py-2 outline-none rounded-xl border border-slate-200 bg-white text-sm font-medium shadow-sm flex items-center gap-2 text-gray-700"
             >
-              <Filter size={16} className="text-orange-500" />
+              <Filter size={16} className="text-[#F59E0B]" />
               <span>{getFilterDisplayText()}</span>
               <ChevronDown size={14} className={isTimeDropdownOpen ? "rotate-180" : ""} />
             </button>
             {isTimeDropdownOpen && !isCalendarOpen && (
               <div className="absolute right-0 mt-2 bg-white border border-slate-100 rounded-2xl shadow-2xl z-50 py-2 min-w-40">
-                {["Weekly", "Monthly", "Quarterly", "Yearly", "All Time"].map(tab => (
-                  <button key={tab} onClick={() => handleTimeFilterChange(tab as TimeFilter)} className={`w-full text-left px-4 py-2.5 text-[13px] ${timeFilter === tab ? "text-orange-600 font-bold bg-orange-50/50" : "text-slate-600 hover:bg-slate-50"}`}>
+                {["All Time", "Weekly", "Monthly", "Quarterly", "Yearly"].map(tab => (
+                  <button key={tab} onClick={() => handleTimeFilterChange(tab as TimeFilter)} className={` outline-none w-full text-left px-4 py-2.5 text-[13px] ${timeFilter === tab ? "text-amber-500 font-bold bg-orange-50/50" : "text-slate-600 hover:bg-slate-50"}`}>
                     {tab}
                   </button>
                 ))}
-                <button onClick={() => handleTimeFilterChange("Custom")} className={`w-full text-left px-4 py-2.5 text-[13px] ${timeFilter === "Custom" ? "text-orange-600 font-bold bg-orange-50/50" : "text-slate-600 hover:bg-slate-50"}`}>Custom</button>
+                <button onClick={() => handleTimeFilterChange("Custom")} className={`w-full text-left px-4 py-2.5 text-[13px] ${timeFilter === "Custom" ? "text-amber-500 font-bold bg-orange-50/50" : "text-slate-600 hover:bg-slate-50"}`}>Custom</button>
               </div>
             )}
             {isCalendarOpen && (
@@ -355,7 +355,7 @@ const ProductionReports: React.FC = () => {
                 <div className="space-y-3">
                   <input type="date" value={customRange.start} onChange={(e) => setCustomRange({ ...customRange, start: e.target.value })} className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500/20" />
                   <input type="date" value={customRange.end} min={customRange.start} onChange={(e) => setCustomRange({ ...customRange, end: e.target.value })} className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500/20" />
-                  <button onClick={handleCustomApply} className="w-full bg-orange-500 text-white py-2 rounded-lg text-sm font-bold hover:bg-orange-600">Apply Range</button>
+                  <button onClick={handleCustomApply} className="w-full bg-[#F59E0B] text-white py-2 rounded-lg text-sm font-bold hover:bg-[#f67317]">Apply Range</button>
                 </div>
               </div>
             )}
@@ -366,35 +366,35 @@ const ProductionReports: React.FC = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
           <div className="bg-white p-6 rounded-2xl border-l-4 border-orange-500 shadow-sm hover:shadow-md transition">
             <div className="flex items-center justify-between mb-2">
-              <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">Total Orders</p>
-              <Factory size={20} className="text-orange-500" />
+              <p className="text-[11px] font-bold text-gray-800 uppercase tracking-widest">Total Orders</p>
+              <Factory size={20} className="text-[#F59E0B]" />
             </div>
-            <h3 className="text-2xl font-extrabold text-gray-800">{stats.totalOrders}</h3>
+            <h3 className="text-2xl font-extrabold text-gray-700">{stats.totalOrders}</h3>
           </div>
           <div className="bg-white p-6 rounded-2xl border-l-4 border-blue-500 shadow-sm hover:shadow-md transition">
             <div className="flex items-center justify-between mb-2">
-              <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">In Progress</p>
+              <p className="text-[11px] font-bold text-gray-800 uppercase tracking-widest">In Progress</p>
               <Play size={20} className="text-blue-500" />
             </div>
-            <h3 className="text-2xl font-extrabold text-gray-800">{stats.inProgress}</h3>
+            <h3 className="text-2xl font-extrabold text-gray-700">{stats.inProgress}</h3>
           </div>
           <div className="bg-white p-6 rounded-2xl border-l-4 border-green-500 shadow-sm hover:shadow-md transition">
             <div className="flex items-center justify-between mb-2">
-              <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">Completed</p>
+              <p className="text-[11px] font-bold text-gray-800 uppercase tracking-widest">Completed</p>
               <CheckCircle size={20} className="text-green-500" />
             </div>
-            <h3 className="text-2xl font-extrabold text-gray-800">{stats.completed}</h3>
+            <h3 className="text-2xl font-extrabold text-gray-700">{stats.completed}</h3>
           </div>
           <div className="bg-white p-6 rounded-2xl border-l-4 border-purple-500 shadow-sm hover:shadow-md transition">
             <div className="flex items-center justify-between mb-2">
-              <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">Planned/Scheduled</p>
+              <p className="text-[11px] font-bold text-gray-800 uppercase tracking-widest">Scheduled</p>
               <Calendar size={20} className="text-purple-500" />
             </div>
-            <h3 className="text-2xl font-extrabold text-gray-800">{stats.planned}</h3>
+            <h3 className="text-2xl font-extrabold text-gray-700">{stats.planned}</h3>
           </div>
           <div className="bg-white p-6 rounded-2xl border-l-4 border-red-500 shadow-sm hover:shadow-md transition">
             <div className="flex items-center justify-between mb-2">
-              <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">Material Shortages</p>
+              <p className="text-[11px] font-bold text-gray-800 uppercase tracking-widest">Material Shortages</p>
               <AlertTriangle size={20} className="text-red-500" />
             </div>
             <h3 className="text-2xl font-extrabold text-red-600">{stats.materialShortages}</h3>
@@ -420,7 +420,7 @@ const ProductionReports: React.FC = () => {
                         <span>Available: <strong>{material.availableQty.toLocaleString()} {material.unit}</strong></span>
                         <span className="text-red-600">Shortage: <strong>{material.shortage.toLocaleString()} {material.unit}</strong></span>
                       </div>
-                      <button onClick={() => handleCreatePO(material.materialName)} className="px-3 py-1.5 bg-orange-500 text-white rounded-lg text-sm hover:bg-orange-600 transition">
+                      <button onClick={() => handleCreatePO(material.materialName)} className="px-3 py-1.5 bg-[#F59E0B] text-white rounded-lg text-sm hover:bg-[#f67317] transition">
                         Create PO
                       </button>
                     </div>
@@ -433,7 +433,7 @@ const ProductionReports: React.FC = () => {
 
         {/* Charts and Insights Grid - Matching Dashboard Graph UI */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
-          
+
           {/* Efficiency Trend Chart - Same as Dashboard Production Trend */}
           <div className="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
             <div className="flex justify-between items-center mb-12">
@@ -445,14 +445,14 @@ const ProductionReports: React.FC = () => {
               </div>
               <div className="flex gap-4">
                 <div className="flex items-center gap-2 text-xs font-medium text-gray-500">
-                  <div className="w-2 h-2 rounded-full bg-orange-500" /> Actual
+                  <div className="w-2 h-2 rounded-full bg-[#F59E0B]" /> Actual
                 </div>
                 <div className="flex items-center gap-2 text-xs font-medium text-gray-500">
                   <div className="w-2 h-2 rounded-full bg-slate-300" /> Target (80%)
                 </div>
               </div>
             </div>
-            
+
             <div className="h-64 flex">
               {/* Y-Axis */}
               <div className="flex flex-col justify-between h-full text-[11px] text-gray-400 mr-2">
@@ -482,7 +482,7 @@ const ProductionReports: React.FC = () => {
                           style={{ height: `${(point.target / maxValue) * 100}%` }}
                         />
                         <div
-                          className="w-4 bg-orange-500 rounded-t transition-all duration-300 cursor-pointer relative"
+                          className="w-4 bg-[#F59E0B] rounded-t transition-all duration-300 cursor-pointer relative"
                           style={{ height: `${(point.actual / maxValue) * 100}%` }}
                           onMouseEnter={() => setHoveredShift(idx)}
                           onMouseLeave={() => setHoveredShift(null)}
@@ -507,7 +507,7 @@ const ProductionReports: React.FC = () => {
                 </div>
               </div>
             </div>
-            
+
             <div className="mt-14 pt-4 border-t border-slate-100 flex justify-between items-center">
               <div className="flex items-center gap-4">
                 <div className="flex items-center gap-4">
@@ -522,7 +522,7 @@ const ProductionReports: React.FC = () => {
                 <div className="w-px h-4 bg-gray-200" />
                 <div className="flex items-center gap-2">
                   <span className="text-[11px] text-gray-500">Best Shift:</span>
-                  <span className="text-sm font-bold text-orange-600">{bestShift.label}</span>
+                  <span className="text-sm font-bold text-amber-500">{bestShift.label}</span>
                 </div>
               </div>
               <div className="text-[10px] text-gray-400">Hover bars for details</div>
@@ -540,7 +540,7 @@ const ProductionReports: React.FC = () => {
                 <p className="text-sm text-gray-400">Root Cause Breakdown</p>
               </div>
               <div className="text-right">
-                <p className="text-2xl font-extrabold text-gray-800">{formatTime(totalDowntimeMinutes)}</p>
+                <p className="text-2xl font-extrabold text-gray-700">{formatTime(totalDowntimeMinutes)}</p>
                 <p className="text-[10px] text-gray-400">total idle time</p>
               </div>
             </div>
@@ -604,21 +604,19 @@ const ProductionReports: React.FC = () => {
         <div className="flex gap-3 mb-6">
           <button
             onClick={() => setActiveView("orders")}
-            className={`px-5 py-2.5 text-sm font-bold rounded-xl transition-all flex items-center gap-2 ${
-              activeView === "orders" 
-                ? "bg-orange-500 text-white shadow-md" 
-                : "bg-white text-slate-600 border border-slate-200 hover:bg-slate-50"
-            }`}
+            className={`px-4 py-2 outline-none text-sm font-bold rounded-xl transition-all flex items-center gap-2 ${activeView === "orders"
+              ? "bg-[#F59E0B] text-white shadow-md"
+              : "bg-white text-slate-600 border border-slate-200 hover:bg-slate-50"
+              }`}
           >
             <Factory size={16} /> Production Orders
           </button>
           <button
             onClick={() => setActiveView("materials")}
-            className={`px-5 py-2.5 text-sm font-bold rounded-xl transition-all flex items-center gap-2 ${
-              activeView === "materials" 
-                ? "bg-orange-500 text-white shadow-md" 
-                : "bg-white text-slate-600 border border-slate-200 hover:bg-slate-50"
-            }`}
+            className={`px-4 py-2 outline-none text-sm font-bold rounded-xl transition-all flex items-center gap-2 ${activeView === "materials"
+              ? "bg-[#F59E0B] text-white shadow-md"
+              : "bg-white text-slate-600 border border-slate-200 hover:bg-slate-50"
+              }`}
           >
             <Package size={16} /> Material Requirements
           </button>
@@ -627,15 +625,15 @@ const ProductionReports: React.FC = () => {
         {/* Production Orders Table - Matching Table Style from Other Pages */}
         {activeView === "orders" && (
           <div className="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
-            
+
             {/* Toolbar */}
             <div className="p-6 flex flex-col lg:flex-row justify-between items-center gap-4 border-b border-slate-50">
               <div className="relative w-full lg:w-96">
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" size={18} />
-                <input 
-                  type="text" 
-                  placeholder="Search by PO ID, Sales Order, or Product..." 
-                  className="w-full pl-12 pr-4 py-3.5 bg-slate-50 border-transparent rounded-2xl focus:bg-white focus:ring-4 focus:ring-orange-500/5 text-sm outline-none" 
+                <input
+                  type="text"
+                  placeholder="Search by PO ID, Sales Order, or Product..."
+                  className="w-full pl-12 pr-4 py-3.5 bg-slate-50 border-transparent rounded-2xl focus:bg-white focus:ring-4 focus:ring-orange-500/5 text-sm outline-none"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
@@ -643,29 +641,29 @@ const ProductionReports: React.FC = () => {
               <div className="flex flex-wrap gap-3">
                 {/* Status Filter */}
                 <div className="relative" ref={statusDropdownRef}>
-                  <button onClick={() => setActiveDropdown(activeDropdown === "status" ? null : "status")} className={`px-4 py-3 rounded-xl border text-[13px] font-bold flex items-center gap-2 ${statusFilter !== "All" ? "bg-orange-50 border-orange-200 text-orange-600" : "bg-white border-slate-200 text-slate-600"}`}>
+                  <button onClick={() => setActiveDropdown(activeDropdown === "status" ? null : "status")} className={`px-4 py-3 rounded-xl border text-[13px] font-bold flex items-center gap-2 ${statusFilter !== "All" ? "bg-orange-50 border-orange-200 text-amber-500" : "bg-white border-slate-200 text-slate-600"}`}>
                     {statusFilter === "All" ? "Status" : statusFilter.replace("_", " ")} <ChevronDown size={14} className={activeDropdown === "status" ? "rotate-180" : ""} />
                   </button>
                   {activeDropdown === "status" && (
                     <div className="absolute right-0 mt-2 w-40 bg-white rounded-2xl shadow-2xl z-50 py-2">
                       {statusOptions.map(opt => (
-                        <button key={opt} onClick={() => { setStatusFilter(opt); setActiveDropdown(null); }} className={`w-full text-left px-4 py-2 text-[13px] hover:bg-slate-50 ${statusFilter === opt ? "text-orange-600 font-bold bg-orange-50/50" : "text-slate-600"}`}>
+                        <button key={opt} onClick={() => { setStatusFilter(opt); setActiveDropdown(null); }} className={`w-full text-left px-4 py-2 text-[13px] hover:bg-slate-50 ${statusFilter === opt ? "text-amber-500 font-bold bg-orange-50/50" : "text-slate-600"}`}>
                           {opt === "All" ? "All" : opt.replace("_", " ")}
                         </button>
                       ))}
                     </div>
                   )}
                 </div>
-                
+
                 {/* Priority Filter */}
                 <div className="relative" ref={priorityDropdownRef}>
-                  <button onClick={() => setActiveDropdown(activeDropdown === "priority" ? null : "priority")} className={`px-4 py-3 rounded-xl border text-[13px] font-bold flex items-center gap-2 ${priorityFilter !== "All" ? "bg-orange-50 border-orange-200 text-orange-600" : "bg-white border-slate-200 text-slate-600"}`}>
+                  <button onClick={() => setActiveDropdown(activeDropdown === "priority" ? null : "priority")} className={`px-4 py-3 rounded-xl border text-[13px] font-bold flex items-center gap-2 ${priorityFilter !== "All" ? "bg-orange-50 border-orange-200 text-amber-500" : "bg-white border-slate-200 text-slate-600"}`}>
                     {priorityFilter === "All" ? "Priority" : priorityFilter} <ChevronDown size={14} className={activeDropdown === "priority" ? "rotate-180" : ""} />
                   </button>
                   {activeDropdown === "priority" && (
                     <div className="absolute right-0 mt-2 w-32 bg-white rounded-2xl shadow-2xl z-50 py-2">
                       {priorityOptions.map(opt => (
-                        <button key={opt} onClick={() => { setPriorityFilter(opt); setActiveDropdown(null); }} className={`w-full text-left px-4 py-2 text-[13px] hover:bg-slate-50 ${priorityFilter === opt ? "text-orange-600 font-bold bg-orange-50/50" : "text-slate-600"}`}>
+                        <button key={opt} onClick={() => { setPriorityFilter(opt); setActiveDropdown(null); }} className={`w-full text-left px-4 py-2 text-[13px] hover:bg-slate-50 ${priorityFilter === opt ? "text-amber-500 font-bold bg-orange-50/50" : "text-slate-600"}`}>
                           {opt}
                         </button>
                       ))}
@@ -675,13 +673,13 @@ const ProductionReports: React.FC = () => {
 
                 {/* Shift Filter */}
                 <div className="relative" ref={shiftDropdownRef}>
-                  <button onClick={() => setActiveDropdown(activeDropdown === "shift" ? null : "shift")} className={`px-4 py-3 rounded-xl border text-[13px] font-bold flex items-center gap-2 ${shiftFilter !== "All" ? "bg-orange-50 border-orange-200 text-orange-600" : "bg-white border-slate-200 text-slate-600"}`}>
+                  <button onClick={() => setActiveDropdown(activeDropdown === "shift" ? null : "shift")} className={`px-4 py-3 rounded-xl border text-[13px] font-bold flex items-center gap-2 ${shiftFilter !== "All" ? "bg-orange-50 border-orange-200 text-amber-500" : "bg-white border-slate-200 text-slate-600"}`}>
                     {shiftFilter === "All" ? "Shift" : getShiftLabel(shiftFilter as Shift)} <ChevronDown size={14} className={activeDropdown === "shift" ? "rotate-180" : ""} />
                   </button>
                   {activeDropdown === "shift" && (
                     <div className="absolute right-0 mt-2 w-40 bg-white rounded-2xl shadow-2xl z-50 py-2">
                       {shiftOptions.map(opt => (
-                        <button key={opt} onClick={() => { setShiftFilter(opt); setActiveDropdown(null); }} className={`w-full text-left px-4 py-2 text-[13px] hover:bg-slate-50 ${shiftFilter === opt ? "text-orange-600 font-bold bg-orange-50/50" : "text-slate-600"}`}>
+                        <button key={opt} onClick={() => { setShiftFilter(opt); setActiveDropdown(null); }} className={`w-full text-left px-4 py-2 text-[13px] hover:bg-slate-50 ${shiftFilter === opt ? "text-amber-500 font-bold bg-orange-50/50" : "text-slate-600"}`}>
                           {opt === "All" ? "All" : getShiftLabel(opt as Shift)}
                         </button>
                       ))}
@@ -706,7 +704,11 @@ const ProductionReports: React.FC = () => {
                 <thead>
                   <tr className="bg-slate-50/50">
                     <th className="w-12 p-5 text-center border-b border-slate-100">
-                      <input type="checkbox" className="accent-orange-500 w-4 h-4 cursor-pointer" checked={paginatedOrders.length > 0 && selectedIds.length === paginatedOrders.length} onChange={toggleSelectAll} />
+                      <input type="checkbox"
+                        className="h-4 w-4 cursor-pointer appearance-none rounded border border-slate-300 bg-white transition-all relative checked:bg-[#F59E0B] checked:border-[#F59E0B] after:content-[''] after:absolute after:opacity-0 checked:after:opacity-100 after:left-1.25 after:top-px after:w-1 after:h-2 after:border-white after:border-r-2 after:border-b-2 after:rotate-45 outline-none"
+                        checked={paginatedOrders.length > 0 && selectedIds.length === paginatedOrders.length}
+                        onChange={toggleSelectAll}
+                      />
                     </th>
                     <th className="px-4 py-4 text-[11px] text-slate-800 uppercase tracking-widest text-center">PO ID</th>
                     <th className="px-4 py-4 text-[11px] text-slate-800 uppercase tracking-widest text-center">PRODUCT</th>
@@ -724,10 +726,12 @@ const ProductionReports: React.FC = () => {
                   {paginatedOrders.map((order) => (
                     <tr key={order.id} className="group hover:bg-orange-50/20 transition-colors">
                       <td className="p-5 text-center">
-                        <input type="checkbox" className="accent-orange-500 w-4 h-4 cursor-pointer" checked={selectedIds.includes(order.id)} onChange={() => { 
-                          if (selectedIds.includes(order.id)) setSelectedIds(selectedIds.filter(id => id !== order.id)); 
-                          else setSelectedIds([...selectedIds, order.id]); 
-                        }} />
+                        <input type="checkbox"
+                          className="h-4 w-4 cursor-pointer appearance-none rounded border border-slate-300 bg-white transition-all relative checked:bg-[#F59E0B] checked:border-[#F59E0B] after:content-[''] after:absolute after:opacity-0 checked:after:opacity-100 after:left-1.25 after:top-px after:w-1 after:h-2 after:border-white after:border-r-2 after:border-b-2 after:rotate-45 outline-none"
+                          checked={selectedIds.includes(order.id)} onChange={() => {
+                            if (selectedIds.includes(order.id)) setSelectedIds(selectedIds.filter(id => id !== order.id));
+                            else setSelectedIds([...selectedIds, order.id]);
+                          }} />
                       </td>
                       <td className="px-4 py-4 text-[13px] font-mono font-bold text-slate-800 text-center whitespace-nowrap">{order.productionOrderId}</td>
                       <td className="px-4 py-4 text-[13px] text-slate-700 text-center truncate max-w-37.5">{order.productName}</td>
@@ -742,26 +746,26 @@ const ProductionReports: React.FC = () => {
                       <td className="px-4 py-4">
                         <div className="flex items-center justify-center gap-2">
                           <div className="w-20 h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                            <div className="h-full bg-orange-500 rounded-full transition-all" style={{ width: `${order.progress}%` }} />
+                            <div className="h-full bg-[#F59E0B] rounded-full transition-all" style={{ width: `${order.progress}%` }} />
                           </div>
                           <span className="text-[11px] font-semibold text-slate-600">{order.progress}%</span>
                         </div>
                       </td>
                       <td className="px-4 py-4">
                         <div className="flex justify-center gap-2">
-                          <button onClick={() => handleViewDetails(order)} className="p-1.5 text-slate-400 hover:text-orange-500 transition-colors" title="View Details">
+                          <button onClick={() => handleViewDetails(order)} className="p-1.5 text-slate-400 hover:text-[#F59E0B] transition-colors" title="View Details">
                             <Eye size={16} />
                           </button>
                           <button onClick={() => handleDelete(order.id)} className="p-1.5 text-slate-400 hover:text-rose-600 transition-colors" title="Delete">
                             <Trash2 size={16} />
                           </button>
                         </div>
-                       </td>
-                     </tr>
+                      </td>
+                    </tr>
                   ))}
                 </tbody>
               </table>
-              
+
               {filteredOrders.length === 0 && (
                 <div className="py-32 flex flex-col items-center justify-center text-center">
                   <div className="p-6 bg-slate-50 rounded-full mb-4">
@@ -780,13 +784,13 @@ const ProductionReports: React.FC = () => {
                   Showing {(currentPage - 1) * itemsPerPage + 1} to {Math.min(currentPage * itemsPerPage, filteredOrders.length)} of {filteredOrders.length} Orders
                 </div>
                 <div className="flex items-center gap-2">
-                  <button onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1} className="p-2.5 rounded-xl border border-slate-200 bg-white text-slate-500 hover:text-orange-600 disabled:opacity-30">
+                  <button onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1} className="p-2.5 rounded-xl border border-slate-200 bg-white text-slate-500 hover:text-amber-500 disabled:opacity-30">
                     <ChevronLeft size={18} />
                   </button>
                   <div className="flex gap-1.5">
-                    {getPageNumbers().map((page, i) => page === "..." ? (<span key={i} className="px-2 text-slate-300"><MoreHorizontal size={14} /></span>) : (<button key={i} onClick={() => setCurrentPage(page as number)} className={`min-w-10 h-10 rounded-xl text-xs font-bold ${currentPage === page ? "bg-orange-500 text-white shadow-lg" : "bg-white text-slate-500 border border-slate-200"}`}>{page}</button>))}
+                    {getPageNumbers().map((page, i) => page === "..." ? (<span key={i} className="px-2 text-slate-300"><MoreHorizontal size={14} /></span>) : (<button key={i} onClick={() => setCurrentPage(page as number)} className={`min-w-10 h-10 rounded-xl text-xs font-bold ${currentPage === page ? "bg-[#F59E0B] text-white shadow-lg" : "bg-white text-slate-500 border border-slate-200"}`}>{page}</button>))}
                   </div>
-                  <button onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages} className="p-2.5 rounded-xl border border-slate-200 bg-white text-slate-500 hover:text-orange-600 disabled:opacity-30">
+                  <button onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages} className="p-2.5 rounded-xl border border-slate-200 bg-white text-slate-500 hover:text-amber-500 disabled:opacity-30">
                     <ChevronRight size={18} />
                   </button>
                 </div>
@@ -802,7 +806,7 @@ const ProductionReports: React.FC = () => {
               <h3 className="text-lg font-bold text-slate-800">Bill of Materials & Inventory Check</h3>
               <p className="text-sm text-slate-500 mt-1">Raw material requirements for active production orders</p>
             </div>
-            
+
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead className="bg-slate-50/50">
@@ -839,7 +843,7 @@ const ProductionReports: React.FC = () => {
                       </td>
                       <td className="px-6 py-4 text-center">
                         {material.shortage > 0 && (
-                          <button onClick={() => handleCreatePO(material.materialName)} className="px-3 py-1.5 bg-orange-500 text-white text-xs font-medium rounded-lg hover:bg-orange-600 transition">
+                          <button onClick={() => handleCreatePO(material.materialName)} className="outline-none px-4 py-2 bg-[#F59E0B] text-white text-xs font-medium rounded-lg hover:bg-[#f67317] transition">
                             Create PO
                           </button>
                         )}
@@ -924,13 +928,13 @@ const ProductionReports: React.FC = () => {
                   <span className="text-xs font-semibold">{selectedOrder.progress}%</span>
                 </div>
                 <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-                  <div className="h-full bg-orange-500 rounded-full" style={{ width: `${selectedOrder.progress}%` }} />
+                  <div className="h-full bg-[#F59E0B] rounded-full" style={{ width: `${selectedOrder.progress}%` }} />
                 </div>
               </div>
             </div>
             <div className="sticky bottom-0 bg-white border-t p-6 flex justify-between">
               <button onClick={() => setShowDetailsModal(false)} className="px-6 py-2 bg-gray-100 rounded-xl text-sm font-medium hover:bg-gray-200 transition-colors">Close</button>
-              <button className="px-6 py-2 bg-orange-500 text-white rounded-xl text-sm font-medium hover:bg-orange-600 transition-colors flex items-center gap-2">
+              <button className="px-6 py-2 bg-[#F59E0B] text-white rounded-xl text-sm font-medium hover:bg-[#f67317] transition-colors flex items-center gap-2">
                 <Printer size={16} /> Print Instructions
               </button>
             </div>

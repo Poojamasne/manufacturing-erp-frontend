@@ -367,7 +367,7 @@ const ProductionDashboard: React.FC = () => {
         {successMessage && (
           <div className="fixed top-4 right-4 z-50 animate-in slide-in-from-top-2 fade-in duration-300">
             <div className="bg-green-500 text-white px-4 py-3 rounded-lg shadow-lg flex items-center gap-2">
-              <Check size={18} />
+              <Check size={18}  className="outline-none "/>
               <span className="text-sm font-medium">{successMessage}</span>
             </div>
           </div>
@@ -388,13 +388,13 @@ const ProductionDashboard: React.FC = () => {
           <div className="relative" ref={dropdownRef}>
             <button
               onClick={() => setIsTimeDropdownOpen(!isTimeDropdownOpen)}
-              className="px-4 py-2 rounded-xl border border-slate-200 bg-white text-sm font-medium shadow-sm flex items-center gap-2 text-gray-700"
+              className="outline-none px-4 py-2 rounded-xl border border-slate-200 bg-white text-sm font-medium shadow-sm flex items-center gap-2 text-gray-700"
             >
-              <Filter size={16} className="text-orange-500" />
+              <Filter size={16} className="outline-none text-[#F59E0B]" />
               <span>{getFilterDisplayText()}</span>
               <ChevronDown
                 size={14}
-                className={isTimeDropdownOpen ? "rotate-180" : ""}
+                className={isTimeDropdownOpen ? "outline-none rotate-180" : ""}
               />
             </button>
             {isTimeDropdownOpen && !isCalendarOpen && (
@@ -404,7 +404,7 @@ const ProductionDashboard: React.FC = () => {
                     <button
                       key={tab}
                       onClick={() => handleTimeFilterChange(tab as TimeFilter)}
-                      className={`w-full text-left px-4 py-2.5 text-[13px] ${timeFilter === tab ? "text-orange-600 font-bold bg-orange-50/50" : "text-slate-600 hover:bg-slate-50"}`}
+                      className={`outline-none w-full text-left px-4 py-2 text-[13px] ${timeFilter === tab ? "text-amber-500 font-bold bg-orange-50/50" : "text-slate-600 hover:bg-slate-50"}`}
                     >
                       {tab}
                     </button>
@@ -412,7 +412,7 @@ const ProductionDashboard: React.FC = () => {
                 )}
                 <button
                   onClick={() => handleTimeFilterChange("Custom")}
-                  className={`w-full text-left px-4 py-2.5 text-[13px] ${timeFilter === "Custom" ? "text-orange-600 font-bold bg-orange-50/50" : "text-slate-600 hover:bg-slate-50"}`}
+                  className={`outline-none w-full text-left px-4 py-2 text-[13px] ${timeFilter === "Custom" ? "text-amber-500 font-bold bg-orange-50/50" : "text-slate-600 hover:bg-slate-50"}`}
                 >
                   Custom
                 </button>
@@ -430,7 +430,7 @@ const ProductionDashboard: React.FC = () => {
                     onChange={(e) =>
                       setCustomRange({ ...customRange, start: e.target.value })
                     }
-                    className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500/20"
+                    className="outline-none w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500/20"
                   />
                   <input
                     type="date"
@@ -439,11 +439,11 @@ const ProductionDashboard: React.FC = () => {
                     onChange={(e) =>
                       setCustomRange({ ...customRange, end: e.target.value })
                     }
-                    className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500/20"
+                    className="outline-none w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500/20"
                   />
                   <button
                     onClick={handleCustomApply}
-                    className="w-full bg-orange-500 text-white py-2 rounded-lg text-sm font-bold hover:bg-orange-600"
+                    className="outline-none w-full bg-[#F59E0B] text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-[#f67317]"
                   >
                     Apply Range
                   </button>
@@ -457,12 +457,12 @@ const ProductionDashboard: React.FC = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <div className="bg-white p-6 rounded-2xl border-l-4 border-orange-500 shadow-sm hover:shadow-md transition">
             <div className="flex items-center justify-between mb-2">
-              <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">
+              <p className="text-[11px] font-bold text-gray-800 uppercase tracking-widest">
                 Pending Orders
               </p>
-              <Clock size={20} className="text-orange-500" />
+              <Clock size={20} className="outline-none text-[#F59E0B]" />
             </div>
-            <h3 className="text-2xl font-extrabold text-gray-800">
+            <h3 className="text-2xl font-extrabold text-gray-700">
               {stats.pendingOrders}
             </h3>
             <p className="text-xs text-gray-500 mt-1">Awaiting production</p>
@@ -470,12 +470,12 @@ const ProductionDashboard: React.FC = () => {
 
           <div className="bg-white p-6 rounded-2xl border-l-4 border-blue-500 shadow-sm hover:shadow-md transition">
             <div className="flex items-center justify-between mb-2">
-              <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">
+              <p className="text-[11px] font-bold text-gray-800 uppercase tracking-widest">
                 In Progress
               </p>
-              <Factory size={20} className="text-blue-500" />
+              <Factory size={20} className="outline-none text-blue-500" />
             </div>
-            <h3 className="text-2xl font-extrabold text-gray-800">
+            <h3 className="text-2xl font-extrabold text-gray-700">
               {stats.inProgress}
             </h3>
             <p className="text-xs text-gray-500 mt-1">
@@ -485,12 +485,12 @@ const ProductionDashboard: React.FC = () => {
 
           <div className="bg-white p-6 rounded-2xl border-l-4 border-green-500 shadow-sm hover:shadow-md transition">
             <div className="flex items-center justify-between mb-2">
-              <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">
+              <p className="text-[11px] font-bold text-gray-800 uppercase tracking-widest">
                 Completed Orders
               </p>
-              <CheckCircle size={20} className="text-green-500" />
+              <CheckCircle size={20} className="outline-none text-green-500" />
             </div>
-            <h3 className="text-2xl font-extrabold text-gray-800">
+            <h3 className="text-2xl font-extrabold text-gray-700">
               {stats.completedOrders.toLocaleString()}
             </h3>
             <p className="text-xs text-gray-500 mt-1">Finished products</p>
@@ -498,12 +498,12 @@ const ProductionDashboard: React.FC = () => {
 
           <div className="bg-white p-6 rounded-2xl border-l-4 border-red-500 shadow-sm hover:shadow-md transition">
             <div className="flex items-center justify-between mb-2">
-              <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">
+              <p className="text-[11px] font-bold text-gray-800 uppercase tracking-widest">
                 Material Shortages
               </p>
-              <AlertTriangle size={20} className="text-red-500" />
+              <AlertTriangle size={20} className="outline-none text-red-500" />
             </div>
-            <h3 className="text-2xl font-extrabold text-gray-800">
+            <h3 className="text-2xl font-extrabold text-gray-700">
               {
                 materialAlerts.filter(
                   (a) => a.status === "CRITICAL" && !a.poCreated,
@@ -522,14 +522,14 @@ const ProductionDashboard: React.FC = () => {
             {/* Dismiss button for entire alert */}
             <button
               onClick={handleDismissAlert}
-              className="absolute top-4 right-4 text-red-400 hover:text-red-600 transition"
+              className="outline-none absolute top-4 right-4 text-red-400 hover:text-red-600 transition"
               title="Dismiss alert"
             >
-              <X size={20} />
+              <X size={20} className="outline-none " />
             </button>
 
             <div className="flex items-start gap-3">
-              <AlertTriangle className="text-red-500 mt-0.5" size={22} />
+              <AlertTriangle className="outline-none text-red-500 mt-0.5" size={22} />
               <div className="flex-1">
                 <h4 className="font-semibold text-red-800 mb-3">
                   Critical Material Shortages Alert
@@ -566,7 +566,7 @@ const ProductionDashboard: React.FC = () => {
                       <div className="flex gap-2">
                         <button
                           onClick={() => handleCreatePO(alert.id)}
-                          className="px-3 py-1.5 bg-orange-500 text-white rounded-lg text-sm hover:bg-orange-600 transition"
+                          className="outline-none px-4 py-2 bg-[#F59E0B] text-white rounded-xl text-sm hover:bg-[#f67317] transition"
                         >
                           Create PO
                         </button>
@@ -594,7 +594,7 @@ const ProductionDashboard: React.FC = () => {
               </div>
               <div className="flex gap-4">
                 <div className="flex items-center gap-2 text-xs font-medium text-gray-500">
-                  <div className="w-2 h-2 rounded-full bg-orange-500" /> Planned
+                  <div className="w-2 h-2 rounded-full bg-[#F59E0B]" /> Planned
                 </div>
                 <div className="flex items-center gap-2 text-xs font-medium text-gray-500">
                   <div className="w-2 h-2 rounded-full bg-blue-500" /> Actual
@@ -634,7 +634,7 @@ Planned: ${day.planned}
 Actual: ${day.actual}`}
                       >
                         <div
-                          className="w-4 bg-orange-500 rounded-t"
+                          className="w-4 bg-[#F59E0B] rounded-t"
                           style={{
                             height: `${(day.planned / maxValue) * 100}%`,
                           }}
@@ -681,7 +681,7 @@ Actual: ${day.actual}`}
                 </div>
                 <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
                   <div
-                    className="h-full bg-orange-500 rounded-full"
+                    className="h-full bg-[#F59E0B] rounded-full"
                     style={{
                       width: `${(stats.activeMachines / stats.totalMachines) * 100}%`,
                     }}
@@ -709,13 +709,13 @@ Actual: ${day.actual}`}
                   <span className="text-sm text-gray-600">
                     Overall Equipment Effectiveness
                   </span>
-                  <span className="text-lg font-bold text-orange-600">
+                  <span className="text-lg font-bold text-amber-500">
                     {stats.efficiency}%
                   </span>
                 </div>
                 <div className="h-3 bg-gray-100 rounded-full overflow-hidden">
                   <div
-                    className="h-full bg-orange-500 rounded-full"
+                    className="h-full bg-[#F59E0B] rounded-full"
                     style={{ width: `${stats.efficiency}%` }}
                   />
                 </div>
@@ -739,10 +739,10 @@ Actual: ${day.actual}`}
               </div>
               <button
                 onClick={() => setShowAllActivities(!showAllActivities)}
-                className="text-sm text-orange-500 hover:text-orange-600 font-medium"
+                className="outline-none text-sm text-[#F59E0B] hover:text-amber-500 font-medium"
               >
                 {showAllActivities ? "Show Less" : "View All"}{" "}
-                <ArrowRight size={14} className="inline" />
+                <ArrowRight size={14} className="outline-none inline" />
               </button>
             </div>
             <div className="divide-y divide-gray-100">
@@ -781,7 +781,7 @@ Actual: ${day.actual}`}
                         navigate("/production");
                       }
                     }}
-                    className="text-xs text-orange-500 hover:text-orange-600 font-medium"
+                    className="outline-none text-xs text-[#F59E0B] hover:text-amber-500 font-medium"
                   >
                     View
                   </button>
@@ -801,48 +801,48 @@ Actual: ${day.actual}`}
             <div className="p-4 space-y-3">
               <button
                 onClick={() => navigate("/production/planning")}
-                className="w-full flex items-center justify-between p-3 bg-orange-50 rounded-xl hover:bg-orange-100 transition group"
+                className="outline-none w-full flex items-center justify-between p-3 bg-orange-50 rounded-xl hover:bg-orange-100 transition group"
               >
                 <span className="font-medium text-gray-800">
                   New Production Planning
                 </span>
-                <Factory size={18} className="text-orange-500" />
+                <Factory size={18} className="outline-none text-[#F59E0B]" />
               </button>
               <button
                 onClick={() => navigate("/production/orders")}
-                className="w-full flex items-center justify-between p-3 bg-blue-50 rounded-xl hover:bg-blue-100 transition group"
+                className="outline-none w-full flex items-center justify-between p-3 bg-blue-50 rounded-xl hover:bg-blue-100 transition group"
               >
                 <span className="font-medium text-gray-800">
                   View Production Orders
                 </span>
-                <Package size={18} className="text-blue-500" />
+                <Package size={18} className="outline-none text-blue-500" />
               </button>
               <button
                 onClick={() => navigate("/production/shop-floor")}
-                className="w-full flex items-center justify-between p-3 bg-green-50 rounded-xl hover:bg-green-100 transition group"
+                className="outline-none w-full flex items-center justify-between p-3 bg-green-50 rounded-xl hover:bg-green-100 transition group"
               >
                 <span className="font-medium text-gray-800">
                   Shop Floor View
                 </span>
-                <Eye size={18} className="text-green-500" />
+                <Eye size={18} className="outline-none text-green-500" />
               </button>
               <button
                 onClick={() => navigate("/production/scheduling")}
-                className="w-full flex items-center justify-between p-3 bg-purple-50 rounded-xl hover:bg-purple-100 transition group"
+                className="outline-none w-full flex items-center justify-between p-3 bg-purple-50 rounded-xl hover:bg-purple-100 transition group"
               >
                 <span className="font-medium text-gray-800">
                   Production Scheduling
                 </span>
-                <Calendar size={18} className="text-purple-500" />
+                <Calendar size={18} className="outline-none text-purple-500" />
               </button>
               <button
                 onClick={() => navigate("/production/resources")}
-                className="w-full flex items-center justify-between p-3 bg-yellow-50 rounded-xl hover:bg-yellow-100 transition group"
+                className="outline-none w-full flex items-center justify-between p-3 bg-yellow-50 rounded-xl hover:bg-yellow-100 transition group"
               >
                 <span className="font-medium text-gray-800">
                   Resource Allocation
                 </span>
-                <Users size={18} className="text-yellow-600" />
+                <Users size={18} className="outline-none text-yellow-600" />
               </button>
             </div>
           </div>
@@ -871,7 +871,7 @@ Actual: ${day.actual}`}
                     ))}
                 </div>
               </div>
-              <button className="text-sm text-yellow-700 hover:text-yellow-800 font-medium">
+              <button className="text-sm text-yellow-700 hover:text-yellow-800 font-medium outline-none">
                 Review Inventory →
               </button>
             </div>

@@ -176,10 +176,10 @@ const Sidebar: React.FC = () => {
       </nav>
 
       {/* FIXED FOOTER */}
-      <div className="shrink-0 p-4 border-t border-gray-100 bg-white">
+      <div className=" outline-none shrink-0 p-4 border-t border-gray-100 bg-white">
         <button
           onClick={handleLogout}
-          className="group w-full flex items-center gap-3 px-4 py-3 cursor-pointer rounded-xl text-gray-500 hover:bg-red-50 hover:text-red-600 transition-all duration-200"
+          className=" outline-none group w-full flex items-center gap-3 px-4 py-3 cursor-pointer rounded-xl text-gray-500 hover:bg-red-50 hover:text-amber-500 transition-all duration-200"
         >
           <img
             src="/icons/logout.svg"

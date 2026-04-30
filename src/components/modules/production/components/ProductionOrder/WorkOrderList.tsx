@@ -161,7 +161,7 @@ const WorkOrderList: React.FC = () => {
     if (searchQuery) filtered = filtered.filter(w => w.workOrderId.toLowerCase().includes(searchQuery.toLowerCase()) || w.taskName.toLowerCase().includes(searchQuery.toLowerCase()) || w.productionOrderName.toLowerCase().includes(searchQuery.toLowerCase()));
     if (statusFilter !== "All") filtered = filtered.filter(w => w.status === statusFilter);
     if (shiftFilter !== "All") filtered = filtered.filter(w => w.shift === shiftFilter);
-    
+
     filtered = filtered.filter((order) => {
       const orderDate = new Date(order.createdAt);
       const now = new Date();
@@ -211,13 +211,13 @@ const WorkOrderList: React.FC = () => {
   };
 
   const handleViewDetails = (order: WorkOrder) => { setSelectedOrder(order); setShowDetailsModal(true); };
-  const handleStartTask = (id: string) => { 
-    setWorkOrders(workOrders.map(w => w.id === id ? { ...w, status: "IN_PROGRESS", progress: 5 } : w)); 
-    alert("Task started successfully!"); 
+  const handleStartTask = (id: string) => {
+    setWorkOrders(workOrders.map(w => w.id === id ? { ...w, status: "IN_PROGRESS", progress: 5 } : w));
+    alert("Task started successfully!");
   };
-  const handleCompleteTask = (id: string) => { 
-    setWorkOrders(workOrders.map(w => w.id === id ? { ...w, status: "COMPLETED", progress: 100 } : w)); 
-    alert("Task completed!"); 
+  const handleCompleteTask = (id: string) => {
+    setWorkOrders(workOrders.map(w => w.id === id ? { ...w, status: "COMPLETED", progress: 100 } : w));
+    alert("Task completed!");
   };
 
   return (
@@ -232,17 +232,17 @@ const WorkOrderList: React.FC = () => {
 
           {/* Global Time Filter */}
           <div className="relative" ref={timeFilterRef}>
-            <button onClick={() => setIsTimeDropdownOpen(!isTimeDropdownOpen)} className="px-4 py-2 rounded-xl border border-slate-200 bg-white text-sm font-medium shadow-sm flex items-center gap-2 text-gray-700">
-              <Filter size={16} className="text-orange-500" />
+            <button onClick={() => setIsTimeDropdownOpen(!isTimeDropdownOpen)} className="outline-none px-4 py-2 rounded-xl border border-slate-200 bg-white text-sm font-medium shadow-sm flex items-center gap-2 text-gray-700">
+              <Filter size={16} className="text-[#F59E0B]" />
               <span>{getFilterDisplayText()}</span>
               <ChevronDown size={14} className={isTimeDropdownOpen ? "rotate-180" : ""} />
             </button>
             {isTimeDropdownOpen && !isCalendarOpen && (
               <div className="absolute right-0 mt-2 bg-white rounded-2xl shadow-2xl z-50 py-2 min-w-40 overflow-hidden">
-                {["Weekly", "Monthly", "Quarterly", "Yearly", "All Time"].map(tab => (
-                  <button key={tab} onClick={() => handleTimeFilterChange(tab as TimeFilter)} className={`w-full text-left px-4 py-2.5 text-[13px] ${timeFilter === tab ? "text-orange-600 font-bold bg-orange-50/50" : "text-slate-600 hover:bg-slate-50"}`}>{tab}</button>
+                {["All Time", "Weekly", "Monthly", "Quarterly", "Yearly"].map(tab => (
+                  <button key={tab} onClick={() => handleTimeFilterChange(tab as TimeFilter)} className={`outline-none w-full text-left px-4 py-2.5 text-[13px] ${timeFilter === tab ? "text-amber-500 font-bold bg-orange-50/50" : "text-slate-600 hover:bg-slate-50"}`}>{tab}</button>
                 ))}
-                <button onClick={() => handleTimeFilterChange("Custom")} className={`w-full text-left px-4 py-2.5 text-[13px] ${timeFilter === "Custom" ? "text-orange-600 font-bold bg-orange-50/50" : "text-slate-600 hover:bg-slate-50"}`}>Custom</button>
+                <button onClick={() => handleTimeFilterChange("Custom")} className={`outline-none w-full text-left px-4 py-2.5 text-[13px] ${timeFilter === "Custom" ? "text-amber-500 font-bold bg-orange-50/50" : "text-slate-600 hover:bg-slate-50"}`}>Custom</button>
               </div>
             )}
             {isCalendarOpen && (
@@ -250,7 +250,7 @@ const WorkOrderList: React.FC = () => {
                 <div className="space-y-3">
                   <input type="date" value={customRange.start} onChange={(e) => setCustomRange({ ...customRange, start: e.target.value })} className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500/20" />
                   <input type="date" value={customRange.end} min={customRange.start} onChange={(e) => setCustomRange({ ...customRange, end: e.target.value })} className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500/20" />
-                  <button onClick={handleCustomApply} className="w-full bg-orange-500 text-white py-2 rounded-lg text-sm font-bold hover:bg-orange-600">Apply Range</button>
+                  <button onClick={handleCustomApply} className="outline-none w-full bg-[#F59E0B] text-white py-2 rounded-lg text-sm font-bold hover:bg-[#f67317]">Apply Range</button>
                 </div>
               </div>
             )}
@@ -259,11 +259,32 @@ const WorkOrderList: React.FC = () => {
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
-          <div className="bg-white p-5 rounded-2xl border-l-4 border-orange-500 shadow-sm"><p className="text-xs text-gray-500">Total Work Orders</p><p className="text-2xl font-bold">{stats.total}</p></div>
-          <div className="bg-white p-5 rounded-2xl border-l-4 border-gray-500 shadow-sm"><p className="text-xs text-gray-500">Pending</p><p className="text-2xl font-bold">{stats.pending}</p></div>
-          <div className="bg-white p-5 rounded-2xl border-l-4 border-blue-500 shadow-sm"><p className="text-xs text-gray-500">In Progress</p><p className="text-2xl font-bold">{stats.inProgress}</p></div>
-          <div className="bg-white p-5 rounded-2xl border-l-4 border-green-500 shadow-sm"><p className="text-xs text-gray-500">Completed</p><p className="text-2xl font-bold">{stats.completed}</p></div>
-          <div className="bg-white p-5 rounded-2xl border-l-4 border-red-500 shadow-sm"><p className="text-xs text-gray-500">Blocked</p><p className="text-2xl font-bold">{stats.blocked}</p></div>
+          <div className="bg-white p-5 rounded-2xl border-l-4 border-orange-500 shadow-sm">
+            <p className="text-[11px] font-bold text-gray-800 uppercase tracking-widest">
+              Total Work Orders</p>
+            <p className="text-2xl text-gray-700 font-bold">{stats.total}</p>
+          </div>
+
+          <div className="bg-white p-5 rounded-2xl border-l-4 border-gray-500 shadow-sm">
+            <p className="text-[11px] font-bold text-gray-800 uppercase tracking-widest">
+              Pending</p>
+            <p className="text-2xl text-gray-700 font-bold">{stats.pending}</p>
+          </div>
+          <div className="bg-white p-5 rounded-2xl border-l-4 border-blue-500 shadow-sm">
+            <p className="text-[11px] font-bold text-gray-800 uppercase tracking-widest">
+              In Progress</p>
+            <p className="text-2xl text-gray-700 font-bold">{stats.inProgress}</p>
+          </div>
+          <div className="bg-white p-5 rounded-2xl border-l-4 border-green-500 shadow-sm">
+            <p className="text-[11px] font-bold text-gray-800 uppercase tracking-widest">
+              Completed</p>
+            <p className="text-2xl text-gray-700 font-bold">{stats.completed}</p>
+          </div>
+          <div className="bg-white p-5 rounded-2xl border-l-4 border-red-500 shadow-sm">
+            <p className="text-[11px] font-bold text-gray-800 uppercase tracking-widest">
+              Blocked</p>
+            <p className="text-2xl text-gray-700 font-bold">{stats.blocked}</p>
+          </div>
         </div>
 
         {/* Main Container */}
@@ -277,26 +298,26 @@ const WorkOrderList: React.FC = () => {
             <div className="flex flex-wrap gap-3">
               {/* Status Filter */}
               <div className="relative" ref={statusFilterRef}>
-                <button onClick={() => setActiveDropdown(activeDropdown === "status" ? null : "status")} className={`px-4 py-3 rounded-xl border text-[13px] font-bold flex items-center gap-2 ${statusFilter !== "All" ? "bg-orange-50 border-orange-200 text-orange-600" : "bg-white border-slate-200 text-slate-600"}`}>
-                  {statusFilter === "All" ? "Status" : statusFilter} <ChevronDown size={14} className={activeDropdown === "status" ? "rotate-180" : ""} />
+                <button onClick={() => setActiveDropdown(activeDropdown === "status" ? null : "status")} className={`outline-none px-4 py-3 rounded-xl border text-[13px] font-bold flex items-center gap-2 ${statusFilter !== "All" ? "bg-orange-50 border-orange-200 text-amber-500" : "bg-white border-slate-200 text-slate-600"}`}>
+                  {statusFilter === "All" ? "Status" : statusFilter} <ChevronDown size={14} className={activeDropdown === "status" ? "outline-none rotate-180" : ""} />
                 </button>
                 {activeDropdown === "status" && (
                   <div className="absolute right-0 mt-2 w-40 bg-white rounded-2xl shadow-2xl z-50 py-2 overflow-hidden">
                     {statusOptions.map(opt => (
-                      <button key={opt} onClick={() => { setStatusFilter(opt); setActiveDropdown(null); }} className={`w-full text-left px-4 py-2 text-[13px] hover:bg-slate-50 ${statusFilter === opt ? "text-orange-600 font-bold bg-orange-50/50" : "text-slate-600"}`}>{opt}</button>
+                      <button key={opt} onClick={() => { setStatusFilter(opt); setActiveDropdown(null); }} className={`outline-none w-full text-left px-4 py-2 text-[13px] hover:bg-slate-50 ${statusFilter === opt ? "text-amber-500 font-bold bg-orange-50/50" : "text-slate-600"}`}>{opt}</button>
                     ))}
                   </div>
                 )}
               </div>
               {/* Shift Filter */}
               <div className="relative" ref={shiftFilterRef}>
-                <button onClick={() => setActiveDropdown(activeDropdown === "shift" ? null : "shift")} className={`px-4 py-3 rounded-xl border text-[13px] font-bold flex items-center gap-2 ${shiftFilter !== "All" ? "bg-orange-50 border-orange-200 text-orange-600" : "bg-white border-slate-200 text-slate-600"}`}>
-                  {shiftFilter === "All" ? "Shift" : getShiftLabel(shiftFilter as Shift)} <ChevronDown size={14} className={activeDropdown === "shift" ? "rotate-180" : ""} />
+                <button onClick={() => setActiveDropdown(activeDropdown === "shift" ? null : "shift")} className={`outline-none px-4 py-3 rounded-xl border text-[13px] font-bold flex items-center gap-2 ${shiftFilter !== "All" ? "bg-orange-50 border-orange-200 text-amber-500" : "bg-white border-slate-200 text-slate-600"}`}>
+                  {shiftFilter === "All" ? "Shift" : getShiftLabel(shiftFilter as Shift)} <ChevronDown size={14} className={activeDropdown === "shift" ? "outline-none rotate-180" : ""} />
                 </button>
                 {activeDropdown === "shift" && (
                   <div className="absolute right-0 mt-2 w-40 bg-white rounded-2xl shadow-2xl z-50 py-2 overflow-hidden">
                     {shiftOptions.map(opt => (
-                      <button key={opt} onClick={() => { setShiftFilter(opt); setActiveDropdown(null);}} className={`w-full text-left px-4 py-2 text-[13px] hover:bg-slate-50 ${shiftFilter === opt ? "text-orange-600 font-bold bg-orange-50/50" : "text-slate-600"}`}>{opt === "All" ? "All" : getShiftLabel(opt as Shift)}</button>
+                      <button key={opt} onClick={() => { setShiftFilter(opt); setActiveDropdown(null); }} className={`outline-none w-full text-left px-4 py-2 text-[13px] hover:bg-slate-50 ${shiftFilter === opt ? "text-amber-500 font-bold bg-orange-50/50" : "text-slate-600"}`}>{opt === "All" ? "All" : getShiftLabel(opt as Shift)}</button>
                     ))}
                   </div>
                 )}
@@ -304,9 +325,9 @@ const WorkOrderList: React.FC = () => {
               <button
                 disabled={selectedIds.length === 0}
                 onClick={handleBulkDelete}
-                className={`p-3 rounded-xl ${selectedIds.length === 0 ? "bg-gray-100 text-gray-400 cursor-not-allowed" : "bg-rose-600 text-white hover:bg-rose-700"}`}
+                className={`outline-none p-3 rounded-xl ${selectedIds.length === 0 ? "bg-gray-100 text-gray-400 cursor-not-allowed" : "bg-rose-600 text-white hover:bg-rose-700"}`}
               >
-                <Trash2 size={20} />
+                <Trash2 size={20} className="outline-none " />
               </button>
             </div>
           </div>
@@ -318,7 +339,7 @@ const WorkOrderList: React.FC = () => {
                 <th className="w-12 p-5 text-center border-b border-slate-100">
                   <input
                     type="checkbox"
-                    className="accent-orange-500 w-4 h-4 cursor-pointer"
+                    className="h-4 w-4 cursor-pointer appearance-none rounded border border-slate-300 bg-white transition-all relative checked:bg-[#F59E0B] checked:border-[#F59E0B] after:content-[''] after:absolute after:opacity-0 checked:after:opacity-100 after:left-1.25 after:top-px after:w-1 after:h-2 after:border-white after:border-r-2 after:border-b-2 after:rotate-45 outline-none"
                     checked={paginatedOrders.length > 0 && selectedIds.length === paginatedOrders.length}
                     onChange={toggleSelectAll}
                   />
@@ -339,7 +360,7 @@ const WorkOrderList: React.FC = () => {
                     <td className="p-5 text-center">
                       <input
                         type="checkbox"
-                        className="accent-orange-500 w-4 h-4 cursor-pointer"
+                        className="h-4 w-4 cursor-pointer appearance-none rounded border border-slate-300 bg-white transition-all relative checked:bg-[#F59E0B] checked:border-[#F59E0B] after:content-[''] after:absolute after:opacity-0 checked:after:opacity-100 after:left-1.25 after:top-px after:w-1 after:h-2 after:border-white after:border-r-2 after:border-b-2 after:rotate-45 outline-none"
                         checked={selectedIds.includes(wo.id)}
                         onChange={() => {
                           if (selectedIds.includes(wo.id))
@@ -355,28 +376,28 @@ const WorkOrderList: React.FC = () => {
                     <td className="px-4 py-4"><div className="flex items-center justify-center gap-1"><User size={14} className="text-blue-500" /><span className="text-[13px]">{wo.operatorName}</span></div></td>
                     <td className="px-4 py-4 text-[13px] text-slate-700 text-center">{getShiftLabel(wo.shift)}</td>
                     <td className="px-4 py-4 text-center"><StatusBadge status={wo.status} /></td>
-                    <td className="px-4 py-4"><div className="flex items-center justify-center gap-2"><div className="w-20 h-1.5 bg-gray-100 rounded-full overflow-hidden"><div className="h-full bg-orange-500 rounded-full" style={{ width: `${wo.progress}%` }} /></div><span className="text-[11px] font-semibold">{wo.progress}%</span></div></td>
+                    <td className="px-4 py-4"><div className="flex items-center justify-center gap-2"><div className="w-20 h-1.5 bg-gray-100 rounded-full overflow-hidden"><div className="h-full bg-[#F59E0B] rounded-full" style={{ width: `${wo.progress}%` }} /></div><span className="text-[11px] font-semibold">{wo.progress}%</span></div></td>
                     <td className="px-4 py-4"><div className="flex justify-center gap-2">
-                      <button onClick={() => handleViewDetails(wo)} className="p-1.5 text-slate-400 hover:text-orange-500"><Eye size={16} /></button>
-                      {wo.status === "PENDING" && <button onClick={() => handleStartTask(wo.id)} className="p-1.5 text-slate-400 hover:text-green-500"><Play size={16} /></button>}
-                      {wo.status === "IN_PROGRESS" && <button onClick={() => handleCompleteTask(wo.id)} className="p-1.5 text-slate-400 hover:text-green-600"><CheckCircle size={16} /></button>}
-                      <button onClick={() => handleDelete(wo.id)} className="p-1.5 text-slate-400 hover:text-rose-600"><Trash2 size={16} /></button>
+                      <button onClick={() => handleViewDetails(wo)} className="outline-none p-1.5 text-slate-400 hover:text-[#F59E0B]"><Eye size={16} /></button>
+                      {wo.status === "PENDING" && <button onClick={() => handleStartTask(wo.id)} className="outline-none p-1.5 text-slate-400 hover:text-green-500"><Play size={16} /></button>}
+                      {wo.status === "IN_PROGRESS" && <button onClick={() => handleCompleteTask(wo.id)} className="outline-none p-1.5 text-slate-400 hover:text-green-600"><CheckCircle size={16} /></button>}
+                      <button onClick={() => handleDelete(wo.id)} className="outline-none p-1.5 text-slate-400 hover:text-rose-600"><Trash2 size={16} /></button>
                     </div></td>
                   </tr>
                 ))}
               </tbody>
             </table>
-            {filteredWorkOrders.length === 0 && (<div className="py-32 text-center"><div className="p-6 bg-slate-50 rounded-full w-fit mx-auto mb-4"><AlertTriangle className="text-slate-200" size={40} /></div><h3 className="text-lg font-bold text-slate-800">No Work Orders Found</h3></div>)}
+            {filteredWorkOrders.length === 0 && (<div className="py-32 text-center"><div className="p-6 bg-slate-50 rounded-full w-fit mx-auto mb-4"><AlertTriangle className="text-slate-200 outline-none " size={40} /></div><h3 className="text-lg font-bold text-slate-800">No Work Orders Found</h3></div>)}
           </div>
 
           {/* Pagination */}
           {totalPages > 0 && (
             <footer className="p-6 bg-slate-50/50 border-t border-slate-100 flex flex-col md:flex-row justify-between items-center gap-6">
-              <div className="text-[11px] font-bold text-slate-800 uppercase">Showing {(currentPage-1)*itemsPerPage+1} to {Math.min(currentPage*itemsPerPage, filteredWorkOrders.length)} of {filteredWorkOrders.length} Work Orders</div>
+              <div className="text-[11px] font-bold text-slate-800 uppercase">Showing {(currentPage - 1) * itemsPerPage + 1} to {Math.min(currentPage * itemsPerPage, filteredWorkOrders.length)} of {filteredWorkOrders.length} Work Orders</div>
               <div className="flex items-center gap-2">
-                <button onClick={() => setCurrentPage(p => Math.max(1, p-1))} disabled={currentPage === 1} className="p-2.5 rounded-xl border bg-white text-slate-500 hover:text-orange-600 disabled:opacity-30"><ChevronLeft size={18} /></button>
-                <div className="flex gap-1.5">{getPageNumbers().map((page, i) => page === "..." ? <span key={i} className="px-2 text-slate-300"><MoreHorizontal size={14} /></span> : <button key={i} onClick={() => setCurrentPage(page as number)} className={`min-w-10 h-10 rounded-xl text-xs font-bold ${currentPage === page ? "bg-orange-500 text-white shadow-lg" : "bg-white text-slate-500 border border-slate-200"}`}>{page}</button>)}</div>
-                <button onClick={() => setCurrentPage(p => Math.min(totalPages, p+1))} disabled={currentPage === totalPages} className="p-2.5 rounded-xl border bg-white text-slate-500 hover:text-orange-600 disabled:opacity-30"><ChevronRight size={18} /></button>
+                <button onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1} className="outline-none p-2.5 rounded-xl border bg-white text-slate-500 hover:text-amber-500 disabled:opacity-30"><ChevronLeft size={18} /></button>
+                <div className="flex gap-1.5">{getPageNumbers().map((page, i) => page === "..." ? <span key={i} className="px-2 text-slate-300"><MoreHorizontal size={14} /></span> : <button key={i} onClick={() => setCurrentPage(page as number)} className={`outline-none min-w-10 h-10 rounded-xl text-xs font-bold ${currentPage === page ? "bg-[#F59E0B] text-white shadow-lg" : "bg-white text-slate-500 border border-slate-200"}`}>{page}</button>)}</div>
+                <button onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages} className="outline-none p-2.5 rounded-xl border bg-white text-slate-500 hover:text-amber-500 disabled:opacity-30"><ChevronRight size={18} /></button>
               </div>
             </footer>
           )}
@@ -387,7 +408,7 @@ const WorkOrderList: React.FC = () => {
       {showDetailsModal && selectedOrder && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
           <div className="bg-white rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
-            <div className="sticky top-0 bg-white border-b p-6 flex justify-between"><div><h2 className="text-xl font-bold">{selectedOrder.workOrderId}</h2><p className="text-sm text-gray-500">{selectedOrder.taskName}</p></div><button onClick={() => setShowDetailsModal(false)} className="text-gray-400">✕</button></div>
+            <div className="sticky top-0 bg-white border-b p-6 flex justify-between"><div><h2 className="text-xl font-bold">{selectedOrder.workOrderId}</h2><p className="text-sm text-gray-500">{selectedOrder.taskName}</p></div><button onClick={() => setShowDetailsModal(false)} className="outline-none text-gray-400">✕</button></div>
             <div className="p-6 space-y-6">
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div className="p-3 bg-gray-50 rounded-xl"><label className="text-xs text-gray-500">Production Order</label><p className="font-semibold">{selectedOrder.productionOrderName}</p></div>
@@ -403,12 +424,12 @@ const WorkOrderList: React.FC = () => {
               </div>
               <div><h3 className="font-bold mb-2">Work Instructions</h3><div className="bg-gray-50 rounded-xl p-4"><ul className="list-disc list-inside space-y-1">{selectedOrder.instructions.map((inst, i) => <li key={i} className="text-sm">{inst}</li>)}</ul></div></div>
               <div><h3 className="font-bold mb-2">Safety Instructions</h3><div className="bg-yellow-50 rounded-xl p-4 border border-yellow-200"><ul className="list-disc list-inside space-y-1">{selectedOrder.safetyNotes.map((note, i) => <li key={i} className="text-sm text-yellow-800">{note}</li>)}</ul></div></div>
-              <div><div className="bg-gray-100 rounded-full h-2 overflow-hidden"><div className="h-full bg-orange-500 rounded-full" style={{ width: `${selectedOrder.progress}%` }} /></div><p className="text-right text-sm mt-1">{selectedOrder.progress}% Complete</p></div>
+              <div><div className="bg-gray-100 rounded-full h-2 overflow-hidden"><div className="h-full bg-[#F59E0B] rounded-full" style={{ width: `${selectedOrder.progress}%` }} /></div><p className="text-right text-sm mt-1">{selectedOrder.progress}% Complete</p></div>
             </div>
             <div className="sticky bottom-0 bg-white border-t p-6 flex justify-end gap-3">
-              {selectedOrder.status === "PENDING" && <button onClick={() => { handleStartTask(selectedOrder.id); setShowDetailsModal(false); }} className="px-6 py-2 bg-green-500 text-white rounded-xl">Start Task</button>}
-              {selectedOrder.status === "IN_PROGRESS" && <button onClick={() => { handleCompleteTask(selectedOrder.id); setShowDetailsModal(false); }} className="px-6 py-2 bg-green-600 text-white rounded-xl">Complete Task</button>}
-              <button onClick={() => setShowDetailsModal(false)} className="px-6 py-2 bg-gray-100 rounded-xl">Close</button>
+              {selectedOrder.status === "PENDING" && <button onClick={() => { handleStartTask(selectedOrder.id); setShowDetailsModal(false); }} className="outline-none px-6 py-4 bg-green-500 hover:bg-green-600 text-white rounded-xl">Start Task</button>}
+              {selectedOrder.status === "IN_PROGRESS" && <button onClick={() => { handleCompleteTask(selectedOrder.id); setShowDetailsModal(false); }} className="outline-none px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-xl">Complete Task</button>}
+              <button onClick={() => setShowDetailsModal(false)} className="outline-none px-6 py-2 bg-gray-100 hover:bg-gray-200 rounded-xl">Close</button>
             </div>
           </div>
         </div>

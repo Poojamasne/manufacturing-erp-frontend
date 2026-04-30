@@ -490,9 +490,9 @@ const ProductionOrderList: React.FC = () => {
           <div className="relative" ref={timeDropdownRef}>
             <button
               onClick={() => setIsTimeDropdownOpen(!isTimeDropdownOpen)}
-              className="px-4 py-2 rounded-xl border border-slate-200 bg-white text-sm font-medium shadow-sm flex items-center gap-2 text-gray-700"
+              className="outline-none px-4 py-2 rounded-xl border border-slate-200 bg-white text-sm font-medium shadow-sm flex items-center gap-2 text-gray-700"
             >
-              <Filter size={16} className="text-orange-500" />
+              <Filter size={16} className="text-[#F59E0B]" />
               <span>{getFilterDisplayText()}</span>
               <ChevronDown
                 size={14}
@@ -501,12 +501,12 @@ const ProductionOrderList: React.FC = () => {
             </button>
             {isTimeDropdownOpen && !isCalendarOpen && (
               <div className="absolute right-0 mt-2 bg-white rounded-2xl shadow-2xl z-50 py-2 min-w-40 overflow-hidden">
-                {["Weekly", "Monthly", "Quarterly", "Yearly", "All Time"].map(
+                {["All Time", "Weekly", "Monthly", "Quarterly", "Yearly"].map(
                   (tab) => (
                     <button
                       key={tab}
                       onClick={() => handleTimeFilterChange(tab as TimeFilter)}
-                      className={`w-full text-left px-4 py-2.5 text-[13px] ${timeFilter === tab ? "text-orange-600 font-bold bg-orange-50/50" : "text-slate-600 hover:bg-slate-50"}`}
+                      className={`outline-none w-full text-left px-4 py-2.5 text-[13px] ${timeFilter === tab ? "text-amber-500 font-bold bg-orange-50/50" : "text-slate-600 hover:bg-slate-50"}`}
                     >
                       {tab}
                     </button>
@@ -514,7 +514,7 @@ const ProductionOrderList: React.FC = () => {
                 )}
                 <button
                   onClick={() => handleTimeFilterChange("Custom")}
-                  className={`w-full text-left px-4 py-2.5 text-[13px] ${timeFilter === "Custom" ? "text-orange-600 font-bold bg-orange-50/50" : "text-slate-600 hover:bg-slate-50"}`}
+                  className={`outline-none w-full text-left px-4 py-2.5 text-[13px] ${timeFilter === "Custom" ? "text-amber-500 font-bold bg-orange-50/50" : "text-slate-600 hover:bg-slate-50"}`}
                 >
                   Custom
                 </button>
@@ -542,7 +542,7 @@ const ProductionOrderList: React.FC = () => {
                   />
                   <button
                     onClick={handleCustomApply}
-                    className="w-full bg-orange-500 text-white py-2 rounded-lg text-sm font-bold hover:bg-orange-600"
+                    className="outline-none w-full bg-[#F59E0B] text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-[#f67317]"
                   >
                     Apply Range
                   </button>
@@ -554,25 +554,30 @@ const ProductionOrderList: React.FC = () => {
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
-          <div className="bg-white p-5 rounded-2xl border-l-4 border-orange-500 shadow-sm">
-            <p className="text-xs text-gray-500">Total Orders</p>
-            <p className="text-2xl font-bold">{stats.total}</p>
+          <div className="bg-white p-6 rounded-2xl border-l-4 border-orange-500 shadow-sm">
+            <p className="text-[11px] font-bold text-gray-800 uppercase tracking-widest">
+              Total Orders</p>
+            <p className="text-2xl font-bold text-gray-700">{stats.total}</p>
           </div>
-          <div className="bg-white p-5 rounded-2xl border-l-4 border-blue-500 shadow-sm">
-            <p className="text-xs text-gray-500">In Progress</p>
-            <p className="text-2xl font-bold">{stats.inProgress}</p>
+          <div className="bg-white p-6 rounded-2xl border-l-4 border-blue-500 shadow-sm">
+            <p className="text-[11px] font-bold text-gray-800 uppercase tracking-widest">
+              In Progress</p>
+            <p className="text-2xl font-bold text-gray-700">{stats.inProgress}</p>
           </div>
-          <div className="bg-white p-5 rounded-2xl border-l-4 border-green-500 shadow-sm">
-            <p className="text-xs text-gray-500">Completed</p>
-            <p className="text-2xl font-bold">{stats.completed}</p>
+          <div className="bg-white p-6 rounded-2xl border-l-4 border-green-500 shadow-sm">
+            <p className="text-[11px] font-bold text-gray-800 uppercase tracking-widest">
+              Completed</p>
+            <p className="text-2xl font-bold text-gray-700">{stats.completed}</p>
           </div>
-          <div className="bg-white p-5 rounded-2xl border-l-4 border-purple-500 shadow-sm">
-            <p className="text-xs text-gray-500">Planned/Scheduled</p>
-            <p className="text-2xl font-bold">{stats.planned}</p>
+          <div className="bg-white p-6 rounded-2xl border-l-4 border-purple-500 shadow-sm">
+            <p className="text-[11px] font-bold text-gray-800 uppercase tracking-widest">
+              Planned/Scheduled</p>
+            <p className="text-2xl font-bold text-gray-700">{stats.planned}</p>
           </div>
-          <div className="bg-white p-5 rounded-2xl border-l-4 border-yellow-500 shadow-sm">
-            <p className="text-xs text-gray-500">On Hold</p>
-            <p className="text-2xl font-bold">{stats.onHold}</p>
+          <div className="bg-white p-6 rounded-2xl border-l-4 border-yellow-500 shadow-sm">
+            <p className="text-[11px] font-bold text-gray-800 uppercase tracking-widest">
+              On Hold</p>
+            <p className="text-2xl font-bold text-gray-700">{stats.onHold}</p>
           </div>
         </div>
 
@@ -602,14 +607,14 @@ const ProductionOrderList: React.FC = () => {
                       activeDropdown === "status" ? null : "status",
                     )
                   }
-                  className={`px-4 py-3 rounded-xl border text-[13px] font-bold flex items-center gap-2 ${statusFilter !== "All" ? "bg-orange-50 border-orange-200 text-orange-600" : "bg-white border-slate-200 text-slate-600"}`}
+                  className={`outline-none px-4 py-2 rounded-xl border text-[13px] font-bold flex items-center gap-2 ${statusFilter !== "All" ? "bg-orange-50 border-orange-200 text-amber-500" : "bg-white border-slate-200 text-slate-600"}`}
                 >
                   {statusFilter === "All"
                     ? "Status"
                     : statusFilter.replace("_", " ")}{" "}
                   <ChevronDown
                     size={14}
-                    className={activeDropdown === "status" ? "rotate-180" : ""}
+                    className={activeDropdown === "status" ? "outline-none rotate-180" : ""}
                   />
                 </button>
                 {activeDropdown === "status" && (
@@ -621,7 +626,7 @@ const ProductionOrderList: React.FC = () => {
                           setStatusFilter(opt);
                           setActiveDropdown(null);
                         }}
-                        className={`w-full text-left px-4 py-2 text-[13px] hover:bg-slate-50 ${statusFilter === opt ? "text-orange-600 font-bold bg-orange-50/50" : "text-slate-600"}`}
+                        className={`outline-none w-full text-left px-4 py-2 text-[13px] hover:bg-slate-50 ${statusFilter === opt ? "text-amber-500 font-bold bg-orange-50/50" : "text-slate-600"}`}
                       >
                         {opt === "All" ? "All" : opt.replace("_", " ")}
                       </button>
@@ -638,13 +643,13 @@ const ProductionOrderList: React.FC = () => {
                       activeDropdown === "priority" ? null : "priority",
                     )
                   }
-                  className={`px-4 py-3 rounded-xl border text-[13px] font-bold flex items-center gap-2 ${priorityFilter !== "All" ? "bg-orange-50 border-orange-200 text-orange-600" : "bg-white border-slate-200 text-slate-600"}`}
+                  className={`outline-none px-4 py-2 rounded-xl border text-[13px] font-bold flex items-center gap-2 ${priorityFilter !== "All" ? "bg-orange-50 border-orange-200 text-amber-500" : "bg-white border-slate-200 text-slate-600"}`}
                 >
                   {priorityFilter === "All" ? "Priority" : priorityFilter}{" "}
                   <ChevronDown
                     size={14}
                     className={
-                      activeDropdown === "priority" ? "rotate-180" : ""
+                      activeDropdown === "priority" ? "outline-none rotate-180" : ""
                     }
                   />
                 </button>
@@ -657,7 +662,7 @@ const ProductionOrderList: React.FC = () => {
                           setPriorityFilter(opt);
                           setActiveDropdown(null);
                         }}
-                        className={`w-full text-left px-4 py-2 text-[13px] hover:bg-slate-50 ${priorityFilter === opt ? "text-orange-600 font-bold bg-orange-50/50" : "text-slate-600"}`}
+                        className={`outline-none w-full text-left px-4 py-2 text-[13px] hover:bg-slate-50 ${priorityFilter === opt ? "text-amber-500 font-bold bg-orange-50/50" : "text-slate-600"}`}
                       >
                         {opt}
                       </button>
@@ -674,14 +679,14 @@ const ProductionOrderList: React.FC = () => {
                       activeDropdown === "shift" ? null : "shift",
                     )
                   }
-                  className={`px-4 py-3 rounded-xl border text-[13px] font-bold flex items-center gap-2 ${shiftFilter !== "All" ? "bg-orange-50 border-orange-200 text-orange-600" : "bg-white border-slate-200 text-slate-600"}`}
+                  className={`outline-none px-4 py-2 rounded-xl border text-[13px] font-bold flex items-center gap-2 ${shiftFilter !== "All" ? "bg-orange-50 border-orange-200 text-amber-500" : "bg-white border-slate-200 text-slate-600"}`}
                 >
                   {shiftFilter === "All"
                     ? "Shift"
                     : getShiftLabel(shiftFilter as Shift)}{" "}
                   <ChevronDown
                     size={14}
-                    className={activeDropdown === "shift" ? "rotate-180" : ""}
+                    className={activeDropdown === "shift" ? "outline-none rotate-180" : ""}
                   />
                 </button>
                 {activeDropdown === "shift" && (
@@ -693,7 +698,7 @@ const ProductionOrderList: React.FC = () => {
                           setShiftFilter(opt);
                           setActiveDropdown(null);
                         }}
-                        className={`w-full text-left px-4 py-2 text-[13px] hover:bg-slate-50 ${shiftFilter === opt ? "text-orange-600 font-bold bg-orange-50/50" : "text-slate-600"}`}
+                        className={`outline-none w-full text-left px-4 py-2 text-[13px] hover:bg-slate-50 ${shiftFilter === opt ? "text-amber-500 font-bold bg-orange-50/50" : "text-slate-600"}`}
                       >
                         {opt === "All" ? "All" : getShiftLabel(opt as Shift)}
                       </button>
@@ -704,7 +709,7 @@ const ProductionOrderList: React.FC = () => {
               <button
                 disabled={selectedIds.length === 0}
                 onClick={handleBulkDelete}
-                className={`p-3 rounded-xl ${selectedIds.length === 0 ? "bg-gray-100 text-gray-400 cursor-not-allowed" : "bg-rose-600 text-white hover:bg-rose-700"}`}
+                className={`outline-none p-3 rounded-xl ${selectedIds.length === 0 ? "bg-gray-100 text-gray-400 cursor-not-allowed" : "bg-rose-600 text-white hover:bg-rose-700"}`}
               >
                 <Trash2 size={20} />
               </button>
@@ -719,7 +724,7 @@ const ProductionOrderList: React.FC = () => {
                   <th className="w-12 p-5 text-center border-b border-slate-100">
                     <input
                       type="checkbox"
-                      className="accent-orange-500 w-4 h-4"
+                      className="h-4 w-4 cursor-pointer appearance-none rounded border border-slate-300 bg-white transition-all relative checked:bg-[#F59E0B] checked:border-[#F59E0B] after:content-[''] after:absolute after:opacity-0 checked:after:opacity-100 after:left-1.25 after:top-px after:w-1 after:h-2 after:border-white after:border-r-2 after:border-b-2 after:rotate-45 outline-none"
                       checked={
                         paginatedOrders.length > 0 &&
                         selectedIds.length === paginatedOrders.length
@@ -768,7 +773,7 @@ const ProductionOrderList: React.FC = () => {
                     <td className="p-5 text-center">
                       <input
                         type="checkbox"
-                        className="accent-orange-500 w-4 h-4"
+                        className="h-4 w-4 cursor-pointer appearance-none rounded border border-slate-300 bg-white transition-all relative checked:bg-[#F59E0B] checked:border-[#F59E0B] after:content-[''] after:absolute after:opacity-0 checked:after:opacity-100 after:left-1.25 after:top-px after:w-1 after:h-2 after:border-white after:border-r-2 after:border-b-2 after:rotate-45 outline-none"
                         checked={selectedIds.includes(order.id)}
                         onChange={() => {
                           if (selectedIds.includes(order.id))
@@ -807,7 +812,7 @@ const ProductionOrderList: React.FC = () => {
                       <div className="flex items-center justify-center gap-2">
                         <div className="w-20 h-1.5 bg-gray-100 rounded-full overflow-hidden">
                           <div
-                            className="h-full bg-orange-500 rounded-full"
+                            className="h-full bg-[#F59E0B] rounded-full"
                             style={{ width: `${order.progress}%` }}
                           />
                         </div>
@@ -820,18 +825,18 @@ const ProductionOrderList: React.FC = () => {
                       <div className="flex justify-center gap-2">
                         <button
                           onClick={() => handleViewDetails(order)}
-                          className="p-1.5 text-slate-400 hover:text-orange-500"
+                          className="outline-none p-1.5 text-slate-400 hover:text-[#F59E0B]"
                         >
-                          <Eye size={16} />
+                          <Eye size={16} className="outline-none " />
                         </button>
-                        <button className="p-1.5 text-slate-400 hover:text-blue-500">
-                          <Edit size={16} />
+                        <button className="outline-none p-1.5 text-slate-400 hover:text-blue-500">
+                          <Edit size={16} className="outline-none " />
                         </button>
                         <button
                           onClick={() => handleDelete(order.id)}
-                          className="p-1.5 text-slate-400 hover:text-rose-600"
+                          className="outline-none p-1.5 text-slate-400 hover:text-rose-600"
                         >
-                          <Trash2 size={16} />
+                          <Trash2 size={16} className="outline-none " />
                         </button>
                       </div>
                     </td>
@@ -842,7 +847,7 @@ const ProductionOrderList: React.FC = () => {
             {filteredOrders.length === 0 && (
               <div className="py-32 text-center">
                 <div className="p-6 bg-slate-50 rounded-full w-fit mx-auto mb-4">
-                  <Factory className="text-slate-200" size={40} />
+                  <Factory className="text-slate-200 outline-none " size={40} />
                 </div>
                 <h3 className="text-lg font-bold text-slate-800">
                   No Production Orders Found
@@ -863,21 +868,21 @@ const ProductionOrderList: React.FC = () => {
                 <button
                   onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                   disabled={currentPage === 1}
-                  className="p-2.5 rounded-xl border bg-white text-slate-500 hover:text-orange-600 disabled:opacity-30"
+                  className="outline-none p-2.5 rounded-xl border bg-white text-slate-500 hover:text-amber-500 disabled:opacity-30"
                 >
-                  <ChevronLeft size={18} />
+                  <ChevronLeft size={18} className="outline-none " />
                 </button>
                 <div className="flex gap-1.5">
                   {getPageNumbers().map((page, i) =>
                     page === "..." ? (
                       <span key={i} className="px-2 text-slate-300">
-                        <MoreHorizontal size={14} />
+                        <MoreHorizontal size={14} className="outline-none " />
                       </span>
                     ) : (
                       <button
                         key={i}
                         onClick={() => setCurrentPage(page as number)}
-                        className={`min-w-10 h-10 rounded-xl text-xs font-bold ${currentPage === page ? "bg-orange-500 text-white shadow-lg" : "bg-white text-slate-500 border border-slate-200"}`}
+                        className={`outline-none min-w-10 h-10 rounded-xl text-xs font-bold ${currentPage === page ? "bg-[#F59E0B] text-white shadow-lg" : "bg-white text-slate-500 border border-slate-200"}`}
                       >
                         {page}
                       </button>
@@ -889,9 +894,9 @@ const ProductionOrderList: React.FC = () => {
                     setCurrentPage((p) => Math.min(totalPages, p + 1))
                   }
                   disabled={currentPage === totalPages}
-                  className="p-2.5 rounded-xl border bg-white text-slate-500 hover:text-orange-600 disabled:opacity-30"
+                  className="outline-none p-2.5 rounded-xl border bg-white text-slate-500 hover:text-amber-500 disabled:opacity-30"
                 >
-                  <ChevronRight size={18} />
+                  <ChevronRight size={18} className="outline-none " />
                 </button>
               </div>
             </footer>
@@ -914,7 +919,7 @@ const ProductionOrderList: React.FC = () => {
               </div>
               <button
                 onClick={() => setShowDetailsModal(false)}
-                className="text-gray-400"
+                className="outline-none text-gray-400"
               >
                 ✕
               </button>
@@ -981,7 +986,7 @@ const ProductionOrderList: React.FC = () => {
               <div>
                 <div className="bg-gray-100 rounded-full h-2 overflow-hidden">
                   <div
-                    className="h-full bg-orange-500 rounded-full"
+                    className="h-full bg-[#F59E0B] rounded-full"
                     style={{ width: `${selectedOrder.progress}%` }}
                   />
                 </div>
@@ -993,7 +998,7 @@ const ProductionOrderList: React.FC = () => {
             <div className="sticky bottom-0 bg-white border-t p-6 flex justify-end">
               <button
                 onClick={() => setShowDetailsModal(false)}
-                className="px-6 py-2 bg-orange-500 text-white rounded-xl font-semibold text-sm shadow-md hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-400 transition-all duration-200"
+                className="outline-none px-4 py-2 bg-[#F59E0B] text-white rounded-xl font-semibold text-sm shadow-md hover:bg-[#f67317] focus:outline-none focus:ring-2 focus:ring-orange-200 transition-all duration-200"
               >
                 Close
               </button>

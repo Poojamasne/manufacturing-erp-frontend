@@ -10,10 +10,10 @@ import {
   User,
   Eye,
   Search,
-  RefreshCw,
+  // RefreshCw,
   Calendar,
-  QrCode,
-  Camera,
+  // QrCode,
+  // Camera,
   X,
   ChevronDown,
   Filter,
@@ -153,7 +153,7 @@ const ShopFloorExecution: React.FC = () => {
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
-  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [_isRefreshing, _setIsRefreshing] = useState(false);
   const [showAllActivities, setShowAllActivities] = useState(false);
 
   const statusOptions = ["All", "Running", "Warning", "Idle", "Down"];
@@ -292,10 +292,10 @@ const ShopFloorExecution: React.FC = () => {
     }
   };
 
-  const handleRefresh = () => {
-    setIsRefreshing(true);
-    setTimeout(() => setIsRefreshing(false), 1000);
-  };
+  // const handleRefresh = () => {
+  //   setIsRefreshing(true);
+  //   setTimeout(() => setIsRefreshing(false), 1000);
+  // };
 
   const handleViewStation = (station: MachineStation) => {
     setSelectedStation(station);
@@ -317,41 +317,41 @@ const ShopFloorExecution: React.FC = () => {
           </div>
 
           <div className="flex flex-wrap gap-3">
-            <button onClick={handleRefresh} className="p-2.5 bg-white border border-slate-200 rounded-xl text-gray-600 hover:bg-gray-50 transition">
+            {/* <button onClick={handleRefresh} className="outline-none px-4 py-2 bg-white border border-slate-200 rounded-xl text-gray-600 hover:bg-gray-50 transition">
               <RefreshCw size={18} className={isRefreshing ? "animate-spin" : ""} />
             </button>
-            <button className="px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-medium flex items-center gap-2">
+            <button className="outline-none px-4 py-2 bg-white border border-slate-200 rounded-xl text-sm font-medium flex items-center gap-2">
               <QrCode size={16} /> Scan QR
             </button>
-            <button className="px-4 py-2.5 bg-orange-500 text-white rounded-xl text-sm font-bold hover:bg-orange-600 transition flex items-center gap-2 shadow-lg shadow-orange-500/20">
+            <button className="outline-none px-4 py-2 bg-[#F59E0B] text-white rounded-xl text-sm font-bold hover:bg-[#f67317] transition flex items-center gap-2 shadow-lg shadow-orange-500/20">
               <Camera size={16} /> Capture
-            </button>
+            </button> */}
 
             {/* Global Time Filter */}
             <div className="relative" ref={timeFilterRef}>
               <button
                 onClick={() => setIsTimeDropdownOpen(!isTimeDropdownOpen)}
-                className="px-4 py-2 rounded-xl border border-slate-200 bg-white text-sm font-medium shadow-sm flex items-center gap-2 text-gray-700"
+                className="outline-none px-4 py-2 rounded-xl border border-slate-200 bg-white text-sm font-medium shadow-sm flex items-center gap-2 text-gray-700"
               >
-                <Filter size={16} className="text-orange-500" />
+                <Filter size={16} className="text-[#F59E0B]" />
                 <span>{getFilterDisplayText()}</span>
-                <ChevronDown size={14} className={isTimeDropdownOpen ? "rotate-180" : ""} />
+                <ChevronDown size={14} className={isTimeDropdownOpen ? "outline-none rotate-180" : ""} />
               </button>
 
               {isTimeDropdownOpen && !isCalendarOpen && (
                 <div className="absolute right-0 mt-2 bg-white rounded-2xl shadow-2xl z-50 py-2 min-w-40 overflow-hidden">
-                  {["Weekly", "Monthly", "Quarterly", "Yearly", "All Time"].map((tab) => (
+                  {["All Time", "Weekly", "Monthly", "Quarterly", "Yearly"].map((tab) => (
                     <button
                       key={tab}
                       onClick={() => handleTimeFilterChange(tab as TimeFilter)}
-                      className={`w-full text-left px-4 py-2.5 text-[13px] ${timeFilter === tab ? "text-orange-600 font-bold bg-orange-50/50" : "text-slate-600 hover:bg-slate-50"}`}
+                      className={`outline-none w-full text-left px-4 py-2.5 text-[13px] ${timeFilter === tab ? "text-amber-500 font-bold bg-orange-50/50" : "text-slate-600 hover:bg-slate-50"}`}
                     >
                       {tab}
                     </button>
                   ))}
                   <button
                     onClick={() => handleTimeFilterChange("Custom")}
-                    className={`w-full text-left px-4 py-2.5 text-[13px] ${timeFilter === "Custom" ? "text-orange-600 font-bold bg-orange-50/50" : "text-slate-600 hover:bg-slate-50"}`}
+                    className={`outline-none w-full text-left px-4 py-2.5 text-[13px] ${timeFilter === "Custom" ? "text-amber-500 font-bold bg-orange-50/50" : "text-slate-600 hover:bg-slate-50"}`}
                   >
                     Custom
                   </button>
@@ -376,7 +376,7 @@ const ShopFloorExecution: React.FC = () => {
                     />
                     <button
                       onClick={handleCustomApply}
-                      className="w-full bg-orange-500 text-white py-2 rounded-lg text-sm font-bold hover:bg-orange-600"
+                      className="outline-none w-full bg-[#F59E0B] text-white py-2 rounded-lg text-sm font-bold hover:bg-[#f67317]"
                     >
                       Apply Range
                     </button>
@@ -390,23 +390,23 @@ const ShopFloorExecution: React.FC = () => {
         {/* Stats Summary */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           <div className="bg-white p-5 rounded-2xl border-l-4 border-orange-500 shadow-sm">
-            <div className="flex items-center justify-between"><p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">Plant OEE</p><Zap size={18} className="text-orange-500" /></div>
-            <h3 className="text-2xl font-extrabold text-gray-800 mt-1">{stats.avgEfficiency}%</h3>
+            <div className="flex items-center justify-between"><p className="text-[11px] font-bold text-gray-800 uppercase tracking-widest">Plant OEE</p><Zap size={18} className="text-[#F59E0B]" /></div>
+            <h3 className="text-2xl font-extrabold text-gray-700 mt-1">{stats.avgEfficiency}%</h3>
             <p className="text-xs text-green-600 mt-1">↑ 5% increase</p>
           </div>
           <div className="bg-white p-5 rounded-2xl border-l-4 border-teal-500 shadow-sm">
-            <div className="flex items-center justify-between"><p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">Target Progress</p><Activity size={18} className="text-teal-500" /></div>
-            <h3 className="text-2xl font-extrabold text-gray-800 mt-1">{overallProgress}%</h3>
+            <div className="flex items-center justify-between"><p className="text-[11px] font-bold text-gray-800 uppercase tracking-widest">Target Progress</p><Activity size={18} className="text-teal-500" /></div>
+            <h3 className="text-2xl font-extrabold text-gray-700 mt-1">{overallProgress}%</h3>
             <div className="mt-2 h-1.5 bg-gray-100 rounded-full overflow-hidden"><div className="h-full bg-[#f3f4e6]0 rounded-full" style={{ width: `${overallProgress}%` }} /></div>
           </div>
           <div className="bg-white p-5 rounded-2xl border-l-4 border-blue-500 shadow-sm">
-            <div className="flex items-center justify-between"><p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">Active Stations</p><Factory size={18} className="text-blue-500" /></div>
-            <h3 className="text-2xl font-extrabold text-gray-800 mt-1">{stats.running}/{stats.total}</h3>
+            <div className="flex items-center justify-between"><p className="text-[11px] font-bold text-gray-800 uppercase tracking-widest">Active Stations</p><Factory size={18} className="text-blue-500" /></div>
+            <h3 className="text-2xl font-extrabold text-gray-700 mt-1">{stats.running}/{stats.total}</h3>
             <p className="text-xs text-gray-500 mt-1">{stats.down} offline, {stats.warning} issues</p>
           </div>
           <div className="bg-white p-5 rounded-2xl border-l-4 border-purple-500 shadow-sm">
-            <div className="flex items-center justify-between"><p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">Staffing</p><User size={18} className="text-purple-500" /></div>
-            <h3 className="text-2xl font-extrabold text-gray-800 mt-1">{new Set(stations.filter(s => s.operator !== "None").map(s => s.operatorId)).size}</h3>
+            <div className="flex items-center justify-between"><p className="text-[11px] font-bold text-gray-800 uppercase tracking-widest">Staffing</p><User size={18} className="text-purple-500" /></div>
+            <h3 className="text-2xl font-extrabold text-gray-700 mt-1">{new Set(stations.filter(s => s.operator !== "None").map(s => s.operatorId)).size}</h3>
             <p className="text-xs text-gray-500 mt-1">Active operators</p>
           </div>
         </div>
@@ -431,7 +431,7 @@ const ShopFloorExecution: React.FC = () => {
               <div className="relative" ref={statusFilterRef}>
                 <button
                   onClick={() => setActiveDropdown(activeDropdown === "status" ? null : "status")}
-                  className={`px-4 py-3 rounded-xl border text-[13px] font-bold flex items-center gap-2 ${statusFilter !== "All" ? "bg-orange-50 border-orange-200 text-orange-600" : "bg-white border-slate-200 text-slate-600"}`}
+                  className={`outline-none px-4 py-3 rounded-xl border text-[13px] font-bold flex items-center gap-2 ${statusFilter !== "All" ? "bg-orange-50 border-orange-200 text-amber-500" : "bg-white border-slate-200 text-slate-600"}`}
                 >
                   <Filter size={14} />
                   {statusFilter === "All" ? "Status" : statusFilter}
@@ -443,7 +443,7 @@ const ShopFloorExecution: React.FC = () => {
                       <button
                         key={opt}
                         onClick={() => { setStatusFilter(opt); setActiveDropdown(null); }}
-                        className={`w-full text-left px-4 py-2 text-[13px] hover:bg-slate-50 ${statusFilter === opt ? "text-orange-600 font-bold bg-orange-50/50" : "text-slate-600"}`}
+                        className={`outline-none w-full text-left px-4 py-2 text-[13px] hover:bg-slate-50 ${statusFilter === opt ? "text-amber-500 font-bold bg-orange-50/50" : "text-slate-600"}`}
                       >
                         {opt}
                       </button>
@@ -456,7 +456,7 @@ const ShopFloorExecution: React.FC = () => {
               <div className="relative" ref={shiftFilterRef}>
                 <button
                   onClick={() => setActiveDropdown(activeDropdown === "shift" ? null : "shift")}
-                  className={`px-4 py-3 rounded-xl border text-[13px] font-bold flex items-center gap-2 ${shiftFilter !== "All" ? "bg-orange-50 border-orange-200 text-orange-600" : "bg-white border-slate-200 text-slate-600"}`}
+                  className={`outline-none px-4 py-3 rounded-xl border text-[13px] font-bold flex items-center gap-2 ${shiftFilter !== "All" ? "bg-orange-50 border-orange-200 text-amber-500" : "bg-white border-slate-200 text-slate-600"}`}
                 >
                   <Calendar size={14} />
                   {shiftFilter === "All" ? "Shift" : getShiftLabel(shiftFilter as Shift)}
@@ -468,7 +468,7 @@ const ShopFloorExecution: React.FC = () => {
                       <button
                         key={opt}
                         onClick={() => { setShiftFilter(opt); setActiveDropdown(null); }}
-                        className={`w-full text-left px-4 py-2 text-[13px] hover:bg-slate-50 ${shiftFilter === opt ? "text-orange-600 font-bold bg-orange-50/50" : "text-slate-600"}`}
+                        className={`outline-none w-full text-left px-4 py-2 text-[13px] hover:bg-slate-50 ${shiftFilter === opt ? "text-amber-500 font-bold bg-orange-50/50" : "text-slate-600"}`}
                       >
                         {opt === "All" ? "All Shifts" : getShiftLabel(opt as Shift)}
                       </button>
@@ -480,7 +480,7 @@ const ShopFloorExecution: React.FC = () => {
               <button
                 disabled={selectedIds.length === 0}
                 onClick={handleBulkDelete}
-                className={`p-3 rounded-xl ${selectedIds.length === 0 ? "bg-gray-100 text-gray-400 cursor-not-allowed" : "bg-rose-600 text-white hover:bg-rose-700"}`}
+                className={`outline-none p-3 rounded-xl ${selectedIds.length === 0 ? "bg-gray-100 text-gray-400 cursor-not-allowed" : "bg-rose-600 text-white hover:bg-rose-700"}`}
               >
                 <Trash2 size={20} />
               </button>
@@ -496,7 +496,7 @@ const ShopFloorExecution: React.FC = () => {
                     <div className="flex items-start gap-3">
                       <input
                         type="checkbox"
-                        className="accent-orange-500 w-4 h-4 cursor-pointer mt-1"
+                        className="h-4 w-4 cursor-pointer appearance-none rounded border border-slate-300 bg-white transition-all relative checked:bg-[#F59E0B] checked:border-[#F59E0B] after:content-[''] after:absolute after:opacity-0 checked:after:opacity-100 after:left-1.25 after:top-px after:w-1 after:h-2 after:border-white after:border-r-2 after:border-b-2 after:rotate-45 outline-none"
                         checked={selectedIds.includes(station.id)}
                         onChange={() => {
                           if (selectedIds.includes(station.id))
@@ -505,13 +505,13 @@ const ShopFloorExecution: React.FC = () => {
                         }}
                       />
                       <div>
-                        <p className="text-[10px] font-mono font-bold text-gray-400 mb-0.5">{station.id}</p>
+                        <p className="text-[10px] font-mono font-bold text-gray-800 mb-0.5">{station.id}</p>
                         <h3 className="text-base font-bold text-gray-800">{station.name}</h3>
                       </div>
                     </div>
                     <div className="flex gap-1">
-                      <button onClick={() => handleViewStation(station)} className="p-1.5 text-gray-400 hover:text-orange-500 transition rounded-lg"><Eye size={16} /></button>
-                      <button onClick={() => handleDelete(station.id)} className="p-1.5 text-gray-400 hover:text-rose-600 transition rounded-lg"><Trash2 size={16} /></button>
+                      <button onClick={() => handleViewStation(station)} className="outline-none p-1.5 text-gray-400 hover:text-[#F59E0B] transition rounded-lg"><Eye size={16} /></button>
+                      <button onClick={() => handleDelete(station.id)} className="outline-none p-1.5 text-gray-400 hover:text-rose-600 transition rounded-lg"><Trash2 size={16} /></button>
                     </div>
                   </div>
 
@@ -527,7 +527,7 @@ const ShopFloorExecution: React.FC = () => {
                   </div>
 
                   <div className="mb-3">
-                    <div className="flex justify-between text-[10px] font-bold text-gray-400 mb-1">
+                    <div className="flex justify-between text-[10px] font-bold text-gray-800 mb-1">
                       <span>Progress</span>
                       <span className="text-gray-800">{station.progress}%</span>
                     </div>
@@ -575,7 +575,7 @@ const ShopFloorExecution: React.FC = () => {
                 <button
                   onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
                   disabled={currentPage === 1}
-                  className="p-2.5 rounded-xl border border-slate-200 bg-white text-slate-500 hover:text-orange-600 disabled:opacity-30"
+                  className=" outline-none p-2.5 rounded-xl border border-slate-200 bg-white text-slate-500 hover:text-amber-500 disabled:opacity-30"
                 >
                   <ChevronDown size={18} className="rotate-90" />
                 </button>
@@ -585,7 +585,7 @@ const ShopFloorExecution: React.FC = () => {
                       <button
                         key={i}
                         onClick={() => setCurrentPage(page as number)}
-                        className={`min-w-10 h-10 rounded-xl text-xs font-bold ${currentPage === page ? "bg-orange-500 text-white shadow-lg" : "bg-white text-slate-500 border border-slate-200"}`}
+                        className={` outline-none min-w-10 h-10 rounded-xl text-xs font-bold ${currentPage === page ? "bg-[#F59E0B] text-white shadow-lg" : "bg-white text-slate-500 border border-slate-200"}`}
                       >
                         {page}
                       </button>
@@ -595,7 +595,7 @@ const ShopFloorExecution: React.FC = () => {
                 <button
                   onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
                   disabled={currentPage === totalPages}
-                  className="p-2.5 rounded-xl border border-slate-200 bg-white text-slate-500 hover:text-orange-600 disabled:opacity-30"
+                  className=" outline-none p-2.5 rounded-xl border border-slate-200 bg-white text-slate-500 hover:text-amber-500 disabled:opacity-30"
                 >
                   <ChevronDown size={18} className="-rotate-90" />
                 </button>
@@ -608,8 +608,8 @@ const ShopFloorExecution: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
           <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-md font-bold text-gray-800 flex items-center gap-2"><User size={18} className="text-orange-500" /> Recent Activity</h2>
-              <button onClick={() => setShowAllActivities(!showAllActivities)} className="text-[10px] font-bold text-orange-500 hover:text-orange-600">
+              <h2 className="text-md font-bold text-gray-800 flex items-center gap-2"><User size={18} className="text-[#F59E0B]" /> Recent Activity</h2>
+              <button onClick={() => setShowAllActivities(!showAllActivities)} className=" outline-none text-[10px] font-bold text-[#F59E0B] hover:text-amber-500">
                 {showAllActivities ? "Show Less" : "View All"}
               </button>
             </div>
@@ -619,7 +619,7 @@ const ShopFloorExecution: React.FC = () => {
                   <div className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-gray-400">{act.icon}</div>
                   <div className="flex-1">
                     <p className="text-xs text-gray-800 leading-tight"><strong>{act.operatorName}</strong> • {act.action}</p>
-                    <p className="text-[9px] font-bold text-gray-400 uppercase mt-0.5">{formatTime(act.timestamp)}</p>
+                    <p className="text-[9px] font-bold text-gray-800 uppercase mt-0.5">{formatTime(act.timestamp)}</p>
                   </div>
                 </div>
               ))}
@@ -627,14 +627,14 @@ const ShopFloorExecution: React.FC = () => {
           </div>
 
           <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
-            <h2 className="text-md font-bold text-gray-800 mb-3 flex items-center gap-2"><Calendar size={18} className="text-orange-500" /> Shift Info</h2>
+            <h2 className="text-md font-bold text-gray-800 mb-3 flex items-center gap-2"><Calendar size={18} className="text-[#F59E0B]" /> Shift Info</h2>
             <div className="space-y-2">
               <div className="flex justify-between text-sm"><span className="text-gray-500">Current Shift:</span><span className="font-semibold">Morning</span></div>
               <div className="flex justify-between text-sm"><span className="text-gray-500">Personnel:</span><span className="font-semibold">12 Assigned</span></div>
               <div className="flex justify-between text-sm"><span className="text-gray-500">Total Progress:</span><span className="font-semibold">65% of daily target</span></div>
             </div>
             <div className="mt-4 pt-3 border-t border-gray-100">
-              <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden"><div className="h-full bg-orange-500 rounded-full" style={{ width: "65%" }} /></div>
+              <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden"><div className="h-full bg-[#F59E0B] rounded-full" style={{ width: "65%" }} /></div>
             </div>
           </div>
         </div>
@@ -654,13 +654,13 @@ const ShopFloorExecution: React.FC = () => {
                 <div className="p-3 bg-gray-50 rounded-xl"><label className="text-xs text-gray-500 uppercase">Status</label><div className="mt-1"><StatusBadge status={selectedStation.status} /></div></div>
                 <div className="p-3 bg-gray-50 rounded-xl"><label className="text-xs text-gray-500 uppercase">Operator</label><p className="font-semibold">{selectedStation.operator}</p></div>
                 <div className="p-3 bg-gray-50 rounded-xl"><label className="text-xs text-gray-500 uppercase">Shift</label><p className="font-semibold">{getShiftLabel(selectedStation.shift)}</p></div>
-                <div className="p-3 bg-gray-50 rounded-xl"><label className="text-xs text-gray-500 uppercase">Efficiency</label><p className="font-bold text-orange-600">{selectedStation.efficiency}%</p></div>
+                <div className="p-3 bg-gray-50 rounded-xl"><label className="text-xs text-gray-500 uppercase">Efficiency</label><p className="font-bold text-amber-500">{selectedStation.efficiency}%</p></div>
               </div>
 
               <div className="p-3 bg-gray-50 rounded-xl">
                 <label className="text-xs text-gray-500 uppercase">Production Progress</label>
                 <div className="mt-2 h-2 bg-gray-200 rounded-full overflow-hidden">
-                  <div className="h-full bg-orange-500" style={{ width: `${selectedStation.progress}%` }} />
+                  <div className="h-full bg-[#F59E0B]" style={{ width: `${selectedStation.progress}%` }} />
                 </div>
                 <p className="text-right text-sm mt-1 font-bold">{selectedStation.progress}% ({selectedStation.output})</p>
               </div>
@@ -673,8 +673,8 @@ const ShopFloorExecution: React.FC = () => {
             </div>
 
             <div className="sticky bottom-0 bg-white border-t p-6 flex justify-end gap-3 z-10">
-              <button onClick={() => setShowStationModal(false)} className="px-6 py-2 bg-gray-100 rounded-xl text-sm font-bold">Close</button>
-              <button className="px-6 py-2 bg-orange-500 text-white rounded-xl text-sm font-bold shadow-lg shadow-orange-500/20">Station Log</button>
+              <button onClick={() => setShowStationModal(false)} className="outline-none px-4 py-2 bg-gray-100 rounded-xl text-sm font-bold">Close</button>
+              <button className="outline-none px-4 py-2 bg-[#F59E0B] text-white rounded-xl text-sm font-bold shadow-lg shadow-orange-500/20">Station Log</button>
             </div>
           </div>
         </div>

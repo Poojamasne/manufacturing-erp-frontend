@@ -115,7 +115,7 @@ const ResourceAllocation: React.FC = () => {
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
   // Options for filters
-  const statusOptions = resourceType === "machines" 
+  const statusOptions = resourceType === "machines"
     ? ["All", "Available", "In Use", "Maintenance", "Shutdown"]
     : ["All", "Assigned", "Available", "At Capacity"];
 
@@ -148,14 +148,14 @@ const ResourceAllocation: React.FC = () => {
     if (resourceType === "machines") {
       return machines.filter(item =>
         (statusFilter === "All" || item.status === statusFilter) &&
-        (item.id.toLowerCase().includes(searchQuery.toLowerCase()) || 
-         item.name.toLowerCase().includes(searchQuery.toLowerCase()))
+        (item.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          item.name.toLowerCase().includes(searchQuery.toLowerCase()))
       );
     } else {
       return operators.filter(item =>
         (statusFilter === "All" || item.status === statusFilter) &&
-        (item.id.toLowerCase().includes(searchQuery.toLowerCase()) || 
-         item.name.toLowerCase().includes(searchQuery.toLowerCase()))
+        (item.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          item.name.toLowerCase().includes(searchQuery.toLowerCase()))
       );
     }
   }, [machines, operators, resourceType, searchQuery, statusFilter]);
@@ -272,26 +272,26 @@ const ResourceAllocation: React.FC = () => {
           <div className="relative" ref={timeDropdownRef}>
             <button
               onClick={() => setIsTimeDropdownOpen(!isTimeDropdownOpen)}
-              className="px-4 py-2 rounded-xl border border-slate-200 bg-white text-sm font-medium shadow-sm flex items-center gap-2 text-gray-700"
+              className="outline-none px-4 py-2 rounded-xl border border-slate-200 bg-white text-sm font-medium shadow-sm flex items-center gap-2 text-gray-700"
             >
-              <Filter size={16} className="text-orange-500" />
+              <Filter size={16} className="outline-none text-[#F59E0B]" />
               <span>{getFilterDisplayText()}</span>
-              <ChevronDown size={14} className={isTimeDropdownOpen ? "rotate-180" : ""} />
+              <ChevronDown size={14} className={isTimeDropdownOpen ? "outline-none rotate-180" : ""} />
             </button>
             {isTimeDropdownOpen && !isCalendarOpen && (
               <div className="absolute right-0 mt-2 bg-white rounded-2xl shadow-2xl z-50 py-2 min-w-40 overflow-hidden">
-                {["Weekly", "Monthly", "Quarterly", "Yearly", "All Time"].map((tab) => (
+                {["All Time", "Weekly", "Monthly", "Quarterly", "Yearly"].map((tab) => (
                   <button
                     key={tab}
                     onClick={() => handleTimeFilterChange(tab as TimeFilter)}
-                    className={`w-full text-left px-4 py-2.5 text-[13px] ${timeFilter === tab ? "text-orange-600 font-bold bg-orange-50/50" : "text-slate-600 hover:bg-slate-50"}`}
+                    className={`outline-none w-full text-left px-4 py-2.5 text-[13px] ${timeFilter === tab ? "text-amber-500 font-bold bg-orange-50/50" : "text-slate-600 hover:bg-slate-50"}`}
                   >
                     {tab}
                   </button>
                 ))}
                 <button
                   onClick={() => handleTimeFilterChange("Custom")}
-                  className={`w-full text-left px-4 py-2.5 text-[13px] ${timeFilter === "Custom" ? "text-orange-600 font-bold bg-orange-50/50" : "text-slate-600 hover:bg-slate-50"}`}
+                  className={`outline-none w-full text-left px-4 py-2.5 text-[13px] ${timeFilter === "Custom" ? "text-amber-500 font-bold bg-orange-50/50" : "text-slate-600 hover:bg-slate-50"}`}
                 >
                   Custom
                 </button>
@@ -315,7 +315,7 @@ const ResourceAllocation: React.FC = () => {
                   />
                   <button
                     onClick={handleCustomApply}
-                    className="w-full bg-orange-500 text-white py-2 rounded-lg text-sm font-bold hover:bg-orange-600"
+                    className="outline-none w-full bg-[#F59E0B] text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-[#f67317]"
                   >
                     Apply Range
                   </button>
@@ -327,30 +327,30 @@ const ResourceAllocation: React.FC = () => {
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          <div className="bg-white p-5 rounded-2xl border-l-4 border-orange-500 shadow-sm">
-            <p className="text-xs text-gray-500">Total Machines</p>
-            <p className="text-2xl font-bold">{stats.totalMachines}</p>
+          <div className="bg-white p-6 rounded-2xl border-l-4 border-orange-500 shadow-sm">
+            <p className="text-[11px] font-bold text-gray-800 uppercase tracking-widest">Total Machines</p>
+            <p className="text-2xl font-bold text-gray-700">{stats.totalMachines}</p>
             <div className="flex gap-3 mt-2 text-xs">
               <span className="text-teal-600">Available: {stats.availableMachines}</span>
               <span className="text-blue-600">In Use: {stats.inUseMachines}</span>
             </div>
           </div>
-          <div className="bg-white p-5 rounded-2xl border-l-4 border-blue-500 shadow-sm">
-            <p className="text-xs text-gray-500">Maintenance</p>
-            <p className="text-2xl font-bold">{stats.maintenanceMachines}</p>
+          <div className="bg-white p-6 rounded-2xl border-l-4 border-blue-500 shadow-sm">
+            <p className="text-[11px] font-bold text-gray-800 uppercase tracking-widest">Maintenance</p>
+            <p className="text-2xl font-bold text-gray-700">{stats.maintenanceMachines}</p>
             <p className="text-xs text-red-600 mt-1">Machines in maintenance</p>
           </div>
-          <div className="bg-white p-5 rounded-2xl border-l-4 border-green-500 shadow-sm">
-            <p className="text-xs text-gray-500">Total Operators</p>
-            <p className="text-2xl font-bold">{stats.totalOperators}</p>
+          <div className="bg-white p-6 rounded-2xl border-l-4 border-green-500 shadow-sm">
+            <p className="text-[11px] font-bold text-gray-800 uppercase tracking-widest">Total Operators</p>
+            <p className="text-2xl font-bold text-gray-700">{stats.totalOperators}</p>
             <div className="flex gap-3 mt-2 text-xs">
               <span className="text-teal-600">Available: {stats.availableOperators}</span>
               <span className="text-blue-600">Assigned: {stats.assignedOperators}</span>
             </div>
           </div>
-          <div className="bg-white p-5 rounded-2xl border-l-4 border-amber-500 shadow-sm">
-            <p className="text-xs text-gray-500">At Capacity</p>
-            <p className="text-2xl font-bold">{stats.atCapacityOperators}</p>
+          <div className="bg-white p-6 rounded-2xl border-l-4 border-amber-500 shadow-sm">
+            <p className="text-[11px] font-bold text-gray-800 uppercase tracking-widest">At Capacity</p>
+            <p className="text-2xl font-bold text-gray-700">{stats.atCapacityOperators}</p>
             <p className="text-xs text-amber-600 mt-1">Operators at max workload</p>
           </div>
         </div>
@@ -375,23 +375,23 @@ const ResourceAllocation: React.FC = () => {
               <div className="relative" ref={resourceFilterRef}>
                 <button
                   onClick={() => setActiveDropdown(activeDropdown === "resource" ? null : "resource")}
-                  className={`px-4 py-3 rounded-xl border text-[13px] font-bold flex items-center gap-2 ${resourceType !== "machines" ? "bg-orange-50 border-orange-200 text-orange-600" : "bg-white border-slate-200 text-slate-600"}`}
+                  className={`outline-none px-4 py-3 rounded-xl border text-[13px] font-bold flex items-center gap-2 ${resourceType !== "machines" ? "bg-orange-50 border-orange-200 text-amber-500" : "bg-white border-slate-200 text-slate-600"}`}
                 >
                   {resourceType === "machines" ? <Factory size={16} /> : <Users size={16} />}
                   {resourceType === "machines" ? "Machines" : "Operators"}
-                  <ChevronDown size={14} className={activeDropdown === "resource" ? "rotate-180" : ""} />
+                  <ChevronDown size={14} className={activeDropdown === "resource" ? "outline-none rotate-180" : ""} />
                 </button>
                 {activeDropdown === "resource" && (
                   <div className="absolute right-0 mt-2 w-40 bg-white rounded-2xl shadow-2xl z-50 py-2 overflow-hidden">
                     <button
                       onClick={() => { setResourceType("machines"); setActiveDropdown(null); setSelectedIds([]); setCurrentPage(1); setSearchQuery(""); setStatusFilter("All"); }}
-                      className={`w-full text-left px-4 py-2 text-[13px] hover:bg-slate-50 flex items-center gap-2 ${resourceType === "machines" ? "text-orange-600 font-bold bg-orange-50/50" : "text-slate-600"}`}
+                      className={`outline-none w-full text-left px-4 py-2 text-[13px] hover:bg-slate-50 flex items-center gap-2 ${resourceType === "machines" ? "text-amber-500 font-bold bg-orange-50/50" : "text-slate-600"}`}
                     >
                       <Factory size={14} /> Machines
                     </button>
                     <button
                       onClick={() => { setResourceType("operators"); setActiveDropdown(null); setSelectedIds([]); setCurrentPage(1); setSearchQuery(""); setStatusFilter("All"); }}
-                      className={`w-full text-left px-4 py-2 text-[13px] hover:bg-slate-50 flex items-center gap-2 ${resourceType === "operators" ? "text-orange-600 font-bold bg-orange-50/50" : "text-slate-600"}`}
+                      className={`outline-none w-full text-left px-4 py-2 text-[13px] hover:bg-slate-50 flex items-center gap-2 ${resourceType === "operators" ? "text-amber-500 font-bold bg-orange-50/50" : "text-slate-600"}`}
                     >
                       <Users size={14} /> Operators
                     </button>
@@ -403,10 +403,10 @@ const ResourceAllocation: React.FC = () => {
               <div className="relative" ref={statusFilterRef}>
                 <button
                   onClick={() => setActiveDropdown(activeDropdown === "status" ? null : "status")}
-                  className={`px-4 py-3 rounded-xl border text-[13px] font-bold flex items-center gap-2 ${statusFilter !== "All" ? "bg-orange-50 border-orange-200 text-orange-600" : "bg-white border-slate-200 text-slate-600"}`}
+                  className={`outline-none px-4 py-3 rounded-xl border text-[13px] font-bold flex items-center gap-2 ${statusFilter !== "All" ? "bg-orange-50 border-orange-200 text-amber-500" : "bg-white border-slate-200 text-slate-600"}`}
                 >
                   {statusFilter === "All" ? "Status" : statusFilter}
-                  <ChevronDown size={14} className={activeDropdown === "status" ? "rotate-180" : ""} />
+                  <ChevronDown size={14} className={activeDropdown === "status" ? "outline-none rotate-180" : ""} />
                 </button>
                 {activeDropdown === "status" && (
                   <div className="absolute right-0 mt-2 w-40 bg-white rounded-2xl shadow-2xl z-50 py-2 overflow-hidden">
@@ -414,7 +414,7 @@ const ResourceAllocation: React.FC = () => {
                       <button
                         key={opt}
                         onClick={() => { setStatusFilter(opt); setActiveDropdown(null); }}
-                        className={`w-full text-left px-4 py-2 text-[13px] hover:bg-slate-50 ${statusFilter === opt ? "text-orange-600 font-bold bg-orange-50/50" : "text-slate-600"}`}
+                        className={`outline-none w-full text-left px-4 py-2 text-[13px] hover:bg-slate-50 ${statusFilter === opt ? "text-amber-500 font-bold bg-orange-50/50" : "text-slate-600"}`}
                       >
                         {opt}
                       </button>
@@ -426,7 +426,7 @@ const ResourceAllocation: React.FC = () => {
               <button
                 disabled={selectedIds.length === 0}
                 onClick={handleBulkDelete}
-                className={`p-3 rounded-xl ${selectedIds.length === 0 ? "bg-gray-100 text-gray-400 cursor-not-allowed" : "bg-rose-600 text-white hover:bg-rose-700"}`}
+                className={`outline-none p-3 rounded-xl ${selectedIds.length === 0 ? "bg-gray-100 text-gray-400 cursor-not-allowed" : "bg-rose-600 text-white hover:bg-rose-700"}`}
               >
                 <Trash2 size={20} />
               </button>
@@ -441,7 +441,7 @@ const ResourceAllocation: React.FC = () => {
                   <th className="w-12 p-5 text-center border-b border-slate-100">
                     <input
                       type="checkbox"
-                      className="accent-orange-500 w-4 h-4 cursor-pointer"
+                      className="h-4 w-4 cursor-pointer appearance-none rounded border border-slate-300 bg-white transition-all relative checked:bg-[#F59E0B] checked:border-[#F59E0B] after:content-[''] after:absolute after:opacity-0 checked:after:opacity-100 after:left-1.25 after:top-px after:w-1 after:h-2 after:border-white after:border-r-2 after:border-b-2 after:rotate-45 outline-none"
                       checked={paginatedData.length > 0 && selectedIds.length === paginatedData.length}
                       onChange={toggleSelectAll}
                     />
@@ -473,7 +473,7 @@ const ResourceAllocation: React.FC = () => {
                     <td className="p-5 text-center">
                       <input
                         type="checkbox"
-                        className="accent-orange-500 w-4 h-4 cursor-pointer"
+                        className="h-4 w-4 cursor-pointer appearance-none rounded border border-slate-300 bg-white transition-all relative checked:bg-[#F59E0B] checked:border-[#F59E0B] after:content-[''] after:absolute after:opacity-0 checked:after:opacity-100 after:left-1.25 after:top-px after:w-1 after:h-2 after:border-white after:border-r-2 after:border-b-2 after:rotate-45 outline-none"
                         checked={selectedIds.includes(item.id)}
                         onChange={() => {
                           if (selectedIds.includes(item.id))
@@ -491,9 +491,9 @@ const ResourceAllocation: React.FC = () => {
                         <td className="px-4 py-4 text-[13px] font-bold text-slate-800 text-center">{item.load}%</td>
                         <td className="px-4 py-4">
                           <div className="flex justify-center gap-2">
-                            <button onClick={() => handleViewDetails(item)} className="p-1.5 text-slate-400 hover:text-orange-500 transition-colors"><Eye size={16} /></button>
-                            <button onClick={() => setEditingMachine(item)} className="p-1.5 text-slate-400 hover:text-blue-500 transition-colors"><Pencil size={16} /></button>
-                            <button onClick={() => handleDelete(item.id)} className="p-1.5 text-slate-400 hover:text-rose-600 transition-colors"><Trash2 size={16} /></button>
+                            <button onClick={() => handleViewDetails(item)} className="outline-none p-1.5 text-slate-400 hover:text-[#F59E0B] transition-colors"><Eye size={16} /></button>
+                            <button onClick={() => setEditingMachine(item)} className="outline-none p-1.5 text-slate-400 hover:text-blue-500 transition-colors"><Pencil size={16} /></button>
+                            <button onClick={() => handleDelete(item.id)} className="outline-none p-1.5 text-slate-400 hover:text-rose-600 transition-colors"><Trash2 size={16} /></button>
                           </div>
                         </td>
                       </>
@@ -505,7 +505,7 @@ const ResourceAllocation: React.FC = () => {
                         <td className="px-4 py-4 text-center">
                           <div className="flex items-center justify-center gap-2">
                             <div className="w-24 bg-slate-100 h-1.5 rounded-full overflow-hidden">
-                              <div className={`h-full ${item.workload > 80 ? 'bg-red-500' : 'bg-orange-500'}`} style={{ width: `${item.workload}%` }} />
+                              <div className={`h-full ${item.workload > 80 ? 'bg-red-500' : 'bg-[#F59E0B]'}`} style={{ width: `${item.workload}%` }} />
                             </div>
                             <span className="text-[10px] font-bold">{item.workload}%</span>
                           </div>
@@ -513,9 +513,9 @@ const ResourceAllocation: React.FC = () => {
                         <td className="px-4 py-4 text-center"><StatusBadge status={item.status} /></td>
                         <td className="px-4 py-4 text-center">
                           <div className="flex justify-center gap-2">
-                            <button onClick={() => handleViewDetails(item)} className="p-1.5 text-slate-400 hover:text-orange-500 transition-colors"><Eye size={16} /></button>
-                            <button className="p-1.5 text-slate-400 hover:text-blue-500 transition-colors"><Pencil size={16} /></button>
-                            <button onClick={() => handleDelete(item.id)} className="p-1.5 text-slate-400 hover:text-rose-600 transition-colors"><Trash2 size={16} /></button>
+                            <button onClick={() => handleViewDetails(item)} className="outline-none p-1.5 text-slate-400 hover:text-[#F59E0B] transition-colors"><Eye size={16} /></button>
+                            <button onClick={() => setEditingMachine(item)} className="outline-none p-1.5 text-slate-400 hover:text-blue-500 transition-colors"><Pencil size={16} /></button>
+                            <button onClick={() => handleDelete(item.id)} className="outline-none p-1.5 text-slate-400 hover:text-rose-600 transition-colors"><Trash2 size={16} /></button>
                           </div>
                         </td>
                       </>
@@ -542,11 +542,11 @@ const ResourceAllocation: React.FC = () => {
                 Showing {(currentPage - 1) * itemsPerPage + 1} to {Math.min(currentPage * itemsPerPage, currentData.length)} of {currentData.length} {resourceType}
               </div>
               <div className="flex items-center gap-2">
-                <button onClick={() => setCurrentPage((p) => Math.max(1, p - 1))} disabled={currentPage === 1} className="p-2.5 rounded-xl border bg-white text-slate-500 hover:text-orange-600 disabled:opacity-30"><ChevronLeft size={18} /></button>
+                <button onClick={() => setCurrentPage((p) => Math.max(1, p - 1))} disabled={currentPage === 1} className="outline-none p-2.5 rounded-xl border bg-white text-slate-500 hover:text-amber-500 disabled:opacity-30"><ChevronLeft size={18} /></button>
                 <div className="flex gap-1.5">
-                  {getPageNumbers().map((page, i) => page === "..." ? <span key={i} className="px-2 text-slate-300"><MoreHorizontal size={14} /></span> : <button key={i} onClick={() => setCurrentPage(page as number)} className={`min-w-10 h-10 rounded-xl text-xs font-bold ${currentPage === page ? "bg-orange-500 text-white shadow-lg" : "bg-white text-slate-500 border border-slate-200"}`}>{page}</button>)}
+                  {getPageNumbers().map((page, i) => page === "..." ? <span key={i} className="px-2 text-slate-300"><MoreHorizontal size={14} /></span> : <button key={i} onClick={() => setCurrentPage(page as number)} className={`outline-none min-w-10 h-10 rounded-xl text-xs font-bold ${currentPage === page ? "bg-[#F59E0B] text-white shadow-lg" : "bg-white text-slate-500 border border-slate-200"}`}>{page}</button>)}
                 </div>
-                <button onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages} className="p-2.5 rounded-xl border bg-white text-slate-500 hover:text-orange-600 disabled:opacity-30"><ChevronRight size={18} /></button>
+                <button onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages} className="outline-none p-2.5 rounded-xl border bg-white text-slate-500 hover:text-amber-500 disabled:opacity-30"><ChevronRight size={18} /></button>
               </div>
             </footer>
           )}
@@ -561,7 +561,7 @@ const ResourceAllocation: React.FC = () => {
           <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl relative">
             <div className="flex justify-between items-center mb-6">
               <h3 className="text-xl font-bold text-slate-800">Edit Machine Info</h3>
-              <button onClick={() => setEditingMachine(null)} className="text-slate-400 hover:text-slate-600"><X size={20} /></button>
+              <button onClick={() => setEditingMachine(null)} className="outline-none text-slate-400 hover:text-slate-600"><X size={20} /></button>
             </div>
             <form onSubmit={handleUpdateMachine} className="space-y-4">
               <div>
@@ -575,8 +575,8 @@ const ResourceAllocation: React.FC = () => {
                 </select>
               </div>
               <div className="flex gap-3 pt-4">
-                <button type="button" onClick={() => setEditingMachine(null)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold text-sm">Cancel</button>
-                <button type="submit" className="flex-1 py-3 bg-orange-500 text-white rounded-xl font-bold text-sm shadow-lg shadow-orange-500/20">Save Changes</button>
+                <button type="button" onClick={() => setEditingMachine(null)} className="outline-none flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold text-sm">Cancel</button>
+                <button type="submit" className="outline-none flex-1 py-3 bg-[#F59E0B] text-white rounded-xl font-bold text-sm shadow-lg shadow-orange-500/20">Save Changes</button>
               </div>
             </form>
           </div>

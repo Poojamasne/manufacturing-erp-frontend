@@ -7,7 +7,7 @@ import {
   ChevronRight,
   MoreHorizontal,
   Filter,
-  Factory,
+  Play,
   Package,
   ShoppingCart,
   CheckCircle,
@@ -257,7 +257,7 @@ const formatDate = (date: string) => {
   const month = String(d.getMonth() + 1).padStart(2, "0");
   const year = d.getFullYear();
 
-  return `${day}/${month}/${year}`; 
+  return `${day}/${month}/${year}`;
 };
 
 const ProductionPlanningScreen: React.FC = () => {
@@ -394,7 +394,7 @@ const ProductionPlanningScreen: React.FC = () => {
       if (timeFilter === "Quarterly") {
         return (
           Math.floor(orderDate.getMonth() / 3) ===
-            Math.floor(now.getMonth() / 3) &&
+          Math.floor(now.getMonth() / 3) &&
           orderDate.getFullYear() === now.getFullYear()
         );
       }
@@ -541,24 +541,24 @@ const ProductionPlanningScreen: React.FC = () => {
           <div className="relative" ref={dropdownRef}>
             <button
               onClick={() => setIsTimeDropdownOpen(!isTimeDropdownOpen)}
-              className="px-4 py-2 rounded-xl border border-slate-200 bg-white text-sm font-medium shadow-sm flex items-center gap-2 text-gray-700"
+              className="outline-none px-4 py-2 rounded-xl border border-slate-200 bg-white text-sm font-medium shadow-sm flex items-center gap-2 text-gray-700"
             >
-              <Filter size={16} className="text-orange-500" />
+              <Filter size={16} className="outline-none text-[#F59E0B]" />
               <span>{getFilterDisplayText()}</span>
               <ChevronDown
                 size={14}
-                className={isTimeDropdownOpen ? "rotate-180" : ""}
+                className={isTimeDropdownOpen ? "outline-none rotate-180" : ""}
               />
             </button>
 
             {isTimeDropdownOpen && !isCalendarOpen && (
               <div className="absolute right-0 mt-2 bg-white border border-slate-100 rounded-2xl shadow-2xl z-50 py-2 min-w-40">
-                {["Weekly", "Monthly", "Quarterly", "Yearly", "All Time"].map(
+                {["All Time", "Weekly", "Monthly", "Quarterly", "Yearly"].map(
                   (tab) => (
                     <button
                       key={tab}
                       onClick={() => handleTimeFilterChange(tab as TimeFilter)}
-                      className={`w-full text-left px-4 py-2.5 text-[13px] ${timeFilter === tab ? "text-orange-600 font-bold bg-orange-50/50" : "text-slate-600 hover:bg-slate-50"}`}
+                      className={`outline-none w-full text-left px-4 py-2 text-[13px] ${timeFilter === tab ? "text-amber-500 font-bold bg-orange-50/50" : "text-slate-600 hover:bg-slate-50"}`}
                     >
                       {tab}
                     </button>
@@ -566,7 +566,7 @@ const ProductionPlanningScreen: React.FC = () => {
                 )}
                 <button
                   onClick={() => handleTimeFilterChange("Custom")}
-                  className={`w-full text-left px-4 py-2.5 text-[13px] ${timeFilter === "Custom" ? "text-orange-600 font-bold bg-orange-50/50" : "text-slate-600 hover:bg-slate-50"}`}
+                  className={`outline-none w-full text-left px-4 py-2 text-[13px] ${timeFilter === "Custom" ? "text-amber-500 font-bold bg-orange-50/50" : "text-slate-600 hover:bg-slate-50"}`}
                 >
                   Custom
                 </button>
@@ -598,7 +598,7 @@ const ProductionPlanningScreen: React.FC = () => {
                   />
                   <button
                     onClick={handleCustomApply}
-                    className="w-full bg-orange-500 text-white py-2 rounded-lg text-sm font-bold hover:bg-orange-600"
+                    className="outline-none w-full bg-[#F59E0B] text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-[#f67317]"
                   >
                     Apply Range
                   </button>
@@ -615,7 +615,7 @@ const ProductionPlanningScreen: React.FC = () => {
             {/* Search */}
             <div className="relative w-full lg:w-96">
               <Search
-                className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300"
+                className="absolute left-4 top-1/2 -translate-y-1/2 outline-none text-slate-300"
                 size={18}
               />
               <input
@@ -635,16 +635,15 @@ const ProductionPlanningScreen: React.FC = () => {
               <div className="relative" ref={priorityRef}>
                 <button
                   onClick={() => setActiveDropdown(activeDropdown === "priority" ? null : "priority")}
-                  className={`px-4 py-3 rounded-xl border text-[13px] font-bold flex items-center gap-2 ${
-                    priorityFilter !== "All"
-                      ? "bg-orange-50 border-orange-200 text-orange-600"
-                      : "bg-white border-slate-200 text-slate-600"
-                  }`}
+                  className={`outline-none px-4 py-3 rounded-xl border text-[13px] font-bold flex items-center gap-2 ${priorityFilter !== "All"
+                    ? "bg-orange-50 border-orange-200 text-amber-500"
+                    : "bg-white border-slate-200 text-slate-600"
+                    }`}
                 >
                   {priorityFilter === "All" ? "Priority" : priorityFilter}
                   <ChevronDown
                     size={14}
-                    className={activeDropdown === "priority" ? "rotate-180" : ""}
+                    className={activeDropdown === "priority" ? "outline-none rotate-180" : ""}
                   />
                 </button>
 
@@ -657,11 +656,10 @@ const ProductionPlanningScreen: React.FC = () => {
                           setPriorityFilter(opt);
                           setActiveDropdown(null);
                         }}
-                        className={`w-full text-left px-4 py-2 text-[13px] hover:bg-slate-50 ${
-                          priorityFilter === opt
-                            ? "text-orange-600 font-bold bg-orange-50/50"
-                            : "text-slate-600"
-                        }`}
+                        className={`outline-none w-full text-left px-4 py-2 text-[13px] hover:bg-slate-50 ${priorityFilter === opt
+                          ? "text-amber-500 font-bold bg-orange-50/50"
+                          : "text-slate-600"
+                          }`}
                       >
                         {opt}
                       </button>
@@ -674,7 +672,7 @@ const ProductionPlanningScreen: React.FC = () => {
               <button
                 disabled={selectedIds.length === 0}
                 onClick={handleBulkDelete}
-                className={`p-3 rounded-xl ${selectedIds.length === 0 ? "bg-gray-100 text-gray-400 cursor-not-allowed" : "bg-rose-600 text-white hover:bg-rose-700"}`}
+                className={`outline-none p-3 rounded-xl ${selectedIds.length === 0 ? "bg-gray-100 text-gray-400 cursor-not-allowed" : "bg-rose-600 text-white hover:bg-rose-700"}`}
               >
                 <Trash2 size={20} />
               </button>
@@ -689,7 +687,7 @@ const ProductionPlanningScreen: React.FC = () => {
                   <th className="w-12 p-5 text-center border-b border-slate-100">
                     <input
                       type="checkbox"
-                      className="accent-orange-500 w-4 h-4 cursor-pointer"
+                      className="h-4 w-4 cursor-pointer appearance-none rounded border border-slate-300 bg-white transition-all relative checked:bg-[#F59E0B] checked:border-[#F59E0B] after:content-[''] after:absolute after:opacity-0 checked:after:opacity-100 after:left-1.25 after:top-px after:w-1 after:h-2 after:border-white after:border-r-2 after:border-b-2 after:rotate-45 outline-none"
                       checked={
                         paginatedOrders.length > 0 &&
                         selectedIds.length === paginatedOrders.length
@@ -729,7 +727,7 @@ const ProductionPlanningScreen: React.FC = () => {
                     <td className="p-5 text-center">
                       <input
                         type="checkbox"
-                        className="accent-orange-500 w-4 h-4 cursor-pointer"
+                        className="h-4 w-4 cursor-pointer appearance-none rounded border border-slate-300 bg-white transition-all relative checked:bg-[#F59E0B] checked:border-[#F59E0B] after:content-[''] after:absolute after:opacity-0 checked:after:opacity-100 after:left-1.25 after:top-px after:w-1 after:h-2 after:border-white after:border-r-2 after:border-b-2 after:rotate-45 outline-none"
                         checked={selectedIds.includes(order.id)}
                         onChange={() => {
                           if (selectedIds.includes(order.id))
@@ -762,24 +760,24 @@ const ProductionPlanningScreen: React.FC = () => {
                       <div className="flex justify-center gap-2">
                         <button
                           onClick={() => handleViewDetails(order)}
-                          className="p-1.5 text-slate-400 hover:text-orange-500 transition-colors"
+                          className="outline-none p-1.5 text-slate-400 hover:text-[#F59E0B] transition-colors"
                           title="View Details"
                         >
                           <Eye size={16} />
                         </button>
                         <button
                           onClick={() => handlePlanProduction(order)}
-                          className="p-1.5 text-slate-400 hover:text-green-500 transition-colors"
+                          className="outline-none p-1.5 text-slate-400 hover:text-green-500 transition-colors"
                           title="Plan Production"
                         >
-                          <Factory size={16} />
+                          <Play size={16} />
                         </button>
                         <button
                           onClick={() => handleDelete(order.id)}
-                          className="p-1.5 text-slate-400 hover:text-rose-600 transition-colors"
+                          className="outline-none p-1.5 text-slate-400 hover:text-rose-600 transition-colors"
                           title="Delete"
                         >
-                          <Trash2 size={16} />
+                          <Trash2 size={16} className="outline-none" />
                         </button>
                       </div>
                     </td>
@@ -791,7 +789,7 @@ const ProductionPlanningScreen: React.FC = () => {
             {filteredOrders.length === 0 && (
               <div className="py-32 flex flex-col items-center justify-center text-center">
                 <div className="p-6 bg-slate-50 rounded-full mb-4">
-                  <Package className="text-slate-200" size={40} />
+                  <Package className="outline-none text-slate-200" size={40} />
                 </div>
                 <h3 className="text-lg font-bold text-slate-800">
                   No Sales Orders Found
@@ -815,21 +813,21 @@ const ProductionPlanningScreen: React.FC = () => {
                 <button
                   onClick={() => goToPage(currentPage - 1)}
                   disabled={currentPage === 1}
-                  className="p-2.5 rounded-xl border border-slate-200 bg-white text-slate-500 hover:text-orange-600 disabled:opacity-30"
+                  className="outline-none p-2.5 rounded-xl border border-slate-200 bg-white text-slate-500 hover:text-amber-500 disabled:opacity-30"
                 >
-                  <ChevronLeft size={18} />
+                  <ChevronLeft size={18} className="outline-none " />
                 </button>
                 <div className="flex items-center gap-1.5">
                   {getPageNumbers().map((page, i) =>
                     page === "..." ? (
                       <span key={i} className="px-2 text-slate-300">
-                        <MoreHorizontal size={14} />
+                        <MoreHorizontal size={14} className="outline-none" />
                       </span>
                     ) : (
                       <button
                         key={i}
                         onClick={() => goToPage(page as number)}
-                        className={`min-w-10 h-10 rounded-xl text-xs font-bold transition-all ${currentPage === page ? "bg-orange-500 text-white shadow-lg" : "bg-white text-slate-500 border border-slate-200"}`}
+                        className={`outline-none min-w-10 h-10 rounded-xl text-xs font-bold transition-all ${currentPage === page ? "bg-[#F59E0B] text-white shadow-lg" : "bg-white text-slate-500 border border-slate-200"}`}
                       >
                         {page}
                       </button>
@@ -839,9 +837,9 @@ const ProductionPlanningScreen: React.FC = () => {
                 <button
                   onClick={() => goToPage(currentPage + 1)}
                   disabled={currentPage === totalPages}
-                  className="p-2.5 rounded-xl border border-slate-200 bg-white text-slate-500 hover:text-orange-600 disabled:opacity-30"
+                  className="outline-none p-2.5 rounded-xl border border-slate-200 bg-white text-slate-500 hover:text-amber-500 disabled:opacity-30"
                 >
-                  <ChevronRight size={18} />
+                  <ChevronRight size={18} className="outline-none" />
                 </button>
               </div>
             </footer>
@@ -860,7 +858,7 @@ const ProductionPlanningScreen: React.FC = () => {
               </div>
               <button
                 onClick={() => setShowDetailsModal(false)}
-                className="text-gray-400 hover:text-gray-600"
+                className="outline-none text-gray-400 hover:text-gray-600"
               >
                 ✕
               </button>
@@ -904,7 +902,7 @@ const ProductionPlanningScreen: React.FC = () => {
             <div className="sticky bottom-0 bg-white border-t p-6 flex justify-end gap-3">
               <button
                 onClick={() => setShowDetailsModal(false)}
-                className="px-6 py-2 bg-gray-100 rounded-xl hover:bg-gray-200"
+                className="outline-none px-4 py-2 bg-gray-100 rounded-xl hover:bg-gray-200"
               >
                 Close
               </button>
@@ -913,9 +911,9 @@ const ProductionPlanningScreen: React.FC = () => {
                   setShowDetailsModal(false);
                   handlePlanProduction(viewOrder);
                 }}
-                className="px-6 py-2 bg-orange-500 text-white rounded-xl hover:bg-orange-600 flex items-center gap-2"
+                className="outline-none px-4 py-2 bg-[#F59E0B] text-white rounded-xl hover:bg-[#f67317] flex items-center gap-2"
               >
-                <Factory size={14} /> Plan Production
+                <Play size={14} /> Plan Production
               </button>
             </div>
           </div>
@@ -941,7 +939,7 @@ const ProductionPlanningScreen: React.FC = () => {
                   setSelectedOrder(null);
                   setCurrentStep(1);
                 }}
-                className="text-gray-400 hover:text-gray-600"
+                className="outline-none text-gray-400 hover:text-gray-600"
               >
                 <X size={20} />
               </button>
@@ -952,19 +950,19 @@ const ProductionPlanningScreen: React.FC = () => {
               <div className="flex">
                 {[
                   { step: 1, title: "Order Details", icon: Package },
-                  { step: 2, title: "BOM Check", icon: Factory },
+                  { step: 2, title: "BOM Check", icon: Play },
                   { step: 3, title: "Inventory Check", icon: ShoppingCart },
                 ].map((item) => (
                   <div key={item.step} className="flex-1 relative">
                     <div className="flex items-center">
                       <div
-                        className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${currentStep >= item.step ? "bg-orange-500 text-white" : "bg-gray-200 text-gray-600"}`}
+                        className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${currentStep >= item.step ? "bg-[#F59E0B] text-white" : "bg-gray-200 text-gray-600"}`}
                       >
                         <item.icon size={18} />
                       </div>
                       {item.step < 3 && (
                         <div
-                          className={`flex-1 h-0.5 mx-2 transition-all ${currentStep > item.step ? "bg-orange-500" : "bg-gray-200"}`}
+                          className={`flex-1 h-0.5 mx-2 transition-all ${currentStep > item.step ? "bg-[#F59E0B]" : "bg-gray-200"}`}
                         />
                       )}
                     </div>
@@ -1132,11 +1130,11 @@ const ProductionPlanningScreen: React.FC = () => {
                             <td className="px-4 py-3">
                               {item.shortage === 0 ? (
                                 <span className="inline-flex items-center gap-1 text-green-600 text-sm">
-                                  <CheckCircle size={14} /> Available
+                                  <CheckCircle size={14} className="outline-none " /> Available
                                 </span>
                               ) : (
                                 <span className="inline-flex items-center gap-1 text-red-600 text-sm">
-                                  <AlertCircle size={14} /> Shortage:{" "}
+                                  <AlertCircle size={14} className="outline-none" /> Shortage:{" "}
                                   {item.shortage.toFixed(2)} {item.unit}
                                 </span>
                               )}
@@ -1151,7 +1149,7 @@ const ProductionPlanningScreen: React.FC = () => {
                     <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4 mb-4">
                       <div className="flex items-start gap-2">
                         <AlertTriangle
-                          className="text-yellow-600 mt-0.5"
+                          className="outline-none text-yellow-600 mt-0.5"
                           size={18}
                         />
                         <div>
@@ -1164,7 +1162,7 @@ const ProductionPlanningScreen: React.FC = () => {
                           </p>
                           <button
                             onClick={() => setShowPurchaseRequest(true)}
-                            className="mt-3 px-3 py-1.5 bg-orange-500 text-white rounded-lg text-sm hover:bg-orange-600 transition"
+                            className="outline-none mt-3 px-3 py-1.5 bg-[#F59E0B] text-white rounded-lg text-sm hover:bg-[#f67317] transition"
                           >
                             Create Purchase Request
                           </button>
@@ -1180,23 +1178,23 @@ const ProductionPlanningScreen: React.FC = () => {
             <div className="sticky bottom-0 bg-white border-t border-gray-200 p-6 flex justify-between">
               <button
                 onClick={() => setCurrentStep(currentStep - 1)}
-                className={`px-6 py-2 rounded-xl transition ${currentStep > 1 ? "bg-gray-100 text-gray-700 hover:bg-gray-200" : "invisible"}`}
+                className={`outline-none px-4 py-2 rounded-xl transition ${currentStep > 1 ? "bg-gray-100 text-gray-700 hover:bg-gray-200" : "invisible"}`}
               >
                 Previous
               </button>
               {currentStep < 3 ? (
                 <button
                   onClick={() => setCurrentStep(currentStep + 1)}
-                  className="px-6 py-2 bg-orange-500 text-white rounded-xl hover:bg-orange-600 transition flex items-center gap-2"
+                  className="outline-none px-4 py-2 bg-[#F59E0B] text-white rounded-xl hover:bg-[#f67317] transition flex items-center gap-2"
                 >
-                  Next <ChevronRightIcon size={16} />
+                  Next <ChevronRightIcon size={16} className="outline-none " />
                 </button>
               ) : (
                 <button
                   onClick={handleCreateProductionOrder}
-                  className="px-6 py-2 bg-green-600 text-white rounded-xl hover:bg-green-700 transition flex items-center gap-2"
+                  className="outline-none px-4 py-2 bg-green-600 text-white rounded-xl hover:bg-green-700 transition flex items-center gap-2"
                 >
-                  <CheckCircle size={16} /> Create PO
+                  <CheckCircle size={16} className="outline-none " /> Create PO
                 </button>
               )}
             </div>
@@ -1228,13 +1226,13 @@ const ProductionPlanningScreen: React.FC = () => {
             <div className="flex gap-3">
               <button
                 onClick={() => setShowPurchaseRequest(false)}
-                className="flex-1 px-4 py-2 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200"
+                className="outline-none flex-1 px-4 py-2 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200"
               >
                 Cancel
               </button>
               <button
                 onClick={handleCreatePurchaseRequest}
-                className="flex-1 px-4 py-2 bg-orange-500 text-white rounded-xl hover:bg-orange-600"
+                className="outline-none flex-1 px-4 py-2 bg-[#F59E0B] text-white rounded-xl hover:bg-[#f67317]"
               >
                 Create Request
               </button>

@@ -237,7 +237,7 @@ const ProductionScheduling: React.FC = () => {
       } else if (timeFilter === "Quarterly") {
         matchesTime =
           Math.floor(orderDate.getMonth() / 3) ===
-            Math.floor(now.getMonth() / 3) &&
+          Math.floor(now.getMonth() / 3) &&
           orderDate.getFullYear() === now.getFullYear();
       } else if (timeFilter === "Yearly") {
         matchesTime = orderDate.getFullYear() === now.getFullYear();
@@ -341,28 +341,27 @@ const ProductionScheduling: React.FC = () => {
           <div className="relative" ref={dropdownRef}>
             <button
               onClick={() => setIsTimeDropdownOpen(!isTimeDropdownOpen)}
-              className="px-4 py-2 rounded-xl border border-slate-200 bg-white text-sm font-medium shadow-sm flex items-center gap-2 text-gray-700"
+              className="outline-none px-4 py-2 rounded-xl border border-slate-200 bg-white text-sm font-medium shadow-sm flex items-center gap-2 text-gray-700"
             >
-              <Filter size={16} className="text-orange-500" />
+              <Filter size={16} className="outline-none text-[#F59E0B]" />
               <span>{getFilterDisplayText()}</span>
               <ChevronDown
                 size={14}
-                className={isTimeDropdownOpen ? "rotate-180" : ""}
+                className={isTimeDropdownOpen ? "outline-none rotate-180" : ""}
               />
             </button>
 
             {isTimeDropdownOpen && !isCalendarOpen && (
               <div className="absolute right-0 mt-2 bg-white border border-slate-100 rounded-2xl shadow-2xl z-50 py-2 min-w-40">
-                {["Weekly", "Monthly", "Quarterly", "Yearly", "All Time"].map(
+                {["All Time", "Weekly", "Monthly", "Quarterly", "Yearly"].map(
                   (tab) => (
                     <button
                       key={tab}
                       onClick={() => handleTimeFilterChange(tab as TimeFilter)}
-                      className={`w-full text-left px-4 py-2.5 text-[13px] transition-colors ${
-                        timeFilter === tab
-                          ? "text-orange-600 font-bold bg-orange-50/50"
+                      className={`outline-none w-full text-left px-4 py-2.5 text-[13px] transition-colors ${timeFilter === tab
+                          ? "text-amber-500 font-bold bg-orange-50/50"
                           : "text-slate-600 hover:bg-slate-50"
-                      }`}
+                        }`}
                     >
                       {tab}
                     </button>
@@ -370,11 +369,10 @@ const ProductionScheduling: React.FC = () => {
                 )}
                 <button
                   onClick={() => handleTimeFilterChange("Custom")}
-                  className={`w-full text-left px-4 py-2.5 text-[13px] transition-colors ${
-                    timeFilter === "Custom"
-                      ? "text-orange-600 font-bold bg-orange-50/50"
+                  className={`outline-none w-full text-left px-4 py-2.5 text-[13px] transition-colors ${timeFilter === "Custom"
+                      ? "text-amber-500 font-bold bg-orange-50/50"
                       : "text-slate-600 hover:bg-slate-50"
-                  }`}
+                    }`}
                 >
                   Custom
                 </button>
@@ -406,7 +404,7 @@ const ProductionScheduling: React.FC = () => {
                   />
                   <button
                     onClick={handleCustomApply}
-                    className="w-full bg-orange-500 text-white py-2 rounded-lg text-sm font-bold hover:bg-orange-600"
+                    className="w-full bg-[#F59E0B] text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-[#f67317]"
                   >
                     Apply Range
                   </button>
@@ -441,16 +439,15 @@ const ProductionScheduling: React.FC = () => {
               <div className="relative" ref={priorityRef}>
                 <button
                   onClick={() => setActiveDropdown(activeDropdown === "priority" ? null : "priority")}
-                  className={`px-4 py-3 rounded-xl border text-[13px] font-bold flex items-center gap-2 ${
-                    priorityFilter !== "All"
-                      ? "bg-orange-50 border-orange-200 text-orange-600"
+                  className={`outline-none px-4 py-3 rounded-xl border text-[13px] font-bold flex items-center gap-2 ${priorityFilter !== "All"
+                      ? "bg-orange-50 border-orange-200 text-amber-500"
                       : "bg-white border-slate-200 text-slate-600"
-                  }`}
+                    }`}
                 >
                   {priorityFilter === "All" ? "Priority" : priorityFilter}
                   <ChevronDown
                     size={14}
-                    className={activeDropdown === "priority" ? "rotate-180" : ""}
+                    className={activeDropdown === "priority" ? "outline-none rotate-180" : ""}
                   />
                 </button>
 
@@ -463,11 +460,10 @@ const ProductionScheduling: React.FC = () => {
                           setPriorityFilter(opt);
                           setActiveDropdown(null);
                         }}
-                        className={`w-full text-left px-4 py-2 text-[13px] hover:bg-slate-50 ${
-                          priorityFilter === opt
-                            ? "text-orange-600 font-bold bg-orange-50/50"
+                        className={`outline-none w-full text-left px-4 py-2 text-[13px] hover:bg-slate-50 ${priorityFilter === opt
+                            ? "text-amber-500 font-bold bg-orange-50/50"
                             : "text-slate-600"
-                        }`}
+                          }`}
                       >
                         {opt}
                       </button>
@@ -480,7 +476,7 @@ const ProductionScheduling: React.FC = () => {
               <button
                 disabled={selectedIds.length === 0}
                 onClick={handleBulkDelete}
-                className={`p-3 rounded-xl ${selectedIds.length === 0 ? "bg-gray-100 text-gray-400 cursor-not-allowed" : "bg-rose-600 text-white hover:bg-rose-700"}`}
+                className={`outline-none p-3 rounded-xl ${selectedIds.length === 0 ? "bg-gray-100 text-gray-400 cursor-not-allowed" : "bg-rose-600 text-white hover:bg-rose-700"}`}
               >
                 <Trash2 size={20} />
               </button>
@@ -495,7 +491,7 @@ const ProductionScheduling: React.FC = () => {
                   <th className="w-12 p-5 text-center border-b border-slate-100">
                     <input
                       type="checkbox"
-                      className="accent-orange-500 w-4 h-4 cursor-pointer"
+                      className="h-4 w-4 cursor-pointer appearance-none rounded border border-slate-300 bg-white transition-all relative checked:bg-[#F59E0B] checked:border-[#F59E0B] after:content-[''] after:absolute after:opacity-0 checked:after:opacity-100 after:left-1.25 after:top-px after:w-1 after:h-2 after:border-white after:border-r-2 after:border-b-2 after:rotate-45 outline-none"
                       checked={paginatedOrders.length > 0 && selectedIds.length === paginatedOrders.length}
                       onChange={toggleSelectAll}
                     />
@@ -529,7 +525,7 @@ const ProductionScheduling: React.FC = () => {
                     <td className="p-5 text-center">
                       <input
                         type="checkbox"
-                        className="accent-orange-500 w-4 h-4 cursor-pointer"
+                        className="h-4 w-4 cursor-pointer appearance-none rounded border border-slate-300 bg-white transition-all relative checked:bg-[#F59E0B] checked:border-[#F59E0B] after:content-[''] after:absolute after:opacity-0 checked:after:opacity-100 after:left-1.25 after:top-px after:w-1 after:h-2 after:border-white after:border-r-2 after:border-b-2 after:rotate-45 outline-none"
                         checked={selectedIds.includes(order.id)}
                         onChange={() => {
                           if (selectedIds.includes(order.id))
@@ -557,19 +553,19 @@ const ProductionScheduling: React.FC = () => {
                       <div className="flex justify-center gap-2">
                         <button
                           onClick={() => handleViewDetails(order)}
-                          className="p-1.5 text-slate-400 hover:text-orange-500 transition-colors"
+                          className="outline-none p-1.5 text-slate-400 hover:text-[#F59E0B] transition-colors"
                         >
                           <Eye size={16} />
                         </button>
                         <button
                           onClick={() => handleOpenModal(order)}
-                          className="p-1.5 text-slate-400 hover:text-green-500 transition-colors"
+                          className="outline-none p-1.5 text-slate-400 hover:text-green-500 transition-colors"
                         >
                           <Play size={16} />
                         </button>
                         <button
                           onClick={() => handleDelete(order.id)}
-                          className="p-1.5 text-slate-400 hover:text-rose-600 transition-colors"
+                          className="outline-none p-1.5 text-slate-400 hover:text-rose-600 transition-colors"
                         >
                           <Trash2 size={16} />
                         </button>
@@ -610,7 +606,7 @@ const ProductionScheduling: React.FC = () => {
                 <button
                   onClick={() => goToPage(currentPage - 1)}
                   disabled={currentPage === 1}
-                  className="p-2.5 rounded-xl border border-slate-200 bg-white text-slate-500 hover:text-orange-600 disabled:opacity-30 transition-all"
+                  className="p-2.5 rounded-xl border border-slate-200 bg-white text-slate-500 hover:text-amber-500 disabled:opacity-30 transition-all"
                 >
                   <ChevronLeft size={18} />
                 </button>
@@ -624,11 +620,10 @@ const ProductionScheduling: React.FC = () => {
                       <button
                         key={i}
                         onClick={() => goToPage(page as number)}
-                        className={`min-w-10 h-10 rounded-xl text-xs font-bold transition-all ${
-                          currentPage === page
-                            ? "bg-orange-500 text-white shadow-lg"
+                        className={`outline-none min-w-10 h-10 rounded-xl text-xs font-bold transition-all ${currentPage === page
+                            ? "bg-[#F59E0B] text-white shadow-lg"
                             : "bg-white text-slate-500 border border-slate-200"
-                        }`}
+                          }`}
                       >
                         {page}
                       </button>
@@ -638,7 +633,7 @@ const ProductionScheduling: React.FC = () => {
                 <button
                   onClick={() => goToPage(currentPage + 1)}
                   disabled={currentPage === totalPages}
-                  className="p-2.5 rounded-xl border border-slate-200 bg-white text-slate-500 hover:text-orange-600 disabled:opacity-30 transition-all"
+                  className="outline-none p-2.5 rounded-xl border border-slate-200 bg-white text-slate-500 hover:text-amber-500 disabled:opacity-30 transition-all"
                 >
                   <ChevronRight size={18} />
                 </button>
@@ -655,7 +650,7 @@ const ProductionScheduling: React.FC = () => {
             <div className="p-8 pb-0 flex justify-between items-start">
               <div>
                 <div className="flex items-center gap-2 mb-1">
-                  <div className="p-1.5 bg-orange-50 text-orange-600 rounded-lg">
+                  <div className="p-1.5 bg-orange-50 text-amber-500 rounded-lg">
                     <Factory size={18} />
                   </div>
                   <h2 className="text-xl font-black text-slate-800">
@@ -664,14 +659,14 @@ const ProductionScheduling: React.FC = () => {
                 </div>
                 <p className="text-sm text-slate-400 font-medium">
                   Configure run for{" "}
-                  <span className="text-orange-600 font-bold">
+                  <span className="text-amber-500 font-bold">
                     {selectedOrder.id}
                   </span>
                 </p>
               </div>
               <button
                 onClick={() => setIsModalOpen(false)}
-                className="p-2 bg-slate-50 text-slate-400 hover:text-slate-600 rounded-full transition-colors"
+                className="outline-none p-2 bg-slate-50 text-slate-400 hover:text-slate-600 rounded-full transition-colors"
               >
                 <X size={20} />
               </button>
@@ -717,11 +712,10 @@ const ProductionScheduling: React.FC = () => {
                       key={s}
                       type="button"
                       onClick={() => setFormData({ ...formData, shift: s })}
-                      className={`flex-1 py-3 rounded-xl text-[11px] font-bold uppercase tracking-tight transition-all border ${
-                        formData.shift === s
-                          ? "bg-orange-50 border-orange-300 text-orange-600 shadow-sm"
+                      className={`outline-none flex-1 py-3 rounded-xl text-[11px] font-bold uppercase tracking-tight transition-all border ${formData.shift === s
+                          ? "bg-orange-50 border-orange-300 text-amber-500 shadow-sm"
                           : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
-                      }`}
+                        }`}
                     >
                       {s}
                     </button>
@@ -740,14 +734,14 @@ const ProductionScheduling: React.FC = () => {
               <div className="pt-2 flex gap-3">
                 <button
                   onClick={() => setIsModalOpen(false)}
-                  className="flex-1 py-3.5 bg-slate-100 text-slate-600 rounded-2xl font-bold text-xs uppercase tracking-widest hover:bg-slate-200 transition-all"
+                  className="outline-none flex-1 px-4 py-2 bg-slate-100 text-slate-600 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-slate-200 transition-all"
                 >
                   Cancel
                 </button>
 
                 <button
                   onClick={() => setIsModalOpen(false)}
-                  className="flex-1 py-3.5 bg-orange-500 text-white rounded-2xl font-bold text-xs uppercase tracking-widest shadow-lg shadow-orange-500/20 hover:bg-orange-600 transition-all flex items-center justify-center gap-2"
+                  className="outline-none flex-1 px-4 py-2 bg-[#F59E0B] text-white rounded-xl font-bold text-xs uppercase tracking-widest shadow-lg shadow-orange-500/20 hover:bg-[#f67317] transition-all flex items-center justify-center gap-2"
                 >
                   Confirm Run <ArrowRight size={16} />
                 </button>
@@ -768,7 +762,7 @@ const ProductionScheduling: React.FC = () => {
               </div>
               <button
                 onClick={() => setShowDetailsModal(false)}
-                className="text-gray-400 hover:text-gray-600"
+                className="text-gray-400 hover:text-gray-600 outline-none "
               >
                 ✕
               </button>
@@ -800,7 +794,7 @@ const ProductionScheduling: React.FC = () => {
             <div className="sticky bottom-0 bg-white border-t p-6 flex justify-end gap-3">
               <button
                 onClick={() => setShowDetailsModal(false)}
-                className="px-6 py-2 bg-gray-100 rounded-xl hover:bg-gray-200"
+                className="outline-none px-4 py-2 bg-gray-100 rounded-xl hover:bg-gray-200"
               >
                 Close
               </button>
@@ -809,7 +803,7 @@ const ProductionScheduling: React.FC = () => {
                   setShowDetailsModal(false);
                   handleOpenModal(selectedOrder);
                 }}
-                className="px-6 py-2 bg-orange-500 text-white rounded-xl hover:bg-orange-600"
+                className="outline-none px-4 py-2 bg-[#F59E0B] text-white rounded-xl hover:bg-[#f67317]"
               >
                 Start Production
               </button>

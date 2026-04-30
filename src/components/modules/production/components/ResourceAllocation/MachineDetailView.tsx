@@ -142,7 +142,7 @@ const MachineDetailView = () => {
               <button className="px-6 py-3 bg-slate-100 text-slate-600 rounded-2xl font-bold text-sm hover:bg-slate-200 transition">
                 Schedule Maintenance
               </button>
-              <button className="px-6 py-3 bg-orange-500 text-white rounded-2xl font-bold text-sm shadow-lg shadow-orange-500/20 hover:bg-orange-600 transition">
+              <button className="px-6 py-3 bg-[#F59E0B] text-white rounded-2xl font-bold text-sm shadow-lg shadow-orange-500/20 hover:bg-[#f67317] transition">
                 Edit Details
               </button>
             </div>
@@ -170,7 +170,7 @@ const MachineDetailView = () => {
               label: "Op. Hours",
               value: `${machine.totalOperatingHours}h`,
               icon: Clock,
-              color: "text-orange-600",
+              color: "text-amber-500",
               bg: "bg-orange-50",
             },
             {
@@ -204,7 +204,7 @@ const MachineDetailView = () => {
             {/* Technical Specifications */}
             <div className="bg-white rounded-[2.5rem] p-8 shadow-sm border border-gray-100">
               <h3 className="text-lg font-black text-slate-800 mb-6 flex items-center gap-2">
-                <Settings2 size={20} className="text-orange-500" /> Technical
+                <Settings2 size={20} className="text-[#F59E0B]" /> Technical
                 Specifications
               </h3>
               <div className="grid grid-cols-2 gap-y-6 gap-x-12">
@@ -240,7 +240,7 @@ const MachineDetailView = () => {
             {/* Maintenance History */}
             <div className="bg-white rounded-[2.5rem] p-8 shadow-sm border border-gray-100">
               <h3 className="text-lg font-black text-slate-800 mb-6 flex items-center gap-2">
-                <History size={20} className="text-orange-500" /> Maintenance
+                <History size={20} className="text-[#F59E0B]" /> Maintenance
                 History
               </h3>
               <div className="space-y-4">
@@ -284,7 +284,7 @@ const MachineDetailView = () => {
             {/* Current Operation */}
             <div className="bg-slate-900 rounded-[2.5rem] p-8 text-white shadow-xl">
               <h3 className="text-lg font-bold mb-6 flex items-center gap-2">
-                <Activity size={20} className="text-orange-500" /> Live
+                <Activity size={20} className="text-[#F59E0B]" /> Live
                 Operation
               </h3>
               <div className="space-y-6">
@@ -297,7 +297,7 @@ const MachineDetailView = () => {
                   </p>
                 </div>
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-orange-500 rounded-full flex items-center justify-center">
+                  <div className="w-12 h-12 bg-[#F59E0B] rounded-full flex items-center justify-center">
                     <User size={24} />
                   </div>
                   <div>
@@ -312,10 +312,10 @@ const MachineDetailView = () => {
                 <div className="pt-4 border-t border-white/10">
                   <div className="flex justify-between text-xs mb-2">
                     <span className="text-slate-400">Task Progress</span>
-                    <span className="text-orange-500 font-bold">65%</span>
+                    <span className="text-[#F59E0B] font-bold">65%</span>
                   </div>
                   <div className="w-full bg-white/10 h-2 rounded-full overflow-hidden">
-                    <div className="bg-orange-500 h-full w-[65%]" />
+                    <div className="bg-[#F59E0B] h-full w-[65%]" />
                   </div>
                 </div>
               </div>
