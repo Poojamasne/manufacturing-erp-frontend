@@ -11,6 +11,7 @@ const Sidebar: React.FC = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("designation");
     localStorage.removeItem("userName");
+    document.title = "Manufacturing ERP - Login";
     navigate("/");
   };
 
@@ -20,7 +21,7 @@ const Sidebar: React.FC = () => {
       {/* FIXED HEADER */}
       <div className="shrink-0 p-6 py-[21.5px] flex items-center gap-3 border-b border-[#F59E0B30] bg-white z-10">
         <Link to="/production/dashboard" className="bg-[#F59E0B] p-2 rounded-xl text-white shadow-md">
-          <img src="/icons/factory.svg" className="h-5 w-5 brightness-0 invert" alt="Logo" />
+          <img src="/icons/Production_Icons/panel-icon.svg" className="h-5 w-5 brightness-0 invert" alt="Logo" />
         </Link>
         <span className="font-bold text-xl text-gray-800 tracking-tight">Production</span>
       </div>
@@ -34,7 +35,10 @@ const Sidebar: React.FC = () => {
       >
 
         <button
-          onClick={() => navigate("/production/dashboard")}
+          onClick={() => {
+            navigate("/production/dashboard")
+            document.title = "Manufacturing ERP - Production Dashboard";
+          }}
           className={`outline-none w-full flex items-center gap-3 px-4 py-3 cursor-pointer rounded-xl transition-all duration-200 ${isActive("/production/dashboard")
             ? "bg-[#F59E0B] text-white shadow-md"
             : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
@@ -48,34 +52,40 @@ const Sidebar: React.FC = () => {
           <span className={`${isActive("/production/dashboard") ? "font-bold" : "font-semibold"} text-sm`}>Dashboard</span>
         </button>
 
-        {/* Production Orders */}
+        {/* Sales Orders */}
         <button
-          onClick={() => navigate("/production/orders")}
-          className={`outline-none w-full flex items-center gap-3 px-4 cursor-pointer py-3 rounded-xl transition-all duration-200 ${isActive("/production/orders")
+          onClick={() => {
+            navigate("/production/sales-orders")
+            document.title = "Manufacturing ERP - Production Sales Orders"
+          }}
+          className={`outline-none w-full flex items-center gap-3 px-4 cursor-pointer py-3 rounded-xl transition-all duration-200 ${isActive("/production/sales-orders")
             ? "bg-[#F59E0B] text-white shadow-md"
             : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
             }`}
         >
           <img
-            src="/icons/Production-orders.svg"
-            className={`h-5 w-5 ${isActive("/production/orders") ? "brightness-0 invert" : "opacity-60"}`}
+            src="/icons/Production_Icons/Sales-Order.svg"
+            className={`h-5 w-5 ${isActive("/production/sales-orders") ? "brightness-0 invert" : "opacity-60"}`}
             alt=""
           />
-          <span className={`${isActive("/production/orders") ? "font-bold" : "font-semibold"} text-sm`}>
-            Production Orders
+          <span className={`${isActive("/production/sales-orders") ? "font-bold" : "font-semibold"} text-sm`}>
+            Sales Orders
           </span>
         </button>
 
         {/* Production Planning */}
         <button
-          onClick={() => navigate("/production/planning")}
+          onClick={() => {
+            navigate("/production/planning")
+            document.title = "Manufacturing ERP - Production Planning";
+          }}
           className={`outline-none w-full flex items-center gap-3 px-4 cursor-pointer py-3 rounded-xl transition-all duration-200 ${isActive("/production/planning")
             ? "bg-[#F59E0B] text-white shadow-md"
             : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
             }`}
         >
           <img
-            src="/icons/Production-Planning.svg"
+            src="/icons/Production_Icons/Planning.svg"
             className={`h-5 w-5 ${isActive("/production/planning") ? "brightness-0 invert" : "opacity-60"}`}
             alt=""
           />
@@ -84,16 +94,40 @@ const Sidebar: React.FC = () => {
           </span>
         </button>
 
+        {/* Production Orders */}
+        <button
+          onClick={() => {
+            navigate("/production/orders")
+            document.title = "Manufacturing ERP - Production Orders"
+          }}
+          className={`outline-none w-full flex items-center gap-3 px-4 cursor-pointer py-3 rounded-xl transition-all duration-200 ${isActive("/production/orders")
+            ? "bg-[#F59E0B] text-white shadow-md"
+            : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
+            }`}
+        >
+          <img
+            src="/icons/Production_Icons/Production.svg"
+            className={`h-5 w-5 ${isActive("/production/orders") ? "brightness-0 invert" : "opacity-60"}`}
+            alt=""
+          />
+          <span className={`${isActive("/production/orders") ? "font-bold" : "font-semibold"} text-sm`}>
+            Production Orders
+          </span>
+        </button>
+
         {/* Work Orders */}
         <button
-          onClick={() => navigate("/production/work-orders")}
+          onClick={() => {
+            navigate("/production/work-orders");
+            document.title = "Manufacturing ERP - Production Work Orders";
+          }}
           className={`outline-none w-full flex items-center gap-3 px-4 hover:cursor-pointer py-3 rounded-xl transition-all duration-200 ${isActive("/production/work-orders")
             ? "bg-[#F59E0B] text-white shadow-md"
             : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
             }`}
         >
           <img
-            src="/icons/work-orders.svg"
+            src="/icons/Production_Icons/Work-Order.svg"
             className={`h-5 w-5 ${isActive("/production/work-orders") ? "brightness-0 invert" : "opacity-60"}`}
             alt=""
           />
@@ -104,14 +138,17 @@ const Sidebar: React.FC = () => {
 
         {/* Scheduling */}
         <button
-          onClick={() => navigate("/production/scheduling")}
+          onClick={() => {
+            navigate("/production/scheduling");
+            document.title = "Manufacturing ERP - Production Scheduling";
+          }}
           className={`outline-none w-full flex items-center gap-3 px-4 hover:cursor-pointer py-3 rounded-xl transition-all duration-200 ${isActive("/production/scheduling")
             ? "bg-[#F59E0B] text-white shadow-md"
             : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
             }`}
         >
           <img
-            src="/icons/Scheduling.svg"
+            src="/icons/Production_Icons/Scheduling.svg"
             className={`h-5 w-5 ${isActive("/production/scheduling") ? "brightness-0 invert" : "opacity-60"}`}
             alt=""
           />
@@ -123,7 +160,10 @@ const Sidebar: React.FC = () => {
 
         {/* Resources */}
         <button
-          onClick={() => navigate("/production/resources")}
+          onClick={() => {
+            navigate("/production/resources");
+            document.title = "Manufacturing ERP - Production Resources";
+          }}
           className={`outline-none w-full flex items-center gap-3 px-4 hover:cursor-pointer py-3 rounded-xl transition-all duration-200 ${isActive("/production/resources")
             ? "bg-[#F59E0B] text-white shadow-md"
             : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
@@ -140,14 +180,17 @@ const Sidebar: React.FC = () => {
         </button>
         {/* Shop Floor */}
         <button
-          onClick={() => navigate("/production/shop-floor")}
+          onClick={() => {
+            navigate("/production/shop-floor");
+            document.title = "Manufacturing ERP - Production Shop Floor";
+          }}
           className={`outline-none w-full flex items-center gap-3 px-4 hover:cursor-pointer py-3 rounded-xl transition-all duration-200 ${isActive("/production/shop-floor")
             ? "bg-[#F59E0B] text-white shadow-md"
             : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
             }`}
         >
           <img
-            src="/icons/Shop-floor.svg"
+            src="/icons/Production_Icons/Shop-Floor2.svg"
             className={`h-5 w-5 ${isActive("/production/shop-floor") ? "brightness-0 invert" : "opacity-60"}`}
             alt=""
           />
@@ -158,7 +201,10 @@ const Sidebar: React.FC = () => {
 
         {/* Reports */}
         <button
-          onClick={() => navigate("/production/reports")}
+          onClick={() => {
+            navigate("/production/reports");
+            document.title = "Manufacturing ERP - Production Reports & Analytics";
+          }}
           className={`outline-none w-full flex items-center gap-3 px-4 hover:cursor-pointer py-3 rounded-xl transition-all duration-200 ${isActive("/production/reports")
             ? "bg-[#F59E0B] text-white shadow-md"
             : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
