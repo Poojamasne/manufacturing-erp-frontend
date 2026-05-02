@@ -607,7 +607,7 @@ const ProductionOrderList: React.FC = () => {
                       activeDropdown === "status" ? null : "status",
                     )
                   }
-                  className={`outline-none px-4 py-2 rounded-xl border text-[13px] font-bold flex items-center gap-2 ${statusFilter !== "All" ? "bg-orange-50 border-orange-200 text-amber-500" : "bg-white border-slate-200 text-slate-600"}`}
+                  className={`outline-none px-4 py-3 rounded-xl border text-[13px] font-bold flex items-center gap-2 ${statusFilter !== "All" ? "bg-orange-50 border-orange-200 text-amber-500" : "bg-white border-slate-200 text-slate-600"}`}
                 >
                   {statusFilter === "All"
                     ? "Status"
@@ -643,7 +643,7 @@ const ProductionOrderList: React.FC = () => {
                       activeDropdown === "priority" ? null : "priority",
                     )
                   }
-                  className={`outline-none px-4 py-2 rounded-xl border text-[13px] font-bold flex items-center gap-2 ${priorityFilter !== "All" ? "bg-orange-50 border-orange-200 text-amber-500" : "bg-white border-slate-200 text-slate-600"}`}
+                  className={`outline-none px-4 py-3 rounded-xl border text-[13px] font-bold flex items-center gap-2 ${priorityFilter !== "All" ? "bg-orange-50 border-orange-200 text-amber-500" : "bg-white border-slate-200 text-slate-600"}`}
                 >
                   {priorityFilter === "All" ? "Priority" : priorityFilter}{" "}
                   <ChevronDown
@@ -679,7 +679,7 @@ const ProductionOrderList: React.FC = () => {
                       activeDropdown === "shift" ? null : "shift",
                     )
                   }
-                  className={`outline-none px-4 py-2 rounded-xl border text-[13px] font-bold flex items-center gap-2 ${shiftFilter !== "All" ? "bg-orange-50 border-orange-200 text-amber-500" : "bg-white border-slate-200 text-slate-600"}`}
+                  className={`outline-none px-4 py-3 rounded-xl border text-[13px] font-bold flex items-center gap-2 ${shiftFilter !== "All" ? "bg-orange-50 border-orange-200 text-amber-500" : "bg-white border-slate-200 text-slate-600"}`}
                 >
                   {shiftFilter === "All"
                     ? "Shift"
