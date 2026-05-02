@@ -113,9 +113,7 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#f4f7f6] px-4">
-      <div className="w-full max-w-4xl bg-white rounded-2xl shadow-xl border border-gray-200 flex flex-col md:flex-row overflow-hidden">
-        {/* LEFT PANEL */}
+<div className="h-screen flex items-center justify-center bg-[#f4f7f6] px-4"><div className="w-full max-w-4xl h-[90vh] bg-white rounded-2xl shadow-xl border border-gray-200 flex flex-col md:flex-row overflow-hidden">        {/* LEFT PANEL */}
         <div className="hidden md:flex md:w-1/2 bg-[#F59E0B] p-8 flex-col justify-between">
           <div>
             <div className="bg-white/10 p-3 rounded-xl w-fit mb-6">

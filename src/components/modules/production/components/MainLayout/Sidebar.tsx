@@ -20,7 +20,7 @@ const Sidebar: React.FC = () => {
       {/* FIXED HEADER */}
       <div className="shrink-0 p-6 py-[21.5px] flex items-center gap-3 border-b border-[#F59E0B30] bg-white z-10">
         <Link to="/production/dashboard" className="bg-[#F59E0B] p-2 rounded-xl text-white shadow-md">
-          <img src="/icons/factory.svg" className="h-5 w-5" alt="Logo" />
+          <img src="/icons/factory.svg" className="h-5 w-5 brightness-0 invert" alt="Logo" />
         </Link>
         <span className="font-bold text-xl text-gray-800 tracking-tight">Production</span>
       </div>
@@ -48,24 +48,6 @@ const Sidebar: React.FC = () => {
           <span className={`${isActive("/production/dashboard") ? "font-bold" : "font-semibold"} text-sm`}>Dashboard</span>
         </button>
 
-        {/* Production Planning */}
-        <button
-          onClick={() => navigate("/production/planning")}
-          className={`outline-none w-full flex items-center gap-3 px-4 cursor-pointer py-3 rounded-xl transition-all duration-200 ${isActive("/production/planning")
-            ? "bg-[#F59E0B] text-white shadow-md"
-            : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
-            }`}
-        >
-          <img
-            src="/icons/Production-Planning.svg"
-            className={`h-5 w-5 ${isActive("/production/planning") ? "brightness-0 invert" : "opacity-60"}`}
-            alt=""
-          />
-          <span className={`${isActive("/production/planning") ? "font-bold" : "font-semibold"} text-sm`}>
-            Production Planning
-          </span>
-        </button>
-
         {/* Production Orders */}
         <button
           onClick={() => navigate("/production/orders")}
@@ -81,6 +63,24 @@ const Sidebar: React.FC = () => {
           />
           <span className={`${isActive("/production/orders") ? "font-bold" : "font-semibold"} text-sm`}>
             Production Orders
+          </span>
+        </button>
+
+        {/* Production Planning */}
+        <button
+          onClick={() => navigate("/production/planning")}
+          className={`outline-none w-full flex items-center gap-3 px-4 cursor-pointer py-3 rounded-xl transition-all duration-200 ${isActive("/production/planning")
+            ? "bg-[#F59E0B] text-white shadow-md"
+            : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
+            }`}
+        >
+          <img
+            src="/icons/Production-Planning.svg"
+            className={`h-5 w-5 ${isActive("/production/planning") ? "brightness-0 invert" : "opacity-60"}`}
+            alt=""
+          />
+          <span className={`${isActive("/production/planning") ? "font-bold" : "font-semibold"} text-sm`}>
+            Production Planning
           </span>
         </button>
 
