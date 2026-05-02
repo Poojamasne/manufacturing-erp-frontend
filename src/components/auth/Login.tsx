@@ -63,7 +63,6 @@ const Login: React.FC = () => {
     const extension = domainParts[domainParts.length - 1];
     if (!validDomains.includes(extension))
       return { error: "Only .com, .org, .co, .in allowed", isValid: false };
-
     return { error: null, isValid: true };
   }, [email]);
 
@@ -71,6 +70,8 @@ const Login: React.FC = () => {
     if (!password) return { error: null, isValid: false };
     if (password.length < 6)
       return { error: "Minimum 6 characters required", isValid: false };
+    if (password.includes(" "))
+      return { error: "Spaces are not allowed", isValid: false };
     return { error: null, isValid: true };
   }, [password]);
 
@@ -82,7 +83,7 @@ const Login: React.FC = () => {
 
     // ========== TEST CREDENTIALS FOR PRODUCTION PANEL ==========
     // Production Planner
-    if (email === "planner@production.com" && password === "planner123") {
+    if (email && email.trim() === "planner@production.com" && password && password.trim() === "planner123") {
       localStorage.setItem("token", "test-token-production-planner");
       localStorage.setItem("designation", "Production Planner");
       localStorage.setItem("userName", "Production Planner");
@@ -96,15 +97,6 @@ const Login: React.FC = () => {
       localStorage.setItem("designation", "Shop Floor Operator");
       localStorage.setItem("userName", "Shop Floor Operator");
       navigate("/production/dashboard");
-      return;
-    }
-
-    // Sales Manager (for testing sales panel)
-    if (email === "sales@manager.com" && password === "sales123") {
-      localStorage.setItem("token", "test-token-sales");
-      localStorage.setItem("designation", "Sales Manager");
-      localStorage.setItem("userName", "Sales Manager");
-      navigate("/sales/dashboard");
       return;
     }
 
