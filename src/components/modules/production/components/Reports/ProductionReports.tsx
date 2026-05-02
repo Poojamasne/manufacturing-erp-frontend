@@ -421,7 +421,7 @@ const ProductionReports: React.FC = () => {
                         <span className="text-red-600">Shortage: <strong>{material.shortage.toLocaleString()} {material.unit}</strong></span>
                       </div>
                       <button onClick={() => handleCreatePO(material.materialName)} className="px-3 py-1.5 bg-[#F59E0B] text-white rounded-lg text-sm hover:bg-[#f67317] transition">
-                        Create PO
+                        Request PO
                       </button>
                     </div>
                   ))}
@@ -844,7 +844,7 @@ const ProductionReports: React.FC = () => {
                       <td className="px-6 py-4 text-center">
                         {material.shortage > 0 && (
                           <button onClick={() => handleCreatePO(material.materialName)} className="outline-none px-4 py-2 bg-[#F59E0B] text-white text-xs font-medium rounded-lg hover:bg-[#f67317] transition">
-                            Create PO
+                            Request PO
                           </button>
                         )}
                       </td>

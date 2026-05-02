@@ -334,7 +334,7 @@ const ProductionDashboard: React.FC = () => {
       ),
     );
 
-    setSuccessMessage("Purchase Order created successfully!");
+    setSuccessMessage("Purchase Order Request submitted successfully!");
 
     const remainingCritical = materialAlerts.filter(
       (a) => a.status === "CRITICAL" && a.id !== alertId,
@@ -365,7 +365,7 @@ const ProductionDashboard: React.FC = () => {
       <div className="max-w-7xl mx-auto">
         {/* Success Toast Message */}
         {successMessage && (
-          <div className="fixed top-4 right-4 z-50 animate-in slide-in-from-top-2 fade-in duration-300">
+          <div className="fixed top-21 right-4 z-50 animate-in slide-in-from-top-2 fade-in duration-300">
             <div className="bg-green-500 text-white px-4 py-3 rounded-lg shadow-lg flex items-center gap-2">
               <Check size={18}  className="outline-none "/>
               <span className="text-sm font-medium">{successMessage}</span>
@@ -568,7 +568,7 @@ const ProductionDashboard: React.FC = () => {
                           onClick={() => handleCreatePO(alert.id)}
                           className="outline-none px-4 py-2 bg-[#F59E0B] text-white rounded-xl text-sm hover:bg-[#f67317] transition"
                         >
-                          Create PO
+                          Request PO
                         </button>
                       </div>
                     </div>
