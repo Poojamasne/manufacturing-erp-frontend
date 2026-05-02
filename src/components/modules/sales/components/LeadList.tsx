@@ -465,7 +465,7 @@ const LeadList: React.FC = () => {
               <input
                 type="text"
                 placeholder="Search leads by ID, company..."
-                className="w-full pl-12 pr-4 py-3.5 bg-slate-50 border-transparent rounded-2xl focus:bg-white focus:ring-4 focus:ring-teal-500/5 text-sm outline-none transition-all placeholder:text-slate-400"
+                className="w-full pl-12 pr-4 py-3.5 bg-slate-50 border-transparent rounded-2xl focus:bg-white focus:ring-4 focus:ring-orange-500/5 text-sm outline-none transition-all placeholder:text-slate-400"
                 value={searchQuery}
                 onChange={(e) => {
                   setSearchQuery(e.target.value);

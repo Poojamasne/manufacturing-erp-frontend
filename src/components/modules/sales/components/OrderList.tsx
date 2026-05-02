@@ -379,7 +379,7 @@ const OrderList: React.FC = () => {
               <input
                 type="text"
                 placeholder="Search by Order ID or Customer..."
-                className="w-full pl-12 pr-4 py-3.5 bg-slate-50 border-transparent rounded-2xl focus:bg-white focus:ring-4 focus:ring-teal-500/5 text-sm outline-none transition-all placeholder:text-slate-400"
+                className="w-full pl-12 pr-4 py-3.5 bg-slate-50 border-transparent rounded-2xl focus:bg-white focus:ring-4 focus:ring-orange-500/5 text-sm outline-none transition-all placeholder:text-slate-400"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
@@ -465,9 +465,9 @@ const OrderList: React.FC = () => {
                   <th className="px-4 py-4 text-[13px] text-slate-800 uppercase tracking-widest border-b border-slate-100 text-center">
                     CUSTOMER NAME
                   </th>
-                  <th className="px-4 py-4 text-[13px] text-slate-800 uppercase tracking-widest border-b border-slate-100 text-center">
+                  {/* <th className="px-4 py-4 text-[13px] text-slate-800 uppercase tracking-widest border-b border-slate-100 text-center">
                     TOTAL AMOUNT
-                  </th>
+                  </th> */}
                   <th className="px-4 py-4 text-[13px] text-slate-800 uppercase tracking-widest border-b border-slate-100 text-center">
                     STATUS
                   </th>
@@ -507,9 +507,9 @@ const OrderList: React.FC = () => {
                     <td className="px-4 py-4 text-[13px] font-medium text-slate-800 text-center">
                       {o.customer_name || "-"}
                     </td>
-                    <td className="px-4 py-4 text-[14px] font-bold text-slate-800 text-center">
+                    {/* <td className="px-4 py-4 text-[14px] font-bold text-slate-800 text-center">
                       ₹{Number(o.total_amount).toLocaleString("en-IN")}
-                    </td>
+                    </td> */}
                     <td className="px-4 py-4 text-center">
                       <span className={getStatusStyle(o.status)}>
                         {o.status}

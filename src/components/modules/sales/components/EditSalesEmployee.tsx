@@ -252,7 +252,7 @@ const FormInput: React.FC<{ label: string; icon: React.ReactNode; placeholder?: 
                 onChange={(e) => onChange(e.target.value)}
                 placeholder={placeholder}
                 required={required}
-                className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-11 pr-4 py-3 text-sm font-bold focus:ring-4 focus:ring-teal-500/5 focus:border-[#F59E0B] outline-none transition-all placeholder:font-normal"
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-11 pr-4 py-3 text-sm font-bold focus:ring-4 focus:ring-orange-500/5 focus:border-[#F59E0B] outline-none transition-all placeholder:font-normal"
             />
         </div>
     </div>
@@ -266,7 +266,7 @@ const FormSelect: React.FC<{ label: string; options: { label: string; value: str
             <select
                 value={value}
                 onChange={(e) => onChange(e.target.value)}
-                className={`w-full bg-slate-50 border border-slate-200 rounded-xl ${icon ? 'pl-11' : 'pl-4'} pr-10 py-3 text-sm font-bold focus:ring-4 focus:ring-teal-500/5 focus:border-[#F59E0B] outline-none appearance-none cursor-pointer transition-all`}
+                className={`w-full bg-slate-50 border border-slate-200 rounded-xl ${icon ? 'pl-11' : 'pl-4'} pr-10 py-3 text-sm font-bold focus:ring-4 focus:ring-orange-500/5 focus:border-[#F59E0B] outline-none appearance-none cursor-pointer transition-all`}
             >
                 {options.map((opt) => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
             </select>

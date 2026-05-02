@@ -664,7 +664,7 @@ const LeadForm: React.FC = () => {
                   value={formData.address}
                   onChange={handleInputChange}
                   rows={4}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 text-sm focus:border-[#F59E0B] focus:ring-4 focus:ring-teal-500/5 outline-none transition-all resize-none font-medium placeholder:font-normal text-slate-800"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 text-sm focus:border-[#F59E0B] focus:ring-4 focus:ring-orange-500/5 outline-none transition-all resize-none font-medium placeholder:font-normal text-slate-800"
                   placeholder="Building, Street, Area info..."
                 />
               </div>
@@ -715,7 +715,7 @@ const FormInput: React.FC<InputFieldProps> = ({
         {...(props.type === "number" ? { min: 1 } : {})}
         className={`w-full bg-slate-50 border ${
           error ? "border-rose-300 ring-4 ring-rose-50" : "border-slate-200"
-        } rounded-xl px-4 py-3 text-sm focus:border-[#F59E0B] focus:ring-4 focus:ring-teal-500/5 outline-none transition-all font-medium text-slate-800 group-hover:border-slate-300 placeholder:font-normal placeholder:text-slate-400`}
+        } rounded-xl px-4 py-3 text-sm focus:border-[#F59E0B] focus:ring-4 focus:ring-orange-500/5 outline-none transition-all font-medium text-slate-800 group-hover:border-slate-300 placeholder:font-normal placeholder:text-slate-400`}
       />
       {error && (
         <AlertCircle
@@ -758,7 +758,7 @@ const FormSelect: React.FC<SelectFieldProps> = ({
         {...props}
         className={`w-full bg-slate-50 border ${
           error ? "border-rose-300 ring-4 ring-rose-50" : "border-slate-200"
-        } rounded-xl px-4 py-3 text-sm appearance-none outline-none focus:border-[#F59E0B] focus:ring-4 focus:ring-teal-500/5 transition-all font-medium text-slate-800 cursor-pointer group-hover:border-slate-300`}
+        } rounded-xl px-4 py-3 text-sm appearance-none outline-none focus:border-[#F59E0B] focus:ring-4 focus:ring-orange-500/5 transition-all font-medium text-slate-800 cursor-pointer group-hover:border-slate-300`}
       >
         <option value="" className="text-slate-400">Select option</option>
         {options.map((o) => (
