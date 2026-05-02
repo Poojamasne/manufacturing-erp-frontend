@@ -164,11 +164,11 @@ const SalesEmployees: React.FC = () => {
     }
   };
 
-  const handleDelete = (id: string) => {
-    //eslint-disable-next-line @typescript-eslint/no-explicit-any
-    dispatch(deleteEmployee(id, navigate) as any);
-    setSelectedIds((prev) => prev.filter((pid) => pid !== id));
-  };
+  // const handleDelete = (id: string) => {
+  //   //eslint-disable-next-line @typescript-eslint/no-explicit-any
+  //   dispatch(deleteEmployee(id, navigate) as any);
+  //   setSelectedIds((prev) => prev.filter((pid) => pid !== id));
+  // };
 
   const handleBulkDelete = () => {
     if (selectedIds.length === 0) return;
@@ -423,12 +423,12 @@ const SalesEmployees: React.FC = () => {
                         >
                           <FileEdit size={16} />
                         </button>
-                        <button
+                        {/* <button
                           onClick={() => handleDelete(emp?.id)}
                           className="outline-none p-2 hover:bg-white text-slate-500 hover:text-rose-600 rounded-xl transition-all"
                         >
                           <Trash2 size={16} />
-                        </button>
+                        </button> */}
                       </div>
                     </td>
                   </tr>
