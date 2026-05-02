@@ -89,7 +89,7 @@ const Login: React.FC = () => {
       navigate("/production/dashboard");
       return;
     }
-    
+
     // Shop Floor Operator
     if (email === "operator@production.com" && password === "operator123") {
       localStorage.setItem("token", "test-token-production-operator");
@@ -98,7 +98,7 @@ const Login: React.FC = () => {
       navigate("/production/dashboard");
       return;
     }
-    
+
     // Sales Manager (for testing sales panel)
     if (email === "sales@manager.com" && password === "sales123") {
       localStorage.setItem("token", "test-token-sales");
@@ -107,13 +107,14 @@ const Login: React.FC = () => {
       navigate("/sales/dashboard");
       return;
     }
-   
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     dispatch(loginUser({ email, password }, navigate) as any);
   };
 
   return (
-<div className="h-screen flex items-center justify-center bg-[#f4f7f6] px-4"><div className="w-full max-w-4xl h-[90vh] bg-white rounded-2xl shadow-xl border border-gray-200 flex flex-col md:flex-row overflow-hidden">        {/* LEFT PANEL */}
+    <div className="h-screen flex items-center justify-center bg-[#f4f7f6] px-4">
+      <div className="w-full max-w-4xl h-[90vh] bg-white rounded-2xl shadow-xl border border-gray-200 flex flex-col md:flex-row overflow-hidden">        {/* LEFT PANEL */}
         <div className="hidden md:flex md:w-1/2 bg-[#F59E0B] p-8 flex-col justify-between">
           <div>
             <div className="bg-white/10 p-3 rounded-xl w-fit mb-6">
