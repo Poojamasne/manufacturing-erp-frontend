@@ -7,13 +7,12 @@ import {
   Filter,
   ShoppingCart,
   Eye,
-  Edit,
   Trash2,
   Download,
 } from "lucide-react";
 
 type TimeFilter = "Weekly" | "Monthly" | "Quarterly" | "Yearly" | "All Time" | "Custom";
-type SalesOrderStatus = "PENDING" | "APPROVED" | "PROCESSING" | "SHIPPED" | "DELIVERED" | "CANCELLED";
+type SalesOrderStatus = "PENDING" | "PROCESSING" | "DELIVERED" | "CANCELLED";
 type Priority = "HIGH" | "MEDIUM" | "LOW";
 
 interface SalesOrder {
@@ -35,79 +34,53 @@ const mockSalesOrders: SalesOrder[] = [
     id: "1",
     salesOrderId: "SO-001",
     customerName: "Acme Industrial Corp",
-    orderDate: "2024-05-10",
-    deliveryDate: "2024-05-20",
-    totalAmount: 15420.00,
+    orderDate: "2026-05-10",
+    deliveryDate: "2026-05-20",
+    totalAmount: 15420.0,
     itemsCount: 5,
     status: "PROCESSING",
     priority: "HIGH",
     paymentStatus: "PAID",
-    createdAt: "2024-05-10",
+    createdAt: "2026-05-10",
   },
   {
     id: "2",
     salesOrderId: "SO-002",
     customerName: "Global Manufacturing Ltd",
-    orderDate: "2024-05-11",
-    deliveryDate: "2024-05-18",
-    totalAmount: 3200.50,
+    orderDate: "2026-05-11",
+    deliveryDate: "2026-05-18",
+    totalAmount: 3200.5,
     itemsCount: 2,
     status: "PENDING",
     priority: "MEDIUM",
     paymentStatus: "UNPAID",
-    createdAt: "2024-05-11",
+    createdAt: "2026-05-11",
   },
   {
     id: "3",
     salesOrderId: "SO-003",
     customerName: "BuildTech Solutions",
-    orderDate: "2024-05-08",
-    deliveryDate: "2024-05-22",
-    totalAmount: 8900.00,
+    orderDate: "2026-05-08",
+    deliveryDate: "2026-05-22",
+    totalAmount: 8900.0,
     itemsCount: 12,
-    status: "APPROVED",
+    status: "CANCELLED",
     priority: "HIGH",
     paymentStatus: "PARTIAL",
-    createdAt: "2024-05-08",
+    createdAt: "2026-05-08",
   },
   {
     id: "4",
     salesOrderId: "SO-004",
     customerName: "Apex Auto Parts",
-    orderDate: "2024-05-05",
-    deliveryDate: "2024-05-12",
-    totalAmount: 24500.00,
+    orderDate: "2026-05-05",
+    deliveryDate: "2026-05-12",
+    totalAmount: 24500.0,
     itemsCount: 25,
-    status: "SHIPPED",
-    priority: "LOW",
-    paymentStatus: "PAID",
-    createdAt: "2024-05-05",
-  },
-  {
-    id: "5",
-    salesOrderId: "SO-005",
-    customerName: "Prime Logistics",
-    orderDate: "2024-05-12",
-    deliveryDate: "2024-05-25",
-    totalAmount: 1250.00,
-    itemsCount: 1,
-    status: "PENDING",
-    priority: "LOW",
-    paymentStatus: "UNPAID",
-    createdAt: "2024-05-12",
-  },
-  {
-    id: "6",
-    salesOrderId: "SO-006",
-    customerName: "Vector Engineering",
-    orderDate: "2024-05-01",
-    deliveryDate: "2024-05-10",
-    totalAmount: 45000.00,
-    itemsCount: 50,
     status: "DELIVERED",
-    priority: "HIGH",
+    priority: "LOW",
     paymentStatus: "PAID",
-    createdAt: "2024-05-01",
+    createdAt: "2026-05-05",
   },
 ];
 
@@ -115,23 +88,13 @@ const mockSalesOrders: SalesOrder[] = [
 const StatusBadge: React.FC<{ status: SalesOrderStatus }> = ({ status }) => {
   const styles: Record<SalesOrderStatus, string> = {
     PENDING: "bg-gray-100 text-gray-700 border-gray-200",
-    APPROVED: "bg-blue-100 text-blue-700 border-blue-200",
     PROCESSING: "bg-purple-100 text-purple-700 border-purple-200",
-    SHIPPED: "bg-orange-100 text-orange-700 border-orange-200",
     DELIVERED: "bg-green-100 text-green-700 border-green-200",
     CANCELLED: "bg-red-100 text-red-700 border-red-200",
   };
-  const labels: Record<SalesOrderStatus, string> = {
-    PENDING: "Pending",
-    APPROVED: "Approved",
-    PROCESSING: "Processing",
-    SHIPPED: "Shipped",
-    DELIVERED: "Delivered",
-    CANCELLED: "Cancelled",
-  };
   return (
     <span className={`px-2 py-1 rounded text-[10px] font-black uppercase border whitespace-nowrap ${styles[status]}`}>
-      {labels[status]}
+      {status}
     </span>
   );
 };
@@ -149,19 +112,6 @@ const PriorityBadge: React.FC<{ priority: Priority }> = ({ priority }) => {
   );
 };
 
-const PaymentBadge: React.FC<{ status: "PAID" | "PARTIAL" | "UNPAID" }> = ({ status }) => {
-  const styles = {
-    PAID: "text-green-600",
-    PARTIAL: "text-amber-600",
-    UNPAID: "text-red-600",
-  };
-  return (
-    <span className={`text-[12px] font-bold ${styles[status]}`}>
-      {status}
-    </span>
-  );
-};
-
 const formatDate = (date: string) => {
   if (!date) return "-";
   const d = new Date(date);
@@ -171,51 +121,32 @@ const formatDate = (date: string) => {
   return `${day}/${month}/${year}`;
 };
 
-const formatCurrency = (amount: number) => {
-  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount);
-};
-
 const SalesOrderList: React.FC = () => {
-  // Refs for outside click detection
   const timeDropdownRef = useRef<HTMLDivElement>(null);
   const statusDropdownRef = useRef<HTMLDivElement>(null);
   const priorityDropdownRef = useRef<HTMLDivElement>(null);
 
-  // State
   const [orders, _setOrders] = useState<SalesOrder[]>(mockSalesOrders);
-
-  // Filter States
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("All");
   const [priorityFilter, setPriorityFilter] = useState<string>("All");
   const [timeFilter, setTimeFilter] = useState<TimeFilter>("All Time");
-  const [customRange, _setCustomRange] = useState({ start: "", end: "" });
+  const [customRange, setCustomRange] = useState({ start: "", end: "" });
 
-  // Pagination
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
 
-  // UI States
   const [isTimeDropdownOpen, setIsTimeDropdownOpen] = useState(false);
-  const [_isCalendarOpen, setIsCalendarOpen] = useState(false);
+  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [selectedOrder, setSelectedOrder] = useState<SalesOrder | null>(null);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
 
-  const statusOptions = ["All", "PENDING", "APPROVED", "PROCESSING", "SHIPPED", "DELIVERED", "CANCELLED"];
+  const statusOptions = ["All", "PENDING", "PROCESSING", "DELIVERED", "CANCELLED"];
   const priorityOptions = ["All", "HIGH", "MEDIUM", "LOW"];
 
-  // Stats
-  const stats = useMemo(() => ({
-    total: orders.length,
-    pending: orders.filter((o) => o.status === "PENDING").length,
-    approved: orders.filter((o) => o.status === "APPROVED" || o.status === "PROCESSING").length,
-    revenue: orders.reduce((acc, curr) => acc + curr.totalAmount, 0),
-    shipped: orders.filter((o) => o.status === "SHIPPED" || o.status === "DELIVERED").length,
-  }), [orders]);
-
-  // Outside Click logic
+  // Close dropdowns on outside click
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as Node;
@@ -234,11 +165,34 @@ const SalesOrderList: React.FC = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [activeDropdown]);
 
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [searchQuery, statusFilter, priorityFilter, timeFilter, customRange]);
+  const handleTimeFilterChange = (value: TimeFilter) => {
+    if (value === "Custom") {
+      setIsCalendarOpen(true);
+      setIsTimeDropdownOpen(false);
+    } else {
+      setTimeFilter(value);
+      setIsTimeDropdownOpen(false);
+      setIsCalendarOpen(false);
+      setCustomRange({ start: "", end: "" });
+    }
+  };
 
-  // Filter logic
+  const handleCustomApply = () => {
+    if (!customRange.start || !customRange.end) {
+      alert("Please select date range");
+      return;
+    }
+    setTimeFilter("Custom");
+    setIsCalendarOpen(false);
+    setIsTimeDropdownOpen(false);
+  };
+
+  const getFilterDisplayText = () => {
+    if (timeFilter === "Custom" && customRange.start && customRange.end)
+      return `${formatDate(customRange.start)} - ${formatDate(customRange.end)}`;
+    return timeFilter;
+  };
+
   const filteredOrders = useMemo(() => {
     let filtered = [...orders];
     if (searchQuery)
@@ -283,63 +237,68 @@ const SalesOrderList: React.FC = () => {
   return (
     <div className="min-h-screen bg-[#f4f7f6] p-4 sm:p-6 lg:p-8 text-slate-900 font-sans">
       <div className="max-w-7xl mx-auto">
-
         {/* Header */}
         <header className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 mb-10">
           <div>
             <h1 className="text-3xl font-extrabold text-slate-800 tracking-tight">Sales Orders</h1>
-            <p className="text-sm text-gray-500 mt-1 font-medium">Manage incoming demand and customer orders</p>
+            <p className="text-sm text-gray-500 mt-1 font-medium">Incoming Sales Orders</p>
           </div>
 
-          {/* Time Filter */}
           <div className="relative" ref={timeDropdownRef}>
             <button
               onClick={() => setIsTimeDropdownOpen(!isTimeDropdownOpen)}
               className="outline-none px-4 py-2 rounded-xl border border-slate-200 bg-white text-sm font-medium shadow-sm flex items-center gap-2 text-gray-700"
             >
               <Filter size={16} className="text-[#F59E0B]" />
-              <span>{timeFilter}</span>
+              <span>{getFilterDisplayText()}</span>
               <ChevronDown size={14} className={isTimeDropdownOpen ? "rotate-180" : ""} />
             </button>
-            {isTimeDropdownOpen && (
+            {isTimeDropdownOpen && !isCalendarOpen && (
               <div className="absolute right-0 mt-2 bg-white rounded-2xl shadow-2xl z-50 py-2 min-w-40 overflow-hidden">
                 {["All Time", "Weekly", "Monthly", "Quarterly", "Yearly"].map((tab) => (
                   <button
                     key={tab}
-                    onClick={() => { setTimeFilter(tab as TimeFilter); setIsTimeDropdownOpen(false); }}
+                    onClick={() => handleTimeFilterChange(tab as TimeFilter)}
                     className={`outline-none w-full text-left px-4 py-2.5 text-[13px] ${timeFilter === tab ? "text-amber-500 font-bold bg-orange-50/50" : "text-slate-600 hover:bg-slate-50"}`}
                   >
                     {tab}
                   </button>
                 ))}
+                <button
+                  onClick={() => handleTimeFilterChange("Custom")}
+                  className={`outline-none w-full text-left px-4 py-2.5 text-[13px] ${timeFilter === "Custom" ? "text-amber-500 font-bold bg-orange-50/50" : "text-slate-600 hover:bg-slate-50"}`}
+                >
+                  Custom
+                </button>
+              </div>
+            )}
+            {isCalendarOpen && (
+              <div className="absolute right-0 mt-3 bg-white p-6 rounded-2xl shadow-2xl z-50 w-72">
+                <div className="space-y-3">
+                  <input
+                    type="date"
+                    value={customRange.start}
+                    onChange={(e) => setCustomRange({ ...customRange, start: e.target.value })}
+                    className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500/20"
+                  />
+                  <input
+                    type="date"
+                    value={customRange.end}
+                    min={customRange.start}
+                    onChange={(e) => setCustomRange({ ...customRange, end: e.target.value })}
+                    className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500/20"
+                  />
+                  <button
+                    onClick={handleCustomApply}
+                    className="outline-none w-full bg-[#F59E0B] text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-[#f67317]"
+                  >
+                    Apply Range
+                  </button>
+                </div>
               </div>
             )}
           </div>
         </header>
-
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
-          <div className="bg-white p-6 rounded-2xl border-l-4 border-orange-500 shadow-sm">
-            <p className="text-[11px] font-bold text-gray-800 uppercase tracking-widest">Total Orders</p>
-            <p className="text-2xl font-bold text-gray-700">{stats.total}</p>
-          </div>
-          <div className="bg-white p-6 rounded-2xl border-l-4 border-yellow-500 shadow-sm">
-            <p className="text-[11px] font-bold text-gray-800 uppercase tracking-widest">Pending Review</p>
-            <p className="text-2xl font-bold text-gray-700">{stats.pending}</p>
-          </div>
-          <div className="bg-white p-6 rounded-2xl border-l-4 border-blue-500 shadow-sm">
-            <p className="text-[11px] font-bold text-gray-800 uppercase tracking-widest">Approved/Processing</p>
-            <p className="text-2xl font-bold text-gray-700">{stats.approved}</p>
-          </div>
-          <div className="bg-white p-6 rounded-2xl border-l-4 border-green-500 shadow-sm">
-            <p className="text-[11px] font-bold text-gray-800 uppercase tracking-widest">Fulfilled</p>
-            <p className="text-2xl font-bold text-gray-700">{stats.shipped}</p>
-          </div>
-          <div className="bg-white p-6 rounded-2xl border-l-4 border-purple-500 shadow-sm">
-            <p className="text-[11px] font-bold text-gray-800 uppercase tracking-widest">Total Value</p>
-            <p className="text-xl font-bold text-gray-700 truncate">{formatCurrency(stats.revenue)}</p>
-          </div>
-        </div>
 
         {/* Main Container */}
         <div className="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
@@ -420,7 +379,7 @@ const SalesOrderList: React.FC = () => {
                   <th className="w-12 p-5 text-center border-b border-slate-100">
                     <input
                       type="checkbox"
-                      className="h-4 w-4 cursor-pointer appearance-none rounded border border-slate-300 bg-white transition-all relative checked:bg-[#F59E0B] checked:border-[#F59E0B] after:content-[''] after:absolute after:opacity-0 checked:after:opacity-100 after:left-1.25 after:top-px after:w-1 after:h-2 after:border-white after:border-r-2 after:border-b-2 after:rotate-45 outline-none"
+                      className="h-4 w-4 cursor-pointer appearance-none rounded border border-slate-300 bg-white transition-all relative checked:bg-[#F59E0B] checked:border-[#F59E0B] outline-none"
                       checked={paginatedOrders.length > 0 && selectedIds.length === paginatedOrders.length}
                       onChange={toggleSelectAll}
                     />
@@ -429,8 +388,6 @@ const SalesOrderList: React.FC = () => {
                   <th className="px-4 py-4 text-[11px] text-slate-800 uppercase tracking-widest text-center">Customer</th>
                   <th className="px-4 py-4 text-[11px] text-slate-800 uppercase tracking-widest text-center">Date</th>
                   <th className="px-4 py-4 text-[11px] text-slate-800 uppercase tracking-widest text-center">Items</th>
-                  <th className="px-4 py-4 text-[11px] text-slate-800 uppercase tracking-widest text-center">Amount</th>
-                  <th className="px-4 py-4 text-[11px] text-slate-800 uppercase tracking-widest text-center">Payment</th>
                   <th className="px-4 py-4 text-[11px] text-slate-800 uppercase tracking-widest text-center">Priority</th>
                   <th className="px-4 py-4 text-[11px] text-slate-800 uppercase tracking-widest text-center">Status</th>
                   <th className="px-4 py-4 text-[11px] text-slate-800 uppercase tracking-widest text-center">Actions</th>
@@ -442,7 +399,7 @@ const SalesOrderList: React.FC = () => {
                     <td className="p-5 text-center">
                       <input
                         type="checkbox"
-                        className="h-4 w-4 cursor-pointer appearance-none rounded border border-slate-300 bg-white transition-all relative checked:bg-[#F59E0B] checked:border-[#F59E0B] after:content-[''] after:absolute after:opacity-0 checked:after:opacity-100 after:left-1.25 after:top-px after:w-1 after:h-2 after:border-white after:border-r-2 after:border-b-2 after:rotate-45 outline-none"
+                        className="h-4 w-4 cursor-pointer appearance-none rounded border border-slate-300 bg-white transition-all relative checked:bg-[#F59E0B] checked:border-[#F59E0B] outline-none"
                         checked={selectedIds.includes(order.id)}
                         onChange={() => {
                           if (selectedIds.includes(order.id)) setSelectedIds(selectedIds.filter((id) => id !== order.id));
@@ -450,12 +407,10 @@ const SalesOrderList: React.FC = () => {
                         }}
                       />
                     </td>
-                    <td className="px-4 py-4 text-[13px] font-mono font-bold text-slate-800 text-center whitespace-nowrap">{order.salesOrderId}</td>
+                    <td className="px-4 py-4 text-[13px] font-mono font-bold text-slate-800 text-center">{order.salesOrderId}</td>
                     <td className="px-4 py-4 text-[13px] text-slate-700 text-center">{order.customerName}</td>
                     <td className="px-4 py-4 text-[13px] text-slate-700 text-center">{formatDate(order.orderDate)}</td>
                     <td className="px-4 py-4 text-[13px] text-slate-700 text-center">{order.itemsCount}</td>
-                    <td className="px-4 py-4 text-[13px] font-bold text-slate-700 text-center">{formatCurrency(order.totalAmount)}</td>
-                    <td className="px-4 py-4 text-center"><PaymentBadge status={order.paymentStatus} /></td>
                     <td className="px-4 py-4 text-center"><PriorityBadge priority={order.priority} /></td>
                     <td className="px-4 py-4 text-center"><StatusBadge status={order.status} /></td>
                     <td className="px-4 py-4">
@@ -463,12 +418,9 @@ const SalesOrderList: React.FC = () => {
                         <button onClick={() => { setSelectedOrder(order); setShowDetailsModal(true); }} className="outline-none p-1.5 text-slate-400 hover:text-[#F59E0B]">
                           <Eye size={16} />
                         </button>
-                        <button className="outline-none p-1.5 text-slate-400 hover:text-blue-500">
+                        {/* <button className="outline-none p-1.5 text-slate-400 hover:text-blue-500">
                           <Edit size={16} />
-                        </button>
-                        <button className="outline-none p-1.5 text-slate-400 hover:text-rose-600">
-                          <Trash2 size={16} />
-                        </button>
+                        </button> */}
                       </div>
                     </td>
                   </tr>
@@ -515,19 +467,19 @@ const SalesOrderList: React.FC = () => {
         </div>
       </div>
 
-      {/* Details Modal */}
+      {/* Details Modal (Theme Synced) */}
       {showDetailsModal && selectedOrder && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
-          <div className="bg-white rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
-            <div className="sticky top-0 bg-white border-b p-6 flex justify-between">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl max-w-3xl w-full shadow-2xl overflow-hidden">
+            <div className="bg-white border-b p-6 flex justify-between">
               <div>
                 <h2 className="text-xl font-bold">{selectedOrder.salesOrderId}</h2>
                 <p className="text-sm text-gray-500">{selectedOrder.customerName}</p>
               </div>
-              <button onClick={() => setShowDetailsModal(false)} className="outline-none text-gray-400 text-2xl">×</button>
+              <button onClick={() => setShowDetailsModal(false)} className="text-gray-400 text-2xl">×</button>
             </div>
             <div className="p-6 space-y-6">
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                 <div className="p-3 bg-gray-50 rounded-xl">
                   <label className="text-xs text-gray-500">Order Date</label>
                   <p className="font-semibold">{formatDate(selectedOrder.orderDate)}</p>
@@ -537,39 +489,28 @@ const SalesOrderList: React.FC = () => {
                   <p className="font-semibold">{formatDate(selectedOrder.deliveryDate)}</p>
                 </div>
                 <div className="p-3 bg-gray-50 rounded-xl">
-                  <label className="text-xs text-gray-500">Items Count</label>
+                  <label className="text-xs text-gray-500">Total Items</label>
                   <p className="font-semibold">{selectedOrder.itemsCount}</p>
                 </div>
-                <div className="p-3 bg-gray-50 rounded-xl">
-                  <label className="text-xs text-gray-500">Total Amount</label>
-                  <p className="font-semibold text-green-600">{formatCurrency(selectedOrder.totalAmount)}</p>
-                </div>
               </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="p-3 bg-gray-50 rounded-xl">
-                  <label className="text-xs text-gray-500">Payment Status</label>
-                  <div><PaymentBadge status={selectedOrder.paymentStatus} /></div>
+              <div className="flex gap-4">
+                <div className="p-3 bg-gray-50 rounded-xl flex-1">
+                  <label className="text-xs text-gray-500">Status</label>
+                  <div className="mt-1"><StatusBadge status={selectedOrder.status} /></div>
                 </div>
-                <div className="p-3 bg-gray-50 rounded-xl">
-                  <label className="text-xs text-gray-500">Processing Priority</label>
-                  <div><PriorityBadge priority={selectedOrder.priority} /></div>
+                <div className="p-3 bg-gray-50 rounded-xl flex-1">
+                  <label className="text-xs text-gray-500">Priority</label>
+                  <div className="mt-1"><PriorityBadge priority={selectedOrder.priority} /></div>
                 </div>
-              </div>
-
-              <div className="p-3 bg-gray-50 rounded-xl">
-                <label className="text-xs text-gray-500">Status</label>
-                <div className="mt-1"><StatusBadge status={selectedOrder.status} /></div>
               </div>
             </div>
-
-            <div className="sticky bottom-0 bg-white border-t p-6 flex justify-end gap-3">
-              <button className="outline-none px-4 py-2 border border-slate-200 rounded-xl font-semibold text-sm flex items-center gap-2 hover:bg-slate-50">
-                <Download size={16} /> Invoice
+            <div className="bg-white border-t p-6 flex justify-end gap-3">
+              <button className="px-4 py-2 border rounded-xl font-semibold text-sm flex items-center gap-2 hover:bg-slate-50 transition-colors">
+                <Download size={16} /> Export SO
               </button>
               <button
                 onClick={() => setShowDetailsModal(false)}
-                className="outline-none px-4 py-2 bg-[#F59E0B] text-white rounded-xl font-semibold text-sm shadow-md hover:bg-[#f67317]"
+                className="px-4 py-2 bg-[#F59E0B] text-white rounded-xl font-semibold text-sm shadow-md hover:bg-[#f67317] transition-colors"
               >
                 Close
               </button>

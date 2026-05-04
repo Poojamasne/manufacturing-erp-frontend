@@ -7,13 +7,15 @@ import {
   MoreHorizontal,
   Filter,
   Eye,
-  Play,
-  CheckCircle,
+  Edit,
+  // CheckCircle,
   AlertTriangle,
-  User,
-  Cpu,
+  // User,
+  // Cpu,
   Trash2,
+  Plus,
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 type TimeFilter = "Weekly" | "Monthly" | "Quarterly" | "Yearly" | "All Time" | "Custom";
 type WorkOrderStatus = "PENDING" | "ASSIGNED" | "IN_PROGRESS" | "COMPLETED" | "BLOCKED";
@@ -44,38 +46,30 @@ interface WorkOrder {
 
 // ==================== Mock Data ====================
 const mockWorkOrders: WorkOrder[] = [
-  { id: "1", workOrderId: "WO-001", productionOrderId: "PO-001", productionOrderName: "Industrial Bolt M12", taskName: "Raw Material Cutting", description: "Cut steel rods to specified length", machineId: "M001", machineName: "CNC Machine A", operatorId: "OP001", operatorName: "John Doe", shift: "MORNING", startDate: "2024-05-15", endDate: "2024-05-16", estimatedHours: 8, actualHours: 7.5, status: "COMPLETED", progress: 100, instructions: ["Use cutting tool #A12", "Maintain speed at 1500 RPM"], safetyNotes: ["Wear safety goggles", "Keep hands clear"], createdAt: "2024-05-14" },
-  { id: "2", workOrderId: "WO-002", productionOrderId: "PO-001", productionOrderName: "Industrial Bolt M12", taskName: "Threading", description: "Create threads on bolts", machineId: "M002", machineName: "CNC Machine B", operatorId: "OP001", operatorName: "John Doe", shift: "MORNING", startDate: "2024-05-16", endDate: "2024-05-18", estimatedHours: 16, actualHours: 14, status: "IN_PROGRESS", progress: 65, instructions: ["Use threading die size M12", "Apply cutting oil"], safetyNotes: ["Watch for hot chips", "Use coolant"], createdAt: "2024-05-15" },
-  { id: "3", workOrderId: "WO-003", productionOrderId: "PO-001", productionOrderName: "Industrial Bolt M12", taskName: "Quality Inspection", description: "Inspect finished bolts", machineId: "M005", machineName: "Quality Station", operatorId: "OP003", operatorName: "Mike Johnson", shift: "EVENING", startDate: "2024-05-18", endDate: "2024-05-19", estimatedHours: 8, actualHours: 0, status: "PENDING", progress: 0, instructions: ["Check thread tolerance", "Verify hardness"], safetyNotes: ["Use calibrated gauges"], createdAt: "2024-05-17" },
-  { id: "4", workOrderId: "WO-004", productionOrderId: "PO-002", productionOrderName: "Aluminum Frame 4x4", taskName: "Frame Assembly", description: "Assemble aluminum frames", machineId: "M004", machineName: "Assembly Line 1", operatorId: "OP002", operatorName: "Jane Smith", shift: "MORNING", startDate: "2024-05-17", endDate: "2024-05-20", estimatedHours: 24, actualHours: 0, status: "ASSIGNED", progress: 0, instructions: ["Align corners properly", "Secure with screws"], safetyNotes: ["Use safety gloves"], createdAt: "2024-05-16" },
+  { id: "1", workOrderId: "WO-001", productionOrderId: "PO-001", productionOrderName: "Industrial Bolt M12", taskName: "Raw Material Cutting", description: "Cut steel rods to specified length", machineId: "M001", machineName: "CNC Machine A", operatorId: "OP001", operatorName: "John Doe", shift: "MORNING", startDate: "2026-05-15", endDate: "2026-05-16", estimatedHours: 8, actualHours: 7.5, status: "COMPLETED", progress: 100, instructions: ["Use cutting tool #A12", "Maintain speed at 1500 RPM"], safetyNotes: ["Wear safety goggles", "Keep hands clear"], createdAt: "2026-05-14" },
+  { id: "2", workOrderId: "WO-002", productionOrderId: "PO-001", productionOrderName: "Industrial Bolt M12", taskName: "Threading", description: "Create threads on bolts", machineId: "M002", machineName: "CNC Machine B", operatorId: "OP001", operatorName: "John Doe", shift: "MORNING", startDate: "2026-05-16", endDate: "2026-05-18", estimatedHours: 16, actualHours: 14, status: "IN_PROGRESS", progress: 65, instructions: ["Use threading die size M12", "Apply cutting oil"], safetyNotes: ["Watch for hot chips", "Use coolant"], createdAt: "2026-05-15" },
+  { id: "3", workOrderId: "WO-003", productionOrderId: "PO-001", productionOrderName: "Industrial Bolt M12", taskName: "Quality Inspection", description: "Inspect finished bolts", machineId: "M005", machineName: "Quality Station", operatorId: "OP003", operatorName: "Mike Johnson", shift: "EVENING", startDate: "2026-05-18", endDate: "2026-05-19", estimatedHours: 8, actualHours: 0, status: "PENDING", progress: 0, instructions: ["Check thread tolerance", "Verify hardness"], safetyNotes: ["Use calibrated gauges"], createdAt: "2026-05-17" },
+  { id: "4", workOrderId: "WO-004", productionOrderId: "PO-002", productionOrderName: "Aluminum Frame 4x4", taskName: "Frame Assembly", description: "Assemble aluminum frames", machineId: "M004", machineName: "Assembly Line 1", operatorId: "OP002", operatorName: "Jane Smith", shift: "MORNING", startDate: "2026-05-17", endDate: "2026-05-20", estimatedHours: 24, actualHours: 0, status: "ASSIGNED", progress: 0, instructions: ["Align corners properly", "Secure with screws"], safetyNotes: ["Use safety gloves"], createdAt: "2026-05-16" },
 ];
 
 // ==================== Helper Components ====================
-const StatusBadge: React.FC<{ status: WorkOrderStatus }> = ({ status }) => {
-  const styles: Record<WorkOrderStatus, string> = {
-    PENDING: "bg-gray-100 text-gray-700 border-gray-200",
-    ASSIGNED: "bg-blue-100 text-blue-700 border-blue-200",
-    IN_PROGRESS: "bg-orange-100 text-orange-700 border-orange-200",
-    COMPLETED: "bg-green-100 text-green-700 border-green-200",
-    BLOCKED: "bg-red-100 text-red-700 border-red-200"
-  };
-  const labels: Record<WorkOrderStatus, string> = { PENDING: "Pending", ASSIGNED: "Assigned", IN_PROGRESS: "In Progress", COMPLETED: "Completed", BLOCKED: "Blocked" };
-  return <span className={`px-2 py-1 rounded text-[10px] font-black uppercase border ${styles[status]}`}>{labels[status]}</span>;
-};
+// const StatusBadge: React.FC<{ status: WorkOrderStatus }> = ({ status }) => {
+//   const styles: Record<WorkOrderStatus, string> = {
+//     PENDING: "bg-gray-100 text-gray-700 border-gray-200",
+//     ASSIGNED: "bg-blue-100 text-blue-700 border-blue-200",
+//     IN_PROGRESS: "bg-orange-100 text-orange-700 border-orange-200",
+//     COMPLETED: "bg-green-100 text-green-700 border-green-200",
+//     BLOCKED: "bg-red-100 text-red-700 border-red-200"
+//   };
+//   const labels: Record<WorkOrderStatus, string> = { PENDING: "Pending", ASSIGNED: "Assigned", IN_PROGRESS: "In Progress", COMPLETED: "Completed", BLOCKED: "Blocked" };
+//   return <span className={`px-2 py-1 rounded text-[10px] font-black uppercase border ${styles[status]}`}>{labels[status]}</span>;
+// };
 
 const getShiftLabel = (shift: Shift) => {
   const labels: Record<Shift, string> = { MORNING: "Morning", EVENING: "Evening", NIGHT: "Night" };
   return labels[shift];
 };
 
-const formatDate = (date: string) => {
-  if (!date) return "-";
-  const d = new Date(date);
-  const day = String(d.getDate()).padStart(2, "0");
-  const month = String(d.getMonth() + 1).padStart(2, "0");
-  const year = d.getFullYear();
-  return `${day}/${month}/${year}`;
-};
 
 // ==================== Main Component ====================
 const WorkOrderList: React.FC = () => {
@@ -83,7 +77,7 @@ const WorkOrderList: React.FC = () => {
   const timeFilterRef = useRef<HTMLDivElement>(null);
   const statusFilterRef = useRef<HTMLDivElement>(null);
   const shiftFilterRef = useRef<HTMLDivElement>(null);
-
+  const navigate = useNavigate();
   const [workOrders, setWorkOrders] = useState<WorkOrder[]>(mockWorkOrders);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("All");
@@ -156,6 +150,15 @@ const WorkOrderList: React.FC = () => {
     return timeFilter;
   };
 
+  const formatDate = (date: string) => {
+  if (!date) return "-";
+  const d = new Date(date);
+  const day = String(d.getDate()).padStart(2, "0");
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const year = d.getFullYear();
+  return `${day}/${month}/${year}`;
+};
+
   const filteredWorkOrders = useMemo(() => {
     let filtered = [...workOrders];
     if (searchQuery) filtered = filtered.filter(w => w.workOrderId.toLowerCase().includes(searchQuery.toLowerCase()) || w.taskName.toLowerCase().includes(searchQuery.toLowerCase()) || w.productionOrderName.toLowerCase().includes(searchQuery.toLowerCase()));
@@ -213,12 +216,12 @@ const WorkOrderList: React.FC = () => {
   const handleViewDetails = (order: WorkOrder) => { setSelectedOrder(order); setShowDetailsModal(true); };
   const handleStartTask = (id: string) => {
     setWorkOrders(workOrders.map(w => w.id === id ? { ...w, status: "IN_PROGRESS", progress: 5 } : w));
-    alert("Task started successfully!");
+    alert("This section is under development!");
   };
-  const handleCompleteTask = (id: string) => {
-    setWorkOrders(workOrders.map(w => w.id === id ? { ...w, status: "COMPLETED", progress: 100 } : w));
-    alert("Task completed!");
-  };
+  // const handleCompleteTask = (id: string) => {
+  //   setWorkOrders(workOrders.map(w => w.id === id ? { ...w, status: "COMPLETED", progress: 100 } : w));
+  //   alert("Task Section is under development!");
+  // };
 
   return (
     <div className="min-h-screen bg-[#f4f7f6] p-4 sm:p-6 lg:p-8 text-slate-900 font-sans">
@@ -229,31 +232,40 @@ const WorkOrderList: React.FC = () => {
             <h1 className="text-3xl font-extrabold text-slate-800 tracking-tight">Work Orders</h1>
             <p className="text-sm text-gray-500 mt-1 font-medium">Manage work order assignments </p>
           </div>
-
-          {/* Global Time Filter */}
-          <div className="relative" ref={timeFilterRef}>
-            <button onClick={() => setIsTimeDropdownOpen(!isTimeDropdownOpen)} className="outline-none px-4 py-2 rounded-xl border border-slate-200 bg-white text-sm font-medium shadow-sm flex items-center gap-2 text-gray-700">
-              <Filter size={16} className="text-[#F59E0B]" />
-              <span>{getFilterDisplayText()}</span>
-              <ChevronDown size={14} className={isTimeDropdownOpen ? "rotate-180" : ""} />
-            </button>
-            {isTimeDropdownOpen && !isCalendarOpen && (
-              <div className="absolute right-0 mt-2 bg-white rounded-2xl shadow-2xl z-50 py-2 min-w-40 overflow-hidden">
-                {["All Time", "Weekly", "Monthly", "Quarterly", "Yearly"].map(tab => (
-                  <button key={tab} onClick={() => handleTimeFilterChange(tab as TimeFilter)} className={`outline-none w-full text-left px-4 py-2.5 text-[13px] ${timeFilter === tab ? "text-amber-500 font-bold bg-orange-50/50" : "text-slate-600 hover:bg-slate-50"}`}>{tab}</button>
-                ))}
-                <button onClick={() => handleTimeFilterChange("Custom")} className={`outline-none w-full text-left px-4 py-2.5 text-[13px] ${timeFilter === "Custom" ? "text-amber-500 font-bold bg-orange-50/50" : "text-slate-600 hover:bg-slate-50"}`}>Custom</button>
-              </div>
-            )}
-            {isCalendarOpen && (
-              <div className="absolute right-0 mt-3 bg-white p-6 rounded-2xl shadow-2xl z-50 w-72">
-                <div className="space-y-3">
-                  <input type="date" value={customRange.start} onChange={(e) => setCustomRange({ ...customRange, start: e.target.value })} className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500/20" />
-                  <input type="date" value={customRange.end} min={customRange.start} onChange={(e) => setCustomRange({ ...customRange, end: e.target.value })} className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500/20" />
-                  <button onClick={handleCustomApply} className="outline-none w-full bg-[#F59E0B] text-white py-2 rounded-lg text-sm font-bold hover:bg-[#f67317]">Apply Range</button>
+          <div className="flex items-center gap-3 w-full md:w-auto">
+            {/* Global Time Filter */}
+            <div className="relative" ref={timeFilterRef}>
+              <button onClick={() => setIsTimeDropdownOpen(!isTimeDropdownOpen)} className="outline-none px-4 py-2 rounded-xl border border-slate-200 bg-white text-sm font-medium shadow-sm flex items-center gap-2 text-gray-700">
+                <Filter size={16} className="text-[#F59E0B]" />
+                <span>{getFilterDisplayText()}</span>
+                <ChevronDown size={14} className={isTimeDropdownOpen ? "rotate-180" : ""} />
+              </button>
+              {isTimeDropdownOpen && !isCalendarOpen && (
+                <div className="absolute right-0 mt-2 bg-white rounded-2xl shadow-2xl z-50 py-2 min-w-40 overflow-hidden">
+                  {["All Time", "Weekly", "Monthly", "Quarterly", "Yearly"].map(tab => (
+                    <button key={tab} onClick={() => handleTimeFilterChange(tab as TimeFilter)} className={`outline-none w-full text-left px-4 py-2.5 text-[13px] ${timeFilter === tab ? "text-amber-500 font-bold bg-orange-50/50" : "text-slate-600 hover:bg-slate-50"}`}>{tab}</button>
+                  ))}
+                  <button onClick={() => handleTimeFilterChange("Custom")} className={`outline-none w-full text-left px-4 py-2.5 text-[13px] ${timeFilter === "Custom" ? "text-amber-500 font-bold bg-orange-50/50" : "text-slate-600 hover:bg-slate-50"}`}>Custom</button>
                 </div>
-              </div>
-            )}
+              )}
+              {isCalendarOpen && (
+                <div className="absolute right-0 mt-3 bg-white p-6 rounded-2xl shadow-2xl z-50 w-72">
+                  <div className="space-y-3">
+                    <input type="date" value={customRange.start} onChange={(e) => setCustomRange({ ...customRange, start: e.target.value })} className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500/20" />
+                    <input type="date" value={customRange.end} min={customRange.start} onChange={(e) => setCustomRange({ ...customRange, end: e.target.value })} className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500/20" />
+                    <button onClick={handleCustomApply} className="outline-none w-full bg-[#F59E0B] text-white py-2 rounded-lg text-sm font-bold hover:bg-[#f67317]">Apply Range</button>
+                  </div>
+                </div>
+              )}
+            </div>
+            <button
+              onClick={() => navigate("/production/work-orders/new-work-order")}
+              className="outline-none group flex items-center gap-1 bg-[#F59E0B] hover:bg-[#f67317] text-white px-2.5 py-2 rounded-xl font-bold text-sm shadow-xl shadow-amber-500/5 transition-all active:scale-95 whitespace-nowrap"
+            >
+              <Plus size={18} />
+              <span className="hidden sm:inline">Create New Work Order</span>
+              <span className="sm:hidden">New</span>
+            </button>
           </div>
         </header>
 
@@ -347,11 +359,13 @@ const WorkOrderList: React.FC = () => {
                 <th className="px-4 py-4 text-[11px] text-slate-800 uppercase tracking-widest text-center">WO ID</th>
                 <th className="px-4 py-4 text-[11px] text-slate-800 uppercase tracking-widest text-center">TASK</th>
                 <th className="px-4 py-4 text-[11px] text-slate-800 uppercase tracking-widest text-center">PO ID</th>
-                <th className="px-4 py-4 text-[11px] text-slate-800 uppercase tracking-widest text-center">MACHINE</th>
-                <th className="px-4 py-4 text-[11px] text-slate-800 uppercase tracking-widest text-center">OPERATOR</th>
-                <th className="px-4 py-4 text-[11px] text-slate-800 uppercase tracking-widest text-center">SHIFT</th>
-                <th className="px-4 py-4 text-[11px] text-slate-800 uppercase tracking-widest text-center">STATUS</th>
-                <th className="px-4 py-4 text-[11px] text-slate-800 uppercase tracking-widest text-center">PROGRESS</th>
+                {/* <th className="px-4 py-4 text-[11px] text-slate-800 uppercase tracking-widest text-center">MACHINE</th> */}
+                {/* <th className="px-4 py-4 text-[11px] text-slate-800 uppercase tracking-widest text-center">OPERATOR</th> */}
+                {/* <th className="px-4 py-4 text-[11px] text-slate-800 uppercase tracking-widest text-center">SHIFT</th> */}
+                {/* <th className="px-4 py-4 text-[11px] text-slate-800 uppercase tracking-widest text-center">STATUS</th> */}
+                {/* <th className="px-4 py-4 text-[11px] text-slate-800 uppercase tracking-widest text-center">PROGRESS</th> */}
+                <th className="px-4 py-4 text-[11px] text-slate-800 uppercase tracking-widest text-center">Start Date</th>
+                <th className="px-4 py-4 text-[11px] text-slate-800 uppercase tracking-widest text-center">End Date</th>
                 <th className="px-4 py-4 text-[11px] text-slate-800 uppercase tracking-widest text-center">ACTIONS</th>
               </tr></thead>
               <tbody className="divide-y divide-slate-50">
@@ -372,15 +386,16 @@ const WorkOrderList: React.FC = () => {
                     <td className="px-4 py-4 text-[13px] font-mono font-bold text-slate-800 text-center">{wo.workOrderId}</td>
                     <td className="px-4 py-4 text-[13px] text-slate-700 text-center">{wo.taskName}</td>
                     <td className="px-4 py-4 text-[13px] text-slate-700 text-center">{wo.productionOrderId}</td>
-                    <td className="px-4 py-4"><div className="flex items-center justify-center gap-1"><Cpu size={14} className="text-purple-500" /><span className="text-[13px]">{wo.machineName}</span></div></td>
-                    <td className="px-4 py-4"><div className="flex items-center justify-center gap-1"><User size={14} className="text-blue-500" /><span className="text-[13px]">{wo.operatorName}</span></div></td>
-                    <td className="px-4 py-4 text-[13px] text-slate-700 text-center">{getShiftLabel(wo.shift)}</td>
-                    <td className="px-4 py-4 text-center"><StatusBadge status={wo.status} /></td>
-                    <td className="px-4 py-4"><div className="flex items-center justify-center gap-2"><div className="w-20 h-1.5 bg-gray-100 rounded-full overflow-hidden"><div className="h-full bg-[#F59E0B] rounded-full" style={{ width: `${wo.progress}%` }} /></div><span className="text-[11px] font-semibold">{wo.progress}%</span></div></td>
+                    <td className="px-4 py-4 text-[13px] text-slate-700 text-center">{formatDate(wo.startDate)}</td>
+                    <td className="px-4 py-4 text-[13px] text-slate-700 text-center">{formatDate(wo.endDate)}</td>
+                    {/* <td className="px-4 py-4"><div className="flex items-center justify-center gap-1"><Cpu size={14} className="text-purple-500" /><span className="text-[13px]">{wo.machineName}</span></div></td> */}
+                    {/* <td className="px-4 py-4"><div className="flex items-center justify-center gap-1"><User size={14} className="text-blue-500" /><span className="text-[13px]">{wo.operatorName}</span></div></td> */}
+                    {/* <td className="px-4 py-4 text-[13px] text-slate-700 text-center">{getShiftLabel(wo.shift)}</td> */}
+                    {/* <td className="px-4 py-4 text-center"><StatusBadge status={wo.status} /></td> */}
+                    {/* <td className="px-4 py-4"><div className="flex items-center justify-center gap-2"><div className="w-20 h-1.5 bg-gray-100 rounded-full overflow-hidden"><div className="h-full bg-[#F59E0B] rounded-full" style={{ width: `${wo.progress}%` }} /></div><span className="text-[11px] font-semibold">{wo.progress}%</span></div></td> */}
                     <td className="px-4 py-4"><div className="flex justify-center gap-2">
                       <button onClick={() => handleViewDetails(wo)} className="outline-none p-1.5 text-slate-400 hover:text-[#F59E0B]"><Eye size={16} /></button>
-                      {wo.status === "PENDING" && <button onClick={() => handleStartTask(wo.id)} className="outline-none p-1.5 text-slate-400 hover:text-green-500"><Play size={16} /></button>}
-                      {wo.status === "IN_PROGRESS" && <button onClick={() => handleCompleteTask(wo.id)} className="outline-none p-1.5 text-slate-400 hover:text-green-600"><CheckCircle size={16} /></button>}
+                      <button onClick={() => handleStartTask(wo.id)} className="outline-none p-1.5 text-slate-400 hover:text-green-500"><Edit size={16} /></button>
                       <button onClick={() => handleDelete(wo.id)} className="outline-none p-1.5 text-slate-400 hover:text-rose-600"><Trash2 size={16} /></button>
                     </div></td>
                   </tr>
@@ -428,7 +443,7 @@ const WorkOrderList: React.FC = () => {
             </div>
             <div className="sticky bottom-0 bg-white border-t p-6 flex justify-end gap-3">
               {selectedOrder.status === "PENDING" && <button onClick={() => { handleStartTask(selectedOrder.id); setShowDetailsModal(false); }} className="outline-none px-6 py-4 bg-green-500 hover:bg-green-600 text-white rounded-xl">Start Task</button>}
-              {selectedOrder.status === "IN_PROGRESS" && <button onClick={() => { handleCompleteTask(selectedOrder.id); setShowDetailsModal(false); }} className="outline-none px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-xl">Complete Task</button>}
+              {/* {selectedOrder.status === "IN_PROGRESS" && <button onClick={() => { handleCompleteTask(selectedOrder.id); setShowDetailsModal(false); }} className="outline-none px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-xl">Complete Task</button>} */}
               <button onClick={() => setShowDetailsModal(false)} className="outline-none px-6 py-2 bg-gray-100 hover:bg-gray-200 rounded-xl">Close</button>
             </div>
           </div>

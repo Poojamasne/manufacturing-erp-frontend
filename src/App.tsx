@@ -41,7 +41,7 @@ import ProductionProtectedRoute from "./components/auth/ProductionProtectedRoute
 import ProductionDashboard from './components/modules/production/Dashboard';
 import ProductionPlanningScreen from './components/modules/production/components/ProductionPlanning/ProductionPlanningScreen';
 import ProductionOrderList from './components/modules/production/components/ProductionOrder/ProductionOrderList';
-import WorkOrderList from './components/modules/production/components/ProductionOrder/WorkOrderList';
+import WorkOrderList from './components/modules/production/components/WorkOrder/WorkOrderList';
 import ResourceAllocation from './components/modules/production/components/ResourceAllocation/ResourceAllocation';
 import ProductionScheduler from './components/modules/production/components/Scheduling/ProductionScheduling';
 import ShopFloorExecution from './components/modules/production/components/ShopFloor/ShopFloorExecution';
@@ -49,6 +49,11 @@ import ProductionReports from './components/modules/production/components/Report
 
 import { Toaster } from "react-hot-toast";
 import SalesOrderList from "./components/modules/production/components/SalesOrder/SalesOrderList";
+import EditProductionPlan from "./components/modules/production/components/ProductionPlanning/EditProductionPlan";
+import CreateProductionPlan from "./components/modules/production/components/ProductionPlanning/CreateProductionPlan";
+import ViewProductionPlan from "./components/modules/production/components/ProductionPlanning/ViewProductionPlan";
+import PurchaseRequestList from "./components/modules/production/components/PurchaseRequest/PurchaseRequestList";
+import CreateWorkOrder from "./components/modules/production/components/WorkOrder/CreateWorkOrder";
 
 /* Global Suspense Wrapper */
 const withSuspense = (Component: React.ReactNode) => (
@@ -71,7 +76,7 @@ function App() {
     },
     {
       path: "/role-mismatch",
-      element: <RoleNotMatched />,
+      element: withSuspense(<RoleNotMatched />),
 
     },
 
@@ -93,83 +98,83 @@ function App() {
             },
             {
               path: "leads",
-              element: <LeadsPage />,
+              element: withSuspense(<LeadsPage />),
             },
             {
               path: "leads/new-lead",
-              element: <LeadForm />,
+              element: withSuspense(<LeadForm />),
             },
             {
               path: "leads/edit-lead/:id",
-              element: <EditLeadForm />,
+              element: withSuspense(<EditLeadForm />),
             },
             {
               path: "leads/view-lead/:id",
-              element: <LeadView />,
+              element: withSuspense(<LeadView />),
             },
             {
               path: "opportunities",
-              element: <OpportunitiesPage />,
+              element: withSuspense(<OpportunitiesPage />),
             },
             {
               path: "opportunities/opportunity-view/:id",
-              element: <OpportunityView />,
+              element: withSuspense(<OpportunityView />),
             },
             {
               path: "quotation",
-              element: <QuotationPage />,
+              element: withSuspense(<QuotationPage />),
             },
             {
               path: "quotation/quotation-view/:id",
-              element: <QuotationView />,
+              element: withSuspense(<QuotationView />),
             },
             {
               path: "quotation/quotation-create",
-              element: <QuotationCreate />
+              element: withSuspense(<QuotationCreate />)
             },
             {
               path: "orders",
-              element: <OrdersPage />,
+              element: withSuspense(<OrdersPage />),
             },
             {
               path: "orders/order-view/:id",
-              element: <OrderView />,
+              element: withSuspense(<OrderView />),
             },
             {
               path: "orders/create",
-              element: <OrderCreate />,
+              element: withSuspense(<OrderCreate />),
             },
             {
               path: "production",
-              element: <SalesProductionPage />,
+              element: withSuspense(<SalesProductionPage />),
             },
             {
               path: "production/production-edit/:id",
-              element: <ProductionEdit />
+              element: withSuspense(<ProductionEdit />)
             },
             {
               path: "reports",
-              element: <ReportsAndAnalytics />,
+              element: withSuspense(<ReportsAndAnalytics />),
             },
             {
               path: "employees",
-              element: <SalesEmployees />,
+              element: withSuspense(<SalesEmployees />),
             },
             {
               path: "employees/add-employee",
-              element: <AddSalesEmployee />,
+              element: withSuspense(<AddSalesEmployee />),
             },
             {
               path: "employees/edit-employee/:id",
-              element: <EditSalesEmployee />,
+              element: withSuspense(<EditSalesEmployee />),
             },
             {
               path: "employees/view-employee/:id",
-              element: <ViewSalesEmployee />,
+              element: withSuspense(<ViewSalesEmployee />),
             },
             {
               path: "notes",
-              element: <NotesPage />,
+              element: withSuspense(<NotesPage />),
             },
           ],
         },
@@ -193,65 +198,95 @@ function App() {
             // Dashboard
             {
               path: "dashboard",
-              element: <ProductionDashboard />
+              element: withSuspense(<ProductionDashboard />)
             },
 
             // Production Planning
             {
               path: "sales-orders",
-              element: <SalesOrderList />
+              element: withSuspense(<SalesOrderList />)
             },
 
-            // Production Planning
+            // Production Planning Dashboard
             {
               path: "planning",
-              element: <ProductionPlanningScreen />
+              element: withSuspense(<ProductionPlanningScreen />)
+            },
+
+            // create production plan
+            {
+              path: "planning/new-plan",
+              element: withSuspense(<CreateProductionPlan />)
+            },
+
+            // edit production plan
+            {
+              path: "planning/edit-plan/:id",
+              element: withSuspense(<EditProductionPlan />)
+            },
+
+            // view production plan
+            {
+              path: "planning/view-plan/:id",
+              element: withSuspense(<ViewProductionPlan />)
             },
 
             // Production Orders
             {
               path: "orders",
-              element: <ProductionOrderList />
+              element: withSuspense(<ProductionOrderList />)
             },
 
             // Work Orders
             {
               path: "work-orders",
-              element: <WorkOrderList />
+              element: withSuspense(<WorkOrderList />)
+            },
+
+            // create work order
+            {
+              path: "work-orders/new-work-order",
+              element: withSuspense(<CreateWorkOrder />)
             },
 
             // Resource Allocation (Machines & Operators)
             {
               path: "resources",
-              element: <ResourceAllocation />
+              element: withSuspense(<ResourceAllocation />)
             },
 
             // Production Scheduling
             {
               path: "scheduling",
-              element: <ProductionScheduler />
+              element: withSuspense(<ProductionScheduler />)
             },
 
             // Shop Floor Execution
             {
               path: "shop-floor",
-              element: <ShopFloorExecution />
+              element: withSuspense(<ShopFloorExecution />)
             },
             {
               path: "work-instructions",
-              element: <ShopFloorExecution />
+              element: withSuspense(<ShopFloorExecution />)
             },
 
             // Reports & Analytics
             {
               path: "reports",
-              element: <ProductionReports />
+              element: withSuspense(<ProductionReports />)
+            },
+
+            // Reports & Analytics
+            {
+              path: "purchase-requests",
+              element: withSuspense(<PurchaseRequestList />)
             },
 
             // Notes
             {
               path: "notes",
-              element: <NotesPage />
+              element: withSuspense(<NotesPage />)
             },
           ],
         },

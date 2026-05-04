@@ -13,7 +13,9 @@ import {
   MoreHorizontal,
   Eye,
   Trash2,
+  Plus,
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 type TimeFilter =
   | "Weekly"
@@ -138,7 +140,7 @@ const ProductionScheduling: React.FC = () => {
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
-
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     startDate: "",
     endDate: "",
@@ -359,8 +361,8 @@ const ProductionScheduling: React.FC = () => {
                       key={tab}
                       onClick={() => handleTimeFilterChange(tab as TimeFilter)}
                       className={`outline-none w-full text-left px-4 py-2.5 text-[13px] transition-colors ${timeFilter === tab
-                          ? "text-amber-500 font-bold bg-orange-50/50"
-                          : "text-slate-600 hover:bg-slate-50"
+                        ? "text-amber-500 font-bold bg-orange-50/50"
+                        : "text-slate-600 hover:bg-slate-50"
                         }`}
                     >
                       {tab}
@@ -370,8 +372,8 @@ const ProductionScheduling: React.FC = () => {
                 <button
                   onClick={() => handleTimeFilterChange("Custom")}
                   className={`outline-none w-full text-left px-4 py-2.5 text-[13px] transition-colors ${timeFilter === "Custom"
-                      ? "text-amber-500 font-bold bg-orange-50/50"
-                      : "text-slate-600 hover:bg-slate-50"
+                    ? "text-amber-500 font-bold bg-orange-50/50"
+                    : "text-slate-600 hover:bg-slate-50"
                     }`}
                 >
                   Custom
@@ -412,6 +414,14 @@ const ProductionScheduling: React.FC = () => {
               </div>
             )}
           </div>
+          <button
+            onClick={() => navigate("/production/scheduling/new-schedule")}
+            className="outline-none group flex items-center gap-1 bg-[#F59E0B] hover:bg-[#f67317] text-white px-2.5 py-2 rounded-xl font-bold text-sm shadow-xl shadow-amber-500/5 transition-all active:scale-95 whitespace-nowrap"
+          >
+            <Plus size={18} />
+            <span className="hidden sm:inline">Create Schedule</span>
+            <span className="sm:hidden">New</span>
+          </button>
         </header>
 
         {/* Main Table Container */}
@@ -440,8 +450,8 @@ const ProductionScheduling: React.FC = () => {
                 <button
                   onClick={() => setActiveDropdown(activeDropdown === "priority" ? null : "priority")}
                   className={`outline-none px-4 py-3 rounded-xl border text-[13px] font-bold flex items-center gap-2 ${priorityFilter !== "All"
-                      ? "bg-orange-50 border-orange-200 text-amber-500"
-                      : "bg-white border-slate-200 text-slate-600"
+                    ? "bg-orange-50 border-orange-200 text-amber-500"
+                    : "bg-white border-slate-200 text-slate-600"
                     }`}
                 >
                   {priorityFilter === "All" ? "Priority" : priorityFilter}
@@ -461,8 +471,8 @@ const ProductionScheduling: React.FC = () => {
                           setActiveDropdown(null);
                         }}
                         className={`outline-none w-full text-left px-4 py-2 text-[13px] hover:bg-slate-50 ${priorityFilter === opt
-                            ? "text-amber-500 font-bold bg-orange-50/50"
-                            : "text-slate-600"
+                          ? "text-amber-500 font-bold bg-orange-50/50"
+                          : "text-slate-600"
                           }`}
                       >
                         {opt}
@@ -621,8 +631,8 @@ const ProductionScheduling: React.FC = () => {
                         key={i}
                         onClick={() => goToPage(page as number)}
                         className={`outline-none min-w-10 h-10 rounded-xl text-xs font-bold transition-all ${currentPage === page
-                            ? "bg-[#F59E0B] text-white shadow-lg"
-                            : "bg-white text-slate-500 border border-slate-200"
+                          ? "bg-[#F59E0B] text-white shadow-lg"
+                          : "bg-white text-slate-500 border border-slate-200"
                           }`}
                       >
                         {page}
@@ -713,8 +723,8 @@ const ProductionScheduling: React.FC = () => {
                       type="button"
                       onClick={() => setFormData({ ...formData, shift: s })}
                       className={`outline-none flex-1 py-3 rounded-xl text-[11px] font-bold uppercase tracking-tight transition-all border ${formData.shift === s
-                          ? "bg-orange-50 border-orange-300 text-amber-500 shadow-sm"
-                          : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
+                        ? "bg-orange-50 border-orange-300 text-amber-500 shadow-sm"
+                        : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
                         }`}
                     >
                       {s}

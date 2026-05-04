@@ -137,18 +137,6 @@ const styles = StyleSheet.create({
 export const QuotationPDFReport = ({ data }: { data: any }) => {
     const formatINR = (amt: any) =>
         `₹${Number(amt).toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
-
-    const getStatusColor = (status: string) => {
-        switch (status) {
-            case "Rejected": return { bg: '#fff1f2', text: '#e11d48', border: '#ffe4e6' };
-            case "Approved": return { bg: '#ecfdf5', text: '#059669', border: '#d1fae5' };
-            case "Pending": return { bg: '#fffbeb', text: '#d97706', border: '#fef3c7' };
-            default: return { bg: '#f8fafc', text: '#64748b', border: '#e2e8f0' };
-        }
-    };
-
-    const statusStyle = getStatusColor(data.status);
-
     return (
         <Document title={`Quotation-${data.quote_id}`}>
             <Page size="A4" style={styles.page}>
@@ -158,9 +146,6 @@ export const QuotationPDFReport = ({ data }: { data: any }) => {
                         <View>
                             <Text style={styles.title}>QUOTATION</Text>
                             <Text style={styles.quoteId}>Ref: {data.quote_id}</Text>
-                        </View>
-                        <View style={[styles.badge, { backgroundColor: statusStyle.bg, color: statusStyle.text, borderColor: statusStyle.border }]}>
-                            <Text>Status: {data.status}</Text>
                         </View>
                     </View>
 

@@ -7,16 +7,11 @@ import {
   ChevronRight,
   MoreHorizontal,
   Filter,
-  Play,
+  Edit,
   Package,
-  ShoppingCart,
-  CheckCircle,
-  AlertCircle,
-  AlertTriangle,
-  ChevronRight as ChevronRightIcon,
-  X,
   Eye,
   Trash2,
+  Plus,
 } from "lucide-react";
 
 // ==================== Types ====================
@@ -41,22 +36,6 @@ interface SalesOrder {
   created_at?: string;
 }
 
-interface BOMItem {
-  materialId: string;
-  materialName: string;
-  quantityPerUnit: number;
-  unit: string;
-  totalRequired: number;
-}
-
-interface InventoryItem {
-  materialId: string;
-  materialName: string;
-  availableQuantity: number;
-  requiredQuantity: number;
-  unit: string;
-  shortage: number;
-}
 
 // ==================== Mock Data ====================
 const mockSalesOrders: SalesOrder[] = [
@@ -117,121 +96,6 @@ const mockSalesOrders: SalesOrder[] = [
   },
 ];
 
-// BOM Database
-const bomDatabase: { [key: string]: BOMItem[] } = {
-  "Industrial Bolt M12": [
-    {
-      materialId: "RM001",
-      materialName: "Steel Rod 12mm",
-      quantityPerUnit: 1.2,
-      unit: "kg",
-      totalRequired: 0,
-    },
-    {
-      materialId: "RM002",
-      materialName: "Zinc Coating",
-      quantityPerUnit: 0.05,
-      unit: "kg",
-      totalRequired: 0,
-    },
-    {
-      materialId: "RM003",
-      materialName: "Thread Oil",
-      quantityPerUnit: 0.01,
-      unit: "liter",
-      totalRequired: 0,
-    },
-  ],
-  "Aluminum Frame 4x4": [
-    {
-      materialId: "RM004",
-      materialName: "Aluminum Sheet",
-      quantityPerUnit: 2.5,
-      unit: "kg",
-      totalRequired: 0,
-    },
-    {
-      materialId: "RM005",
-      materialName: "Screws Set",
-      quantityPerUnit: 8,
-      unit: "pcs",
-      totalRequired: 0,
-    },
-    {
-      materialId: "RM006",
-      materialName: "Corner Brackets",
-      quantityPerUnit: 4,
-      unit: "pcs",
-      totalRequired: 0,
-    },
-  ],
-  "Plastic Container L": [
-    {
-      materialId: "RM007",
-      materialName: "Plastic Resin",
-      quantityPerUnit: 1.8,
-      unit: "kg",
-      totalRequired: 0,
-    },
-    {
-      materialId: "RM008",
-      materialName: "Color Masterbatch",
-      quantityPerUnit: 0.1,
-      unit: "kg",
-      totalRequired: 0,
-    },
-  ],
-  "Rubber Gasket Set": [
-    {
-      materialId: "RM009",
-      materialName: "Rubber Sheet",
-      quantityPerUnit: 0.5,
-      unit: "kg",
-      totalRequired: 0,
-    },
-    {
-      materialId: "RM010",
-      materialName: "Adhesive",
-      quantityPerUnit: 0.02,
-      unit: "liter",
-      totalRequired: 0,
-    },
-  ],
-  "Steel Plate 6mm": [
-    {
-      materialId: "RM011",
-      materialName: "Steel Coil",
-      quantityPerUnit: 6.5,
-      unit: "kg",
-      totalRequired: 0,
-    },
-    {
-      materialId: "RM012",
-      materialName: "Cutting Oil",
-      quantityPerUnit: 0.03,
-      unit: "liter",
-      totalRequired: 0,
-    },
-  ],
-};
-
-// Inventory Database
-const inventoryDatabase: {
-  [key: string]: { available: number; unit: string };
-} = {
-  RM001: { available: 4500, unit: "kg" },
-  RM002: { available: 300, unit: "kg" },
-  RM003: { available: 80, unit: "liter" },
-  RM004: { available: 400, unit: "kg" },
-  RM005: { available: 1500, unit: "pcs" },
-  RM006: { available: 800, unit: "pcs" },
-  RM007: { available: 1200, unit: "kg" },
-  RM008: { available: 150, unit: "kg" },
-  RM009: { available: 800, unit: "kg" },
-  RM010: { available: 45, unit: "liter" },
-  RM011: { available: 6000, unit: "kg" },
-  RM012: { available: 60, unit: "liter" },
-};
 
 // ==================== Helper Components ====================
 const StatusBadge: React.FC<{ status: string }> = ({ status }) => {
@@ -268,12 +132,9 @@ const ProductionPlanningScreen: React.FC = () => {
 
   // State
   const [salesOrders, setSalesOrders] = useState<SalesOrder[]>(mockSalesOrders);
-  const [selectedOrder, setSelectedOrder] = useState<SalesOrder | null>(null);
-  const [viewOrder, setViewOrder] = useState<SalesOrder | null>(null);
-  const [currentStep, setCurrentStep] = useState(1);
-  const [bomItems, setBomItems] = useState<BOMItem[]>([]);
-  const [inventoryItems, setInventoryItems] = useState<InventoryItem[]>([]);
-  const [showPurchaseRequest, setShowPurchaseRequest] = useState(false);
+  const [selectedOrder, _setSelectedOrder] = useState<SalesOrder | null>(null);
+  const [viewOrder, _setViewOrder] = useState<SalesOrder | null>(null);
+  const [_currentStep, _setCurrentStep] = useState(1);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
 
   // Filter States
@@ -471,58 +332,6 @@ const ProductionPlanningScreen: React.FC = () => {
     }
   };
 
-  const handleViewDetails = (order: SalesOrder) => {
-    setViewOrder(order);
-    setShowDetailsModal(true);
-  };
-
-  // Handle production planning
-  const handlePlanProduction = (order: SalesOrder) => {
-    setSelectedOrder(order);
-    setCurrentStep(1);
-
-    const bom = bomDatabase[order.productName] || [];
-    const calculatedBom = bom.map((item) => ({
-      ...item,
-      totalRequired: item.quantityPerUnit * order.quantity,
-    }));
-    setBomItems(calculatedBom);
-
-    const inventoryCheck = calculatedBom.map((bomItem) => {
-      const inventory = inventoryDatabase[bomItem.materialId] || {
-        available: 0,
-        unit: bomItem.unit,
-      };
-      const shortage = Math.max(0, bomItem.totalRequired - inventory.available);
-      return {
-        materialId: bomItem.materialId,
-        materialName: bomItem.materialName,
-        availableQuantity: inventory.available,
-        requiredQuantity: bomItem.totalRequired,
-        unit: inventory.unit,
-        shortage: shortage,
-      };
-    });
-    setInventoryItems(inventoryCheck);
-  };
-
-  const hasMaterialShortage = () => {
-    return inventoryItems.some((item) => item.shortage > 0);
-  };
-
-  const handleCreateProductionOrder = () => {
-    const productionOrderId = `PO-${Date.now()}`;
-    alert(`Production Order ${productionOrderId} created successfully!`);
-    setSelectedOrder(null);
-    setCurrentStep(1);
-    navigate("/production/orders");
-  };
-
-  const handleCreatePurchaseRequest = () => {
-    setShowPurchaseRequest(false);
-    alert("Purchase Request Created!");
-  };
-
   return (
     <div className="min-h-screen bg-[#f4f7f6] p-4 sm:p-6 lg:p-8 text-slate-900 font-sans">
       <div className="max-w-7xl mx-auto">
@@ -537,74 +346,85 @@ const ProductionPlanningScreen: React.FC = () => {
             </p>
           </div>
 
-          {/* Global Time Filter */}
-          <div className="relative" ref={dropdownRef}>
-            <button
-              onClick={() => setIsTimeDropdownOpen(!isTimeDropdownOpen)}
-              className="outline-none px-4 py-2 rounded-xl border border-slate-200 bg-white text-sm font-medium shadow-sm flex items-center gap-2 text-gray-700"
-            >
-              <Filter size={16} className="outline-none text-[#F59E0B]" />
-              <span>{getFilterDisplayText()}</span>
-              <ChevronDown
-                size={14}
-                className={isTimeDropdownOpen ? "outline-none rotate-180" : ""}
-              />
-            </button>
-
-            {isTimeDropdownOpen && !isCalendarOpen && (
-              <div className="absolute right-0 mt-2 bg-white border border-slate-100 rounded-2xl shadow-2xl z-50 py-2 min-w-40">
-                {["All Time", "Weekly", "Monthly", "Quarterly", "Yearly"].map(
-                  (tab) => (
-                    <button
-                      key={tab}
-                      onClick={() => handleTimeFilterChange(tab as TimeFilter)}
-                      className={`outline-none w-full text-left px-4 py-2 text-[13px] ${timeFilter === tab ? "text-amber-500 font-bold bg-orange-50/50" : "text-slate-600 hover:bg-slate-50"}`}
-                    >
-                      {tab}
-                    </button>
-                  ),
-                )}
-                <button
-                  onClick={() => handleTimeFilterChange("Custom")}
-                  className={`outline-none w-full text-left px-4 py-2 text-[13px] ${timeFilter === "Custom" ? "text-amber-500 font-bold bg-orange-50/50" : "text-slate-600 hover:bg-slate-50"}`}
-                >
-                  Custom
-                </button>
-              </div>
-            )}
-
-            {isCalendarOpen && (
-              <div
-                ref={calendarRef}
-                className="absolute right-0 mt-3 bg-white p-6 rounded-2xl shadow-xl border z-50 w-72"
+          <div className="flex items-center gap-3 w-full md:w-auto">
+            {/* Global Time Filter */}
+            <div className="relative" ref={dropdownRef}>
+              <button
+                onClick={() => setIsTimeDropdownOpen(!isTimeDropdownOpen)}
+                className="outline-none px-4 py-2 rounded-xl border border-slate-200 bg-white text-sm font-medium shadow-sm flex items-center gap-2 text-gray-700"
               >
-                <div className="space-y-3">
-                  <input
-                    type="date"
-                    value={customRange.start}
-                    onChange={(e) =>
-                      setCustomRange({ ...customRange, start: e.target.value })
-                    }
-                    className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500/20"
-                  />
-                  <input
-                    type="date"
-                    value={customRange.end}
-                    min={customRange.start}
-                    onChange={(e) =>
-                      setCustomRange({ ...customRange, end: e.target.value })
-                    }
-                    className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500/20"
-                  />
+                <Filter size={16} className="outline-none text-[#F59E0B]" />
+                <span>{getFilterDisplayText()}</span>
+                <ChevronDown
+                  size={14}
+                  className={isTimeDropdownOpen ? "outline-none rotate-180" : ""}
+                />
+              </button>
+
+              {isTimeDropdownOpen && !isCalendarOpen && (
+                <div className="absolute right-0 mt-2 bg-white border border-slate-100 rounded-2xl shadow-2xl z-50 py-2 min-w-40">
+                  {["All Time", "Weekly", "Monthly", "Quarterly", "Yearly"].map(
+                    (tab) => (
+                      <button
+                        key={tab}
+                        onClick={() => handleTimeFilterChange(tab as TimeFilter)}
+                        className={`outline-none w-full text-left px-4 py-2 text-[13px] ${timeFilter === tab ? "text-amber-500 font-bold bg-orange-50/50" : "text-slate-600 hover:bg-slate-50"}`}
+                      >
+                        {tab}
+                      </button>
+                    ),
+                  )}
                   <button
-                    onClick={handleCustomApply}
-                    className="outline-none w-full bg-[#F59E0B] text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-[#f67317]"
+                    onClick={() => handleTimeFilterChange("Custom")}
+                    className={`outline-none w-full text-left px-4 py-2 text-[13px] ${timeFilter === "Custom" ? "text-amber-500 font-bold bg-orange-50/50" : "text-slate-600 hover:bg-slate-50"}`}
                   >
-                    Apply Range
+                    Custom
                   </button>
                 </div>
-              </div>
-            )}
+              )}
+
+              {isCalendarOpen && (
+                <div
+                  ref={calendarRef}
+                  className="absolute right-0 mt-3 bg-white p-6 rounded-2xl shadow-xl border z-50 w-72"
+                >
+                  <div className="space-y-3">
+                    <input
+                      type="date"
+                      value={customRange.start}
+                      onChange={(e) =>
+                        setCustomRange({ ...customRange, start: e.target.value })
+                      }
+                      className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500/20"
+                    />
+                    <input
+                      type="date"
+                      value={customRange.end}
+                      min={customRange.start}
+                      onChange={(e) =>
+                        setCustomRange({ ...customRange, end: e.target.value })
+                      }
+                      className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500/20"
+                    />
+                    <button
+                      onClick={handleCustomApply}
+                      className="outline-none w-full bg-[#F59E0B] text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-[#f67317]"
+                    >
+                      Apply Range
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+            {/* Create New Plan Button */}
+            <button
+              onClick={() => navigate("/production/planning/new-plan")}
+              className="outline-none group flex items-center gap-1 bg-[#F59E0B] hover:bg-[#f67317] text-white px-2.5 py-2 rounded-xl font-bold text-sm shadow-xl shadow-amber-500/5 transition-all active:scale-95 whitespace-nowrap"
+            >
+              <Plus size={18} />
+              <span className="hidden sm:inline">Create New Plan</span>
+              <span className="sm:hidden">New</span>
+            </button>
           </div>
         </header>
 
@@ -759,18 +579,18 @@ const ProductionPlanningScreen: React.FC = () => {
                     <td className="px-4 py-4">
                       <div className="flex justify-center gap-2">
                         <button
-                          onClick={() => handleViewDetails(order)}
+                          onClick={() => navigate(`/production/planning/view-plan/${order.id}`)}
                           className="outline-none p-1.5 text-slate-400 hover:text-[#F59E0B] transition-colors"
                           title="View Details"
                         >
                           <Eye size={16} />
                         </button>
                         <button
-                          onClick={() => handlePlanProduction(order)}
+                          onClick={() => navigate(`/production/planning/edit-plan/${order.id}`)}
                           className="outline-none p-1.5 text-slate-400 hover:text-green-500 transition-colors"
                           title="Plan Production"
                         >
-                          <Play size={16} />
+                          <Edit size={16} />
                         </button>
                         <button
                           onClick={() => handleDelete(order.id)}
@@ -907,334 +727,10 @@ const ProductionPlanningScreen: React.FC = () => {
                 Close
               </button>
               <button
-                onClick={() => {
-                  setShowDetailsModal(false);
-                  handlePlanProduction(viewOrder);
-                }}
+                onClick={() => navigate("/production/planning/edit-plan/" + (selectedOrder ? selectedOrder.id : "1"))}
                 className="outline-none px-4 py-2 bg-[#F59E0B] text-white rounded-xl hover:bg-[#f67317] flex items-center gap-2"
               >
-                <Play size={14} /> Plan Production
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Production Planning Modal */}
-      {selectedOrder && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
-          <div className="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col">
-            {/* Modal Header */}
-            <div className="sticky top-0 z-20 bg-white border-b border-gray-200 p-6 flex justify-between items-center shadow-sm">
-              <div>
-                <h2 className="text-xl font-bold text-gray-800">
-                  Production Planning Wizard
-                </h2>
-                <p className="text-sm text-gray-500 mt-1">
-                  {selectedOrder.productName}
-                </p>
-              </div>
-              <button
-                onClick={() => {
-                  setSelectedOrder(null);
-                  setCurrentStep(1);
-                }}
-                className="outline-none text-gray-400 hover:text-gray-600"
-              >
-                <X size={20} />
-              </button>
-            </div>
-
-            {/* Steps */}
-            <div className="sticky top-22 z-10 bg-white p-6 border-b border-gray-200">
-              <div className="flex">
-                {[
-                  { step: 1, title: "Order Details", icon: Package },
-                  { step: 2, title: "BOM Check", icon: Play },
-                  { step: 3, title: "Inventory Check", icon: ShoppingCart },
-                ].map((item) => (
-                  <div key={item.step} className="flex-1 relative">
-                    <div className="flex items-center">
-                      <div
-                        className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${currentStep >= item.step ? "bg-[#F59E0B] text-white" : "bg-gray-200 text-gray-600"}`}
-                      >
-                        <item.icon size={18} />
-                      </div>
-                      {item.step < 3 && (
-                        <div
-                          className={`flex-1 h-0.5 mx-2 transition-all ${currentStep > item.step ? "bg-[#F59E0B]" : "bg-gray-200"}`}
-                        />
-                      )}
-                    </div>
-                    <p className="text-xs text-gray-500 mt-2">{item.title}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Step Content */}
-            <div className="flex-1 overflow-y-auto p-6">
-              {currentStep === 1 && (
-                <div>
-                  <h3 className="font-bold text-gray-800 mb-4">
-                    Order Details
-                  </h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                    <div className="p-4 bg-gray-50 rounded-xl">
-                      <label className="text-xs text-gray-500 uppercase">
-                        Order ID
-                      </label>
-                      <p className="font-semibold text-gray-900">
-                        {selectedOrder.id}
-                      </p>
-                    </div>
-                    <div className="p-4 bg-gray-50 rounded-xl">
-                      <label className="text-xs text-gray-500 uppercase">
-                        Product
-                      </label>
-                      <p className="font-semibold text-gray-900">
-                        {selectedOrder.productName}
-                      </p>
-                    </div>
-                    <div className="p-4 bg-gray-50 rounded-xl">
-                      <label className="text-xs text-gray-500 uppercase">
-                        Quantity Required
-                      </label>
-                      <p className="font-semibold text-gray-900">
-                        {selectedOrder.quantity.toLocaleString()} units
-                      </p>
-                    </div>
-                    <div className="p-4 bg-gray-50 rounded-xl">
-                      <label className="text-xs text-gray-500 uppercase">
-                        Delivery Date
-                      </label>
-                      <p className="font-semibold text-gray-900">
-                        {formatDate(selectedOrder.deliveryDate)}
-                      </p>
-                    </div>
-                    <div className="p-4 bg-gray-50 rounded-xl">
-                      <label className="text-xs text-gray-500 uppercase">
-                        Customer Name
-                      </label>
-                      <p className="font-semibold text-gray-900">
-                        {selectedOrder.customerName}
-                      </p>
-                    </div>
-                    <div className="p-4 bg-gray-50 rounded-xl">
-                      <label className="text-xs text-gray-500 uppercase">
-                        Contact
-                      </label>
-                      <p className="font-semibold text-gray-900">
-                        {selectedOrder.customerPhone}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="bg-orange-50 border border-orange-200 rounded-xl p-4">
-                    <p className="text-sm text-orange-800">
-                      ✓ Ready to check BOM. Click Next to view Bill of
-                      Materials.
-                    </p>
-                  </div>
-                </div>
-              )}
-
-              {currentStep === 2 && (
-                <div>
-                  <h3 className="font-bold text-gray-800 mb-4">
-                    Bill of Materials (BOM)
-                  </h3>
-                  <div className="overflow-x-auto mb-6">
-                    <table className="w-full">
-                      <thead className="bg-gray-50">
-                        <tr>
-                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                            Material
-                          </th>
-                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                            Qty/Unit
-                          </th>
-                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                            Unit
-                          </th>
-                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                            Total Required
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-gray-200">
-                        {bomItems.map((item, idx) => (
-                          <tr key={idx}>
-                            <td className="px-4 py-3 text-sm">
-                              {item.materialName}
-                            </td>
-                            <td className="px-4 py-3 text-sm">
-                              {item.quantityPerUnit}
-                            </td>
-                            <td className="px-4 py-3 text-sm">{item.unit}</td>
-                            <td className="px-4 py-3 text-sm font-semibold">
-                              {item.totalRequired.toFixed(2)}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                  <div className="bg-green-50 border border-green-200 rounded-xl p-4">
-                    <p className="text-sm text-green-800">
-                      ✓ BOM fetched successfully. Click Next to check inventory
-                      availability.
-                    </p>
-                  </div>
-                </div>
-              )}
-
-              {currentStep === 3 && (
-                <div>
-                  <h3 className="font-bold text-gray-800 mb-4">
-                    Inventory Availability Check
-                  </h3>
-                  <div className="overflow-x-auto mb-6">
-                    <table className="w-full">
-                      <thead className="bg-gray-50">
-                        <tr>
-                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                            Material
-                          </th>
-                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                            Required
-                          </th>
-                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                            Available
-                          </th>
-                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                            Unit
-                          </th>
-                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                            Status
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-gray-200">
-                        {inventoryItems.map((item, idx) => (
-                          <tr key={idx}>
-                            <td className="px-4 py-3 text-sm">
-                              {item.materialName}
-                            </td>
-                            <td className="px-4 py-3 text-sm">
-                              {item.requiredQuantity.toFixed(2)}
-                            </td>
-                            <td className="px-4 py-3 text-sm">
-                              {item.availableQuantity}
-                            </td>
-                            <td className="px-4 py-3 text-sm">{item.unit}</td>
-                            <td className="px-4 py-3">
-                              {item.shortage === 0 ? (
-                                <span className="inline-flex items-center gap-1 text-green-600 text-sm">
-                                  <CheckCircle size={14} className="outline-none " /> Available
-                                </span>
-                              ) : (
-                                <span className="inline-flex items-center gap-1 text-red-600 text-sm">
-                                  <AlertCircle size={14} className="outline-none" /> Shortage:{" "}
-                                  {item.shortage.toFixed(2)} {item.unit}
-                                </span>
-                              )}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-
-                  {hasMaterialShortage() && (
-                    <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4 mb-4">
-                      <div className="flex items-start gap-2">
-                        <AlertTriangle
-                          className="outline-none text-yellow-600 mt-0.5"
-                          size={18}
-                        />
-                        <div>
-                          <p className="text-sm font-semibold text-yellow-800">
-                            Material Shortage Detected
-                          </p>
-                          <p className="text-sm text-yellow-700 mt-1">
-                            Some materials are insufficient. A purchase request
-                            will be created.
-                          </p>
-                          <button
-                            onClick={() => setShowPurchaseRequest(true)}
-                            className="outline-none mt-3 px-3 py-1.5 bg-[#F59E0B] text-white rounded-lg text-sm hover:bg-[#f67317] transition"
-                          >
-                            Create Purchase Request
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-
-            {/* Modal Footer */}
-            <div className="sticky bottom-0 bg-white border-t border-gray-200 p-6 flex justify-between">
-              <button
-                onClick={() => setCurrentStep(currentStep - 1)}
-                className={`outline-none px-4 py-2 rounded-xl transition ${currentStep > 1 ? "bg-gray-100 text-gray-700 hover:bg-gray-200" : "invisible"}`}
-              >
-                Previous
-              </button>
-              {currentStep < 3 ? (
-                <button
-                  onClick={() => setCurrentStep(currentStep + 1)}
-                  className="outline-none px-4 py-2 bg-[#F59E0B] text-white rounded-xl hover:bg-[#f67317] transition flex items-center gap-2"
-                >
-                  Next <ChevronRightIcon size={16} className="outline-none " />
-                </button>
-              ) : (
-                <button
-                  onClick={handleCreateProductionOrder}
-                  className="outline-none px-4 py-2 bg-green-600 text-white rounded-xl hover:bg-green-700 transition flex items-center gap-2"
-                >
-                  <CheckCircle size={16} className="outline-none " /> Create PO
-                </button>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Purchase Request Modal */}
-      {showPurchaseRequest && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl max-w-md w-full p-6">
-            <h3 className="text-lg font-bold text-gray-800 mb-4">
-              Create Purchase Request
-            </h3>
-            <div className="space-y-3 mb-6">
-              {inventoryItems
-                .filter((i) => i.shortage > 0)
-                .map((item, idx) => (
-                  <div key={idx} className="p-3 bg-gray-50 rounded-xl">
-                    <p className="font-medium text-gray-800">
-                      {item.materialName}
-                    </p>
-                    <p className="text-sm text-gray-600">
-                      Required: {item.shortage.toFixed(2)} {item.unit}
-                    </p>
-                  </div>
-                ))}
-            </div>
-            <div className="flex gap-3">
-              <button
-                onClick={() => setShowPurchaseRequest(false)}
-                className="outline-none flex-1 px-4 py-2 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleCreatePurchaseRequest}
-                className="outline-none flex-1 px-4 py-2 bg-[#F59E0B] text-white rounded-xl hover:bg-[#f67317]"
-              >
-                Create Request
+                <Edit size={14} /> Plan Production
               </button>
             </div>
           </div>

@@ -5,12 +5,12 @@ import {
   Trash2,
   ChevronLeft,
   ChevronRight,
-  Edit3,
+  // Edit3,
   MoreHorizontal,
   Settings,
   Filter,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+// import { useNavigate } from "react-router-dom";
 import {
   getProductions,
   deleteProduction,
@@ -28,7 +28,6 @@ type ProdStatus =
   | "Delayed"
   | "All";
 type Stage =
-  | "Pending"
   | "Raw Materials"
   | "Cutting"
   | "Assembly"
@@ -57,7 +56,7 @@ interface ProductionJob {
 }
 
 const ProductionList: React.FC = () => {
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const calendarRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -93,7 +92,6 @@ const ProductionList: React.FC = () => {
   // Stage options
   const stageOptions: Stage[] = [
     "All",
-    "Pending",
     "Raw Materials",
     "Cutting",
     "Assembly",
@@ -610,7 +608,7 @@ const ProductionList: React.FC = () => {
                     </td>
                     <td className="px-4 py-4">
                       <div className="flex justify-center gap-2">
-                        <button
+                        {/* <button
                           title="Edit Production"
                           onClick={() =>
                             navigate(
@@ -620,7 +618,7 @@ const ProductionList: React.FC = () => {
                           className="outline-none p-2 hover:bg-white text-slate-500 hover:text-[#F59E0B] rounded-xl transition-all"
                         >
                           <Edit3 size={16} />
-                        </button>
+                        </button> */}
                         <button
                           title="Delete Job"
                           onClick={() => handleDelete(j.id)}

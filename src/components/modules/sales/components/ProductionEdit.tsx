@@ -249,7 +249,7 @@ const ProductionEdit: React.FC = () => {
               </div>
               <div className="flex items-center gap-2 text-sm">
                 <Box size={16} className="text-gray-400" />
-                <span>Order: {production?.order_id || "N/A"}</span>
+                <span>Order Id: {production?.order_id || "N/A"}</span>
               </div>
               <div className="flex items-center gap-2 text-sm">
                 <Clock size={16} className="text-gray-400" />
@@ -417,12 +417,13 @@ const ProductionEdit: React.FC = () => {
                     </label>
                     <input
                       type="text"
+                      readOnly
                       value={formData.assigned_to}
                       onChange={(e) =>
                         updateFormData("assigned_to", e.target.value)
                       }
                       placeholder="Enter user ID"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-[#F59E0B] focus:border-transparent"
+                      className="w-full cursor-not-allowed px-3 py-2 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-[#F59E0B] focus:border-transparent"
                     />
                   </div>
                   <div>

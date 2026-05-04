@@ -341,7 +341,7 @@ const OrderCreate: React.FC = () => {
                   {quotations && quotations.length > 0 ? (
                     quotations
                       .filter((quotation: any) =>
-                        ["sent", "accepted"].includes(
+                        ["accepted"].includes(
                           (quotation.status || "").toLowerCase(),
                         ),
                       )

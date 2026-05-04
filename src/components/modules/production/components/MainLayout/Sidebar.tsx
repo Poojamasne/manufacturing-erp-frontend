@@ -136,6 +136,27 @@ const Sidebar: React.FC = () => {
           </span>
         </button>
 
+ {/* Resources */}
+        <button
+          onClick={() => {
+            navigate("/production/resources");
+            document.title = "Manufacturing ERP - Production Resources";
+          }}
+          className={`outline-none w-full flex items-center gap-3 px-4 hover:cursor-pointer py-3 rounded-xl transition-all duration-200 ${isActive("/production/resources")
+            ? "bg-[#F59E0B] text-white shadow-md"
+            : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
+            }`}
+        >
+          <img
+            src="/icons/Resources.svg"
+            className={`h-5 w-5 ${isActive("/production/resources") ? "brightness-0 invert" : "opacity-60"}`}
+            alt=""
+          />
+          <span className={`${isActive("/production/resources") ? "font-bold" : "font-semibold"} text-sm`}>
+            Resources
+          </span>
+        </button>
+
         {/* Scheduling */}
         <button
           onClick={() => {
@@ -157,27 +178,6 @@ const Sidebar: React.FC = () => {
           </span>
         </button>
 
-
-        {/* Resources */}
-        <button
-          onClick={() => {
-            navigate("/production/resources");
-            document.title = "Manufacturing ERP - Production Resources";
-          }}
-          className={`outline-none w-full flex items-center gap-3 px-4 hover:cursor-pointer py-3 rounded-xl transition-all duration-200 ${isActive("/production/resources")
-            ? "bg-[#F59E0B] text-white shadow-md"
-            : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
-            }`}
-        >
-          <img
-            src="/icons/Resources.svg"
-            className={`h-5 w-5 ${isActive("/production/resources") ? "brightness-0 invert" : "opacity-60"}`}
-            alt=""
-          />
-          <span className={`${isActive("/production/resources") ? "font-bold" : "font-semibold"} text-sm`}>
-            Resources
-          </span>
-        </button>
         {/* Shop Floor */}
         <button
           onClick={() => {
@@ -217,6 +217,27 @@ const Sidebar: React.FC = () => {
           />
           <span className={`${isActive("/production/reports") ? "font-bold" : "font-semibold"} text-sm`}>
             Reports & Analytics
+          </span>
+        </button>
+
+        {/* All Purchase Requests */}
+        <button
+          onClick={() => {
+            navigate("/production/purchase-requests");
+            document.title = "Manufacturing ERP - Production Purchase Requests";
+          }}
+          className={`outline-none w-full flex items-center gap-3 px-4 hover:cursor-pointer py-3 rounded-xl transition-all duration-200 ${isActive("/production/purchase-requests")
+            ? "bg-[#F59E0B] text-white shadow-md"
+            : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
+            }`}
+        >
+          <img
+            src="/icons/Production_Icons/Invoice.svg"
+            className={`h-5 w-5 ${isActive("/production/purchase-requests") ? "brightness-0 invert" : "opacity-60"}`}
+            alt=""
+          />
+          <span className={`${isActive("/production/purchase-requests") ? "font-bold" : "font-semibold"} text-sm`}>
+            All Purchase Requests
           </span>
         </button>
       </nav>

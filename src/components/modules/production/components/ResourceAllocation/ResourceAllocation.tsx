@@ -3,15 +3,15 @@ import {
   ChevronDown,
   Search,
   Filter,
-  Factory,
+  Cog,
   X,
   Eye,
-  Pencil,
   ChevronLeft,
   ChevronRight,
   MoreHorizontal,
   Users,
-  Trash2
+  Trash2,
+  Edit
 } from "lucide-react";
 
 // ==================== Types ====================
@@ -44,7 +44,7 @@ const initialMachines: Machine[] = [
   { id: "MAC-101", name: "CNC Milling X1", type: "Heavy Machining", status: "Available", load: 0 },
   { id: "MAC-102", name: "Laser Cutter v2", type: "Precision", status: "In Use", load: 85 },
   { id: "MAC-103", name: "Lathe Pro", type: "Manual", status: "Maintenance", load: 0 },
-  { id: "MAC-104", name: "3D Printer Industrial", type: "Additive", status: "Shutdown", load: 0 },
+  { id: "MAC-104", name: "3D Printer Industrial", type: "Additive", status: "Available", load: 0 },
   { id: "MAC-105", name: "Drill Press A", type: "Manual", status: "Available", load: 10 },
   { id: "MAC-106", name: "Hydraulic Press", type: "Heavy", status: "In Use", load: 45 },
 ];
@@ -377,7 +377,7 @@ const ResourceAllocation: React.FC = () => {
                   onClick={() => setActiveDropdown(activeDropdown === "resource" ? null : "resource")}
                   className={`outline-none px-4 py-3 rounded-xl border text-[13px] font-bold flex items-center gap-2 ${resourceType !== "machines" ? "bg-orange-50 border-orange-200 text-amber-500" : "bg-white border-slate-200 text-slate-600"}`}
                 >
-                  {resourceType === "machines" ? <Factory size={16} /> : <Users size={16} />}
+                  {resourceType === "machines" ? <Cog size={16} /> : <Users size={16} />}
                   {resourceType === "machines" ? "Machines" : "Operators"}
                   <ChevronDown size={14} className={activeDropdown === "resource" ? "outline-none rotate-180" : ""} />
                 </button>
@@ -387,7 +387,7 @@ const ResourceAllocation: React.FC = () => {
                       onClick={() => { setResourceType("machines"); setActiveDropdown(null); setSelectedIds([]); setCurrentPage(1); setSearchQuery(""); setStatusFilter("All"); }}
                       className={`outline-none w-full text-left px-4 py-2 text-[13px] hover:bg-slate-50 flex items-center gap-2 ${resourceType === "machines" ? "text-amber-500 font-bold bg-orange-50/50" : "text-slate-600"}`}
                     >
-                      <Factory size={14} /> Machines
+                      <Cog size={14} /> Machines
                     </button>
                     <button
                       onClick={() => { setResourceType("operators"); setActiveDropdown(null); setSelectedIds([]); setCurrentPage(1); setSearchQuery(""); setStatusFilter("All"); }}
@@ -492,7 +492,7 @@ const ResourceAllocation: React.FC = () => {
                         <td className="px-4 py-4">
                           <div className="flex justify-center gap-2">
                             <button onClick={() => handleViewDetails(item)} className="outline-none p-1.5 text-slate-400 hover:text-[#F59E0B] transition-colors"><Eye size={16} /></button>
-                            <button onClick={() => setEditingMachine(item)} className="outline-none p-1.5 text-slate-400 hover:text-blue-500 transition-colors"><Pencil size={16} /></button>
+                            <button onClick={() => setEditingMachine(item)} className="outline-none p-1.5 text-slate-400 hover:text-blue-500 transition-colors"><Edit size={16} /></button>
                             <button onClick={() => handleDelete(item.id)} className="outline-none p-1.5 text-slate-400 hover:text-rose-600 transition-colors"><Trash2 size={16} /></button>
                           </div>
                         </td>
@@ -514,7 +514,7 @@ const ResourceAllocation: React.FC = () => {
                         <td className="px-4 py-4 text-center">
                           <div className="flex justify-center gap-2">
                             <button onClick={() => handleViewDetails(item)} className="outline-none p-1.5 text-slate-400 hover:text-[#F59E0B] transition-colors"><Eye size={16} /></button>
-                            <button onClick={() => setEditingMachine(item)} className="outline-none p-1.5 text-slate-400 hover:text-blue-500 transition-colors"><Pencil size={16} /></button>
+                            <button onClick={() => setEditingMachine(item)} className="outline-none p-1.5 text-slate-400 hover:text-blue-500 transition-colors"><Edit size={16} /></button>
                             <button onClick={() => handleDelete(item.id)} className="outline-none p-1.5 text-slate-400 hover:text-rose-600 transition-colors"><Trash2 size={16} /></button>
                           </div>
                         </td>
@@ -528,7 +528,7 @@ const ResourceAllocation: React.FC = () => {
             {currentData.length === 0 && (
               <div className="py-32 text-center">
                 <div className="p-6 bg-slate-50 rounded-full w-fit mx-auto mb-4">
-                  {resourceType === "machines" ? <Factory className="text-slate-200" size={40} /> : <Users className="text-slate-200" size={40} />}
+                  {resourceType === "machines" ? <Cog className="text-slate-200" size={40} /> : <Users className="text-slate-200" size={40} />}
                 </div>
                 <h3 className="text-lg font-bold text-slate-800">No {resourceType === "machines" ? "Machines" : "Operators"} Found</h3>
               </div>
