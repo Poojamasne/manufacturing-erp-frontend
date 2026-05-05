@@ -77,6 +77,8 @@ const LeadList: React.FC = () => {
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const calendarRef = useRef<HTMLDivElement>(null);
+    const filterDropdownRef = useRef<HTMLDivElement>(null);
+
 
   useEffect(() => {
     dispatch(getLeads());
@@ -100,6 +102,13 @@ const LeadList: React.FC = () => {
       ) {
         setIsCalendarOpen(false);
       }
+      if (
+      filterDropdownRef.current &&
+      !filterDropdownRef.current.contains(event.target as Node)
+    ) {
+      setOpenDropdown(null);
+    }
+
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
@@ -474,7 +483,7 @@ const LeadList: React.FC = () => {
               />
             </div>
 
-            <div className="flex flex-wrap items-center justify-center lg:justify-end gap-3 w-full">
+            <div ref = {filterDropdownRef}className="flex flex-wrap items-center justify-center lg:justify-end gap-3 w-full">
               {[
                 {
                   label: "Priority",
@@ -640,6 +649,7 @@ const LeadList: React.FC = () => {
                     </td>
                     <td className="px-4 py-4">
                       <div className="flex justify-center gap-2">
+                        <div className="relative group/tooltip">
                         <button
                           onClick={() =>
                             navigate("/sales/leads/view-lead/" + lead.id)
@@ -648,6 +658,11 @@ const LeadList: React.FC = () => {
                         >
                           <Eye size={16} />
                         </button>
+                         <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-[10px] font-semibold px-2 py-0.5 rounded opacity-0 group-hover/tooltip:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-20">     
+                            View
+                        </span>
+                        </div>
+                        <div className="relative group/tooltip">
                         <button
                           onClick={() =>
                             navigate("/sales/leads/edit-lead/" + lead.id)
@@ -656,12 +671,24 @@ const LeadList: React.FC = () => {
                         >
                           <FileEdit size={16} />
                         </button>
-                        <button
+                                                 <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-[10px] font-semibold px-2 py-0.5 rounded opacity-0 group-hover/tooltip:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-20">     
+                            Edit 
+                        </span>
+
+                        </div>
+                        <div className="relative group/tooltip">                      
+                            <button
                           onClick={() => handleDelete(lead.id)}
                           className="outline-none p-2 hover:bg-white text-slate-800 hover:text-rose-600 rounded-xl transition-all"
                         >
                           <Trash2 size={16} />
                         </button>
+                                                 <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-[10px] font-semibold px-2 py-0.5 rounded opacity-0 group-hover/tooltip:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-20">     
+                            Delete
+                        </span>
+
+                        </div>
+
                       </div>
                     </td>
                   </tr>
