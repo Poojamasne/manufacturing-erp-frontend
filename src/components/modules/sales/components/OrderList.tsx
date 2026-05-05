@@ -48,7 +48,7 @@ const OrderList: React.FC = () => {
   const dispatch = useAppDispatch();
   const calendarRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
-
+  const statusRef = useRef<HTMLDivElement>(null);
   const { orders, pagination } = useAppSelector(
     (state: RootState) => state.SalesOrder,
   );
@@ -124,6 +124,13 @@ const OrderList: React.FC = () => {
         !calendarRef.current.contains(event.target as Node)
       ) {
         setIsCalendarOpen(false);
+      }
+      // status dropdown close on outside click
+      if (
+        statusRef.current &&
+        !statusRef.current.contains(event.target as Node)
+      ) {
+        setIsStatusOpen(false);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
@@ -386,7 +393,7 @@ const OrderList: React.FC = () => {
             </div>
 
             <div className="flex flex-wrap items-center justify-center lg:justify-end gap-3 w-full">
-              <div className="relative min-w-35">
+              <div className="relative min-w-35" ref={statusRef}>
                 <button
                   onClick={() => setIsStatusOpen(!isStatusOpen)}
                   className={`outline-none w-full flex items-center justify-between gap-2 px-4 py-3 rounded-xl border text-[13px] font-bold transition-all ${statusFilter !== "All" ? "bg-[#f3f4e6] border-amber-400 text-[#F59E0B]" : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"}`}
