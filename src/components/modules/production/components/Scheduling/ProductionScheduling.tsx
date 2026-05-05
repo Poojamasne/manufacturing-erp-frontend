@@ -5,579 +5,202 @@ import {
   ChevronLeft,
   ChevronRight,
   Filter,
-  Play,
-  X,
-  ArrowRight,
-  Clock,
-  Factory,
-  MoreHorizontal,
   Eye,
-  Trash2,
-  Plus,
+  Calendar,
+  AlertTriangle,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 
-type TimeFilter =
-  | "Weekly"
-  | "Monthly"
-  | "Quarterly"
-  | "Yearly"
-  | "All Time"
-  | "Custom";
+// ==================== Types ====================
+type TimeFilter = "Weekly" | "Monthly" | "Quarterly" | "Yearly" | "All Time" | "Custom";
+type WorkOrderStatus = "PENDING" | "ASSIGNED" | "IN_PROGRESS" | "COMPLETED" | "BLOCKED";
+type Shift = "MORNING" | "EVENING" | "NIGHT";
 
-interface ProductionOrder {
+interface WorkOrder {
   id: string;
-  productName: string;
-  quantity: number;
-  deadline: string;
-  priority: "HIGH" | "MEDIUM" | "LOW";
-  created_at?: string;
+  workOrderId: string;
+  taskName: string;
+  productionOrderId: string;
+  machineName: string;
+  operatorName: string;
+  shift: Shift;
+  startDate: string;
+  endDate: string;
+  status: WorkOrderStatus;
+  createdAt: string;
 }
 
-const mockOrders: ProductionOrder[] = [
-  {
-    id: "PO-1001",
-    productName: "Industrial Bolt M12",
-    quantity: 5000,
-    deadline: "2024-05-20",
-    priority: "HIGH",
-    created_at: "2024-05-10",
-  },
-  {
-    id: "PO-1002",
-    productName: "Aluminum Frame 4x4",
-    quantity: 250,
-    deadline: "2024-05-18",
-    priority: "HIGH",
-    created_at: "2024-05-11",
-  },
-  {
-    id: "PO-1003",
-    productName: "Plastic Container L",
-    quantity: 1000,
-    deadline: "2024-05-22",
-    priority: "MEDIUM",
-    created_at: "2024-05-12",
-  },
-  {
-    id: "PO-1004",
-    productName: "Rubber Gasket Set",
-    quantity: 3000,
-    deadline: "2024-05-25",
-    priority: "LOW",
-    created_at: "2024-05-09",
-  },
-  {
-    id: "PO-1005",
-    productName: "Steel Plate 6mm",
-    quantity: 1500,
-    deadline: "2024-05-28",
-    priority: "HIGH",
-    created_at: "2024-05-13",
-  },
-  {
-    id: "PO-1006",
-    productName: "Copper Wire 2mm",
-    quantity: 2000,
-    deadline: "2024-05-30",
-    priority: "MEDIUM",
-    created_at: "2024-05-14",
-  },
+// ==================== Mock Data ====================
+const mockWorkOrders: WorkOrder[] = [
+  { id: "1", workOrderId: "WO-1001", taskName: "CNC Milling", productionOrderId: "PO-990", machineName: "Milling Station A", operatorName: "John Doe", shift: "MORNING", startDate: "2024-05-10", endDate: "2024-05-12", status: "IN_PROGRESS", createdAt: "2024-05-01" },
+  { id: "2", workOrderId: "WO-1002", taskName: "Quality Check", productionOrderId: "PO-991", machineName: "Inspection Lab", operatorName: "Jane Smith", shift: "EVENING", startDate: "2024-05-15", endDate: "2024-05-15", status: "PENDING", createdAt: "2024-05-02" },
+  { id: "3", workOrderId: "WO-1003", taskName: "Assembly", productionOrderId: "PO-992", machineName: "Line 4", operatorName: "Mike Ross", shift: "NIGHT", startDate: "2024-05-11", endDate: "2024-05-14", status: "ASSIGNED", createdAt: "2024-05-03" },
 ];
 
-// ==================== Helper Components ====================
-const PriorityBadge: React.FC<{ priority: string }> = ({ priority }) => {
-  const styles: { [key: string]: string } = {
-    HIGH: "text-red-600 bg-red-50 border-red-100",
-    MEDIUM: "text-amber-600 bg-amber-50 border-amber-100",
-    LOW: "text-teal-600 bg-[#f3f4e6] border-[#f3f4e6]",
-  };
-  return (
-    <span
-      className={`px-2 py-1 rounded text-[10px] font-black uppercase border ${styles[priority] || styles.MEDIUM}`}
-    >
-      {priority}
-    </span>
-  );
-};
+const WorkOrderScheduling: React.FC = () => {
+  // Refs for Outside Clicks
+  const timeDropdownRef = useRef<HTMLDivElement>(null);
+  const statusDropdownRef = useRef<HTMLDivElement>(null);
+  const viewModalRef = useRef<HTMLDivElement>(null);
+  const scheduleModalRef = useRef<HTMLDivElement>(null);
 
-const formatDate = (date: string) => {
-  if (!date) return "-";
-  const d = new Date(date);
-
-  const day = String(d.getDate()).padStart(2, "0");
-  const month = String(d.getMonth() + 1).padStart(2, "0");
-  const year = d.getFullYear();
-
-  return `${day}/${month}/${year}`;
-};
-
-const ProductionScheduling: React.FC = () => {
-  const dropdownRef = useRef<HTMLDivElement>(null);
-  const calendarRef = useRef<HTMLDivElement>(null);
-  const priorityRef = useRef<HTMLDivElement>(null);
-
-  // Data States
-  const [orders, setOrders] = useState<ProductionOrder[]>(mockOrders);
-  const [selectedOrder, setSelectedOrder] = useState<ProductionOrder | null>(
-    null,
-  );
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [showDetailsModal, setShowDetailsModal] = useState(false);
-
-  // Filter States
+  // State
+  const [workOrders, _setWorkOrders] = useState<WorkOrder[]>(mockWorkOrders);
   const [searchQuery, setSearchQuery] = useState("");
-  const [priorityFilter, setPriorityFilter] = useState<string>("All");
+  const [statusFilter, setStatusFilter] = useState("All");
   const [timeFilter, setTimeFilter] = useState<TimeFilter>("All Time");
-  const [customRange, setCustomRange] = useState({ start: "", end: "" });
+  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+  
+  const [showViewModal, setShowViewModal] = useState(false);
+  const [showScheduleModal, setShowScheduleModal] = useState(false);
+  const [selectedOrder, setSelectedOrder] = useState<WorkOrder | null>(null);
 
-  // Pagination States
+  // Pagination State
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
 
-  // UI States
-  const [isTimeDropdownOpen, setIsTimeDropdownOpen] = useState(false);
-  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
-  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
-  const [selectedIds, setSelectedIds] = useState<string[]>([]);
-  const navigate = useNavigate();
-  const [formData, setFormData] = useState({
-    startDate: "",
-    endDate: "",
-    shift: "Morning",
-  });
-
-  // Priority options
-  const priorityOptions = ["All", "HIGH", "MEDIUM", "LOW"];
-
-  // Close dropdowns on outside click
+  // Handle Outside Clicks
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
-      ) {
-        setIsTimeDropdownOpen(false);
-      }
-      if (
-        calendarRef.current &&
-        !calendarRef.current.contains(event.target as Node)
-      ) {
-        setIsCalendarOpen(false);
-      }
-      if (
-        priorityRef.current &&
-        !priorityRef.current.contains(event.target as Node)
-      ) {
-        setActiveDropdown(null);
-      }
+    const handleClickOutside = (e: MouseEvent) => {
+      const target = e.target as Node;
+      if (activeDropdown === "time" && timeDropdownRef.current && !timeDropdownRef.current.contains(target)) setActiveDropdown(null);
+      if (activeDropdown === "status" && statusDropdownRef.current && !statusDropdownRef.current.contains(target)) setActiveDropdown(null);
+      if (showViewModal && viewModalRef.current && !viewModalRef.current.contains(target)) setShowViewModal(false);
+      if (showScheduleModal && scheduleModalRef.current && !scheduleModalRef.current.contains(target)) setShowScheduleModal(false);
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+  }, [activeDropdown, showViewModal, showScheduleModal]);
 
-  // Reset page on filter change
-  useEffect(() => {
-    //eslint-disable-next-line react-hooks/exhaustive-deps
-    setCurrentPage(1);
-  }, [searchQuery, priorityFilter, timeFilter, customRange]);
-
-  // Handle time filter change
-  const handleTimeFilterChange = (value: TimeFilter) => {
-    if (value === "Custom") {
-      setIsCalendarOpen(true);
-      setIsTimeDropdownOpen(false);
-    } else {
-      setTimeFilter(value);
-      setIsTimeDropdownOpen(false);
-      setIsCalendarOpen(false);
-      setCustomRange({ start: "", end: "" });
-    }
-  };
-
-  // Handle custom range apply
-  const handleCustomApply = () => {
-    if (!customRange.start || !customRange.end) {
-      alert("Please select date range");
-      return;
-    }
-    setTimeFilter("Custom");
-    setIsCalendarOpen(false);
-    setIsTimeDropdownOpen(false);
-  };
-
-  // Get filter display text
-  const getFilterDisplayText = () => {
-    if (timeFilter === "Custom" && customRange.start && customRange.end) {
-      return `${formatDate(customRange.start)} - ${formatDate(customRange.end)}`;
-    }
-    return timeFilter;
-  };
-
-  // Filter Logic
+  // Filtering Logic
   const filteredOrders = useMemo(() => {
-    let filtered = orders.filter((order) => {
-      const matchesSearch =
-        order.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        order.productName.toLowerCase().includes(searchQuery.toLowerCase());
-      const matchesPriority =
-        priorityFilter === "All" || order.priority === priorityFilter;
-
-      // Time Filter Logic
-      const orderDate = new Date(order.created_at || order.deadline);
-      const now = new Date();
-      let matchesTime = true;
-
-      if (timeFilter === "Weekly") {
-        const diffDays =
-          (now.getTime() - orderDate.getTime()) / (1000 * 60 * 60 * 24);
-        matchesTime = diffDays <= 7 && diffDays >= 0;
-      } else if (timeFilter === "Monthly") {
-        matchesTime =
-          orderDate.getMonth() === now.getMonth() &&
-          orderDate.getFullYear() === now.getFullYear();
-      } else if (timeFilter === "Quarterly") {
-        matchesTime =
-          Math.floor(orderDate.getMonth() / 3) ===
-          Math.floor(now.getMonth() / 3) &&
-          orderDate.getFullYear() === now.getFullYear();
-      } else if (timeFilter === "Yearly") {
-        matchesTime = orderDate.getFullYear() === now.getFullYear();
-      } else if (
-        timeFilter === "Custom" &&
-        customRange.start &&
-        customRange.end
-      ) {
-        const start = new Date(customRange.start);
-        const end = new Date(customRange.end);
-        matchesTime = orderDate >= start && orderDate <= end;
-      }
-
-      return matchesSearch && matchesPriority && matchesTime;
-    });
-
-    return filtered.sort(
-      (a, b) =>
-        new Date(b.created_at || b.deadline).getTime() -
-        new Date(a.created_at || a.deadline).getTime(),
+    return workOrders.filter(wo => 
+      (wo.workOrderId.toLowerCase().includes(searchQuery.toLowerCase()) || wo.taskName.toLowerCase().includes(searchQuery.toLowerCase())) &&
+      (statusFilter === "All" || wo.status === statusFilter)
     );
-  }, [orders, searchQuery, priorityFilter, timeFilter, customRange]);
+  }, [workOrders, searchQuery, statusFilter]);
 
   // Pagination Logic
   const totalPages = Math.ceil(filteredOrders.length / itemsPerPage);
-  const paginatedOrders = filteredOrders.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage,
-  );
+  const paginatedOrders = filteredOrders.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
   const getPageNumbers = () => {
     const pages = [];
-    for (let i = 1; i <= totalPages; i++) {
-      if (
-        i === 1 ||
-        i === totalPages ||
-        (i >= currentPage - 1 && i <= currentPage + 1)
-      ) {
-        pages.push(i);
-      } else if (pages[pages.length - 1] !== "...") {
-        pages.push("...");
-      }
-    }
+    for (let i = 1; i <= totalPages; i++) pages.push(i);
     return pages;
   };
 
-  const goToPage = (page: number) => {
-    if (page >= 1 && page <= totalPages) {
-      setCurrentPage(page);
-    }
-  };
-
-  const handleOpenModal = (order: ProductionOrder) => {
-    setSelectedOrder(order);
-    setIsModalOpen(true);
-  };
-
-  const handleViewDetails = (order: ProductionOrder) => {
-    setSelectedOrder(order);
-    setShowDetailsModal(true);
-  };
-
-  const toggleSelectAll = () => {
-    if (selectedIds.length === paginatedOrders.length && paginatedOrders.length > 0) {
-      setSelectedIds([]);
-    } else {
-      setSelectedIds(paginatedOrders.map((o) => o.id));
-    }
-  };
-
-  const handleDelete = (id: string) => {
-    if (window.confirm("Delete this production order?")) {
-      setOrders(orders.filter((o) => o.id !== id));
-      setSelectedIds(selectedIds.filter((selectedId) => selectedId !== id));
-    }
-  };
-
-  const handleBulkDelete = () => {
-    if (selectedIds.length === 0) return;
-    if (window.confirm(`Delete ${selectedIds.length} order(s)?`)) {
-      setOrders(orders.filter((o) => !selectedIds.includes(o.id)));
-      setSelectedIds([]);
-    }
+  const formatDate = (date: string) => {
+    if (!date) return "-";
+    const d = new Date(date);
+    return `${String(d.getDate()).padStart(2, "0")}/${String(d.getMonth() + 1).padStart(2, "0")}/${d.getFullYear()}`;
   };
 
   return (
     <div className="min-h-screen bg-[#f4f7f6] p-4 sm:p-6 lg:p-8 text-slate-900 font-sans">
       <div className="max-w-7xl mx-auto">
+        
         {/* Header */}
         <header className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 mb-10">
           <div>
-            <h1 className="text-3xl font-extrabold text-slate-800 tracking-tight">
-              Production Scheduling
-            </h1>
-            <p className="text-sm text-gray-500 mt-1 font-medium">
-              Initiate and manage production runs
-            </p>
+            <h1 className="text-3xl font-extrabold text-slate-800 tracking-tight">Work Scheduling</h1>
+            <p className="text-sm text-gray-500 mt-1 font-medium">Assign shifts and dates to work orders</p>
           </div>
 
-          {/* Time Filter - Matching Production Planning Style */}
-          <div className="relative" ref={dropdownRef}>
-            <button
-              onClick={() => setIsTimeDropdownOpen(!isTimeDropdownOpen)}
-              className="outline-none px-4 py-2 rounded-xl border border-slate-200 bg-white text-sm font-medium shadow-sm flex items-center gap-2 text-gray-700"
-            >
-              <Filter size={16} className="outline-none text-[#F59E0B]" />
-              <span>{getFilterDisplayText()}</span>
-              <ChevronDown
-                size={14}
-                className={isTimeDropdownOpen ? "outline-none rotate-180" : ""}
-              />
+          <div className="relative" ref={timeDropdownRef}>
+            <button onClick={() => setActiveDropdown(activeDropdown === "time" ? null : "time")} className="outline-none px-4 py-2 rounded-xl border border-slate-200 bg-white text-sm font-medium shadow-sm flex items-center gap-2 text-gray-700">
+              <Filter size={16} className="text-[#F59E0B]" />
+              <span>{timeFilter}</span>
+              <ChevronDown size={14} className={activeDropdown === "time" ? "rotate-180" : ""} />
             </button>
-
-            {isTimeDropdownOpen && !isCalendarOpen && (
-              <div className="absolute right-0 mt-2 bg-white border border-slate-100 rounded-2xl shadow-2xl z-50 py-2 min-w-40">
-                {["All Time", "Weekly", "Monthly", "Quarterly", "Yearly"].map(
-                  (tab) => (
-                    <button
-                      key={tab}
-                      onClick={() => handleTimeFilterChange(tab as TimeFilter)}
-                      className={`outline-none w-full text-left px-4 py-2.5 text-[13px] transition-colors ${timeFilter === tab
-                        ? "text-amber-500 font-bold bg-orange-50/50"
-                        : "text-slate-600 hover:bg-slate-50"
-                        }`}
-                    >
-                      {tab}
-                    </button>
-                  ),
-                )}
-                <button
-                  onClick={() => handleTimeFilterChange("Custom")}
-                  className={`outline-none w-full text-left px-4 py-2.5 text-[13px] transition-colors ${timeFilter === "Custom"
-                    ? "text-amber-500 font-bold bg-orange-50/50"
-                    : "text-slate-600 hover:bg-slate-50"
-                    }`}
-                >
-                  Custom
-                </button>
-              </div>
-            )}
-
-            {isCalendarOpen && (
-              <div
-                ref={calendarRef}
-                className="absolute right-0 mt-3 bg-white p-6 rounded-2xl shadow-xl border z-50 w-72"
-              >
-                <div className="space-y-3">
-                  <input
-                    type="date"
-                    value={customRange.start}
-                    onChange={(e) =>
-                      setCustomRange({ ...customRange, start: e.target.value })
-                    }
-                    className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500/20"
-                  />
-                  <input
-                    type="date"
-                    value={customRange.end}
-                    min={customRange.start}
-                    onChange={(e) =>
-                      setCustomRange({ ...customRange, end: e.target.value })
-                    }
-                    className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500/20"
-                  />
-                  <button
-                    onClick={handleCustomApply}
-                    className="w-full bg-[#F59E0B] text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-[#f67317]"
-                  >
-                    Apply Range
-                  </button>
-                </div>
+            {activeDropdown === "time" && (
+              <div className="absolute right-0 mt-2 bg-white rounded-2xl shadow-2xl z-50 py-2 min-w-44 border border-slate-50 overflow-hidden">
+                {["All Time", "Weekly", "Monthly", "Quarterly", "Yearly", "Custom"].map(t => (
+                  <button key={t} onClick={() => { setTimeFilter(t as TimeFilter); setActiveDropdown(null); }} className="w-full text-left px-4 py-2.5 text-[13px] hover:bg-slate-50 text-slate-600 transition-colors font-medium italic">{t}</button>
+                ))}
               </div>
             )}
           </div>
-          <button
-            onClick={() => navigate("/production/scheduling/new-schedule")}
-            className="outline-none group flex items-center gap-1 bg-[#F59E0B] hover:bg-[#f67317] text-white px-2.5 py-2 rounded-xl font-bold text-sm shadow-xl shadow-amber-500/5 transition-all active:scale-95 whitespace-nowrap"
-          >
-            <Plus size={18} />
-            <span className="hidden sm:inline">Create Schedule</span>
-            <span className="sm:hidden">New</span>
-          </button>
         </header>
 
-        {/* Main Table Container */}
+        {/* Stats Section */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          <StatCard label="Total Scheduled" value={workOrders.length} color="border-orange-500" />
+          <StatCard label="Morning Shift" value={workOrders.filter(w=>w.shift==="MORNING").length} color="border-blue-500" />
+          <StatCard label="Evening Shift" value={workOrders.filter(w=>w.shift==="EVENING").length} color="border-purple-500" />
+          <StatCard label="Night Shift" value={workOrders.filter(w=>w.shift==="NIGHT").length} color="border-slate-800" />
+        </div>
+
+        {/* Main List Container */}
         <div className="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
+          
           {/* Toolbar */}
           <div className="p-6 flex flex-col lg:flex-row justify-between items-center gap-4 border-b border-slate-50">
-            {/* Search Bar - Left Side */}
             <div className="relative w-full lg:w-96">
-              <Search
-                className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300"
-                size={18}
-              />
-              <input
-                type="text"
-                placeholder="Search by order ID or product..."
-                className="w-full pl-12 pr-4 py-3.5 bg-slate-50 border-transparent rounded-2xl focus:bg-white focus:ring-4 focus:ring-orange-500/5 text-sm outline-none transition-all"
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" size={18} />
+              <input 
+                type="text" 
+                placeholder="Search work orders..." 
+                className="w-full pl-12 pr-4 py-3.5 bg-slate-50 border-transparent rounded-2xl focus:bg-white focus:ring-4 focus:ring-orange-500/5 text-sm outline-none"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
 
-            {/* Filters and Actions - Right Side */}
-            <div className="flex flex-wrap gap-3">
-              {/* Priority Filter */}
-              <div className="relative" ref={priorityRef}>
-                <button
-                  onClick={() => setActiveDropdown(activeDropdown === "priority" ? null : "priority")}
-                  className={`outline-none px-4 py-3 rounded-xl border text-[13px] font-bold flex items-center gap-2 ${priorityFilter !== "All"
-                    ? "bg-orange-50 border-orange-200 text-amber-500"
-                    : "bg-white border-slate-200 text-slate-600"
-                    }`}
-                >
-                  {priorityFilter === "All" ? "Priority" : priorityFilter}
-                  <ChevronDown
-                    size={14}
-                    className={activeDropdown === "priority" ? "outline-none rotate-180" : ""}
-                  />
+            <div className="flex gap-3">
+              <div className="relative" ref={statusDropdownRef}>
+                <button onClick={() => setActiveDropdown(activeDropdown === "status" ? null : "status")} className={`outline-none px-4 py-3 rounded-xl border text-[13px] font-bold flex items-center gap-2 ${statusFilter !== "All" ? "bg-orange-50 border-orange-200 text-amber-500" : "bg-white border-slate-200 text-slate-600"}`}>
+                  {statusFilter === "All" ? "Status" : statusFilter}
+                  <ChevronDown size={14} className={activeDropdown === "status" ? "rotate-180" : ""} />
                 </button>
-
-                {activeDropdown === "priority" && (
-                  <div className="absolute right-0 mt-2 w-32 bg-white rounded-2xl shadow-2xl z-50 py-2">
-                    {priorityOptions.map((opt) => (
-                      <button
-                        key={opt}
-                        onClick={() => {
-                          setPriorityFilter(opt);
-                          setActiveDropdown(null);
-                        }}
-                        className={`outline-none w-full text-left px-4 py-2 text-[13px] hover:bg-slate-50 ${priorityFilter === opt
-                          ? "text-amber-500 font-bold bg-orange-50/50"
-                          : "text-slate-600"
-                          }`}
-                      >
-                        {opt}
-                      </button>
+                {activeDropdown === "status" && (
+                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-2xl shadow-2xl z-50 py-2 border border-slate-50 overflow-hidden">
+                    {["All", "PENDING", "ASSIGNED", "IN_PROGRESS", "COMPLETED"].map(s => (
+                      <button key={s} onClick={() => { setStatusFilter(s); setActiveDropdown(null); }} className="w-full text-left px-4 py-2 text-[13px] hover:bg-slate-50 text-slate-600 font-medium">{s}</button>
                     ))}
                   </div>
                 )}
               </div>
-
-              {/* Bulk Delete Button */}
-              <button
-                disabled={selectedIds.length === 0}
-                onClick={handleBulkDelete}
-                className={`outline-none p-3 rounded-xl ${selectedIds.length === 0 ? "bg-gray-100 text-gray-400 cursor-not-allowed" : "bg-rose-600 text-white hover:bg-rose-700"}`}
-              >
-                <Trash2 size={20} />
-              </button>
             </div>
           </div>
 
           {/* Table */}
-          <div className="w-full overflow-x-auto">
+          <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="bg-slate-50/50">
-                  <th className="w-12 p-5 text-center border-b border-slate-100">
-                    <input
-                      type="checkbox"
-                      className="h-4 w-4 cursor-pointer appearance-none rounded border border-slate-300 bg-white transition-all relative checked:bg-[#F59E0B] checked:border-[#F59E0B] after:content-[''] after:absolute after:opacity-0 checked:after:opacity-100 after:left-1.25 after:top-px after:w-1 after:h-2 after:border-white after:border-r-2 after:border-b-2 after:rotate-45 outline-none"
-                      checked={paginatedOrders.length > 0 && selectedIds.length === paginatedOrders.length}
-                      onChange={toggleSelectAll}
-                    />
-                  </th>
-                  <th className="px-4 py-4 text-[11px] text-slate-800 uppercase tracking-widest border-b border-slate-100 text-center">
-                    ORDER ID
-                  </th>
-                  <th className="px-4 py-4 text-[11px] text-slate-800 uppercase tracking-widest border-b border-slate-100 text-center">
-                    PRODUCT
-                  </th>
-                  <th className="px-4 py-4 text-[11px] text-slate-800 uppercase tracking-widest border-b border-slate-100 text-center">
-                    QUANTITY
-                  </th>
-                  <th className="px-4 py-4 text-[11px] text-slate-800 uppercase tracking-widest border-b border-slate-100 text-center">
-                    DEADLINE
-                  </th>
-                  <th className="px-4 py-4 text-[11px] text-slate-800 uppercase tracking-widest border-b border-slate-100 text-center">
-                    PRIORITY
-                  </th>
-                  <th className="px-4 py-4 text-[11px] text-slate-800 uppercase tracking-widest border-b border-slate-100 text-center">
-                    ACTIONS
-                  </th>
+                  <th className="px-6 py-4 text-[11px] text-slate-800 uppercase tracking-widest text-center">WO ID</th>
+                  <th className="px-6 py-4 text-[11px] text-slate-800 uppercase tracking-widest text-center">Task</th>
+                  <th className="px-6 py-4 text-[11px] text-slate-800 uppercase tracking-widest text-center">Shift</th>
+                  <th className="px-6 py-4 text-[11px] text-slate-800 uppercase tracking-widest text-center">Start Date</th>
+                  <th className="px-6 py-4 text-[11px] text-slate-800 uppercase tracking-widest text-center">End Date</th>
+                  <th className="px-6 py-4 text-[11px] text-slate-800 uppercase tracking-widest text-center">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-50">
-                {paginatedOrders.map((order) => (
-                  <tr
-                    key={order.id}
-                    className="group hover:bg-orange-50/20 transition-colors"
-                  >
-                    <td className="p-5 text-center">
-                      <input
-                        type="checkbox"
-                        className="h-4 w-4 cursor-pointer appearance-none rounded border border-slate-300 bg-white transition-all relative checked:bg-[#F59E0B] checked:border-[#F59E0B] after:content-[''] after:absolute after:opacity-0 checked:after:opacity-100 after:left-1.25 after:top-px after:w-1 after:h-2 after:border-white after:border-r-2 after:border-b-2 after:rotate-45 outline-none"
-                        checked={selectedIds.includes(order.id)}
-                        onChange={() => {
-                          if (selectedIds.includes(order.id))
-                            setSelectedIds(selectedIds.filter((id) => id !== order.id));
-                          else setSelectedIds([...selectedIds, order.id]);
-                        }}
-                      />
+                {paginatedOrders.map((wo) => (
+                  <tr key={wo.id} className="group hover:bg-orange-50/20 transition-colors">
+                    <td className="px-6 py-4 text-[13px] font-mono font-bold text-slate-800 text-center">{wo.workOrderId}</td>
+                    <td className="px-6 py-4 text-[13px] text-slate-700 text-center font-medium">{wo.taskName}</td>
+                    <td className="px-6 py-4 text-center">
+                      <span className={`px-2 py-1 rounded text-[10px] font-black uppercase border ${wo.shift === 'MORNING' ? 'bg-blue-50 text-blue-600 border-blue-100' : wo.shift === 'EVENING' ? 'bg-purple-50 text-purple-600 border-purple-100' : 'bg-slate-100 text-slate-600 border-slate-200'}`}>
+                        {wo.shift}
+                      </span>
                     </td>
-                    <td className="px-4 py-4 text-[13px] font-mono font-bold text-slate-800 text-center">
-                      {order.id}
-                    </td>
-                    <td className="px-4 py-4 text-[13px] text-slate-700 text-center">
-                      {order.productName}
-                    </td>
-                    <td className="px-4 py-4 text-[13px] text-slate-700 text-center">
-                      {order.quantity.toLocaleString()}
-                    </td>
-                    <td className="px-4 py-4 text-[13px] text-slate-700 text-center">
-                      {formatDate(order.deadline)}
-                    </td>
-                    <td className="px-4 py-4 text-center">
-                      <PriorityBadge priority={order.priority} />
-                    </td>
-                    <td className="px-4 py-4">
-                      <div className="flex justify-center gap-2">
-                        <button
-                          onClick={() => handleViewDetails(order)}
-                          className="outline-none p-1.5 text-slate-400 hover:text-[#F59E0B] transition-colors"
+                    <td className="px-6 py-4 text-[13px] text-slate-700 text-center">{formatDate(wo.startDate)}</td>
+                    <td className="px-6 py-4 text-[13px] text-slate-700 text-center">{formatDate(wo.endDate)}</td>
+                    <td className="px-6 py-4 text-center">
+                      <div className="flex justify-center gap-3">
+                        <button 
+                          onClick={() => { setSelectedOrder(wo); setShowViewModal(true); }}
+                          className="p-2 text-slate-400 hover:text-[#F59E0B] hover:bg-white rounded-lg transition-all"
                         >
-                          <Eye size={16} />
+                          <Eye size={18} />
                         </button>
-                        <button
-                          onClick={() => handleOpenModal(order)}
-                          className="outline-none p-1.5 text-slate-400 hover:text-green-500 transition-colors"
+                        <button 
+                          onClick={() => { setSelectedOrder(wo); setShowScheduleModal(true); }}
+                          className="p-2 text-slate-400 hover:text-blue-600 hover:bg-white rounded-lg transition-all"
                         >
-                          <Play size={16} />
-                        </button>
-                        <button
-                          onClick={() => handleDelete(order.id)}
-                          className="outline-none p-1.5 text-slate-400 hover:text-rose-600 transition-colors"
-                        >
-                          <Trash2 size={16} />
+                          <Calendar size={18} />
                         </button>
                       </div>
                     </td>
@@ -585,147 +208,103 @@ const ProductionScheduling: React.FC = () => {
                 ))}
               </tbody>
             </table>
-
             {filteredOrders.length === 0 && (
-              <div className="py-32 flex flex-col items-center justify-center text-center">
-                <div className="p-6 bg-slate-50 rounded-full mb-4">
-                  <Factory className="text-slate-200" size={40} />
-                </div>
-                <h3 className="text-lg font-bold text-slate-800">
-                  No Production Orders Found
-                </h3>
-                <p className="text-slate-400 text-sm max-w-xs">
-                  No production orders matching your filter criteria.
-                </p>
-              </div>
+               <div className="py-20 text-center">
+                 <AlertTriangle className="mx-auto text-slate-200 mb-4" size={48} />
+                 <h3 className="text-lg font-bold text-slate-800">No records found</h3>
+               </div>
             )}
           </div>
 
-          {/* Pagination Footer */}
-          {totalPages > 0 && (
-            <footer className="p-6 bg-slate-50/50 border-t border-slate-100 flex flex-col md:flex-row justify-between items-center gap-6">
-              <div className="text-[11px] font-bold text-slate-800 uppercase tracking-widest">
-                Showing{" "}
-                {filteredOrders.length > 0
-                  ? (currentPage - 1) * itemsPerPage + 1
-                  : 0}{" "}
-                to {Math.min(currentPage * itemsPerPage, filteredOrders.length)}{" "}
-                of {filteredOrders.length} Orders
+          {/* Pagination */}
+          <footer className="p-6 bg-slate-50/50 border-t border-slate-100 flex flex-col md:flex-row justify-between items-center gap-6">
+            <div className="text-[11px] font-bold text-slate-800 uppercase tracking-wider">
+              Showing {(currentPage - 1) * itemsPerPage + 1} to {Math.min(currentPage * itemsPerPage, filteredOrders.length)} of {filteredOrders.length} records
+            </div>
+            <div className="flex items-center gap-2">
+              <button 
+                onClick={() => setCurrentPage(p => Math.max(1, p - 1))} 
+                disabled={currentPage === 1}
+                className="p-2.5 rounded-xl border bg-white text-slate-500 hover:text-[#F59E0B] disabled:opacity-30 outline-none"
+              >
+                <ChevronLeft size={18} />
+              </button>
+              <div className="flex gap-1.5">
+                {getPageNumbers().map(n => (
+                  <button 
+                    key={n} 
+                    onClick={() => setCurrentPage(n)}
+                    className={`min-w-10 h-10 rounded-xl text-xs font-bold transition-all outline-none ${currentPage === n ? "bg-[#F59E0B] text-white shadow-lg" : "bg-white text-slate-500 border border-slate-200 hover:border-orange-200"}`}
+                  >
+                    {n}
+                  </button>
+                ))}
               </div>
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => goToPage(currentPage - 1)}
-                  disabled={currentPage === 1}
-                  className="p-2.5 rounded-xl border border-slate-200 bg-white text-slate-500 hover:text-amber-500 disabled:opacity-30 transition-all"
-                >
-                  <ChevronLeft size={18} />
-                </button>
-                <div className="flex items-center gap-1.5">
-                  {getPageNumbers().map((page, i) =>
-                    page === "..." ? (
-                      <span key={i} className="px-2 text-slate-300">
-                        <MoreHorizontal size={14} />
-                      </span>
-                    ) : (
-                      <button
-                        key={i}
-                        onClick={() => goToPage(page as number)}
-                        className={`outline-none min-w-10 h-10 rounded-xl text-xs font-bold transition-all ${currentPage === page
-                          ? "bg-[#F59E0B] text-white shadow-lg"
-                          : "bg-white text-slate-500 border border-slate-200"
-                          }`}
-                      >
-                        {page}
-                      </button>
-                    ),
-                  )}
-                </div>
-                <button
-                  onClick={() => goToPage(currentPage + 1)}
-                  disabled={currentPage === totalPages}
-                  className="outline-none p-2.5 rounded-xl border border-slate-200 bg-white text-slate-500 hover:text-amber-500 disabled:opacity-30 transition-all"
-                >
-                  <ChevronRight size={18} />
-                </button>
-              </div>
-            </footer>
-          )}
+              <button 
+                onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} 
+                disabled={currentPage === totalPages}
+                className="p-2.5 rounded-xl border bg-white text-slate-500 hover:text-[#F59E0B] disabled:opacity-30 outline-none"
+              >
+                <ChevronRight size={18} />
+              </button>
+            </div>
+          </footer>
         </div>
       </div>
 
-      {/* Start Production Modal */}
-      {isModalOpen && selectedOrder && (
-        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-[2.5rem] max-w-md w-full shadow-2xl border border-slate-100 overflow-hidden animate-in zoom-in-95 duration-200">
-            <div className="p-8 pb-0 flex justify-between items-start">
-              <div>
-                <div className="flex items-center gap-2 mb-1">
-                  <div className="p-1.5 bg-orange-50 text-amber-500 rounded-lg">
-                    <Factory size={18} />
-                  </div>
-                  <h2 className="text-xl font-black text-slate-800">
-                    Start Production
-                  </h2>
-                </div>
-                <p className="text-sm text-slate-400 font-medium">
-                  Configure run for{" "}
-                  <span className="text-amber-500 font-bold">
-                    {selectedOrder.id}
-                  </span>
-                </p>
+      {/* VIEW DETAILS MODAL (Read Only) */}
+      {showViewModal && selectedOrder && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-in fade-in">
+          <div ref={viewModalRef} className="bg-white rounded-[2.5rem] max-w-lg w-full shadow-2xl overflow-hidden animate-in zoom-in-95">
+            <div className="p-8 border-b bg-slate-50/50 flex justify-between items-center">
+              <h2 className="text-xl font-black text-slate-800 uppercase tracking-tight">Work Order Details</h2>
+              <button onClick={() => setShowViewModal(false)} className="text-slate-400 hover:text-slate-600 text-2xl outline-none">×</button>
+            </div>
+            <div className="p-10 space-y-8">
+              <div className="grid grid-cols-2 gap-8">
+                <ModalDetail label="Work Order ID" value={selectedOrder.workOrderId} />
+                <ModalDetail label="Production ID" value={selectedOrder.productionOrderId} />
+                <ModalDetail label="Machine" value={selectedOrder.machineName} />
+                <ModalDetail label="Operator" value={selectedOrder.operatorName} />
               </div>
-              <button
-                onClick={() => setIsModalOpen(false)}
-                className="outline-none p-2 bg-slate-50 text-slate-400 hover:text-slate-600 rounded-full transition-colors"
+              <div className="pt-4 border-t border-slate-100 grid grid-cols-2 gap-8">
+                <ModalDetail label="Status" value={selectedOrder.status} isBadge />
+                <ModalDetail label="Current Shift" value={selectedOrder.shift} isBadge />
+              </div>
+            </div>
+            <div className="p-8 border-t bg-slate-50/50 flex justify-end">
+              <button 
+                onClick={() => setShowViewModal(false)}
+                className="px-8 py-3 bg-slate-800 text-white rounded-xl font-black text-[11px] uppercase tracking-widest shadow-lg hover:bg-slate-900 transition-all outline-none"
               >
-                <X size={20} />
+                Close Details
               </button>
             </div>
+          </div>
+        </div>
+      )}
 
-            <div className="p-8 space-y-6">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <label className="text-[11px] font-bold text-slate-600 uppercase tracking-wider ml-1">
-                    Start Date
-                  </label>
-                  <input
-                    type="date"
-                    value={formData.startDate}
-                    onChange={(e) =>
-                      setFormData({ ...formData, startDate: e.target.value })
-                    }
-                    className="w-full px-4 py-3 bg-white border border-slate-200 rounded-2xl text-[13px] font-semibold text-slate-800 outline-none focus:ring-4 focus:ring-orange-500/10 focus:border-orange-400 transition-all shadow-sm"
-                  />
-                </div>
-                <div className="space-y-1.5">
-                  <label className="text-[11px] font-bold text-slate-600 uppercase tracking-wider ml-1">
-                    End Date
-                  </label>
-                  <input
-                    type="date"
-                    value={formData.endDate}
-                    onChange={(e) =>
-                      setFormData({ ...formData, endDate: e.target.value })
-                    }
-                    className="w-full px-4 py-3 bg-white border border-slate-200 rounded-2xl text-[13px] font-semibold text-slate-800 outline-none focus:ring-4 focus:ring-orange-500/10 focus:border-orange-400 transition-all shadow-sm"
-                  />
-                </div>
+      {/* SCHEDULING MODAL (Functional) */}
+      {showScheduleModal && selectedOrder && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-in fade-in">
+          <div ref={scheduleModalRef} className="bg-white rounded-[2.5rem] max-w-lg w-full shadow-2xl overflow-hidden animate-in zoom-in-95">
+            <div className="p-8 border-b bg-orange-50/30 flex justify-between items-center">
+              <div>
+                <h2 className="text-xl font-black text-slate-800 uppercase tracking-tight">Update Schedule</h2>
+                <p className="text-[10px] font-bold text-orange-500 uppercase tracking-widest mt-1">{selectedOrder.workOrderId} • {selectedOrder.taskName}</p>
               </div>
-
+              <button onClick={() => setShowScheduleModal(false)} className="text-slate-400 hover:text-slate-600 text-2xl outline-none">×</button>
+            </div>
+            
+            <div className="p-10 space-y-6">
               <div className="space-y-2">
-                <label className="text-[11px] font-bold text-slate-600 uppercase tracking-wider ml-1">
-                  Production Shift
-                </label>
-                <div className="flex gap-2">
-                  {["Morning", "Afternoon", "Evening"].map((s) => (
-                    <button
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Shift Assignment</label>
+                <div className="grid grid-cols-3 gap-2">
+                  {["MORNING", "EVENING", "NIGHT"].map((s) => (
+                    <button 
                       key={s}
-                      type="button"
-                      onClick={() => setFormData({ ...formData, shift: s })}
-                      className={`outline-none flex-1 py-3 rounded-xl text-[11px] font-bold uppercase tracking-tight transition-all border ${formData.shift === s
-                        ? "bg-orange-50 border-orange-300 text-amber-500 shadow-sm"
-                        : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
-                        }`}
+                      onClick={() => setSelectedOrder({...selectedOrder, shift: s as Shift})}
+                      className={`py-3 rounded-xl border text-[11px] font-bold transition-all outline-none ${selectedOrder.shift === s ? 'bg-orange-500 border-orange-500 text-white shadow-md shadow-orange-200' : 'bg-white border-slate-200 text-slate-500 hover:border-orange-200'}`}
                     >
                       {s}
                     </button>
@@ -733,89 +312,37 @@ const ProductionScheduling: React.FC = () => {
                 </div>
               </div>
 
-              <div className="bg-slate-50 rounded-2xl p-4 flex items-start gap-3">
-                <Clock size={16} className="text-slate-400 mt-0.5" />
-                <p className="text-[11px] text-slate-500 leading-relaxed">
-                  Starting this production will notify the assigned operators
-                  and update the machine load status automatically.
-                </p>
-              </div>
-
-              <div className="pt-2 flex gap-3">
-                <button
-                  onClick={() => setIsModalOpen(false)}
-                  className="outline-none flex-1 px-4 py-2 bg-slate-100 text-slate-600 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-slate-200 transition-all"
-                >
-                  Cancel
-                </button>
-
-                <button
-                  onClick={() => setIsModalOpen(false)}
-                  className="outline-none flex-1 px-4 py-2 bg-[#F59E0B] text-white rounded-xl font-bold text-xs uppercase tracking-widest shadow-lg shadow-orange-500/20 hover:bg-[#f67317] transition-all flex items-center justify-center gap-2"
-                >
-                  Confirm Run <ArrowRight size={16} />
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Order Details Modal */}
-      {showDetailsModal && selectedOrder && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
-          <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="sticky top-0 bg-white border-b p-6 flex justify-between">
-              <div>
-                <h2 className="text-xl font-bold">{selectedOrder.id}</h2>
-                <p className="text-sm text-gray-500">{selectedOrder.productName}</p>
-              </div>
-              <button
-                onClick={() => setShowDetailsModal(false)}
-                className="text-gray-400 hover:text-gray-600 outline-none "
-              >
-                ✕
-              </button>
-            </div>
-            <div className="p-6 space-y-6">
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                <div className="p-3 bg-gray-50 rounded-xl">
-                  <label className="text-xs text-gray-500 uppercase">Product</label>
-                  <p className="font-semibold">{selectedOrder.productName}</p>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Start Date</label>
+                  <input 
+                    type="date" 
+                    value={selectedOrder.startDate}
+                    onChange={(e) => setSelectedOrder({...selectedOrder, startDate: e.target.value})}
+                    className="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-xl text-sm font-bold focus:ring-2 focus:ring-orange-500/20 outline-none" 
+                  />
                 </div>
-                <div className="p-3 bg-gray-50 rounded-xl">
-                  <label className="text-xs text-gray-500 uppercase">Quantity</label>
-                  <p className="font-semibold">{selectedOrder.quantity.toLocaleString()}</p>
-                </div>
-                <div className="p-3 bg-gray-50 rounded-xl">
-                  <label className="text-xs text-gray-500 uppercase">Deadline</label>
-                  <p className="font-semibold">{formatDate(selectedOrder.deadline)}</p>
-                </div>
-                <div className="p-3 bg-gray-50 rounded-xl">
-                  <label className="text-xs text-gray-500 uppercase">Priority</label>
-                  <PriorityBadge priority={selectedOrder.priority} />
-                </div>
-                <div className="p-3 bg-gray-50 rounded-xl">
-                  <label className="text-xs text-gray-500 uppercase">Created At</label>
-                  <p className="font-semibold">{formatDate(selectedOrder.created_at || "")}</p>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">End Date</label>
+                  <input 
+                    type="date" 
+                    value={selectedOrder.endDate}
+                    onChange={(e) => setSelectedOrder({...selectedOrder, endDate: e.target.value})}
+                    className="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-xl text-sm font-bold focus:ring-2 focus:ring-orange-500/20 outline-none" 
+                  />
                 </div>
               </div>
             </div>
-            <div className="sticky bottom-0 bg-white border-t p-6 flex justify-end gap-3">
-              <button
-                onClick={() => setShowDetailsModal(false)}
-                className="outline-none px-4 py-2 bg-gray-100 rounded-xl hover:bg-gray-200"
-              >
-                Close
-              </button>
-              <button
+
+            <div className="p-8 border-t bg-slate-50/50 flex flex-col gap-3">
+              <button 
                 onClick={() => {
-                  setShowDetailsModal(false);
-                  handleOpenModal(selectedOrder);
+                  alert(`Schedule updated for ${selectedOrder.workOrderId}`);
+                  setShowScheduleModal(false);
                 }}
-                className="outline-none px-4 py-2 bg-[#F59E0B] text-white rounded-xl hover:bg-[#f67317]"
+                className="w-full py-4 bg-[#F59E0B] text-white rounded-2xl font-black text-[12px] uppercase tracking-widest shadow-xl shadow-orange-500/20 hover:bg-[#f67317] transition-all active:scale-[0.98] outline-none"
               >
-                Start Production
+                Update Schedule
               </button>
             </div>
           </div>
@@ -825,4 +352,25 @@ const ProductionScheduling: React.FC = () => {
   );
 };
 
-export default ProductionScheduling;
+// ==================== Sub-Components ====================
+const StatCard = ({ label, value, color }: { label: string; value: number | string; color: string }) => (
+  <div className={`bg-white p-6 rounded-2xl border-l-4 ${color} shadow-sm`}>
+    <p className="text-[11px] font-bold text-gray-800 uppercase tracking-widest mb-1">{label}</p>
+    <p className="text-2xl font-black text-slate-700">{value}</p>
+  </div>
+);
+
+const ModalDetail = ({ label, value, isBadge }: { label: string; value: string; isBadge?: boolean }) => (
+  <div>
+    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 block">{label}</label>
+    {isBadge ? (
+       <span className="px-3 py-1 bg-slate-100 text-slate-700 rounded-lg text-[11px] font-black uppercase border border-slate-200">
+         {value}
+       </span>
+    ) : (
+      <p className="text-md font-bold text-slate-800 leading-tight">{value}</p>
+    )}
+  </div>
+);
+
+export default WorkOrderScheduling;

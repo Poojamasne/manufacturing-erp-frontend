@@ -115,69 +115,7 @@ export const fetchReportData = createAsyncThunk(
     }
 );
 
-export const exportReportCSV = createAsyncThunk(
-    "reports/exportReportCSV",
-    async (params: { range: string; startDate?: string; endDate?: string }, { rejectWithValue, getState }) => {
-        try {
-            Swal.fire({
-                title: "Exporting Report...",
-                text: "Please wait while we prepare the report.",
-                allowOutsideClick: false,
-                customClass: {
-                    loader: 'lead-loader'
-                },
-                didOpen: () => {
-                    Swal.showLoading();
-                }
-            });
 
-            const state = getState() as RootState;
-            const token = state.auth.token || localStorage.getItem("token");
-
-            let url = `${import.meta.env.VITE_API_BASE_URL}/sales/export?range=${params.range}`;
-            if (params.range === "Custom" && params.startDate && params.endDate) {
-                url += `&startDate=${params.startDate}&endDate=${params.endDate}`;
-            }
-
-            const response = await axios.get(url, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-                responseType: 'blob'
-            });
-            Swal.close();
-            // Create download link
-            const blob = new Blob([response.data], { type: 'text/csv' });
-            const link = document.createElement('a');
-            const url_ = window.URL.createObjectURL(blob);
-            link.href = url_;
-            link.setAttribute('download', `report_${params.range}_${new Date().toISOString().split('T')[0]}.csv`);
-            document.body.appendChild(link);
-            link.click();
-            link.remove();
-            window.URL.revokeObjectURL(url_);
-
-            Swal.fire({
-                icon: 'success',
-                title: 'Exported!',
-                iconColor:"#F59E0B",
-                text: 'Report exported successfully',
-                timer: 1500,
-                timerProgressBar: true,
-                showConfirmButton: true
-            });
-
-            return true;
-        } catch (error: any) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Export Failed',
-                text: error.response?.data?.message || "Error exporting report",
-            });
-            return rejectWithValue(error.response?.data?.message || "Error exporting report");
-        }
-    }
-);
 
 const reportSlice = createSlice({
     name: "reports",
@@ -202,17 +140,6 @@ const reportSlice = createSlice({
                 state.loading = false;
                 state.error = action.payload as string;
             })
-            // Export Report
-            .addCase(exportReportCSV.pending, (state) => {
-                state.loading = true;
-            })
-            .addCase(exportReportCSV.fulfilled, (state) => {
-                state.loading = false;
-            })
-            .addCase(exportReportCSV.rejected, (state, action) => {
-                state.loading = false;
-                state.error = action.payload as string;
-            });
     },
 });
 
