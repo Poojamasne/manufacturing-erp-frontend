@@ -1,5 +1,4 @@
 import React, { useState, useMemo, useRef, useEffect } from "react";
-// import { useNavigate } from "react-router-dom";
 import {
   ChevronDown,
   Search,
@@ -32,14 +31,6 @@ const mockOrders: ProductionOrder[] = [
   { id: "2", productionOrderId: "PO-002", salesOrderId: "SO-002", productName: "Aluminum Frame 4x4", quantity: 250, deadline: "2024-05-18", status: "PLANNED", priority: "HIGH", createdAt: "2024-05-12" },
   { id: "3", productionOrderId: "PO-003", salesOrderId: "SO-003", productName: "Plastic Container L", quantity: 1000, deadline: "2024-05-22", status: "ON_HOLD", priority: "MEDIUM", createdAt: "2024-05-13" },
   { id: "4", productionOrderId: "PO-004", salesOrderId: "SO-004", productName: "Plastic Container L", quantity: 1000, deadline: "2024-05-22", status: "ON_HOLD", priority: "MEDIUM", createdAt: "2024-05-13" },
-  { id: "5", productionOrderId: "PO-005", salesOrderId: "SO-005", productName: "Plastic Container L", quantity: 1000, deadline: "2024-05-22", status: "ON_HOLD", priority: "MEDIUM", createdAt: "2024-05-13" },
-  { id: "6", productionOrderId: "PO-006", salesOrderId: "SO-006", productName: "Plastic Container L", quantity: 1000, deadline: "2024-05-22", status: "ON_HOLD", priority: "MEDIUM", createdAt: "2024-05-13" },
-  { id: "7", productionOrderId: "PO-007", salesOrderId: "SO-007", productName: "Plastic Container L", quantity: 1000, deadline: "2024-05-22", status: "ON_HOLD", priority: "MEDIUM", createdAt: "2024-05-13" },
-  { id: "8", productionOrderId: "PO-008", salesOrderId: "SO-008", productName: "Plastic Container L", quantity: 1000, deadline: "2024-05-22", status: "ON_HOLD", priority: "MEDIUM", createdAt: "2024-05-13" },
-  { id: "9", productionOrderId: "PO-009", salesOrderId: "SO-009", productName: "Plastic Container L", quantity: 1000, deadline: "2024-05-22", status: "ON_HOLD", priority: "MEDIUM", createdAt: "2024-05-13" },
-  { id: "10", productionOrderId: "PO-010", salesOrderId: "SO-010", productName: "Plastic Container L", quantity: 1000, deadline: "2024-05-22", status: "ON_HOLD", priority: "MEDIUM", createdAt: "2024-05-13" },
-  { id: "11", productionOrderId: "PO-011", salesOrderId: "SO-011", productName: "Plastic Container L", quantity: 1000, deadline: "2024-05-22", status: "ON_HOLD", priority: "MEDIUM", createdAt: "2024-05-13" },
-  { id: "12", productionOrderId: "PO-012", salesOrderId: "SO-0012", productName: "Plastic Container L", quantity: 1000, deadline: "2024-05-22", status: "ON_HOLD", priority: "MEDIUM", createdAt: "2024-05-13" },
 ];
 
 // ==================== Helper Components ====================
@@ -72,7 +63,6 @@ const formatDate = (date: string) => {
 };
 
 const ProductionOrderList: React.FC = () => {
-  // const navigate = useNavigate();
   const timeDropdownRef = useRef<HTMLDivElement>(null);
   const statusDropdownRef = useRef<HTMLDivElement>(null);
   const modalContentRef = useRef<HTMLDivElement>(null);
@@ -80,7 +70,11 @@ const ProductionOrderList: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
   const [timeFilter, setTimeFilter] = useState<TimeFilter>("All Time");
+  const [customRange, setCustomRange] = useState({ start: "", end: "" });
+
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+  const [isTimeDropdownOpen, setIsTimeDropdownOpen] = useState(false);
+  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<ProductionOrder | null>(null);
 
@@ -95,23 +89,82 @@ const ProductionOrderList: React.FC = () => {
     onHold: mockOrders.filter(o => o.status === "ON_HOLD").length,
   }), []);
 
+  // Sync outside click for ALL dropdowns and calendar
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as Node;
-      if (activeDropdown === "time" && timeDropdownRef.current && !timeDropdownRef.current.contains(target)) setActiveDropdown(null);
-      if (activeDropdown === "status" && statusDropdownRef.current && !statusDropdownRef.current.contains(target)) setActiveDropdown(null);
-      if (showDetailsModal && modalContentRef.current && !modalContentRef.current.contains(target)) setShowDetailsModal(false);
+      if (timeDropdownRef.current && !timeDropdownRef.current.contains(target)) {
+        setIsTimeDropdownOpen(false);
+        setIsCalendarOpen(false);
+      }
+      if (activeDropdown === "status" && statusDropdownRef.current && !statusDropdownRef.current.contains(target)) {
+        setActiveDropdown(null);
+      }
+      if (showDetailsModal && modalContentRef.current && !modalContentRef.current.contains(target)) {
+        setShowDetailsModal(false);
+      }
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [activeDropdown, showDetailsModal]);
 
+  const handleTimeFilterChange = (value: TimeFilter) => {
+    if (value === "Custom") {
+      setIsCalendarOpen(true);
+      setIsTimeDropdownOpen(false);
+    } else {
+      setTimeFilter(value);
+      setIsTimeDropdownOpen(false);
+      setIsCalendarOpen(false);
+      setCustomRange({ start: "", end: "" });
+    }
+  };
+
+  const handleCustomApply = () => {
+    if (!customRange.start || !customRange.end) {
+      alert("Please select date range");
+      return;
+    }
+    setTimeFilter("Custom");
+    setIsCalendarOpen(false);
+    setIsTimeDropdownOpen(false);
+  };
+
+  const getFilterDisplayText = () => {
+    if (timeFilter === "Custom" && customRange.start && customRange.end)
+      return `${formatDate(customRange.start)} - ${formatDate(customRange.end)}`;
+    return timeFilter;
+  };
+
   const filteredOrders = useMemo(() => {
-    return mockOrders.filter(o =>
+    let filtered = mockOrders.filter(o =>
       (o.productName.toLowerCase().includes(searchQuery.toLowerCase()) || o.productionOrderId.includes(searchQuery)) &&
       (statusFilter === "All" || o.status === statusFilter)
     );
-  }, [searchQuery, statusFilter]);
+
+    // Time Filtering Logic
+    filtered = filtered.filter((order) => {
+      const orderDate = new Date(order.createdAt);
+      const now = new Date();
+      if (timeFilter === "Weekly") {
+        const diffDays = (now.getTime() - orderDate.getTime()) / (1000 * 60 * 60 * 24);
+        return diffDays <= 7 && diffDays >= 0;
+      }
+      if (timeFilter === "Monthly")
+        return orderDate.getMonth() === now.getMonth() && orderDate.getFullYear() === now.getFullYear();
+      if (timeFilter === "Quarterly")
+        return Math.floor(orderDate.getMonth() / 3) === Math.floor(now.getMonth() / 3) && orderDate.getFullYear() === now.getFullYear();
+      if (timeFilter === "Yearly") return orderDate.getFullYear() === now.getFullYear();
+      if (timeFilter === "Custom" && customRange.start && customRange.end) {
+        const start = new Date(customRange.start);
+        const end = new Date(customRange.end);
+        return orderDate >= start && orderDate <= end;
+      }
+      return true;
+    });
+
+    return filtered;
+  }, [searchQuery, statusFilter, timeFilter, customRange]);
 
   const totalPages = Math.ceil(filteredOrders.length / itemsPerPage);
   const paginatedOrders = filteredOrders.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
@@ -125,7 +178,7 @@ const ProductionOrderList: React.FC = () => {
   return (
     <div className="min-h-screen bg-[#f4f7f6] p-4 sm:p-6 lg:p-8 text-slate-900 font-sans">
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
+        {/* Header - EXACT font size and color implementation */}
         <header className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 mb-10">
           <div>
             <h1 className="text-3xl font-extrabold text-slate-800 tracking-tight">Production Orders</h1>
@@ -133,22 +186,68 @@ const ProductionOrderList: React.FC = () => {
           </div>
 
           <div className="relative" ref={timeDropdownRef}>
-            <button onClick={() => setActiveDropdown(activeDropdown === "time" ? null : "time")} className="outline-none px-4 py-2 rounded-xl border border-slate-200 bg-white text-sm font-medium shadow-sm flex items-center gap-2 text-gray-700">
+            <button
+              onClick={() => setIsTimeDropdownOpen(!isTimeDropdownOpen)}
+              className="outline-none px-4 py-2 rounded-xl border border-slate-200 bg-white text-sm font-medium shadow-sm flex items-center gap-2 text-gray-700"
+            >
               <Filter size={16} className="text-[#F59E0B]" />
-              <span>{timeFilter}</span>
-              <ChevronDown size={14} className={activeDropdown === "time" ? "rotate-180" : ""} />
+              <span>{getFilterDisplayText()}</span>
+              <ChevronDown size={14} className={isTimeDropdownOpen ? "rotate-180" : ""} />
             </button>
-            {activeDropdown === "time" && (
-              <div className="absolute right-0 mt-2 bg-white rounded-2xl shadow-2xl z-50 py-2 min-w-40 border border-slate-50 overflow-hidden font-medium">
-                {["All Time", "Weekly", "Monthly"].map(t => (
-                  <button key={t} onClick={() => { setTimeFilter(t as TimeFilter); setActiveDropdown(null); }} className="w-full text-left px-4 py-2.5 text-[13px] hover:bg-slate-50 text-slate-600 transition-colors italic">{t}</button>
+            {isTimeDropdownOpen && !isCalendarOpen && (
+              <div className="absolute right-0 mt-2 bg-white rounded-2xl shadow-2xl z-50 py-2 min-w-40 overflow-hidden border border-slate-50">
+                {["All Time", "Weekly", "Monthly", "Quarterly", "Yearly"].map((tab) => (
+                  <button
+                    key={tab}
+                    onClick={() => handleTimeFilterChange(tab as TimeFilter)}
+                    className={`outline-none w-full text-left px-4 py-2.5 text-[13px] ${timeFilter === tab ? "text-amber-500 font-bold bg-orange-50/50" : "text-slate-600 hover:bg-slate-50"}`}
+                  >
+                    {tab}
+                  </button>
                 ))}
+                <button
+                  onClick={() => handleTimeFilterChange("Custom")}
+                  className={`outline-none w-full text-left px-4 py-2.5 text-[13px] border-t border-slate-50 ${timeFilter === "Custom" ? "text-amber-500 font-bold bg-orange-50/50" : "text-slate-600 hover:bg-slate-50"}`}
+                >
+                  Custom
+                </button>
               </div>
             )}
+            {isCalendarOpen && (
+                <div
+                  className="absolute right-0 mt-3 bg-white p-6 rounded-2xl shadow-xl border z-50 w-72"
+                >
+                  <div className="space-y-3">
+                    <input
+                      type="date"
+                      value={customRange.start}
+                      onChange={(e) =>
+                        setCustomRange({ ...customRange, start: e.target.value })
+                      }
+                      className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500/20"
+                    />
+                    <input
+                      type="date"
+                      value={customRange.end}
+                      min={customRange.start}
+                      onChange={(e) =>
+                        setCustomRange({ ...customRange, end: e.target.value })
+                      }
+                      className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500/20"
+                    />
+                    <button
+                      onClick={handleCustomApply}
+                      className="outline-none w-full bg-[#F59E0B] text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-[#f67317]"
+                    >
+                      Apply Range
+                    </button>
+                  </div>
+                </div>
+              )}
           </div>
         </header>
 
-        {/* Stats Cards - Matches Provided Logic */}
+        {/* Stats Section */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
           <StatCard label="Total Orders" value={stats.total} color="border-orange-500" />
           <StatCard label="In Progress" value={stats.inProgress} color="border-blue-500" />
@@ -157,9 +256,8 @@ const ProductionOrderList: React.FC = () => {
           <StatCard label="On Hold" value={stats.onHold} color="border-yellow-500" />
         </div>
 
-        {/* Main List Container */}
+        {/* Main Data Container */}
         <div className="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
-
           {/* Toolbar */}
           <div className="p-6 flex flex-col lg:flex-row justify-between items-center gap-4 border-b border-slate-50">
             <div className="relative w-full lg:w-96">
@@ -174,9 +272,9 @@ const ProductionOrderList: React.FC = () => {
                   <ChevronDown size={14} className={activeDropdown === "status" ? "rotate-180" : ""} />
                 </button>
                 {activeDropdown === "status" && (
-                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-2xl shadow-2xl z-50 py-2 border border-slate-50 overflow-hidden font-medium">
+                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-2xl shadow-2xl z-50 py-2 border border-slate-50 overflow-hidden">
                     {["All", "PLANNED", "IN_PROGRESS", "COMPLETED", "ON_HOLD"].map(s => (
-                      <button key={s} onClick={() => { setStatusFilter(s); setActiveDropdown(null); }} className="w-full text-left px-4 py-2 text-[13px] hover:bg-slate-50 text-slate-600">{s}</button>
+                      <button key={s} onClick={() => { setStatusFilter(s); setActiveDropdown(null); }} className="w-full text-left px-4 py-2 text-[13px] hover:bg-slate-50 text-slate-600 font-medium">{s}</button>
                     ))}
                   </div>
                 )}
@@ -185,7 +283,7 @@ const ProductionOrderList: React.FC = () => {
             </div>
           </div>
 
-          {/* Table - Exact Style From Provided Snippet */}
+          {/* Table */}
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
@@ -208,7 +306,7 @@ const ProductionOrderList: React.FC = () => {
                     <td className="p-5 text-center">
                       <input type="checkbox" className="h-4 w-4 appearance-none rounded border border-slate-300 bg-white checked:bg-[#F59E0B] outline-none" />
                     </td>
-                    <td className="px-4 py-4 text-[13px] font-mono font-bold text-slate-800 text-center whitespace-nowrap min-w-30">{order.productionOrderId}</td>
+                    <td className="px-4 py-4 text-[13px] font-mono font-bold text-slate-800 text-center">{order.productionOrderId}</td>
                     <td className="px-4 py-4 text-[13px] text-slate-700 text-center">{order.productName}</td>
                     <td className="px-4 py-4 text-[13px] text-slate-700 text-center font-bold">{order.quantity.toLocaleString()}</td>
                     <td className="px-4 py-4 text-[13px] text-slate-700 text-center">{formatDate(order.deadline)}</td>
@@ -216,8 +314,8 @@ const ProductionOrderList: React.FC = () => {
                     <td className="px-4 py-4 text-center"><StatusBadge status={order.status} /></td>
                     <td className="px-4 py-4 text-center">
                       <div className="flex justify-center gap-2">
-                        <button onClick={() => { setSelectedOrder(order); setShowDetailsModal(true); }} className="p-1.5 text-slate-400 hover:text-[#F59E0B]"><Eye size={16} /></button>
-                        <button className="p-1.5 text-slate-400 hover:text-blue-500"><Edit size={16} /></button>
+                        <button onClick={() => { setSelectedOrder(order); setShowDetailsModal(true); }} className="p-1.5 text-slate-400 hover:text-[#F59E0B] transition-colors"><Eye size={16} /></button>
+                        <button className="p-1.5 text-slate-400 hover:text-blue-500 transition-colors"><Edit size={16} /></button>
                       </div>
                     </td>
                   </tr>
@@ -226,32 +324,30 @@ const ProductionOrderList: React.FC = () => {
             </table>
           </div>
 
-          {/* Pagination - Exact Style From Provided Snippet */}
+          {/* Pagination Footer */}
           <footer className="p-6 bg-slate-50/50 border-t border-slate-100 flex flex-col md:flex-row justify-between items-center gap-6">
-            <div className="text-[11px] font-bold text-slate-800 uppercase">
+            <div className="text-[11px] font-bold text-slate-800 uppercase tracking-widest">
               Showing {(currentPage - 1) * itemsPerPage + 1} to {Math.min(currentPage * itemsPerPage, filteredOrders.length)} of {filteredOrders.length} Orders
             </div>
             <div className="flex items-center gap-2">
-              <button onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1} className="p-2.5 rounded-xl border bg-white text-slate-500 hover:text-amber-500 disabled:opacity-30"><ChevronLeft size={18} /></button>
+              <button onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1} className="outline-none p-2.5 rounded-xl border border-slate-200 bg-white text-slate-500 hover:text-amber-500 disabled:opacity-30"><ChevronLeft size={18} /></button>
               <div className="flex gap-1.5">
                 {getPageNumbers().map(n => (
-                  <button key={n} onClick={() => setCurrentPage(n)} className={`min-w-10 h-10 rounded-xl text-xs font-bold ${currentPage === n ? "bg-[#F59E0B] text-white shadow-lg" : "bg-white text-slate-500 border border-slate-200"}`}>{n}</button>
+                  <button key={n} onClick={() => setCurrentPage(n)} className={`outline-none min-w-10 h-10 rounded-xl text-xs font-bold transition-all ${currentPage === n ? "bg-[#F59E0B] text-white shadow-lg" : "bg-white text-slate-500 border border-slate-200"}`}>{n}</button>
                 ))}
               </div>
-              <button onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages} className="p-2.5 rounded-xl border bg-white text-slate-500 hover:text-amber-500 disabled:opacity-30"><ChevronRight size={18} /></button>
+              <button onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages} className="outline-none p-2.5 rounded-xl border border-slate-200 bg-white text-slate-500 hover:text-amber-500 disabled:opacity-30"><ChevronRight size={18} /></button>
             </div>
           </footer>
         </div>
       </div>
 
-      {/* Modal - Professional Theme + Rounded [2.5rem] + Outside Click */}
+      {/* Details Modal */}
       {showDetailsModal && selectedOrder && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-in fade-in">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div ref={modalContentRef} className="bg-white rounded-[2.5rem] max-w-2xl w-full shadow-2xl overflow-hidden animate-in zoom-in-95">
             <div className="p-8 border-b flex justify-between items-center bg-slate-50/50">
-              <div>
-                <h2 className="text-2xl font-black text-slate-800">Production Order</h2>
-              </div>
+              <h2 className="text-2xl font-black text-slate-800 uppercase tracking-tight italic">Production details</h2>
               <button onClick={() => setShowDetailsModal(false)} className="text-slate-400 hover:text-slate-600 text-2xl">×</button>
             </div>
             <div className="p-10 grid grid-cols-1 md:grid-cols-2 gap-10">
@@ -261,9 +357,8 @@ const ProductionOrderList: React.FC = () => {
               <ModalDetail label="Originating SO" value={selectedOrder.salesOrderId} />
             </div>
             <div className="p-8 border-t bg-slate-50/50 flex justify-between items-center">
-              <div className="flex gap-4"> Status: <StatusBadge status={selectedOrder.status} /></div>
-              <div className="flex gap-4">Priority: <PriorityBadge priority={selectedOrder.priority} /></div>
-              <button onClick={() => setShowDetailsModal(false)} className="px-4 py-2 bg-[#F59E0B] hover:bg-[#f67317] text-white rounded-xl font-black text-[11px] uppercase tracking-widest shadow-xl">Close Details</button>
+              <div className="flex gap-4 items-center">Status: <StatusBadge status={selectedOrder.status} /></div>
+              <button onClick={() => setShowDetailsModal(false)} className="px-6 py-3 bg-[#F59E0B] hover:bg-[#f67317] text-white rounded-xl font-black text-[11px] uppercase tracking-widest shadow-xl transition-all">Close Details</button>
             </div>
           </div>
         </div>
@@ -274,16 +369,16 @@ const ProductionOrderList: React.FC = () => {
 
 // ==================== Sub-Components ====================
 const StatCard = ({ label, value, color }: { label: string; value: number; color: string }) => (
-  <div className={`bg-white p-6 rounded-2xl border-l-4 ${color} shadow-sm`}>
+  <div className={`bg-white p-6 rounded-2xl border-l-4 ${color} shadow-sm transition-transform`}>
     <p className="text-[11px] font-bold text-gray-800 uppercase tracking-widest">{label}</p>
-    <p className="text-2xl font-bold text-gray-700">{value}</p>
+    <p className="text-2xl font-black text-slate-700 tracking-tight">{value}</p>
   </div>
 );
 
 const ModalDetail = ({ label, value }: { label: string; value: string }) => (
   <div>
     <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1 block">{label}</label>
-    <p className="text-lg font-bold text-slate-800 leading-tight">{value}</p>
+    <p className="text-lg font-bold text-slate-800 tracking-tight leading-tight">{value}</p>
   </div>
 );
 

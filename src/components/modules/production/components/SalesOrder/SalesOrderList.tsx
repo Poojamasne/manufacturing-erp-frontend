@@ -273,7 +273,7 @@ const SalesOrderList: React.FC = () => {
               </div>
             )}
             {isCalendarOpen && (
-              <div className="absolute right-0 mt-3 bg-white p-6 rounded-2xl shadow-2xl z-50 w-72">
+              <div className="absolute right-0 mt-3 bg-white p-6 rounded-2xl shadow-2xl z-50 w-72 border">
                 <div className="space-y-3">
                   <input
                     type="date"
