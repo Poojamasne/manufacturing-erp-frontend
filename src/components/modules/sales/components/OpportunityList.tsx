@@ -100,7 +100,7 @@ const OpportunityList: React.FC = () => {
     status: "",
     priority: ""
   });
-
+ 
   const statusOptions = ["All", ...OPPORTUNITY_STATUSES];
 
   const fetchLeads = async () => {
