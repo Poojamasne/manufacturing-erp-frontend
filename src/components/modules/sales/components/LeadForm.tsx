@@ -128,6 +128,15 @@ const LeadForm: React.FC = () => {
   }, [productRows]);
 
   // --- Validation Logic ---
+
+  const validateNameInput = (value: string) => {
+  return value.replace(/[^a-zA-Z\s]/g, '');
+  }
+
+  const validateNumberInput = (value: string) => {
+  return value.replace(/\D/g, '');
+};
+
   const validate = (): boolean => {
     const newErrors: FormErrors = {};
 
@@ -141,11 +150,18 @@ const LeadForm: React.FC = () => {
       }
     }
 
-    if (!formData.company_name.trim())
-      newErrors.company_name = "Company name is required";
-    if (!formData.contact_person.trim())
-      newErrors.contact_person = "Contact person is required";
-    if (!/^\d{10}$/.test(formData.phone))
+if (!formData.company_name.trim()) {
+  newErrors.company_name = "Company name is required";
+} else if (!/^[a-zA-Z\s]+$/.test(formData.company_name)) {
+  newErrors.company_name = "Company name should contain only letters and spaces";
+}
+    
+if (!formData.contact_person.trim()) {
+  newErrors.contact_person = "Contact person is required";
+} else if (!/^[a-zA-Z\s]+$/.test(formData.contact_person)) {
+  newErrors.contact_person = "Contact person name should contain only letters and spaces";
+} 
+   if (!/^\d{10}$/.test(formData.phone))
       newErrors.phone = "Enter a valid 10-digit number";
 
     if (formData.email) {
@@ -194,23 +210,38 @@ const LeadForm: React.FC = () => {
   };
 
   // --- Handlers ---
-  const handleInputChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >,
-  ) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]:
-        name === "assigned_to" ? (value === "" ? "" : Number(value)) : value,
-    }));
-    if (errors[name]) {
-      const updatedErrors = { ...errors };
-      delete updatedErrors[name];
-      setErrors(updatedErrors);
-    }
-  };
+const handleInputChange = (
+  e: React.ChangeEvent<
+    HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+  >,
+) => {
+  const { name, value } = e.target;
+  
+  let sanitizedValue = value;
+  
+  // Apply validation based on field name
+  if (name === "company_name" || name === "contact_person") {
+    sanitizedValue = validateNameInput(value);
+  }
+  
+  if (name === "phone") {
+    sanitizedValue = validateNumberInput(value);
+    // Limit to 10 digits
+    if (sanitizedValue.length > 10) sanitizedValue = sanitizedValue.slice(0, 10);
+  }
+  
+  setFormData((prev) => ({
+    ...prev,
+    [name]:
+      name === "assigned_to" ? (sanitizedValue === "" ? "" : Number(sanitizedValue)) : sanitizedValue,
+  }));
+  
+  if (errors[name]) {
+    const updatedErrors = { ...errors };
+    delete updatedErrors[name];
+    setErrors(updatedErrors);
+  }
+};
 
   const handleProductSelect = (id: number, pId: string) => {
     setProductRows((prev) =>
@@ -761,11 +792,16 @@ const FormSelect: React.FC<SelectFieldProps> = ({
         } rounded-xl px-4 py-3 text-sm appearance-none outline-none focus:border-[#F59E0B] focus:ring-4 focus:ring-orange-500/5 transition-all font-medium text-slate-800 cursor-pointer group-hover:border-slate-300`}
       >
         <option value="" className="text-slate-400">Select option</option>
-        {options.map((o) => (
-          <option key={o.v} value={o.v} className="text-slate-800">
-            {o.l}
-          </option>
-        ))}
+{options.map((o) => (
+  <option
+    key={o.v}
+    value={o.v}
+    title={o.l}  
+    className="text-slate-800"
+  >
+    {o.l}
+  </option>
+))}
       </select>
       <ChevronDown
         size={14}

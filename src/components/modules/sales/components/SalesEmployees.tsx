@@ -403,6 +403,7 @@ const SalesEmployees: React.FC = () => {
                     </td>
                     <td className="px-4 py-4">
                       <div className="flex justify-center gap-2">
+                        <div className="relative group/tooltip">
                         <button
                           onClick={() =>
                             navigate(
@@ -413,6 +414,12 @@ const SalesEmployees: React.FC = () => {
                         >
                           <Eye size={16} />
                         </button>
+                        <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-[10px] font-semibold px-2 py-0.5 rounded opacity-0 group-hover/tooltip:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-20">     
+                                                    View
+                                                </span>
+
+                        </div>
+                        <div className="relative group/tooltip">
                         <button
                           onClick={() =>
                             navigate(
@@ -423,12 +430,25 @@ const SalesEmployees: React.FC = () => {
                         >
                           <FileEdit size={16} />
                         </button>
-                        {/* <button
-                          onClick={() => handleDelete(emp?.id)}
+
+                        <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-[10px] font-semibold px-2 py-0.5 rounded opacity-0 group-hover/tooltip:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-20">     
+                                                    Edit
+                                                </span>
+
+                        </div>
+                        <div className="relative group/tooltip">
+                        <button
+                disabled={selectedIds.length === 0}
+                onClick={handleBulkDelete}
                           className="outline-none p-2 hover:bg-white text-slate-500 hover:text-rose-600 rounded-xl transition-all"
                         >
                           <Trash2 size={16} />
-                        </button> */}
+                        </button>
+                                                <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-[10px] font-semibold px-2 py-0.5 rounded opacity-0 group-hover/tooltip:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-20">     
+                                                    Delete
+                                                </span>
+
+                        </div>
                       </div>
                     </td>
                   </tr>
