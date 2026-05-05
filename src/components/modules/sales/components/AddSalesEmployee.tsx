@@ -157,15 +157,26 @@ const AddSalesEmployee: React.FC = () => {
                                 onChange={(val) => setFormData({ ...formData, phone: val })}
                                 required
                             />
-                            <FormInput
+                            {/* <FormInput
                                 label="Designation"
                                 icon={<Briefcase size={14} />}
                                 placeholder="Sales Executive"
                                 value={formData.designation}
                                 onChange={(val) => setFormData({ ...formData, designation: val })}
                                 required
-                            />
+                            /> */}
                             <FormSelect
+                                label="Designation"
+                                icon={<Briefcase size={14} />}
+                                options={[
+                                    { label: "Sales Executive", value: "Sales Executive" },
+                                    { label: "Sales Manager", value: "Sales Manager" }
+                                ]}
+                                value={formData.designation}
+                                //eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                onChange={(val) => setFormData({ ...formData, designation: val as any })}
+                            />
+                             <FormSelect
                                 label="System Role"
                                 icon={<ShieldCheck size={14} />}
                                 options={[

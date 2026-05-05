@@ -60,6 +60,8 @@ const ProductionList: React.FC = () => {
   const dispatch = useAppDispatch();
   const calendarRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const StatusDropdownRef = useRef<HTMLDivElement>(null);
+  const StageDropdownRef = useRef<HTMLDivElement>(null);
 
   const { productions, pagination } = useAppSelector(
     (state: RootState) => state.SalesProduction,
@@ -161,6 +163,18 @@ const ProductionList: React.FC = () => {
         !calendarRef.current.contains(event.target as Node)
       ) {
         setIsCalendarOpen(false);
+      }
+
+      if (StatusDropdownRef.current &&
+        !StatusDropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsStatusOpen(false);
+      }
+
+      if (StageDropdownRef.current &&
+        !StageDropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsStageOpen(false);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
@@ -443,7 +457,7 @@ const ProductionList: React.FC = () => {
 
             <div className="flex flex-wrap items-center justify-center lg:justify-end gap-3 w-full">
               {/* Status Filter */}
-              <div className="relative min-w-35">
+              <div className="relative min-w-35" ref={StatusDropdownRef}>
                 <button
                   onClick={() => setIsStatusOpen(!isStatusOpen)}
                   className={`outline-none w-full flex items-center justify-between gap-2 px-4 py-3 rounded-xl border text-[13px] font-bold transition-all ${statusFilter !== "All" ? "bg-[#f3f4e6] border-amber-400 text-[#F59E0B]" : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"}`}
@@ -476,7 +490,7 @@ const ProductionList: React.FC = () => {
               </div>
 
               {/* Stage Filter */}
-              <div className="relative min-w-35">
+              <div className="relative min-w-35" ref={StageDropdownRef}>
                 <button
                   onClick={() => setIsStageOpen(!isStageOpen)}
                   className={`outline-none w-full flex items-center justify-between gap-2 px-4 py-3 rounded-xl border text-[13px] font-bold transition-all ${stageFilter !== "All" ? "bg-[#f3f4e6] border-amber-400 text-[#F59E0B]" : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"}`}
@@ -511,8 +525,10 @@ const ProductionList: React.FC = () => {
               <button
                 onClick={handleBulkDelete}
                 disabled={selectedIds.length === 0}
-                className="p-3 bg-rose-50 text-rose-500 rounded-xl hover:bg-rose-100 disabled:opacity-20 transition-colors"
-              >
+                className={`p-3 rounded-xl transition-all ${selectedIds.length === 0
+                  ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                  : "bg-rose-600 text-white hover:bg-rose-700 shadow-sm"
+                  }`}  >
                 <Trash2 size={20} />
               </button>
             </div>
