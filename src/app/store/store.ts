@@ -1,0 +1,30 @@
+﻿import { configureStore } from "@reduxjs/toolkit";
+import authReducer from "../../features/sales/ModuleStateFiles/AuthSlice";
+import salesEmployeeReducer from "../../features/sales/ModuleStateFiles/EmployeeSlice";
+import salesLeadReducer from "../../features/sales/ModuleStateFiles/LeadSlice";
+import dashboardReducer from "../../features/sales/ModuleStateFiles/DashboardSlice";
+import salesProductReducer from "../../features/sales/ModuleStateFiles/ProductSlice";
+import opportunitiesReducer from "../../features/sales/ModuleStateFiles/OpportunitySlice";
+import quotationReducer from "../../features/sales/ModuleStateFiles/QuotationSlice";
+import orderReducer from "../../features/sales/ModuleStateFiles/OrderSlice";
+import productionReducer from "../../features/sales/ModuleStateFiles/ProductionSlice";
+import reportReducer from "../../features/sales/ModuleStateFiles/ReportSlice";
+
+const store = configureStore({
+  reducer: {
+    auth: authReducer,
+    SalesEmployee: salesEmployeeReducer,
+    SalesLeads: salesLeadReducer,
+    SalesDashboard: dashboardReducer,
+    SalesProduct: salesProductReducer,
+    SalesOpportunity: opportunitiesReducer,
+    SalesQuotation: quotationReducer,
+    SalesOrder: orderReducer,
+    SalesProduction: productionReducer,
+    SalesReport: reportReducer,
+  },
+});
+
+export default store;
+export type RootState = ReturnType<typeof store.getState>;
+export type AppDispatch = typeof store.dispatch;
