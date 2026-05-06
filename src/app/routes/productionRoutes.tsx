@@ -1,6 +1,5 @@
 import { lazy } from "react";
 import type { RouteObject } from "react-router-dom";
-import { Navigate } from "react-router-dom";
 
 import ProductionProtectedRoute from "../../features/auth/ProductionProtectedRoute";
 import ProductionMainLayout from "../../features/production/layout/MainLayout";
@@ -36,7 +35,7 @@ export const productionRoutes: RouteObject[] = [
       {
         element: <ProductionMainLayout />,
         children: [
-          { index: true, element: <Navigate to="/production/dashboard" replace /> },
+          { index: true, element: <ProductionDashboard /> },
           { path: "dashboard", element: withSuspense(<ProductionDashboard />) },
           { path: "sales-orders", element: withSuspense(<SalesOrderList />) },
           { path: "planning", element: withSuspense(<ProductionPlanningScreen />) },

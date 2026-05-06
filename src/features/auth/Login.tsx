@@ -85,6 +85,18 @@ const Login: React.FC = () => {
       navigate("/production/dashboard");
       return;
     }
+    if (
+      email &&
+      email.trim() === "inventory@erp.com" &&
+      password &&
+      password.trim() === "inventory123"
+    ) {
+      localStorage.setItem("token", "test-token-inventory-manager");
+      localStorage.setItem("designation", "Inventory Manager");
+      localStorage.setItem("userName", "Inventory Manager");
+      navigate("/inventory/dashboard");
+      return;
+    }
 
     if (email === "operator@production.com" && password === "operator123") {
       localStorage.setItem("token", "test-token-production-operator");

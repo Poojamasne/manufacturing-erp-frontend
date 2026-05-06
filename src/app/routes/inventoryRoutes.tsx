@@ -1,5 +1,4 @@
 import type { RouteObject } from "react-router-dom";
-import { Navigate } from "react-router-dom";
 import { lazy } from "react";
 
 import ProtectedRoute from "../../features/auth/ProtectedRoute";
@@ -13,12 +12,12 @@ const InventoryDashboard = lazy(
 export const inventoryRoutes: RouteObject[] = [
   {
     path: "/inventory",
-    element: <ProtectedRoute requiredRole={["Inventory Manager"]} />,
+    element: <ProtectedRoute requiredRole={["Inventory Manager","Admin"]} />,
     children: [
       {
         element: <InventoryLayout />,
         children: [
-          { index: true, element: <Navigate to="/inventory/dashboard" replace /> },
+          { index: true, element: <InventoryDashboard /> },
           { path: "dashboard", element: withSuspense(<InventoryDashboard />) },
         ],
       },
