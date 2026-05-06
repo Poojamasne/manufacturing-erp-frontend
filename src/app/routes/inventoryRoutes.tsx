@@ -6,6 +6,8 @@ import InventoryLayout from "../../features/inventory/layout/InventoryLayout";
 import { withSuspense } from "./routeUtils";
 import MaterialReceiptList from "../../features/inventory/components/MaterialReceipt/MaterialReceiptList";
 import NewMaterialReceipt from "../../features/inventory/components/MaterialReceipt/NewMaterialReceipt";
+import ViewMaterialReceiptEntry from "../../features/inventory/components/MaterialReceipt/ViewMaterialReceiptEntry";
+import EditReceiptEntry from "../../features/inventory/components/MaterialReceipt/EditMaterialReceipt";
 
 const InventoryDashboard = lazy(
   () => import("../../features/inventory/pages/InventoryDashboard")
@@ -23,6 +25,8 @@ export const inventoryRoutes: RouteObject[] = [
           { path: "dashboard", element: withSuspense(<InventoryDashboard />) },
           { path: "material-receipts", element: withSuspense(<MaterialReceiptList />) },
           { path: "material-receipts/new-material-receipt", element: withSuspense(<NewMaterialReceipt />) },
+          { path: "material-receipts/view/:id", element: withSuspense(<ViewMaterialReceiptEntry />) },
+          { path: "material-receipts/edit/:id", element: withSuspense(<EditReceiptEntry />) },
         ],
       },
     ],
