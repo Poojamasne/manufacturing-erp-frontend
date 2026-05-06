@@ -37,7 +37,6 @@ import ViewSalesEmployee from "./components/modules/sales/components/ViewSalesEm
 import EditSalesEmployee from "./components/modules/sales/components/EditSalesEmployee";
 
 // Production Imports
-import ProductionProtectedRoute from "./components/auth/ProductionProtectedRoute";
 import ProductionDashboard from './components/modules/production/Dashboard';
 import ProductionPlanningScreen from './components/modules/production/components/ProductionPlanning/ProductionPlanningScreen';
 import ProductionOrderList from './components/modules/production/components/ProductionOrder/ProductionOrderList';
@@ -83,7 +82,7 @@ function App() {
     // Sales Module
     {
       path: "/sales",
-      element: <ProtectedRoute requiredRole="Sales Manager" />,
+      element: <ProtectedRoute requiredRole={["Sales Manager","Admin"]} />,
       children: [
         {
           element: <SalesMainLayout />,
@@ -184,7 +183,7 @@ function App() {
     // Production Module - Full Working Routes
     {
       path: "/production",
-      element: <ProductionProtectedRoute requiredRoles={["Production Planner", "Shop Floor Operator"]} />,
+      element: <ProtectedRoute requiredRole={["Production Planner", "Shop Floor Operator", "Admin"]} />,
       children: [
         {
           element: <ProductionMainLayout />,

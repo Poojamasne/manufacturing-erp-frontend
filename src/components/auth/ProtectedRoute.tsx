@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 
 interface ProtectedRouteProps {
-  requiredRole: string;
+  requiredRole: string[];
 }
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ requiredRole }) => {
@@ -14,7 +14,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ requiredRole }) => {
     const token = localStorage.getItem("token");
     const role = localStorage.getItem("designation");
 
-    setIsAllowed(!!token && role === requiredRole);
+    setIsAllowed(!!token && requiredRole.includes(role as string));
   }, [location, requiredRole]);
   console.log("Access check result:", isAllowed);
   if (isAllowed === null)
