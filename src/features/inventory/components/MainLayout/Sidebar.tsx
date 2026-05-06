@@ -20,8 +20,8 @@ const Sidebar: React.FC = () => {
 
       {/* FIXED HEADER */}
       <div className="shrink-0 p-6 py-[21.5px] flex items-center gap-3 border-b border-[#F59E0B30] bg-white z-10">
-        <Link to="/production/dashboard" className="bg-[#F59E0B] p-2 rounded-xl text-white shadow-md">
-          <img src="/icons/Production_Icons/panel-icon.svg" className="h-5 w-5 brightness-0 invert" alt="Logo" />
+        <Link to="/inventory/dashboard" className="bg-[#F59E0B] p-2 rounded-xl text-white shadow-md">
+          <img src="/icons/Production_Icons/Product.svg" className="h-5 w-5 brightness-0 invert" alt="Logo" />
         </Link>
         <span className="font-bold text-xl text-gray-800 tracking-tight">Inventory</span>
       </div>
