@@ -4,6 +4,8 @@ import { lazy } from "react";
 import ProtectedRoute from "../../features/auth/ProtectedRoute";
 import InventoryLayout from "../../features/inventory/layout/InventoryLayout";
 import { withSuspense } from "./routeUtils";
+import MaterialReceiptList from "../../features/inventory/components/MaterialReceipt/MaterialReceiptList";
+import NewMaterialReceipt from "../../features/inventory/components/MaterialReceipt/NewMaterialReceipt";
 
 const InventoryDashboard = lazy(
   () => import("../../features/inventory/pages/InventoryDashboard")
@@ -19,6 +21,8 @@ export const inventoryRoutes: RouteObject[] = [
         children: [
           { index: true, element: <InventoryDashboard /> },
           { path: "dashboard", element: withSuspense(<InventoryDashboard />) },
+          { path: "material-receipts", element: withSuspense(<MaterialReceiptList />) },
+          { path: "material-receipts/new-material-receipt", element: withSuspense(<NewMaterialReceipt />) },
         ],
       },
     ],

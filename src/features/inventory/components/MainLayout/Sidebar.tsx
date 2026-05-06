@@ -50,6 +50,24 @@ const Sidebar: React.FC = () => {
             alt=""
           />
           <span className={`${isActive("/inventory/dashboard") ? "font-bold" : "font-semibold"} text-sm`}>Dashboard</span>
+        </button> 
+        {/* inventory Dashboard */}
+        <button
+          onClick={() => {
+            navigate("/inventory/material-receipts")
+            document.title = "Manufacturing ERP - Production Dashboard";
+          }}
+          className={`outline-none w-full flex items-center gap-3 px-4 py-3 cursor-pointer rounded-xl transition-all duration-200 ${isActive("/inventory/material-receipts")
+            ? "bg-[#F59E0B] text-white shadow-md"
+            : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
+            }`}
+        >
+          <img
+            src="/icons/dashboard-monitor.svg"
+            className={`h-5 w-5 ${isActive("/inventory/material-receipts") ? "" : "invert opacity-60"}`}
+            alt=""
+          />
+          <span className={`${isActive("/inventory/material-receipts") ? "font-bold" : "font-semibold"} text-sm`}>Material Receipts</span>
         </button>
       </nav>
 
