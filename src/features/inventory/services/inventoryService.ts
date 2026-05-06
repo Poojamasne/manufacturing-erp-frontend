@@ -101,7 +101,6 @@ export const inventoryService = {
   getAllMaterials: () => materialRepository.list(),
   getMaterialById: (id: string) => materialRepository.getById(id),
   createMaterial: (material: Omit<Material, 'id' | 'createdAt' | 'updatedAt'>) => {
-    const now = new Date().toISOString();
     return materialRepository.create({
       ...material,
       id: crypto.randomUUID(),

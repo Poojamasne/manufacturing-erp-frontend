@@ -10,7 +10,7 @@ import {
   Loader 
 } from "lucide-react";
 
-export const InventoryDashboard: React.FC = () => {
+const InventoryDashboard: React.FC = () => {
   const { 
     summary, 
     lowStockMaterials, 
@@ -239,3 +239,4 @@ export const InventoryDashboard: React.FC = () => {
     </div>
   );
 };
+export default InventoryDashboard;
