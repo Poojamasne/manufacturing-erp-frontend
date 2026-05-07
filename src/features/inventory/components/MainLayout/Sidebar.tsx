@@ -99,7 +99,7 @@ const Sidebar: React.FC = () => {
             }`}
         >
           <img
-            src="/icons/Production_Icons/Order.svg"
+            src="/icons/Issue.svg"
             className={`h-5 w-5 ${isActive("/inventory/issue-execution") ? "" : "invert opacity-60"}`}
             alt="Issue Execution"
           />
