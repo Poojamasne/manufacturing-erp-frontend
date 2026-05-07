@@ -6,6 +6,8 @@ import InventoryLayout from "../../features/inventory/layout/InventoryLayout";
 import { withSuspense } from "./routeUtils";
 import MaterialReceiptList from "../../features/inventory/components/MaterialReceipt/MaterialReceiptList";
 import NewMaterialReceipt from "../../features/inventory/components/MaterialReceipt/NewMaterialReceipt";
+import WarehouseManagement from "../../features/inventory/pages/wareHouseManagment";
+import MaterialIssueExecution from "../../features/inventory/pages/MaterialIssueExecution";
 
 const InventoryDashboard = lazy(
   () => import("../../features/inventory/pages/InventoryDashboard")
@@ -14,7 +16,7 @@ const InventoryDashboard = lazy(
 export const inventoryRoutes: RouteObject[] = [
   {
     path: "/inventory",
-    element: <ProtectedRoute requiredRole={["Inventory Manager","Admin"]} />,
+    element: <ProtectedRoute requiredRole={["Inventory Manager", "Admin"]} />,
     children: [
       {
         element: <InventoryLayout />,
@@ -23,6 +25,8 @@ export const inventoryRoutes: RouteObject[] = [
           { path: "dashboard", element: withSuspense(<InventoryDashboard />) },
           { path: "material-receipts", element: withSuspense(<MaterialReceiptList />) },
           { path: "material-receipts/new-material-receipt", element: withSuspense(<NewMaterialReceipt />) },
+          { path: "wareHouse", element: withSuspense(<WarehouseManagement />) },
+          {path: "issue-execution",element: withSuspense(<MaterialIssueExecution/>)}
         ],
       },
     ],
