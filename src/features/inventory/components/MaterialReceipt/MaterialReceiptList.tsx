@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import {
     Package, Search, Filter,
     Plus, ChevronLeft, ChevronRight as ChevronRightIcon,
-    Trash2, Eye, MapPin,
+    Trash2, Eye,
     Edit,
 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
@@ -62,7 +62,14 @@ const MaterialReceiptList = () => {
         dispatch(getReceiptEntry(id));
         navigate(`/inventory/material-receipts/view/${id}`);
     };
-
+    const formatDate = (date: string) => {
+        if (!date) return "";
+        const d = new Date(date);
+        const month = String(d.getMonth() + 1).padStart(2, "0");
+        const day = String(d.getDate()).padStart(2, "0");
+        const year = d.getFullYear();
+        return `${day}-${month}-${year}`;
+    };
     return (
         <div className="min-h-screen bg-[#f4f7f6] p-4 sm:p-6 lg:p-8 text-slate-900 font-sans">
             <div className="max-w-7xl mx-auto">
@@ -129,11 +136,10 @@ const MaterialReceiptList = () => {
                             <thead>
                                 <tr className="bg-slate-50/50">
                                     <th className="px-4 py-4 text-[13px] text-slate-800 uppercase tracking-widest border-b border-slate-100 text-center">ID</th>
-                                    <th className="px-4 py-4 text-[13px] text-slate-800 uppercase tracking-widest border-b border-slate-100 text-center">Created</th>
+                                    <th className="px-4 py-4 text-[13px] text-slate-800 uppercase tracking-widest border-b border-slate-100 text-center">Received Date</th>
                                     <th className="px-4 py-4 text-[13px] text-slate-800 uppercase tracking-widest border-b border-slate-100 text-center">Material Details</th>
                                     <th className="px-4 py-4 text-[13px] text-slate-800 uppercase tracking-widest border-b border-slate-100 text-center">Batch / Supplier</th>
                                     <th className="px-4 py-4 text-[13px] text-slate-800 uppercase tracking-widest border-b border-slate-100 text-center">Units</th>
-                                    <th className="px-4 py-4 text-[13px] text-slate-800 uppercase tracking-widest border-b border-slate-100 text-center">Location</th>
                                     <th className="px-4 py-4 text-[13px] text-slate-800 uppercase tracking-widest border-b border-slate-100 text-center">Actions</th>
                                 </tr>
                             </thead>
@@ -149,18 +155,18 @@ const MaterialReceiptList = () => {
                                                 {item.receipt_id}
                                             </td>
                                             <td className="px-4 py-4 text-[13px] text-slate-800 whitespace-nowrap text-center font-medium">
-                                                {item.received_date}
+                                                {formatDate(item.received_date)}
                                             </td>
                                             <td className="px-4 py-4 text-center">
                                                 <div className="flex items-center justify-center gap-3">
-                                                   <Link to={`/inventory/material-receipts/view/${item.id}`} className="flex items-center gap-3">
-                                                    <div className="p-2 bg-slate-100 rounded-xl text-[#F59E0B] group-hover:bg-white transition shadow-sm">
-                                                        <Package size={16} />
-                                                    </div>
-                                                    <div className="text-left">
-                                                        <p className="font-extrabold text-slate-800 text-[13px] leading-tight">{item.material_name.slice(0, 12)}...</p>
-                                                        <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">{item.material_code}</p>
-                                                    </div>
+                                                    <Link to={`/inventory/material-receipts/view/${item.id}`} className="flex items-center gap-3">
+                                                        <div className="p-2 bg-slate-100 rounded-xl text-[#F59E0B] group-hover:bg-white transition shadow-sm">
+                                                            <Package size={16} />
+                                                        </div>
+                                                        <div className="text-left">
+                                                            <p className="font-extrabold text-slate-800 text-[13px] leading-tight">{item.material_name.slice(0, 12)}...</p>
+                                                            <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">{item.material_code}</p>
+                                                        </div>
                                                     </Link>
                                                 </div>
                                             </td>
@@ -173,12 +179,6 @@ const MaterialReceiptList = () => {
                                             <td className="px-4 py-4 text-center">
                                                 <p className="font-black text-slate-800 text-[13px]">{item.quantity_received.toLocaleString()}</p>
                                                 <p className="text-[10px] text-[#F59E0B] font-black uppercase tracking-tighter">{item.measure_unit}</p>
-                                            </td>
-                                            <td className="px-4 py-4 text-center">
-                                                <div className="flex items-center justify-center gap-1.5 text-slate-600 text-xs font-bold">
-                                                    <MapPin size={14} className="text-[#F59E0B]" />
-                                                    {item.warehouse_location}
-                                                </div>
                                             </td>
                                             <td className="px-2 py-2">
                                                 <div className="flex justify-center gap-1">

@@ -126,7 +126,7 @@ const ViewMaterialReceiptEntry: React.FC = () => {
                     <div className="space-y-6">
 
                         {/* Storage Allocation Card */}
-                        <div className="bg-slate-800 rounded-[2.5rem] p-8 text-white shadow-xl shadow-slate-200">
+                        {/* <div className="bg-slate-800 rounded-[2.5rem] p-8 text-white shadow-xl shadow-slate-200">
                             <div className="flex items-center gap-3 mb-8">
                                 <div className="p-2.5 bg-white/10 text-white rounded-xl">
                                     <MapPin size={20} />
@@ -152,7 +152,7 @@ const ViewMaterialReceiptEntry: React.FC = () => {
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </div> */}
 
                         {/* Audit Log Card */}
                         <div className="bg-white rounded-[2.5rem] p-8 border border-gray-100 shadow-sm">

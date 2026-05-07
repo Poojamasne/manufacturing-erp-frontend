@@ -31,10 +31,6 @@ const initialState = {
         quantity_received: 0,
         measure_unit: "",
         received_date: "",
-        warehouse_location: "",
-        rack_number: "",
-        received_by: "",
-        notes: "",
     } as ReceiptEntry | null,
 
     // Dummy Data for the List View
@@ -49,9 +45,7 @@ const initialState = {
             quantity_received: 5000,
             measure_unit: "kg",
             received_date: "2024-05-10",
-            warehouse_location: "Warehouse A",
-            rack_number: "Rack-04",
-            received_by: "Admin User",
+
         },
         {
             id: 2,
@@ -63,9 +57,6 @@ const initialState = {
             quantity_received: 200,
             measure_unit: "meters",
             received_date: "2024-05-12",
-            warehouse_location: "Warehouse B",
-            rack_number: "Rack-12",
-            received_by: "Admin User",
         },
     ] as ReceiptEntry[],
 
@@ -185,7 +176,6 @@ export const createReceiptEntry = (payload: any, navigate: NavigateFunction) => 
             ...payload,
             id: Date.now(),
             receipt_id: `REC-${Math.floor(1000 + Math.random() * 9000)}`,
-            received_by: "Admin User"
         };
 
         dispatch(createReceiptSuccess(newEntry));
@@ -225,7 +215,6 @@ export const editReceiptEntry = (id: string | number, payload: any, navigate: Na
         const updatedEntry: ReceiptEntry = {
             ...payload,
             id,
-            received_by: "Admin User",
         };
 
         dispatch(updateReceiptSuccess(updatedEntry));

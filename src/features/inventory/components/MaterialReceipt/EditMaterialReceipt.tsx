@@ -5,8 +5,6 @@ import {
     Package,
     Save,
     Truck,
-
-    MapPin,
     AlertCircle,
     ChevronDown
 } from "lucide-react";
@@ -38,9 +36,7 @@ const EditReceiptEntry: React.FC = () => {
         batch_number: "",
         supplier_name: "",
         received_date: "",
-        warehouse_location: "",
-        rack_number: "",
-        notes: ""
+        receipt_id: "",
     });
 
     const [errors, setErrors] = useState<{ [key: string]: string }>({});
@@ -63,9 +59,7 @@ const EditReceiptEntry: React.FC = () => {
                 batch_number: receipt.batch_number || "",
                 supplier_name: receipt.supplier_name || "",
                 received_date: receipt.received_date || "",
-                warehouse_location: receipt.warehouse_location || "",
-                rack_number: receipt.rack_number || "",
-                notes: receipt.notes || ""
+                receipt_id: receipt.receipt_id || ""
             });
         }
     }, [receipt]);
@@ -81,7 +75,6 @@ const EditReceiptEntry: React.FC = () => {
         if (!formData.material_name) newErrors.material_name = "Select material";
         if (!formData.quantity_received || formData.quantity_received <= 0) newErrors.quantity_received = "Enter valid qty";
         if (!formData.batch_number) newErrors.batch_number = "Batch # is required";
-        if (!formData.warehouse_location) newErrors.warehouse_location = "Select warehouse";
 
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
@@ -117,13 +110,13 @@ const EditReceiptEntry: React.FC = () => {
                     <div className="flex gap-3 w-full md:w-auto">
                         <button
                             onClick={() => navigate("/inventory/material-receipts")}
-                            className="flex-1 md:flex-none px-6 py-2.5 rounded-xl font-bold text-sm bg-white border border-slate-200 hover:bg-slate-50 transition-all text-slate-600"
+                            className="flex-1 md:flex-none px-4 py-2 rounded-xl font-bold text-sm bg-white border border-slate-200 hover:bg-slate-50 transition-all text-slate-600 hover:text-[#F59E0B]"
                         >
                             Cancel
                         </button>
                         <button
                             onClick={handleSave}
-                            className="flex-1 md:flex-none px-6 py-2.5 rounded-xl font-bold text-sm text-white bg-[#F59E0B] shadow-lg shadow-amber-500/10 hover:bg-[#f67317] transition-all flex items-center justify-center gap-2"
+                            className="flex-1 md:flex-none px-4 py-2 rounded-xl font-bold text-sm text-white bg-[#F59E0B] shadow-lg shadow-amber-500/10 hover:bg-[#f67317] transition-all flex items-center justify-center gap-2"
                         >
                             <Save size={18} /> Update Changes
                         </button>
@@ -142,6 +135,14 @@ const EditReceiptEntry: React.FC = () => {
                                 onChange={handleInputChange}
                                 required
                                 error={errors.material_name}
+                            />
+                            <FormInput
+                                label="Material Code"
+                                name="material_code"
+                                value={formData.material_code}
+                                onChange={handleInputChange}
+                                required
+                                error={errors.material_code}
                             />
                             <FormInput
                                 label="Quantity Received"
@@ -186,7 +187,7 @@ const EditReceiptEntry: React.FC = () => {
                                 onChange={handleInputChange}
                             />
                             <FormInput
-                                label="Receipt Date"
+                                label="Received Date"
                                 name="received_date"
                                 type="date"
                                 value={formData.received_date}
@@ -195,40 +196,6 @@ const EditReceiptEntry: React.FC = () => {
                         </div>
                     </div>
 
-                    {/* Section 3: Storage */}
-                    <div className="bg-white rounded-[2.5rem] p-6 sm:p-8 border border-gray-100 shadow-sm">
-                        <SectionTitle icon={<MapPin size={20} />} title="Warehouse Allocation" />
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-                            <FormSelect
-                                label="Location"
-                                name="warehouse_location"
-                                value={formData.warehouse_location}
-                                onChange={handleInputChange}
-                                options={[
-                                    { l: "Main Warehouse (WH-1)", v: "Warehouse A" },
-                                    { l: "Cold Storage (WH-2)", v: "Warehouse B" },
-                                ]}
-                            />
-                            <FormInput
-                                label="Rack / Shelf"
-                                name="rack_number"
-                                value={formData.rack_number}
-                                onChange={handleInputChange}
-                                placeholder="e.g. R-12"
-                            />
-                        </div>
-                        <div className="mt-6 flex flex-col gap-1.5">
-                            <label className="text-xs font-black text-slate-500 uppercase tracking-widest px-1">Internal Notes</label>
-                            <textarea
-                                name="notes"
-                                value={formData.notes}
-                                onChange={handleInputChange}
-                                rows={3}
-                                className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 text-sm focus:border-[#F59E0B] focus:ring-4 focus:ring-orange-500/5 outline-none transition-all resize-none font-medium text-slate-800"
-                                placeholder="Damage reports, quality checks, etc..."
-                            />
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>

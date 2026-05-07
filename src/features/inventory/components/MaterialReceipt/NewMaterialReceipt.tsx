@@ -1,9 +1,8 @@
 import React, { useState } from "react";
 import {
     Package, Layers, Truck,
-    MapPin, ChevronRight, Save,
+    ChevronRight, Save,
     ChevronDown,
-    NotebookPen
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch } from "../../../common/ReduxMainHooks";
@@ -21,9 +20,6 @@ const NewMaterialReceipt: React.FC = () => {
         supplier_name: "",
         batch_number: "",
         received_date: new Date().toISOString().split('T')[0],
-        warehouse_location: "WH-1",
-        rack_number: "",
-        notes: ""
     });
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -52,14 +48,14 @@ const NewMaterialReceipt: React.FC = () => {
                         <button
                             type="button"
                             onClick={() => navigate("/inventory/material-receipts")}
-                            className="flex-1 md:flex-none px-6 py-2.5 rounded-xl font-bold text-sm bg-white border border-slate-200 hover:bg-slate-50 transition-all text-slate-600"
+                            className="flex-1 md:flex-none px-4 py-2 rounded-xl font-bold text-sm bg-white border border-slate-200 hover:bg-slate-50 transition-all text-slate-600 hover:text-[#F59E0B]"
                         >
                             Cancel
                         </button>
                         <button
                             type="button"
                             onClick={handleSubmit}
-                            className="flex-1 md:flex-none px-6 py-2.5 rounded-xl font-bold text-sm text-white bg-[#F59E0B] shadow-lg shadow-amber-500/10 hover:bg-[#f67317] transition-all flex items-center justify-center gap-2"
+                            className="flex-1 md:flex-none px-4 py-2 rounded-xl font-bold text-sm text-white bg-[#F59E0B] shadow-lg shadow-amber-500/10 hover:bg-[#f67317] transition-all flex items-center justify-center gap-2"
                         >
                             <Save size={18} /> Complete Entry
                         </button>
@@ -136,7 +132,6 @@ const NewMaterialReceipt: React.FC = () => {
                                 </div>
                             </div>
                             <div className="flex flex-col gap-1.5">
-
                                 <label className="text-xs font-black text-slate-500 uppercase tracking-widest px-1">Quantity Unit</label>
                                 <div className="relative group">
                                     <Layers className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
@@ -151,21 +146,7 @@ const NewMaterialReceipt: React.FC = () => {
                                     />
                                 </div>
                             </div>
-                            <div className="flex flex-col gap-1.5">
-                                <label className="text-xs font-black text-slate-500 uppercase tracking-widest px-1">Note</label>
-                                <div className="relative group">
-                                    <NotebookPen className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-                                    <input
-                                        type="text"
-                                        min={1}
-                                        required
-                                        placeholder="Enter note"
-                                        className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-12 pr-4 py-3.5 text-sm focus:border-[#F59E0B] focus:ring-4 focus:ring-orange-500/5 outline-none transition-all font-bold text-slate-800"
-                                        value={formData.notes}
-                                        onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                                    />
-                                </div>
-                            </div>
+
                         </div>
                     </div>
 
@@ -199,7 +180,7 @@ const NewMaterialReceipt: React.FC = () => {
                             </div>
 
                             <div className="flex flex-col gap-1.5">
-                                <label className="text-xs font-black text-slate-500 uppercase tracking-widest px-1">Receipt Date</label>
+                                <label className="text-xs font-black text-slate-500 uppercase tracking-widest px-1">Received Date</label>
                                 <input
                                     type="date"
                                     required
@@ -211,35 +192,6 @@ const NewMaterialReceipt: React.FC = () => {
                         </div>
                     </div>
 
-                    {/* Section 3: Storage */}
-                    <div className="bg-white rounded-[2.5rem] p-6 sm:p-8 border border-gray-100 shadow-sm">
-                        <SectionTitle icon={<MapPin size={20} />} title="Warehouse Allocation" />
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-                            <div className="flex flex-col gap-1.5">
-                                <label className="text-xs font-black text-slate-500 uppercase tracking-widest px-1">Location</label>
-                                <select
-                                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3.5 text-sm focus:border-[#F59E0B] focus:ring-4 focus:ring-orange-500/5 outline-none font-bold"
-                                    value={formData.warehouse_location}
-                                    onChange={(e) => setFormData({ ...formData, warehouse_location: e.target.value })}
-                                >
-                                    <option value="WH-1">Main Warehouse (WH-1)</option>
-                                    <option value="WH-2">Cold Storage (WH-2)</option>
-                                </select>
-                            </div>
-
-                            <div className="flex flex-col gap-1.5">
-                                <label className="text-xs font-black text-slate-500 uppercase tracking-widest px-1">Rack / Shelf</label>
-                                <input
-                                    type="text"
-                                    placeholder="e.g. R-12 / B-04"
-                                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3.5 text-sm focus:border-[#F59E0B] focus:ring-4 focus:ring-orange-500/5 outline-none font-bold"
-                                    value={formData.rack_number}
-                                    onChange={(e) => setFormData({ ...formData, rack_number: e.target.value })}
-                                />
-                            </div>
-                        </div>
-                    </div>
                 </form>
             </div>
         </div>
