@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
     ChevronRight, Package, Hash, Truck,
-    Calendar, MapPin, User, Info, FileText,
+    Calendar,  User, Info, FileText,
     Layers
 } from "lucide-react";
 
