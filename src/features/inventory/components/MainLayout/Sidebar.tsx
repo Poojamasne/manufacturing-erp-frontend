@@ -50,12 +50,12 @@ const Sidebar: React.FC = () => {
             alt=""
           />
           <span className={`${isActive("/inventory/dashboard") ? "font-bold" : "font-semibold"} text-sm`}>Dashboard</span>
-        </button>
+        </button> 
         {/* inventory Dashboard */}
         <button
           onClick={() => {
             navigate("/inventory/material-receipts")
-            document.title = "Manufacturing ERP - Production Dashboard";
+            document.title = "Manufacturing ERP - Material Receipts";
           }}
           className={`outline-none w-full flex items-center gap-3 px-4 py-3 cursor-pointer rounded-xl transition-all duration-200 ${isActive("/inventory/material-receipts")
             ? "bg-[#F59E0B] text-white shadow-md"
@@ -63,7 +63,7 @@ const Sidebar: React.FC = () => {
             }`}
         >
           <img
-            src="/icons/dashboard-monitor.svg"
+            src="/icons/Edit_Receipt.svg"
             className={`h-5 w-5 ${isActive("/inventory/material-receipts") ? "" : "invert opacity-60"}`}
             alt=""
           />
