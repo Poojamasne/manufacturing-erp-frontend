@@ -9,7 +9,9 @@ import NewMaterialReceipt from "../../features/inventory/components/MaterialRece
 import MaterialIssueExecution from "../../features/inventory/pages/MaterialIssueExecution";
 import ViewMaterialReceiptEntry from "../../features/inventory/components/MaterialReceipt/ViewMaterialReceiptEntry";
 import EditReceiptEntry from "../../features/inventory/components/MaterialReceipt/EditMaterialReceipt";
-import AddLocation from "../../features/inventory/components/warehousecomponents/AddLocation";
+import AllocateMaterialStorage from "../../features/inventory/pages/AllocateMaterialStorage";
+import ViewMaterialStorage from "../../features/inventory/pages/ViewMaterialStorage";
+import EditMaterialStorageAllocation from "../../features/inventory/pages/EditMaterialStorageAllocation";
 
 const InventoryDashboard = lazy(
   () => import("../../features/inventory/pages/InventoryDashboard")
@@ -31,11 +33,13 @@ export const inventoryRoutes: RouteObject[] = [
           { path: "dashboard", element: withSuspense(<InventoryDashboard />) },
           { path: "material-receipts", element: withSuspense(<MaterialReceiptList />) },
           { path: "material-receipts/new-material-receipt", element: withSuspense(<NewMaterialReceipt />) },
-          { path: "wareHouse", element: withSuspense(<WarehouseManagementLazy />) },
-          { path: "wareHouse/add", element: withSuspense(<AddLocation />) },
-          { path: "issue-execution", element: withSuspense(<MaterialIssueExecution />) },
           { path: "material-receipts/view/:id", element: withSuspense(<ViewMaterialReceiptEntry />) },
           { path: "material-receipts/edit/:id", element: withSuspense(<EditReceiptEntry />) },
+          { path: "warehouse", element: withSuspense(<WarehouseManagementLazy />) },
+          { path: "warehouse/add-material", element: withSuspense(<AllocateMaterialStorage />) },
+          { path: "warehouse/edit-material/:id", element: withSuspense(<EditMaterialStorageAllocation />) },
+          { path: "warehouse/view-storage/:id", element: withSuspense(<ViewMaterialStorage />) },
+          { path: "issue-execution", element: withSuspense(<MaterialIssueExecution />) },
         ],
       },
     ],

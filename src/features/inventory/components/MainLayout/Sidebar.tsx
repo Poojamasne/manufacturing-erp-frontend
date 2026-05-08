@@ -50,7 +50,7 @@ const Sidebar: React.FC = () => {
             alt=""
           />
           <span className={`${isActive("/inventory/dashboard") ? "font-bold" : "font-semibold"} text-sm`}>Dashboard</span>
-        </button> 
+        </button>
         {/* inventory Dashboard */}
         <button
           onClick={() => {
@@ -75,8 +75,8 @@ const Sidebar: React.FC = () => {
             document.title = "Manufacturing ERP - Warehouse Management";
           }}
           className={`outline-none w-full flex items-center gap-2 px-4 py-3 cursor-pointer rounded-xl transition-all duration-200 ${isActive("/inventory/warehouse")
-              ? "bg-[#F59E0B] text-white shadow-md"
-              : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
+            ? "bg-[#F59E0B] text-white shadow-md"
+            : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
             }`}
         >
           <img
@@ -94,8 +94,29 @@ const Sidebar: React.FC = () => {
             document.title = "Manufacturing ERP - Material Issue Execution";
           }}
           className={`outline-none w-full flex items-center gap-3 px-4 py-3 cursor-pointer rounded-xl transition-all duration-200 ${isActive("/inventory/issue-execution")
-              ? "bg-[#F59E0B] text-white shadow-md"
-              : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
+            ? "bg-[#F59E0B] text-white shadow-md"
+            : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
+            }`}
+        >
+          <img
+            src="/icons/inventoryIcons/Issue_Request.svg"
+            className={`h-5 w-5 ${isActive("/inventory/issue-execution") ? "" : "invert opacity-60"}`}
+            alt="Issue Execution"
+          />
+          <span className={`${isActive("/inventory/issue-execution") ? "font-bold" : "font-semibold"} text-sm`}>
+           Material Issue Request
+          </span>
+        </button>
+
+        {/* Material Issue Execution */}
+        <button
+          onClick={() => {
+            navigate("/inventory/issue-execution");
+            document.title = "Manufacturing ERP - Material Issue Execution";
+          }}
+          className={`outline-none w-full flex items-center gap-3 px-4 py-3 cursor-pointer rounded-xl transition-all duration-200 ${isActive("/inventory/issue-execution")
+            ? "bg-[#F59E0B] text-white shadow-md"
+            : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
             }`}
         >
           <img
@@ -104,10 +125,9 @@ const Sidebar: React.FC = () => {
             alt="Issue Execution"
           />
           <span className={`${isActive("/inventory/issue-execution") ? "font-bold" : "font-semibold"} text-sm`}>
-            Issue Execution
+            Issue Material
           </span>
         </button>
-
       </nav>
 
       {/* FIXED FOOTER */}

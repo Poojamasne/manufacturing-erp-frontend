@@ -9,7 +9,8 @@ import quotationReducer from "../../features/sales/ModuleStateFiles/QuotationSli
 import orderReducer from "../../features/sales/ModuleStateFiles/OrderSlice";
 import productionReducer from "../../features/sales/ModuleStateFiles/ProductionSlice";
 import reportReducer from "../../features/sales/ModuleStateFiles/ReportSlice";
-import inventoryReducer from "../../features/inventory/ModuleStateFiles/MaterialReceiptSlice";
+import inventoryMaterialReceiptReducer from "../../features/inventory/ModuleStateFiles/MaterialReceiptSlice";
+import inventoryWarehouseReducer from "../../features/inventory/ModuleStateFiles/WarehouseSlice";
 
 const store = configureStore({
   reducer: {
@@ -23,7 +24,8 @@ const store = configureStore({
     SalesOrder: orderReducer,
     SalesProduction: productionReducer,
     SalesReport: reportReducer,
-    inventoryMaterialReceipt: inventoryReducer,
+    inventoryMaterialReceipt: inventoryMaterialReceiptReducer,
+    inventoryWarehouse: inventoryWarehouseReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
