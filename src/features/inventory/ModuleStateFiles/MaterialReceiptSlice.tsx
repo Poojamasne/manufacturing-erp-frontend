@@ -95,8 +95,11 @@ const receiptSlice = createSlice({
             const found = state.receipts.find(
                 r => String(r.id) === String(action.payload)
             );
+            const foundReceiptID = state.receipts.find(
+                r => String(r.receipt_id) === String(action.payload)
+            );
 
-            state.receipt = found || null;
+            state.receipt = found || foundReceiptID || null;
 
             console.log("receipt found:", found);
         },

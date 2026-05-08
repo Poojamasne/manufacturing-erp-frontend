@@ -56,12 +56,12 @@ const ViewMaterialStorage: React.FC = () => {
                         >
                             <Printer size={18} /> Print Label
                         </button> */}
-                        {/* <button
-                            onClick={() => navigate("/inventory/warehouse")}
-                            className="flex-1 md:flex-none px-6 py-2.5 rounded-xl font-bold text-sm text-white bg-slate-800 shadow-lg hover:bg-slate-700 transition-all flex items-center justify-center gap-2"
+                        <button
+                            onClick={() => navigate("/inventory/warehouse/edit-material/" + allocation?.id)}
+                            className="flex-1 md:flex-none px-4 py-2 rounded-xl font-bold text-sm text-white bg-[#F59E0B] shadow-lg hover:bg-[#f67317] transition-all flex items-center justify-center gap-2"
                         >
-                            <ArrowLeft size={18} /> Back to Warehouse
-                        </button> */}
+                            Edit
+                        </button>
                     </div>
                 </header>
 
