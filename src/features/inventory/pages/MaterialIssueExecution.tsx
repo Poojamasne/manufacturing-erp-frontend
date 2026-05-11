@@ -12,10 +12,13 @@ import {
   ArrowRight,
   Edit,
 } from "lucide-react";
+import { useAppDispatch, useAppSelector } from "../../../app/store/hook";
+import type { RootState } from "../../../app/store/store";
+import { updateExecutionStatus } from "../ModuleStateFiles/MaterialIssueAndExecutionSlice";
 
 // ==================== Types ====================
 type TimeFilter = "Weekly" | "Monthly" | "Quarterly" | "Yearly" | "All Time" | "Custom";
-type IssueStatus = "APPROVED" | "ISSUED" | "DELIVERED" | "REJECTED";
+type executionstatus = "APPROVED" | "ISSUED" | "DELIVERED" | "REJECTED";
 
 interface MaterialIssue {
   id: string;
@@ -27,17 +30,9 @@ interface MaterialIssue {
   unit: string;
   warehouseLocation: string;
   batchNumber: string;
-  status: IssueStatus;
+  status: executionstatus;
   createdAt: string;
 }
-
-// ==================== Mock Data ====================
-const mockIssues: MaterialIssue[] = [
-  { id: "1", requestId: "REQ-9001", productionOrderId: "PO-7721", materialName: "Steel Sheet 2mm", materialCode: "MAT-001", quantity: 150, unit: "kg", warehouseLocation: "WH-A / R-10", batchNumber: "BT-9920", status: "APPROVED", createdAt: new Date().toISOString() },
-  { id: "2", requestId: "REQ-9005", productionOrderId: "PO-7725", materialName: "Aluminum Rod", materialCode: "MAT-088", quantity: 1200, unit: "m", warehouseLocation: "WH-B / R-04", batchNumber: "BT-8822", status: "ISSUED", createdAt: "2024-05-01T10:00:00Z" },
-  { id: "3", requestId: "REQ-9009", productionOrderId: "PO-7730", materialName: "Copper Wire", materialCode: "MAT-042", quantity: 500, unit: "m", warehouseLocation: "WH-A / R-12", batchNumber: "BT-7741", status: "DELIVERED", createdAt: "2024-01-15T10:00:00Z" },
-];
-
 // ==================== Helper Components ====================
 const formatDate = (date: string) => {
   if (!date) return "-";
@@ -51,9 +46,10 @@ const MaterialIssueExecution: React.FC = () => {
   const calendarRef = useRef<HTMLDivElement>(null);
   const statusRef = useRef<HTMLDivElement>(null);
   const modalRef = useRef<HTMLDivElement>(null);
+  const dispatch = useAppDispatch();
+  const { executions } = useAppSelector((state: RootState) => state.inventoryMaterialIssueAndExecution)
 
   // States
-  const [issues, setIssues] = useState<MaterialIssue[]>(mockIssues);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
   const [timeFilter, setTimeFilter] = useState<TimeFilter>("All Time");
@@ -93,20 +89,20 @@ const MaterialIssueExecution: React.FC = () => {
   };
 
   // Update Status Logic
-  const handleUpdateStatus = (newStatus: IssueStatus) => {
+  const handleUpdateStatus = (newStatus: executionstatus) => {
     if (!selectedIssue) return;
-    setIssues(prev => prev.map(item => item.id === selectedIssue.id ? { ...item, status: newStatus } : item));
+    dispatch(updateExecutionStatus(selectedIssue.id, newStatus));
     setModalType(null);
   };
 
   const filteredData = useMemo(() => {
-    return issues.filter(item => {
+    return executions.filter(item => {
       const matchesSearch = item.materialName.toLowerCase().includes(searchQuery.toLowerCase()) ||
         item.requestId.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesStatus = statusFilter === "All" || item.status === statusFilter;
       return matchesSearch && matchesStatus;
     }).sort((a, b) => Number(b.id) - Number(a.id));
-  }, [issues, searchQuery, statusFilter]);
+  }, [executions, searchQuery, statusFilter]);
 
   const paginatedData = filteredData.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
@@ -156,10 +152,10 @@ const MaterialIssueExecution: React.FC = () => {
 
         {/* SUMMARY CARDS */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          <StatCard label="Approved to Issue" value={issues.filter(i => i.status === "APPROVED").length} color="border-blue-500" />
-          <StatCard label="Dispatched / Issued" value={issues.filter(i => i.status === "ISSUED").length} color="border-amber-500" />
-          <StatCard label="Delivered Today" value={issues.filter(i => i.status === "DELIVERED").length} color="border-emerald-500" />
-          <StatCard label="Rejected" value={issues.filter(i => i.status === "REJECTED").length} color="border-rose-500" />
+          <StatCard label="Approved to Issue" value={executions.filter(i => i.status === "APPROVED").length} color="border-blue-500" />
+          <StatCard label="Dispatched / Issued" value={executions.filter(i => i.status === "ISSUED").length} color="border-amber-500" />
+          <StatCard label="Delivered Today" value={executions.filter(i => i.status === "DELIVERED").length} color="border-emerald-500" />
+          <StatCard label="Rejected" value={executions.filter(i => i.status === "REJECTED").length} color="border-rose-500" />
         </div>
 
         {/* TABLE CONTAINER */}
@@ -335,15 +331,15 @@ const MaterialIssueExecution: React.FC = () => {
                 <button
                   onClick={() => handleUpdateStatus("ISSUED")}
                   className={`w-full flex items-center justify-between p-3 border rounded-xl group transition-all ${selectedIssue.status === "ISSUED"
-                      ? "bg-blue-600 border-blue-700"
-                      : "bg-blue-50 border-blue-100 hover:bg-blue-600"
+                    ? "bg-blue-600 border-blue-700"
+                    : "bg-blue-50 border-blue-100 hover:bg-blue-600"
                     }`}
                 >
                   <div className="flex items-center gap-3">
                     <div
                       className={`p-2 rounded-lg transition shadow-sm ${selectedIssue.status === "ISSUED"
-                          ? "bg-white text-blue-600"
-                          : "bg-white text-blue-600 group-hover:scale-110"
+                        ? "bg-white text-blue-600"
+                        : "bg-white text-blue-600 group-hover:scale-110"
                         }`}
                     >
                       <Package size={18} />
@@ -351,8 +347,8 @@ const MaterialIssueExecution: React.FC = () => {
 
                     <span
                       className={`font-black text-[11px] uppercase tracking-widest ${selectedIssue.status === "ISSUED"
-                          ? "text-white"
-                          : "text-blue-900 group-hover:text-white"
+                        ? "text-white"
+                        : "text-blue-900 group-hover:text-white"
                         }`}
                     >
                       Mark as Issued
@@ -370,15 +366,15 @@ const MaterialIssueExecution: React.FC = () => {
                 <button
                   onClick={() => handleUpdateStatus("DELIVERED")}
                   className={`w-full flex items-center justify-between p-3 border rounded-xl group transition-all ${selectedIssue.status === "DELIVERED"
-                      ? "bg-emerald-600 border-emerald-700"
-                      : "bg-emerald-50 border-emerald-100 hover:bg-emerald-600"
+                    ? "bg-emerald-600 border-emerald-700"
+                    : "bg-emerald-50 border-emerald-100 hover:bg-emerald-600"
                     }`}
                 >
                   <div className="flex items-center gap-3">
                     <div
                       className={`p-2 rounded-lg transition shadow-sm ${selectedIssue.status === "DELIVERED"
-                          ? "bg-white text-emerald-600"
-                          : "bg-white text-emerald-600 group-hover:scale-110"
+                        ? "bg-white text-emerald-600"
+                        : "bg-white text-emerald-600 group-hover:scale-110"
                         }`}
                     >
                       <CheckCircle2 size={18} />
@@ -386,8 +382,8 @@ const MaterialIssueExecution: React.FC = () => {
 
                     <span
                       className={`font-black text-[11px] uppercase tracking-widest ${selectedIssue.status === "DELIVERED"
-                          ? "text-white"
-                          : "text-emerald-900 group-hover:text-white"
+                        ? "text-white"
+                        : "text-emerald-900 group-hover:text-white"
                         }`}
                     >
                       Confirm Delivery
@@ -405,15 +401,15 @@ const MaterialIssueExecution: React.FC = () => {
                 <button
                   onClick={() => handleUpdateStatus("REJECTED")}
                   className={`w-full flex items-center justify-between p-3 border rounded-xl group transition-all ${selectedIssue.status === "REJECTED"
-                      ? "bg-rose-600 border-rose-700"
-                      : "bg-rose-50 border-rose-100 hover:bg-rose-600"
+                    ? "bg-rose-600 border-rose-700"
+                    : "bg-rose-50 border-rose-100 hover:bg-rose-600"
                     }`}
                 >
                   <div className="flex items-center gap-3">
                     <div
                       className={`p-2 rounded-lg transition shadow-sm ${selectedIssue.status === "REJECTED"
-                          ? "bg-white text-rose-600"
-                          : "bg-white text-rose-400 group-hover:scale-110"
+                        ? "bg-white text-rose-600"
+                        : "bg-white text-rose-400 group-hover:scale-110"
                         }`}
                     >
                       <Package size={18} />
@@ -421,8 +417,8 @@ const MaterialIssueExecution: React.FC = () => {
 
                     <span
                       className={`font-black text-[11px] uppercase tracking-widest ${selectedIssue.status === "REJECTED"
-                          ? "text-white"
-                          : "text-rose-900 group-hover:text-white"
+                        ? "text-white"
+                        : "text-rose-900 group-hover:text-white"
                         }`}
                     >
                       Reject Issue

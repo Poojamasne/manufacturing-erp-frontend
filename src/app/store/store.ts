@@ -11,6 +11,7 @@ import productionReducer from "../../features/sales/ModuleStateFiles/ProductionS
 import reportReducer from "../../features/sales/ModuleStateFiles/ReportSlice";
 import inventoryMaterialReceiptReducer from "../../features/inventory/ModuleStateFiles/MaterialReceiptSlice";
 import inventoryWarehouseReducer from "../../features/inventory/ModuleStateFiles/WarehouseSlice";
+import inventoryMaterialIssueAndExecutionReducer from "../../features/inventory/ModuleStateFiles/MaterialIssueAndExecutionSlice";
 
 const store = configureStore({
   reducer: {
@@ -26,6 +27,8 @@ const store = configureStore({
     SalesReport: reportReducer,
     inventoryMaterialReceipt: inventoryMaterialReceiptReducer,
     inventoryWarehouse: inventoryWarehouseReducer,
+    inventoryMaterialIssueAndExecution:
+      inventoryMaterialIssueAndExecutionReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

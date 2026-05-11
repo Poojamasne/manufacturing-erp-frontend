@@ -13,7 +13,10 @@ import {
   Truck,
   ArrowRight,
 } from "lucide-react";
-
+import { useAppDispatch } from "../../../app/store/hook";
+import type { RootState } from "../../../app/store/store";
+import { useAppSelector } from "../../common/ReduxMainHooks";
+import { updateRequestStatus } from "../ModuleStateFiles/MaterialIssueAndExecutionSlice";
 // ==================== Types ====================
 type TimeFilter = "Weekly" | "Monthly" | "Quarterly" | "Yearly" | "All Time" | "Custom";
 type RequestStatus = "PENDING" | "APPROVED" | "REJECTED" | "PURCHASE_NOTIFIED";
@@ -31,13 +34,6 @@ interface IssueRequest {
   createdAt: string;
 }
 
-// ==================== Mock Data ====================
-const mockRequests: IssueRequest[] = [
-  { id: "1", requestId: "REQ-4001", productionOrderId: "PO-7721", materialName: "Steel Sheet 2mm", materialCode: "MAT-001", qtyRequired: 150, qtyAvailable: 500, unit: "kg", status: "PENDING", createdAt: new Date().toISOString() },
-  { id: "2", requestId: "REQ-4005", productionOrderId: "PO-7725", materialName: "Aluminum Rod", materialCode: "MAT-088", qtyRequired: 2000, qtyAvailable: 450, unit: "m", status: "PENDING", createdAt: "2024-05-01T10:00:00Z" },
-  { id: "3", requestId: "REQ-4009", productionOrderId: "PO-7730", materialName: "Copper Wire", materialCode: "MAT-042", qtyRequired: 500, qtyAvailable: 1200, unit: "m", status: "APPROVED", createdAt: "2024-01-15T10:00:00Z" },
-  { id: "4", requestId: "REQ-4012", productionOrderId: "PO-7735", materialName: "Polymer Resin", materialCode: "MAT-102", qtyRequired: 800, qtyAvailable: 0, unit: "kg", status: "PURCHASE_NOTIFIED", createdAt: "2024-02-10T10:00:00Z" },
-];
 
 const MaterialIssueRequestHandling: React.FC = () => {
   // Refs
@@ -45,9 +41,9 @@ const MaterialIssueRequestHandling: React.FC = () => {
   const statusDropdownRef = useRef<HTMLDivElement>(null);
   const calendarRef = useRef<HTMLDivElement>(null);
   const modalRef = useRef<HTMLDivElement>(null);
-
+  const dispatch = useAppDispatch();
+  const { requests } = useAppSelector((state: RootState) => state.inventoryMaterialIssueAndExecution)
   // States
-  const [requests, setRequests] = useState<IssueRequest[]>(mockRequests);
   const [searchQuery, setSearchQuery] = useState("");
   const [timeFilter, setTimeFilter] = useState<TimeFilter>("All Time");
   const [statusFilter, setStatusFilter] = useState<RequestStatus | "All">("All");
@@ -90,7 +86,7 @@ const MaterialIssueRequestHandling: React.FC = () => {
 
   const updateStatus = (newStatus: RequestStatus) => {
     if (!selectedReq) return;
-    setRequests(prev => prev.map(r => r.id === selectedReq.id ? { ...r, status: newStatus } : r));
+    dispatch(updateRequestStatus(selectedReq.id, newStatus));
     setModalType(null);
   };
 
