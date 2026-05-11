@@ -1,5 +1,5 @@
 ﻿import { configureStore } from "@reduxjs/toolkit";
-import authReducer from "../../features/sales/ModuleStateFiles/AuthSlice";
+import authReducer from "../../features/auth/ModuleStateFiles/AuthSlice";
 import salesEmployeeReducer from "../../features/sales/ModuleStateFiles/EmployeeSlice";
 import salesLeadReducer from "../../features/sales/ModuleStateFiles/LeadSlice";
 import dashboardReducer from "../../features/sales/ModuleStateFiles/DashboardSlice";

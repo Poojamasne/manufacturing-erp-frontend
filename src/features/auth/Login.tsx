@@ -10,7 +10,7 @@ import {
   CheckCircle2,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { loginUser, clearErrors } from "../sales/ModuleStateFiles/AuthSlice";
+import { loginUser, clearErrors } from "./ModuleStateFiles/AuthSlice";
 import { useAppDispatch, useAppSelector } from "../common/ReduxMainHooks";
 
 const Login: React.FC = () => {
