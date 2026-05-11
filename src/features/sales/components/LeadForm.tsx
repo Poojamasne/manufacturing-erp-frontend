@@ -130,12 +130,12 @@ const LeadForm: React.FC = () => {
   // --- Validation Logic ---
 
   const validateNameInput = (value: string) => {
-  return value.replace(/[^a-zA-Z\s]/g, '');
+    return value.replace(/[^a-zA-Z\s]/g, '');
   }
 
   const validateNumberInput = (value: string) => {
-  return value.replace(/\D/g, '');
-};
+    return value.replace(/\D/g, '');
+  };
 
   const validate = (): boolean => {
     const newErrors: FormErrors = {};
@@ -150,18 +150,18 @@ const LeadForm: React.FC = () => {
       }
     }
 
-if (!formData.company_name.trim()) {
-  newErrors.company_name = "Company name is required";
-} else if (!/^[a-zA-Z\s]+$/.test(formData.company_name)) {
-  newErrors.company_name = "Company name should contain only letters and spaces";
-}
-    
-if (!formData.contact_person.trim()) {
-  newErrors.contact_person = "Contact person is required";
-} else if (!/^[a-zA-Z\s]+$/.test(formData.contact_person)) {
-  newErrors.contact_person = "Contact person name should contain only letters and spaces";
-} 
-   if (!/^\d{10}$/.test(formData.phone))
+    if (!formData.company_name.trim()) {
+      newErrors.company_name = "Company name is required";
+    } else if (!/^[a-zA-Z\s]+$/.test(formData.company_name)) {
+      newErrors.company_name = "Company name should contain only letters and spaces";
+    }
+
+    if (!formData.contact_person.trim()) {
+      newErrors.contact_person = "Contact person is required";
+    } else if (!/^[a-zA-Z\s]+$/.test(formData.contact_person)) {
+      newErrors.contact_person = "Contact person name should contain only letters and spaces";
+    }
+    if (!/^\d{10}$/.test(formData.phone))
       newErrors.phone = "Enter a valid 10-digit number";
 
     if (formData.email) {
@@ -177,7 +177,7 @@ if (!formData.contact_person.trim()) {
         if (emailParts.length === 2) {
           const domain = emailParts[1];
           const validTLDs = [
-            "com", "org", "net", "edu", "gov", "in", "co", "io", "ai", 
+            "com", "org", "net", "edu", "gov", "in", "co", "io", "ai",
             "app", "dev", "tech", "info", "biz",
           ];
           const tld = domain.split(".").pop()?.toLowerCase();
@@ -210,38 +210,38 @@ if (!formData.contact_person.trim()) {
   };
 
   // --- Handlers ---
-const handleInputChange = (
-  e: React.ChangeEvent<
-    HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-  >,
-) => {
-  const { name, value } = e.target;
-  
-  let sanitizedValue = value;
-  
-  // Apply validation based on field name
-  if (name === "company_name" || name === "contact_person") {
-    sanitizedValue = validateNameInput(value);
-  }
-  
-  if (name === "phone") {
-    sanitizedValue = validateNumberInput(value);
-    // Limit to 10 digits
-    if (sanitizedValue.length > 10) sanitizedValue = sanitizedValue.slice(0, 10);
-  }
-  
-  setFormData((prev) => ({
-    ...prev,
-    [name]:
-      name === "assigned_to" ? (sanitizedValue === "" ? "" : Number(sanitizedValue)) : sanitizedValue,
-  }));
-  
-  if (errors[name]) {
-    const updatedErrors = { ...errors };
-    delete updatedErrors[name];
-    setErrors(updatedErrors);
-  }
-};
+  const handleInputChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >,
+  ) => {
+    const { name, value } = e.target;
+
+    let sanitizedValue = value;
+
+    // Apply validation based on field name
+    if (name === "company_name" || name === "contact_person") {
+      sanitizedValue = validateNameInput(value);
+    }
+
+    if (name === "phone") {
+      sanitizedValue = validateNumberInput(value);
+      // Limit to 10 digits
+      if (sanitizedValue.length > 10) sanitizedValue = sanitizedValue.slice(0, 10);
+    }
+
+    setFormData((prev) => ({
+      ...prev,
+      [name]:
+        name === "assigned_to" ? (sanitizedValue === "" ? "" : Number(sanitizedValue)) : sanitizedValue,
+    }));
+
+    if (errors[name]) {
+      const updatedErrors = { ...errors };
+      delete updatedErrors[name];
+      setErrors(updatedErrors);
+    }
+  };
 
   const handleProductSelect = (id: number, pId: string) => {
     setProductRows((prev) =>
@@ -282,7 +282,7 @@ const handleInputChange = (
     if (!validate()) return;
 
     setIsSubmitting(true);
-    
+
     // CRITICAL FIX: Convert empty date strings to null
     const payload = {
       company_name: formData.company_name,
@@ -310,13 +310,13 @@ const handleInputChange = (
     };
 
     console.log("Final Payload being sent:", JSON.stringify(payload, null, 2));
-    
+
     if (payload.products.length === 0) {
       setErrors({ ...errors, products: "Please add at least one product" });
       setIsSubmitting(false);
       return;
     }
-    
+
     try {
       await dispatch(createLead(payload, navigate));
     } catch (error) {
@@ -463,11 +463,10 @@ const handleInputChange = (
                 return (
                   <div
                     key={row.id}
-                    className={`grid grid-cols-1 md:grid-cols-12 gap-4 p-5 rounded-2xl border transition-all items-end ${
-                      errors[`prod_${row.id}`] || errors[`var_${row.id}`] 
-                        ? "bg-red-50/30 border-red-100" 
+                    className={`grid grid-cols-1 md:grid-cols-12 gap-4 p-5 rounded-2xl border transition-all items-end ${errors[`prod_${row.id}`] || errors[`var_${row.id}`]
+                        ? "bg-red-50/30 border-red-100"
                         : "bg-slate-50/50 border-slate-100"
-                    }`}
+                      }`}
                   >
                     <div className="md:col-span-4">
                       <FormSelect
@@ -620,7 +619,8 @@ const handleInputChange = (
                   error={errors.assigned_to}
                   options={
                     employees?.map((emp) => ({
-                      l: `${emp.name} (${emp.designation})`,
+                      l: `${emp.name}`,
+                      //  {(${emp.designation})} if you went designation in dropdown then past this line in l: `${emp.name} (${emp.designation})`
                       v: emp.id,
                     })) || []
                   }
@@ -744,9 +744,8 @@ const FormInput: React.FC<InputFieldProps> = ({
       <input
         {...props}
         {...(props.type === "number" ? { min: 1 } : {})}
-        className={`w-full bg-slate-50 border ${
-          error ? "border-rose-300 ring-4 ring-rose-50" : "border-slate-200"
-        } rounded-xl px-4 py-3 text-sm focus:border-[#F59E0B] focus:ring-4 focus:ring-orange-500/5 outline-none transition-all font-medium text-slate-800 group-hover:border-slate-300 placeholder:font-normal placeholder:text-slate-400`}
+        className={`w-full bg-slate-50 border ${error ? "border-rose-300 ring-4 ring-rose-50" : "border-slate-200"
+          } rounded-xl px-4 py-3 text-sm focus:border-[#F59E0B] focus:ring-4 focus:ring-orange-500/5 outline-none transition-all font-medium text-slate-800 group-hover:border-slate-300 placeholder:font-normal placeholder:text-slate-400`}
       />
       {error && (
         <AlertCircle
@@ -787,21 +786,20 @@ const FormSelect: React.FC<SelectFieldProps> = ({
     <div className="relative group">
       <select
         {...props}
-        className={`w-full bg-slate-50 border ${
-          error ? "border-rose-300 ring-4 ring-rose-50" : "border-slate-200"
-        } rounded-xl px-4 py-3 text-sm appearance-none outline-none focus:border-[#F59E0B] focus:ring-4 focus:ring-orange-500/5 transition-all font-medium text-slate-800 cursor-pointer group-hover:border-slate-300`}
+        className={`w-full bg-slate-50 border ${error ? "border-rose-300 ring-4 ring-rose-50" : "border-slate-200"
+          } rounded-xl px-4 py-3 text-sm appearance-none outline-none focus:border-[#F59E0B] focus:ring-4 focus:ring-orange-500/5 transition-all font-medium text-slate-800 cursor-pointer group-hover:border-slate-300`}
       >
         <option value="" className="text-slate-400">Select option</option>
-{options.map((o) => (
-  <option
-    key={o.v}
-    value={o.v}
-    title={o.l}  
-    className="text-slate-800"
-  >
-    {o.l}
-  </option>
-))}
+        {options.map((o) => (
+          <option
+            key={o.v}
+            value={o.v}
+            title={o.l}
+            className="text-slate-800"
+          >
+            {o.l}
+          </option>
+        ))}
       </select>
       <ChevronDown
         size={14}

@@ -404,49 +404,49 @@ const SalesEmployees: React.FC = () => {
                     <td className="px-4 py-4">
                       <div className="flex justify-center gap-2">
                         <div className="relative group/tooltip">
-                        <button
-                          onClick={() =>
-                            navigate(
-                              `/sales/employees/view-employee/${emp?.id}`,
-                            )
-                          }
-                          className="outline-none p-2 hover:bg-white text-slate-500 hover:text-[#F59E0B] rounded-xl transition-all"
-                        >
-                          <Eye size={16} />
-                        </button>
-                        <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-[10px] font-semibold px-2 py-0.5 rounded opacity-0 group-hover/tooltip:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-20">     
-                                                    View
-                                                </span>
+                          <button
+                            onClick={() =>
+                              navigate(
+                                `/sales/employees/view-employee/${emp?.id}`,
+                              )
+                            }
+                            className="outline-none p-2 hover:bg-white text-slate-500 hover:text-[#F59E0B] rounded-xl transition-all"
+                          >
+                            <Eye size={16} />
+                          </button>
+                          <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-[10px] font-semibold px-2 py-0.5 rounded opacity-0 group-hover/tooltip:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-20">
+                            View
+                          </span>
 
                         </div>
                         <div className="relative group/tooltip">
-                        <button
-                          onClick={() =>
-                            navigate(
-                              `/sales/employees/edit-employee/${emp?.id}`,
-                            )
-                          }
-                          className="outline-none p-2 hover:bg-white text-slate-500 hover:text-blue-600 rounded-xl transition-all"
-                        >
-                          <FileEdit size={16} />
-                        </button>
+                          <button
+                            onClick={() =>
+                              navigate(
+                                `/sales/employees/edit-employee/${emp?.id}`,
+                              )
+                            }
+                            className="outline-none p-2 hover:bg-white text-slate-500 hover:text-blue-600 rounded-xl transition-all"
+                          >
+                            <FileEdit size={16} />
+                          </button>
 
-                        <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-[10px] font-semibold px-2 py-0.5 rounded opacity-0 group-hover/tooltip:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-20">     
-                                                    Edit
-                                                </span>
+                          <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-[10px] font-semibold px-2 py-0.5 rounded opacity-0 group-hover/tooltip:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-20">
+                            Edit
+                          </span>
 
                         </div>
                         <div className="relative group/tooltip">
-                        <button
-                disabled={selectedIds.length === 0}
-                onClick={handleBulkDelete}
-                          className="outline-none p-2 hover:bg-white text-slate-500 hover:text-rose-600 rounded-xl transition-all"
-                        >
-                          <Trash2 size={16} />
-                        </button>
-                                                <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-[10px] font-semibold px-2 py-0.5 rounded opacity-0 group-hover/tooltip:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-20">     
-                                                    Delete
-                                                </span>
+                          <button
+                            disabled={selectedIds.length === 0}
+                            onClick={handleBulkDelete}
+                            className="outline-none p-2 hover:bg-white text-slate-500 hover:text-rose-600 rounded-xl transition-all"
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                          <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-[10px] font-semibold px-2 py-0.5 rounded opacity-0 group-hover/tooltip:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-20">
+                            Delete
+                          </span>
 
                         </div>
                       </div>

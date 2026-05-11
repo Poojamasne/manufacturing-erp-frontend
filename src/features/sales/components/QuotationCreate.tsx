@@ -140,7 +140,7 @@ const FormField: React.FC<FormFieldProps> = ({
 const QuotationCreate: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const { loading } = useAppSelector((state: RootState) => state.SalesQuotation); 
+  const { loading } = useAppSelector((state: RootState) => state.SalesQuotation);
   const products = useAppSelector((state: RootState) => state.SalesProduct.products as Product[]);
 
   const [activeSection, setActiveSection] = useState("customer");
@@ -201,7 +201,7 @@ const QuotationCreate: React.FC = () => {
   // Logic to handle product selection from dropdown
   const handleProductSelect = (id: string, compositeKey: string) => {
     if (!compositeKey) return;
-    
+
     // Find the product and variant from the master list
     // compositeKey format: "productName|variantName"
     const [pName, vName] = compositeKey.split("|");
@@ -212,11 +212,11 @@ const QuotationCreate: React.FC = () => {
       setLineItems((prev) =>
         prev.map((item) => {
           if (item.id === id) {
-            const updated = { 
-                ...item, 
-                product: selectedProduct.product_name, 
-                description: selectedVariant.variant_name,
-                unitPrice: parseFloat(selectedVariant.unit_price) || 0
+            const updated = {
+              ...item,
+              product: selectedProduct.product_name,
+              description: selectedVariant.variant_name,
+              unitPrice: parseFloat(selectedVariant.unit_price) || 0
             };
             updated.total = calculateLineTotal(updated);
             return updated;
@@ -263,7 +263,7 @@ const QuotationCreate: React.FC = () => {
     if (!formData.phone.trim()) newErrors.phone = "Phone is required";
     if (!formData.billingAddress.trim()) newErrors.billingAddress = "Billing address is required";
     if (lineItems.some((item) => !item.product.trim())) newErrors.lineItems = "Please select products";
-    
+
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       setActiveSection(newErrors.lineItems ? "items" : "customer");
@@ -391,13 +391,13 @@ const QuotationCreate: React.FC = () => {
                           >
                             <option value="">Select Product</option>
                             {products?.map((p: any) => (
-                                <optgroup key={p.product_id} label={p.product_name}>
-                                    {p.variants?.map((v: any) => (
-                                        <option key={v.variant_id} value={`${p.product_name}|${v.variant_name}`}>
-                                            {p.product_name} - {v.variant_name}
-                                        </option>
-                                    ))}
-                                </optgroup>
+                              <optgroup key={p.product_id} label={p.product_name}>
+                                {p.variants?.map((v: any) => (
+                                  <option key={v.variant_id} value={`${p.product_name}|${v.variant_name}`}>
+                                    {p.product_name} - {v.variant_name}
+                                  </option>
+                                ))}
+                              </optgroup>
                             ))}
                           </select>
                         </td>
@@ -405,13 +405,13 @@ const QuotationCreate: React.FC = () => {
                           <input type="text" value={item.description} readOnly className="w-48 px-3 py-2 border border-gray-100 bg-gray-50 rounded-lg text-sm text-gray-500 cursor-not-allowed outline-none" />
                         </td>
                         <td className="p-4">
-                          <input type="number" min= "1" value={item.quantity} onChange={(e) => updateLineItem(item.id, "quantity", parseFloat(e.target.value) || 0)} className="w-20 px-3 outline-none py-2 border border-gray-200 rounded-lg text-sm text-left" />
+                          <input type="number" min="1" value={item.quantity} onChange={(e) => updateLineItem(item.id, "quantity", parseFloat(e.target.value) || 0)} className="w-20 px-3 outline-none py-2 border border-gray-200 rounded-lg text-sm text-left" />
                         </td>
                         <td className="p-4">
                           <input type="number" min="1" value={item.unitPrice} onChange={(e) => updateLineItem(item.id, "unitPrice", parseFloat(e.target.value) || 0)} className="w-28 px-3 outline-none py-2 border border-gray-200 rounded-lg text-sm text-left" />
                         </td>
                         <td className="p-4">
-                          <input type="number"  min = "0" value={item.discount} onChange={(e) => updateLineItem(item.id, "discount", parseFloat(e.target.value) || 0)} className="w-16 px-3 outline-none py-2 border border-gray-200 rounded-lg text-sm text-left" />
+                          <input type="number" min="0" value={item.discount} onChange={(e) => updateLineItem(item.id, "discount", parseFloat(e.target.value) || 0)} className="w-16 px-3 outline-none py-2 border border-gray-200 rounded-lg text-sm text-left" />
                         </td>
                         <td className="p-4">
                           <input type="number" value={item.tax} onChange={(e) => updateLineItem(item.id, "tax", parseFloat(e.target.value) || 0)} className="w-16 px-3 py-2 border outline-none border-gray-200 rounded-lg text-sm text-left" />

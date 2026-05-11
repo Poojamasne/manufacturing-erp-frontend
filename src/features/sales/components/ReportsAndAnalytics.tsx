@@ -343,7 +343,7 @@ const ReportsAndAnalytics: FC = () => {
                     </linearGradient>
                   </defs>
                   <CartesianGrid vertical={false} stroke="#f1f5f9" />
-                  <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: "#7e899c", fontSize: 10 , fontWeight: 650 }} dy={10} />
+                  <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: "#7e899c", fontSize: 10, fontWeight: 650 }} dy={10} />
                   <YAxis axisLine={false} tickLine={false} tick={{ fill: "#7e899c", fontSize: 10, fontWeight: 650 }} />
                   <Tooltip formatter={(value) => [`₹${Number(value).toLocaleString('en-IN')}`, 'Revenue']} contentStyle={{ borderRadius: "16px", border: "none", boxShadow: "0 10px 15px -3px rgb(0 0 0 / 0.1)" }} />
                   <Area type="monotone" dataKey="val" stroke={THEME.primary} strokeWidth={4} fill="url(#pGradient)" />

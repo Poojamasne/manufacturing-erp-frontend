@@ -47,7 +47,7 @@ const QuotationList: React.FC = () => {
   const dispatch = useAppDispatch();
   const calendarRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
-    const filterDropdownRef = useRef<HTMLDivElement>(null);
+  const filterDropdownRef = useRef<HTMLDivElement>(null);
 
 
 
@@ -109,11 +109,11 @@ const QuotationList: React.FC = () => {
         setIsCalendarOpen(false);
       }
       if (
-      filterDropdownRef.current &&
-      !filterDropdownRef.current.contains(event.target as Node)
-    ) {
-      setIsStatusOpen(false);
-    }
+        filterDropdownRef.current &&
+        !filterDropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsStatusOpen(false);
+      }
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
@@ -482,7 +482,7 @@ const QuotationList: React.FC = () => {
             </div>
 
             <div className="flex flex-wrap items-center justify-center lg:justify-end gap-3 w-full">
-              <div  ref= {filterDropdownRef}className="relative min-w-35">
+              <div ref={filterDropdownRef} className="relative min-w-35">
                 <button
                   onClick={() => setIsStatusOpen(!isStatusOpen)}
                   className={`outline-none w-full flex items-center justify-between gap-2 px-4 py-3 rounded-xl border text-[13px] font-bold transition-all ${statusFilter !== "All" ? "bg-[#f3f4e6] border-amber-400 text-[#F59E0B]" : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"}`}
@@ -620,31 +620,31 @@ const QuotationList: React.FC = () => {
                       </span>
                     </td>
                     <td className="px-4 py-4">
-                                            <div className="flex justify-center gap-2">
+                      <div className="flex justify-center gap-2">
                         <div className="relative group/tooltip">
-                        <button
-                          onClick={() =>
-                            navigate(`/sales/quotation/quotation-view/${qt.id}`)
-                          }
-                          className="outline-none p-2 hover:bg-white text-slate-800 hover:text-[#F59E0B] rounded-xl transition-all"
-                        >
-                          <Eye size={16} />
-                        </button>
-                         <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-[10px] font-semibold px-2 py-0.5 rounded opacity-0 group-hover/tooltip:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-20">     
+                          <button
+                            onClick={() =>
+                              navigate(`/sales/quotation/quotation-view/${qt.id}`)
+                            }
+                            className="outline-none p-2 hover:bg-white text-slate-800 hover:text-[#F59E0B] rounded-xl transition-all"
+                          >
+                            <Eye size={16} />
+                          </button>
+                          <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-[10px] font-semibold px-2 py-0.5 rounded opacity-0 group-hover/tooltip:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-20">
                             View
-                        </span>
+                          </span>
                         </div>
 
-                        <div className="relative group/tooltip">                      
-                            <button
-                          onClick={() => handleDelete(qt.id)}
-                          className="outline-none p-2 hover:bg-white text-slate-800 hover:text-rose-600 rounded-xl transition-all"
-                        >
-                          <Trash2 size={16} />
-                        </button>
-                                                 <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-[10px] font-semibold px-2 py-0.5 rounded opacity-0 group-hover/tooltip:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-20">     
+                        <div className="relative group/tooltip">
+                          <button
+                            onClick={() => handleDelete(qt.id)}
+                            className="outline-none p-2 hover:bg-white text-slate-800 hover:text-rose-600 rounded-xl transition-all"
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                          <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-[10px] font-semibold px-2 py-0.5 rounded opacity-0 group-hover/tooltip:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-20">
                             Delete
-                        </span>
+                          </span>
 
                         </div>
 

@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch } from "../../common/ReduxMainHooks";
-import { createEmployee } from "../ModuleStateFiles/EmployeeSlice"; 
+import { createEmployee } from "../ModuleStateFiles/EmployeeSlice";
 
 interface EmployeeFormData {
     name: string;
@@ -44,7 +44,7 @@ const checkPasswordStrength = (password: string) => {
     if (/[a-z]/.test(password)) strength++;
     if (/[0-9]/.test(password)) strength++;
     if (/[!@#$%^&*(),.?":{}|<>]/.test(password)) strength++;
-    
+
     if (strength <= 2) return "Weak";
     if (strength <= 4) return "Medium";
     return "Strong";
@@ -57,7 +57,7 @@ const AddSalesEmployee: React.FC = () => {
     const [showSuccess, setShowSuccess] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const [passwordStrength, setPasswordStrength] = useState("");
-    
+
     const [formData, setFormData] = useState<EmployeeFormData>({
         name: "",
         email: "",
@@ -65,12 +65,12 @@ const AddSalesEmployee: React.FC = () => {
         phone: "",
         designation: "Sales Executive",
         role: "salesperson",
-        is_active: "1" 
+        is_active: "1"
     });
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        
+
         // Validation checks
         if (!formData.name.trim()) {
             alert("Full name is required");
@@ -80,7 +80,7 @@ const AddSalesEmployee: React.FC = () => {
             alert("Name should contain only letters and spaces");
             return;
         }
-        
+
         if (!formData.email.trim()) {
             alert("Email address is required");
             return;
@@ -91,7 +91,7 @@ const AddSalesEmployee: React.FC = () => {
             alert("Please enter a valid email address ending with .com, .org, or .net");
             return;
         }
-        
+
         if (!formData.phone) {
             alert("Phone number is required");
             return;
@@ -100,7 +100,7 @@ const AddSalesEmployee: React.FC = () => {
             alert("Please enter a valid 10-digit phone number");
             return;
         }
-        
+
         // Password validation
         if (!formData.password) {
             alert("Password is required");
@@ -126,7 +126,7 @@ const AddSalesEmployee: React.FC = () => {
             alert("Password must contain at least one special character (!@#$%^&* etc.)");
             return;
         }
-        
+
         setIsSaving(true);
 
         try {
@@ -278,7 +278,7 @@ const AddSalesEmployee: React.FC = () => {
                                 //eslint-disable-next-line @typescript-eslint/no-explicit-any
                                 onChange={(val) => setFormData({ ...formData, designation: val as any })}
                             />
-                             <FormSelect
+                            <FormSelect
                                 label="System Role"
                                 icon={<ShieldCheck size={14} />}
                                 options={[
@@ -327,84 +327,82 @@ const SectionHeader: React.FC<{ icon: React.ReactNode; title: string }> = ({ ico
     </div>
 );
 
-const FormInput: React.FC<{ 
-    label: string; 
-    icon: React.ReactNode; 
-    placeholder?: string; 
-    type?: string; 
-    value: string; 
-    onChange: (val: string) => void; 
+const FormInput: React.FC<{
+    label: string;
+    icon: React.ReactNode;
+    placeholder?: string;
+    type?: string;
+    value: string;
+    onChange: (val: string) => void;
     required?: boolean;
     showPasswordToggle?: boolean;
     showPassword?: boolean;
     onTogglePassword?: () => void;
     passwordStrength?: string;
-}> = ({ 
-    label, 
-    icon, 
-    placeholder, 
-    type = "text", 
-    value, 
-    onChange, 
+}> = ({
+    label,
+    icon,
+    placeholder,
+    type = "text",
+    value,
+    onChange,
     required,
     showPasswordToggle = false,
     showPassword = false,
     onTogglePassword,
     passwordStrength
 }) => (
-    <div className="flex flex-col gap-1.5">
-        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">
-            {label} {required && <span className="text-red-500">*</span>}
-        </label>
-        <div className="relative">
-            <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">{icon}</div>
-            <input
-                type={showPasswordToggle && showPassword ? "text" : type}
-                value={value}
-                onChange={(e) => onChange(e.target.value)}
-                placeholder={placeholder}
-                required={required}
-                className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-11 pr-11 py-3 text-sm font-bold focus:ring-4 focus:ring-orange-500/5 focus:border-[#F59E0B] outline-none transition-all placeholder:font-normal placeholder:text-slate-300"
-            />
-            {showPasswordToggle && onTogglePassword && (
-                <button
-                    type="button"
-                    onClick={onTogglePassword}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-[#F59E0B] transition-colors"
-                >
-                    {showPassword ? <Eye size={16} /> : <EyeOff size={16} />}
-                </button>
+        <div className="flex flex-col gap-1.5">
+            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">
+                {label} {required && <span className="text-red-500">*</span>}
+            </label>
+            <div className="relative">
+                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">{icon}</div>
+                <input
+                    type={showPasswordToggle && showPassword ? "text" : type}
+                    value={value}
+                    onChange={(e) => onChange(e.target.value)}
+                    placeholder={placeholder}
+                    required={required}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-11 pr-11 py-3 text-sm font-bold focus:ring-4 focus:ring-orange-500/5 focus:border-[#F59E0B] outline-none transition-all placeholder:font-normal placeholder:text-slate-300"
+                />
+                {showPasswordToggle && onTogglePassword && (
+                    <button
+                        type="button"
+                        onClick={onTogglePassword}
+                        className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-[#F59E0B] transition-colors"
+                    >
+                        {showPassword ? <Eye size={16} /> : <EyeOff size={16} />}
+                    </button>
+                )}
+            </div>
+            {passwordStrength && value && (
+                <div className="flex items-center gap-2 mt-1">
+                    <div className="flex-1 h-1 rounded-full bg-slate-100 overflow-hidden">
+                        <div
+                            className={`h-full transition-all duration-300 ${passwordStrength === "Weak" ? "w-1/3 bg-red-500" :
+                                passwordStrength === "Medium" ? "w-2/3 bg-yellow-500" :
+                                    "w-full bg-green-500"
+                                }`}
+                        />
+                    </div>
+                    <span className={`text-[10px] font-bold ${passwordStrength === "Weak" ? "text-red-500" :
+                        passwordStrength === "Medium" ? "text-yellow-500" :
+                            "text-green-500"
+                        }`}>
+                        {passwordStrength}
+                    </span>
+                </div>
             )}
         </div>
-        {passwordStrength && value && (
-            <div className="flex items-center gap-2 mt-1">
-                <div className="flex-1 h-1 rounded-full bg-slate-100 overflow-hidden">
-                    <div 
-                        className={`h-full transition-all duration-300 ${
-                            passwordStrength === "Weak" ? "w-1/3 bg-red-500" :
-                            passwordStrength === "Medium" ? "w-2/3 bg-yellow-500" :
-                            "w-full bg-green-500"
-                        }`}
-                    />
-                </div>
-                <span className={`text-[10px] font-bold ${
-                    passwordStrength === "Weak" ? "text-red-500" :
-                    passwordStrength === "Medium" ? "text-yellow-500" :
-                    "text-green-500"
-                }`}>
-                    {passwordStrength}
-                </span>
-            </div>
-        )}
-    </div>
-);
+    );
 
-const FormSelect: React.FC<{ 
-    label: string; 
-    options: { label: string; value: string }[]; 
-    value: string; 
-    onChange: (val: string) => void; 
-    icon?: React.ReactNode 
+const FormSelect: React.FC<{
+    label: string;
+    options: { label: string; value: string }[];
+    value: string;
+    onChange: (val: string) => void;
+    icon?: React.ReactNode
 }> = ({ label, options, value, onChange, icon }) => (
     <div className="flex flex-col gap-1.5">
         <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">{label}</label>
