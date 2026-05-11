@@ -133,17 +133,49 @@ const MaterialIssueExecution: React.FC = () => {
                 {["All Time", "Weekly", "Monthly", "Yearly"].map(t => (
                   <button key={t} onClick={() => handleTimeFilterChange(t as TimeFilter)} className={`w-full text-left px-4 py-2.5 text-[13px] ${timeFilter === t ? "text-amber-500 font-bold bg-orange-50/50" : "text-slate-600 hover:bg-slate-50"}`}>{t}</button>
                 ))}
-                <button onClick={() => setIsCalendarOpen(true)} className="w-full text-left px-4 py-2.5 text-[13px] text-slate-600 hover:bg-slate-50">Custom Range</button>
+                <button onClick={() => setIsCalendarOpen(true)} className="w-full text-left px-4 py-2.5 text-[13px] text-slate-600 hover:bg-slate-50">Custom</button>
               </div>
             )}
             {isCalendarOpen && (
-              <div ref={calendarRef} className="absolute right-0 mt-3 bg-white p-6 rounded-2xl shadow-xl border z-50 w-72 animate-in fade-in zoom-in-95">
+              <div
+                ref={calendarRef}
+                className="absolute right-0 mt-3 bg-white p-6 rounded-2xl shadow-xl border z-50 w-72 animate-in fade-in zoom-in-95"
+              >
                 <div className="space-y-3">
-                  <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Start Date</label>
-                  <input type="date" value={customRange.start} onChange={(e) => setCustomRange({ ...customRange, start: e.target.value })} className="w-full p-2.5 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-orange-100 font-bold text-sm" />
-                  <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">End Date</label>
-                  <input type="date" value={customRange.end} onChange={(e) => setCustomRange({ ...customRange, end: e.target.value })} className="w-full p-2.5 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-orange-100 font-bold text-sm" />
-                  <button onClick={() => { setIsCalendarOpen(false); setTimeFilter("Custom"); }} className="w-full bg-[#F59E0B] text-white py-3 rounded-xl text-xs font-black uppercase tracking-widest shadow-lg shadow-orange-100">Apply Range</button>
+                  <input
+                    type="date"
+                    value={customRange.start}
+                    onChange={(e) =>
+                      setCustomRange({
+                        ...customRange,
+                        start: e.target.value,
+                      })
+                    }
+                    className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-orange-500/20 outline-none"
+                  />
+
+                  <input
+                    type="date"
+                    value={customRange.end}
+                    min={customRange.start}
+                    onChange={(e) =>
+                      setCustomRange({
+                        ...customRange,
+                        end: e.target.value,
+                      })
+                    }
+                    className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-orange-500/20 outline-none"
+                  />
+
+                  <button
+                    onClick={() => {
+                      setIsCalendarOpen(false);
+                      setTimeFilter("Custom");
+                    }}
+                    className="w-full bg-[#F59E0B] text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-[#f67317]"
+                  >
+                    Apply Range
+                  </button>
                 </div>
               </div>
             )}

@@ -10,7 +10,7 @@ import {
   ClipboardList,
   MapPin,
   Search,
-  MoreVertical,
+  // MoreVertical,
   Clock,
   ArrowRight,
   Check,
@@ -311,7 +311,7 @@ const InventoryDashboard: React.FC = () => {
                       <th className="px-6 py-4 text-center">Stock Level</th>
                       <th className="px-6 py-4">Location</th>
                       <th className="px-6 py-4">Status</th>
-                      <th className="px-6 py-4">Action</th>
+                      {/* <th className="px-6 py-4">Action</th> */}
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-100">
@@ -339,11 +339,11 @@ const InventoryDashboard: React.FC = () => {
                               {item.status.replace('_', ' ')}
                             </span>
                           </td>
-                          <td className="px-6 py-4 text-right">
+                          {/* <td className="px-6 py-4 text-right">
                             <button className="p-2 hover:bg-white rounded-lg transition border border-transparent hover:border-gray-200">
                               <MoreVertical size={16} className="text-gray-400" />
                             </button>
-                          </td>
+                          </td> */}
                         </tr>
                       ))
                     ) : (

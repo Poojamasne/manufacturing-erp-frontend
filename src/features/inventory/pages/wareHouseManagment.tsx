@@ -184,7 +184,7 @@ const WarehouseManagement: React.FC = () => {
                   <div className="space-y-3">
                     <input type="date" value={customRange.start} onChange={(e) => setCustomRange({ ...customRange, start: e.target.value })} className="w-full p-2 border rounded-lg outline-none focus:ring-2 focus:ring-[#F59E0B]/20" />
                     <input type="date" value={customRange.end} onChange={(e) => setCustomRange({ ...customRange, end: e.target.value })} className="w-full p-2 border rounded-lg outline-none focus:ring-2 focus:ring-[#F59E0B]/20" />
-                    <button onClick={handleCustomApply} className="w-full bg-[#F59E0B] text-white py-2 rounded-lg text-sm font-bold">Apply Range</button>
+                    <button onClick={handleCustomApply} className="w-full bg-[#F59E0B] hover:bg-[#f67317] text-white py-2 rounded-lg text-sm font-bold">Apply Range</button>
                   </div>
                 </div>
               )}
