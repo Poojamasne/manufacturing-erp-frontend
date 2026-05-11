@@ -87,24 +87,25 @@ const Sidebar: React.FC = () => {
           <span className={`${isActive("/inventory/warehouse") ? "font-bold" : "font-semibold"} text-sm`}>Warehouse Management</span>
         </button>
 
+
         {/* Material Issue Execution */}
         <button
           onClick={() => {
-            navigate("/inventory/issue-execution");
+            navigate("/inventory/material-issue-request-handling");
             document.title = "Manufacturing ERP - Material Issue Execution";
           }}
-          className={`outline-none w-full flex items-center gap-3 px-4 py-3 cursor-pointer rounded-xl transition-all duration-200 ${isActive("/inventory/issue-execution")
+          className={`outline-none w-full flex items-center gap-3 px-4 py-3 cursor-pointer rounded-xl transition-all duration-200 ${isActive("/inventory/material-issue-request-handling")
             ? "bg-[#F59E0B] text-white shadow-md"
             : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
             }`}
         >
           <img
             src="/icons/inventoryIcons/Issue_Request.svg"
-            className={`h-5 w-5 ${isActive("/inventory/issue-execution") ? "" : "invert opacity-60"}`}
+            className={`h-5 w-5 ${isActive("/inventory/material-issue-request-handling") ? "" : "invert opacity-60"}`}
             alt="Issue Execution"
           />
-          <span className={`${isActive("/inventory/issue-execution") ? "font-bold" : "font-semibold"} text-sm`}>
-           Material Issue Request
+          <span className={`${isActive("/inventory/material-issue-request-handling") ? "font-bold" : "font-semibold"} text-sm`}>
+            Material Issue Request
           </span>
         </button>
 
@@ -128,6 +129,7 @@ const Sidebar: React.FC = () => {
             Issue Material
           </span>
         </button>
+
       </nav>
 
       {/* FIXED FOOTER */}

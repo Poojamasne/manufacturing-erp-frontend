@@ -12,6 +12,7 @@ import EditReceiptEntry from "../../features/inventory/components/MaterialReceip
 import AllocateMaterialStorage from "../../features/inventory/pages/AllocateMaterialStorage";
 import ViewMaterialStorage from "../../features/inventory/pages/ViewMaterialStorage";
 import EditMaterialStorageAllocation from "../../features/inventory/pages/EditMaterialStorageAllocation";
+import MaterialIssueRequestHandling from "../../features/inventory/pages/MaterialIssueRequestHandling";
 
 const InventoryDashboard = lazy(
   () => import("../../features/inventory/pages/InventoryDashboard")
@@ -39,6 +40,7 @@ export const inventoryRoutes: RouteObject[] = [
           { path: "warehouse/add-material", element: withSuspense(<AllocateMaterialStorage />) },
           { path: "warehouse/edit-material/:id", element: withSuspense(<EditMaterialStorageAllocation />) },
           { path: "warehouse/view-storage/:id", element: withSuspense(<ViewMaterialStorage />) },
+          { path: "material-issue-request-handling", element: withSuspense(<MaterialIssueRequestHandling />) },
           { path: "issue-execution", element: withSuspense(<MaterialIssueExecution />) },
         ],
       },
