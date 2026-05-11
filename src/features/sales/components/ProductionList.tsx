@@ -550,28 +550,28 @@ const ProductionList: React.FC = () => {
                       onChange={toggleSelectAll}
                     />
                   </th>
-                  <th className="px-4 py-4 text-[13px] text-slate-800 uppercase tracking-widest border-b border-slate-100 text-center">
+                  <th className="px-4 py-4 text-[13px] text-slate-800 uppercase tracking-widest border-b border-slate-100 text-start">
                     JOB ID
                   </th>
-                  <th className="px-4 py-4 text-[13px] text-slate-800 uppercase tracking-widest border-b border-slate-100 text-center">
+                  <th className="px-4 py-4 text-[13px] text-slate-800 uppercase tracking-widest border-b border-slate-100 text-start">
                     ORDER ID
                   </th>
-                  <th className="px-4 py-4 text-[13px] text-slate-800 uppercase tracking-widest border-b border-slate-100 text-center">
+                  <th className="px-4 py-4 text-[13px] text-slate-800 uppercase tracking-widest border-b border-slate-100 text-start">
                     PRODUCT
                   </th>
-                  <th className="px-4 py-4 text-[13px] text-slate-800 uppercase tracking-widest border-b border-slate-100 text-center">
+                  <th className="px-4 py-4 text-[13px] text-slate-800 uppercase tracking-widest border-b border-slate-100 text-start">
                     QTY
                   </th>
-                  <th className="px-4 py-4 text-[13px] text-slate-800 uppercase tracking-widest border-b border-slate-100 text-center">
+                  <th className="px-4 py-4 text-[13px] text-slate-800 uppercase tracking-widest border-b border-slate-100 text-start">
                     STAGE
                   </th>
-                  <th className="px-4 py-4 text-[13px] text-slate-800 uppercase tracking-widest border-b border-slate-100 text-center">
+                  <th className="px-4 py-4 text-[13px] text-slate-800 uppercase tracking-widest border-b border-slate-100 text-start">
                     STATUS
                   </th>
-                  <th className="px-4 py-4 text-[13px] text-slate-800 uppercase tracking-widest border-b border-slate-100 text-center">
+                  <th className="px-4 py-4 text-[13px] text-slate-800 uppercase tracking-widest border-b border-slate-100 text-start">
                     UPDATED
                   </th>
-                  <th className="px-4 py-4 text-[13px] text-slate-800 uppercase tracking-widest border-b border-slate-100 text-center">
+                  <th className="px-4 py-4 text-[13px] text-slate-800 uppercase tracking-widest border-b border-slate-100 text-start">
                     ACTIONS
                   </th>
                 </tr>
@@ -582,7 +582,7 @@ const ProductionList: React.FC = () => {
                     key={j.id}
                     className="group hover:bg-[#f3f4e6]/20 transition-colors"
                   >
-                    <td className="p-5 text-center">
+                    <td className="p-5 text-start">
                       <input
                         type="checkbox"
                         className="h-4 w-4 cursor-pointer appearance-none rounded border border-slate-300 bg-white transition-all relative checked:bg-[#F59E0B] checked:border-[#F59E0B] after:content-[''] after:absolute after:opacity-0 checked:after:opacity-100 after:left-1.25 after:top-px after:w-1 after:h-2 after:border-white after:border-r-2 after:border-b-2 after:rotate-45"
@@ -596,33 +596,32 @@ const ProductionList: React.FC = () => {
                         }
                       />
                     </td>
-                    <td className="px-4 py-4 text-[13px] font-medium text-slate-800 text-center">
+                    <td className="text-start px-4 py-4 text-[13px] font-medium text-slate-800">
                       {j.job_id}
                     </td>
-                    <td className="px-4 py-4 text-[13px] text-slate-600 text-center">
+                    <td className="text-start px-4 py-4 text-[13px] text-slate-600">
                       {j.order_id || "-"}
                     </td>
                     <td
-                      className="px-4 py-4 text-[13px] font-medium text-slate-800 truncate max-w-50"
-                      title={j.product_name}
+                      className="text-start px-4 py-4 text-[13px] font-medium text-slate-800 truncate max-w-50"
                     >
                       {j.product_name}
                     </td>
-                    <td className="px-4 py-4 text-[13px] font-bold text-slate-800 text-center">
+                    <td className="text-start px-4 py-4 text-[13px] font-bold text-slate-800">
                       {j.quantity}
                     </td>
-                    <td className="px-4 py-4 text-center">
+                    <td className="text-start px-4 py-4">
                       <span className={getStageStyle(j.stage)}>{j.stage}</span>
                     </td>
-                    <td className="px-4 py-4 text-center">
+                    <td className="text-start px-4 py-4">
                       <span className={getStatusStyle(j.status)}>
                         {j.status}
                       </span>
                     </td>
-                    <td className="px-4 py-4 text-[13px] text-slate-600 text-center whitespace-nowrap">
+                    <td className="text-start px-4 py-4 text-[13px] text-slate-600 whitespace-nowrap">
                       {formatDate(j.updated_at)}
                     </td>
-                    <td className="px-4 py-4">
+                    <td className="text-start px-4 py-4">
                       <div className="flex justify-center gap-2">
                         {/* <button
                           title="Edit Production"

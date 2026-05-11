@@ -189,14 +189,14 @@ const AddSalesEmployee: React.FC = () => {
                     </div>
 
                     <div className="flex gap-3 w-full md:w-auto">
-                        <button type="button" onClick={() => navigate(-1)} className="flex-1 md:flex-none px-4 py-2 rounded-xl font-bold text-sm text-slate-600 bg-white border border-slate-200 hover:text-amber-500">
+                        <button type="button" onClick={() => navigate(-1)} className="outline-none flex-1 md:flex-none px-4 py-2 rounded-xl font-bold text-sm text-slate-600 bg-white border border-slate-200 hover:text-amber-500">
                             Cancel
                         </button>
                         <button
                             type="submit"
                             form="employee-form"
                             disabled={isSaving}
-                            className="flex-1 md:flex-none px-2.5 py-2 rounded-xl font-bold text-sm text-white bg-[#F59E0B] shadow-lg shadow-amber-500/5 hover:bg-[#f67317] transition-all flex items-center justify-center gap-2 disabled:opacity-70"
+                            className="outline-none flex-1 md:flex-none px-2.5 py-2 rounded-xl font-bold text-sm text-white bg-[#F59E0B] shadow-lg shadow-amber-500/5 hover:bg-[#f67317] transition-all flex items-center justify-center gap-2 disabled:opacity-70"
                         >
                             {isSaving ? "Creating..." : <><Save size={18} /> Save Employee</>}
                         </button>
@@ -370,7 +370,7 @@ const FormInput: React.FC<{
                     <button
                         type="button"
                         onClick={onTogglePassword}
-                        className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-[#F59E0B] transition-colors"
+                        className="outline-none absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-[#F59E0B] transition-colors"
                     >
                         {showPassword ? <Eye size={16} /> : <EyeOff size={16} />}
                     </button>

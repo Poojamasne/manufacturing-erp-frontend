@@ -387,7 +387,7 @@ const QuotationCreate: React.FC = () => {
                           <select
                             value={`${item.product}|${item.description}`}
                             onChange={(e) => handleProductSelect(item.id, e.target.value)}
-                            className={`w-56 px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#F59E0B] ${errors.lineItems && !item.product ? "border-red-500" : "border-gray-200"}`}
+                            className={`w-50 px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#F59E0B] ${errors.lineItems && !item.product ? "border-red-500" : "border-gray-200"}`}
                           >
                             <option value="">Select Product</option>
                             {products?.map((p: any) => (
@@ -402,16 +402,16 @@ const QuotationCreate: React.FC = () => {
                           </select>
                         </td>
                         <td className="p-4">
-                          <input type="text" value={item.description} readOnly className="w-48 px-3 py-2 border border-gray-100 bg-gray-50 rounded-lg text-sm text-gray-500 cursor-not-allowed outline-none" />
+                          <input type="text" value={item.description} readOnly className="w-30 px-3 py-2 border border-gray-200 bg-gray-50 rounded-lg text-sm text-gray-500 cursor-not-allowed outline-none" />
                         </td>
                         <td className="p-4">
-                          <input type="number" min="1" value={item.quantity} onChange={(e) => updateLineItem(item.id, "quantity", parseFloat(e.target.value) || 0)} className="w-20 px-3 outline-none py-2 border border-gray-200 rounded-lg text-sm text-left" />
+                          <input type="number" min="1" value={item.quantity} onChange={(e) => updateLineItem(item.id, "quantity", parseFloat(e.target.value) || 0)} className="w-18 px-3 outline-none py-2 border border-gray-200 rounded-lg text-sm text-left" />
                         </td>
                         <td className="p-4">
-                          <input type="number" min="1" value={item.unitPrice} onChange={(e) => updateLineItem(item.id, "unitPrice", parseFloat(e.target.value) || 0)} className="w-28 px-3 outline-none py-2 border border-gray-200 rounded-lg text-sm text-left" />
+                          <input type="number" min="1" value={item.unitPrice} onChange={(e) => updateLineItem(item.id, "unitPrice", parseFloat(e.target.value) || 0)} className="w-20 px-3 outline-none py-2 border border-gray-200 rounded-lg text-sm text-left" />
                         </td>
                         <td className="p-4">
-                          <input type="number" min="0" value={item.discount} onChange={(e) => updateLineItem(item.id, "discount", parseFloat(e.target.value) || 0)} className="w-16 px-3 outline-none py-2 border border-gray-200 rounded-lg text-sm text-left" />
+                          <input type="number" min="0" value={item.discount} onChange={(e) => updateLineItem(item.id, "discount", parseFloat(e.target.value) || 0)} className="w-15 px-3 outline-none py-2 border border-gray-200 rounded-lg text-sm text-left" />
                         </td>
                         <td className="p-4">
                           <input type="number" value={item.tax} onChange={(e) => updateLineItem(item.id, "tax", parseFloat(e.target.value) || 0)} className="w-16 px-3 py-2 border outline-none border-gray-200 rounded-lg text-sm text-left" />

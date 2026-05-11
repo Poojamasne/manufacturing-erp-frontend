@@ -505,9 +505,9 @@ const OpportunityList: React.FC = () => {
                       </td>
                       <td className="px-4 py-4 text-[13px] font-medium text-slate-800 text-center">{lead.lead_id}</td>
                       <td className="px-4 py-4 text-[13px] text-slate-600 text-center whitespace-nowrap">{formatDate(lead.created_at)}</td>
-                      <td className="px-4 py-4 text-[13px] font-medium text-slate-800 text-center">{lead.company_name}</td>
+                      <td className="px-4 py-4 text-[13px] text-slate-800 text-center">{lead.company_name}</td>
                       <td className="px-4 py-4 text-[13px] text-slate-600 text-center">
-                        <div className="font-medium text-slate-800">{lead.contact_person || "-"}</div>
+                        <div className="text-slate-800">{lead.contact_person || "-"}</div>
                         <div className="text-[15px] text-slate-600">{lead.phone || "-"}</div>
                       </td>
                       <td className="px-4 py-4 text-center">
