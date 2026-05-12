@@ -2,9 +2,7 @@ import React, { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import {
     ChevronRight,
-    Save,
-    Loader2,
-    Package,
+       Package,
     ClipboardCheck,
     Database,
     CheckCircle2,
@@ -51,7 +49,7 @@ const mockBOMs: Record<string, RawMaterial[]> = {
 
 const CreateProductionPlan: React.FC = () => {
     const navigate = useNavigate();
-    const [currentStep, setCurrentStep] = useState(1); 
+    const [currentStep, setCurrentStep] = useState(1);
     const [loading, setLoading] = useState(false);
     const [selectedOrder, setSelectedOrder] = useState<SalesOrder | null>(null);
     const [priority, setPriority] = useState<"HIGH" | "MEDIUM" | "LOW">("MEDIUM");
@@ -180,8 +178,8 @@ const CreateProductionPlan: React.FC = () => {
                             <DetailBox label="Customer" value={selectedOrder.customerName} icon={<User size={14} />} />
                         </div>
                         <div className="flex justify-end gap-4">
-                            <button onClick={() => setCurrentStep(1)} className="px-8 py-3 rounded-xl font-bold text-[#F59E0B] hover:text-[#f67317] border hover:border-amber-500 transition-colors">Back</button>
-                            <button onClick={() => setCurrentStep(3)} className="bg-slate-900 text-white px-10 py-3 rounded-xl font-bold text-sm hover:bg-slate-800 transition-all">Check Materials</button>
+                            <button onClick={() => setCurrentStep(1)} className="px-4 py-2 rounded-xl font-bold text-[#F59E0B] hover:text-[#f67317] border hover:border-amber-500 transition-colors">Back</button>
+                            <button onClick={() => setCurrentStep(3)} className="bg-slate-900 text-white px-4 py-2 rounded-xl font-bold text-sm hover:bg-slate-800 transition-all">Check Materials</button>
                         </div>
                     </div>
                 )}
@@ -198,10 +196,11 @@ const CreateProductionPlan: React.FC = () => {
                             <table className="w-full text-left">
                                 <thead>
                                     <tr className="border-b border-slate-50">
-                                        <th className="pb-4 text-[11px] font-black text-slate-400 uppercase tracking-widest">Material</th>
-                                        <th className="pb-4 text-[11px] font-black text-slate-400 uppercase tracking-widest text-center">In Stock</th>
-                                        <th className="pb-4 text-[11px] font-black text-slate-400 uppercase tracking-widest text-center">Needed</th>
-                                        <th className="pb-4 text-[11px] font-black text-slate-400 uppercase tracking-widest text-center">Shortage</th>
+                                        <th className="pb-4 text-[11px] font-black text-slate-700 uppercase tracking-widest">Material</th>
+                                        <th className="pb-4 text-[11px] font-black text-slate-700 uppercase tracking-widest text-center">In Stock</th>
+                                        <th className="pb-4 text-[11px] font-black text-slate-700 uppercase tracking-widest text-center">Needed</th>
+                                        <th className="pb-4 text-[11px] font-black text-slate-700 uppercase tracking-widest text-center">Status</th>
+                                        <th className="pb-4 text-[11px] font-black text-slate-700 uppercase tracking-widest text-center">Shortage</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-slate-50">
@@ -212,9 +211,16 @@ const CreateProductionPlan: React.FC = () => {
                                             <td className="py-5 text-center font-black text-slate-800">{item.requiredQuantity}</td>
                                             <td className="py-5 text-center">
                                                 {item.shortage > 0 ? (
-                                                    <span className="text-rose-500 font-black">- {item.shortage}</span>
+                                                    <span className="text-rose-500 font-black text-[10px] uppercase bg-emerald-50 px-2 py-1 rounded">Shortage</span>
                                                 ) : (
-                                                    <span className="text-emerald-500 font-black text-[10px] uppercase bg-emerald-50 px-2 py-1 rounded">OK</span>
+                                                    <span className="text-emerald-500 font-black text-[10px] uppercase bg-emerald-50 px-2 py-1 rounded">Available</span>
+                                                )}
+                                            </td>
+                                            <td className="py-5 text-center">
+                                                {item.shortage > 0 ? (
+                                                    <span className="text-rose-500 font-bold">{item.shortage}</span>
+                                                ) : (
+                                                    <span className="text-emerald-500 font-bold">0</span>
                                                 )}
                                             </td>
                                         </tr>
@@ -222,8 +228,8 @@ const CreateProductionPlan: React.FC = () => {
                                 </tbody>
                             </table>
                             <div className="mt-10 flex justify-end gap-4">
-                                <button onClick={() => setCurrentStep(2)} className="px-8 py-3 rounded-xl font-bold  text-[#F59E0B] hover:text-[#f67317] border hover:border-amber-500">Back</button>
-                                <button onClick={() => setCurrentStep(4)} className="bg-slate-900 text-white px-10 py-3 rounded-xl font-bold text-sm">Proceed to Decision</button>
+                                <button onClick={() => setCurrentStep(2)} className="px-4 py-2 rounded-xl font-bold  text-[#F59E0B] hover:text-[#f67317] border hover:border-amber-500">Back</button>
+                                <button onClick={() => setCurrentStep(4)} className="bg-slate-900 hover:bg-slate-800 text-white px-4 py-2 rounded-xl font-bold text-sm">Proceed to Decision</button>
                             </div>
                         </div>
                     </div>
@@ -253,7 +259,7 @@ const CreateProductionPlan: React.FC = () => {
                                             <button
                                                 key={p}
                                                 onClick={() => setPriority(p as any)}
-                                                className={`flex-1 py-3 rounded-xl text-xs font-black transition-all ${priority === p ? 'bg-[#F59E0B] text-white shadow-md' : 'bg-white text-slate-400 border border-slate-100 hover:bg-slate-50'}`}
+                                                className={`flex-1 py-3 rounded-xl text-xs font-black transition-all ${priority === p ? 'bg-[#F59E0B] text-white shadow-md' : 'bg-white text-slate-400 border border-slate-100 hover:bg-slate-100'}`}
                                             >
                                                 {p}
                                             </button>
@@ -262,16 +268,15 @@ const CreateProductionPlan: React.FC = () => {
                                 </div>
                             )}
 
-                            <div className="flex items-center justify-around">
+                            <div className="flex items-center justify-center gap-6">
                                 <button
                                     onClick={handleFinalAction}
                                     disabled={loading}
-                                    className="bg-slate-900 text-white px-4 py-3 rounded-xl font-bold text-sm  hover:bg-slate-800 transition-all flex items-center justify-center gap-1 shadow-xl"
+                                    className="bg-slate-900 text-white px-4 py-2 rounded-xl font-bold text-sm  hover:bg-slate-800 transition-all flex items-center justify-center gap-1 shadow-xl"
                                 >
-                                    {loading ? <Loader2 size={20} className="animate-spin" /> : <Save size={20} />}
                                     {isMaterialAvailable ? "Confirm Production Plan" : "Confirm Purchase Request"}
                                 </button>
-                                <button onClick={() => setCurrentStep(3)} className=" font-bold text-sm rounded-xl px-4 py-3 text-[#F59E0B] hover:text-red-500 border hover:border-red-500 transition-colors">Review Materials Again</button>
+                                <button onClick={() => setCurrentStep(3)} className=" font-bold text-sm rounded-xl px-4 py-2 text-[#F59E0B] hover:text-red-500 border hover:border-red-500 transition-colors">Review Materials Again</button>
                             </div>
                         </div>
                     </div>
@@ -285,10 +290,10 @@ const CreateProductionPlan: React.FC = () => {
 
 const DetailBox: React.FC<{ label: string; value: string; icon: React.ReactNode }> = ({ label, value, icon }) => (
     <div className="space-y-2">
-        <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 flex items-center gap-1.5">
+        <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-700 flex items-center gap-1.5">
             {icon} {label}
         </label>
-        <div className="text-slate-800 font-bold text-sm bg-slate-50/50 px-5 py-4 rounded-3xl border border-slate-50">
+        <div className="text-slate-800 font-bold text-sm bg-slate-50/50 px-1.5 py-2 rounded-3xl border border-slate-50">
             {value}
         </div>
     </div>

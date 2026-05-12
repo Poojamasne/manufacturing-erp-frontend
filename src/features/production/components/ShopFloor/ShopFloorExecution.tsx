@@ -70,6 +70,22 @@ const initialWorkOrders: WorkOrder[] = [
       { id: "t4", name: "Frame Welding", machine: "Weld-Bot", operator: "Sarah W.", startDate: "2024-05-15", endDate: "2024-05-16", status: "COMPLETED" },
       { id: "t5", name: "Surface Coating", machine: "Powder Line", operator: "Tom H.", startDate: "2024-05-17", endDate: "2024-05-17", status: "COMPLETED" },
     ]
+  },
+  {
+    id: "wo-3",
+    workOrderId: "WO-2024-003",
+    productionOrderId: "PO-9909",
+    productName: "Steel Bracket 2x2",
+    totalQuantity: 1000,
+    status: "OPEN",
+    shift: "NIGHT",
+    createdAt: "2024-05-05T14:00:00Z",
+    tasks: [
+      { id: "t6", name: "Brace Cutting", machine: "Cutter Y", operator: "Alice J.", startDate: "2024-05-20", endDate: "2024-05-20", status: "PENDING" },
+      { id: "t7", name: "Bracket Assembly", machine: "Assembly Line", operator: "Bob K.", startDate: "2024-05-21", endDate: "2024-05-21", status: "PENDING" },
+      { id: "t8", name: "Final Inspection", machine: "QC-Station", operator: "Charlie M.", startDate: "2024-05-22", endDate: "2024-05-22", status: "PENDING" },
+      { id: "t9", name: "Packaging", machine: "Packager 3000", operator: "Diana P.", startDate: "2024-05-23", endDate: "2024-05-23", status: "PENDING" },
+    ]
   }
 ];
 
@@ -258,7 +274,7 @@ const ShopFloorExecution: React.FC = () => {
                 <ChevronDown size={14} className={activeDropdown === "status" ? "rotate-180" : ""} />
               </button>
               {activeDropdown === "status" && (
-                <div className="absolute right-0 mt-2 w-40 bg-white rounded-2xl shadow-2xl z-50 py-2 overflow-hidden border">
+                <div className="absolute right-0 mt-2 w-40 bg-white rounded-2xl shadow-2xl z-50 py-2 overflow-hidden">
                   {["All", "OPEN", "IN_PROGRESS", "COMPLETED"].map((opt) => (
                     <button key={opt} onClick={() => { setStatusFilter(opt); setActiveDropdown(null); }} className={`outline-none w-full text-left px-4 py-2.5 text-[13px] hover:bg-slate-50 ${statusFilter === opt ? "text-amber-500 font-bold bg-orange-50/50" : "text-slate-600"}`}>{opt}</button>
                   ))}
@@ -333,14 +349,14 @@ const ShopFloorExecution: React.FC = () => {
 
       {/* Modal */}
       {showManageModal && selectedWO && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
-          <div ref={modalRef} className="bg-white rounded-4xl max-w-4xl w-full shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div ref={modalRef} className="bg-white rounded-xl max-w-4xl w-full shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
             <div className="bg-white border-b p-6 flex justify-between items-center">
               <div>
-                <h2 className="text-xl font-black text-slate-800 uppercase italic">Operational Breakdown</h2>
+                <h2 className="text-xl font-black text-slate-800 uppercase">Operational Breakdown</h2>
                 <p className="text-xs text-amber-500 font-bold uppercase tracking-widest">{selectedWO.workOrderId} • {selectedWO.productName}</p>
               </div>
-              <button onClick={() => setShowManageModal(false)} className="text-gray-400 text-2xl hover:text-slate-600 transition-colors">×</button>
+              <button onClick={() => setShowManageModal(false)} className="text-gray-400 text-2xl hover:text-rose-600 transition-colors">×</button>
             </div>
 
             <div className="p-6 space-y-4 overflow-y-auto">
@@ -388,11 +404,11 @@ const ShopFloorExecution: React.FC = () => {
               </div>
 
               <div className="flex gap-3 w-full sm:w-auto items-center">
-                <button onClick={() => setShowManageModal(false)} className="px-6 py-2.5 bg-slate-50 text-slate-500 rounded-xl font-bold text-xs uppercase hover:bg-slate-100 transition-all border">Close</button>
+                <button onClick={() => setShowManageModal(false)} className="px-4 py-2 bg-slate-50 text-slate-500 rounded-xl font-bold text-xs uppercase hover:bg-slate-100 transition-all border">Close</button>
 
                 {/* FIX: Status-based Footer Message with Animation */}
                 {selectedWO.status === "COMPLETED" ? (
-                  <div className="flex items-center gap-2 px-6 py-2.5 bg-green-50 text-green-600 rounded-xl font-black text-[11px] uppercase tracking-widest border border-green-100 animate-pulse">
+                  <div className="cursor-not-allowed flex items-center gap-2 px-4 py-2 bg-green-50 text-green-600 rounded-xl font-black text-[11px] uppercase tracking-widest border border-green-100 animate-pulse">
                     <CheckCircle2 size={16} />
                     Production Finalized
                   </div>
@@ -400,9 +416,9 @@ const ShopFloorExecution: React.FC = () => {
                   <button
                     disabled={!allTasksFinished}
                     onClick={() => finalizeWorkOrder(selectedWO.id)}
-                    className={`px-8 py-2.5 rounded-xl font-black text-xs uppercase tracking-widest transition-all shadow-md ${allTasksFinished
-                        ? "bg-[#F59E0B] text-white hover:bg-slate-900 shadow-orange-100"
-                        : "bg-slate-100 text-slate-300 cursor-not-allowed shadow-none"
+                    className={`px-4 py-2 rounded-xl font-black text-xs uppercase tracking-widest transition-all shadow-md ${allTasksFinished
+                      ? "bg-[#F59E0B] text-white hover:bg-slate-900 shadow-orange-100"
+                      : "bg-slate-100 text-slate-300 cursor-not-allowed shadow-none"
                       }`}
                   >
                     Finalize Production
@@ -418,9 +434,9 @@ const ShopFloorExecution: React.FC = () => {
 };
 
 const StatCard = ({ label, value, color }: { label: string; value: number | string; color: string }) => (
-  <div className={`bg-white p-6 rounded-2xl border-l-4 ${color} shadow-sm transition-all hover:shadow-md`}>
+  <div className={`bg-white p-8 rounded-xl border-l-4 ${color} shadow-sm transition-all hover:shadow-md`}>
     <p className="text-[11px] font-bold text-gray-800 uppercase tracking-widest">{label}</p>
-    <p className="text-2xl font-extrabold text-slate-700 tracking-tight">{value}</p>
+    <p className="text-2xl font-bold text-slate-700 tracking-tight">{value}</p>
   </div>
 );
 

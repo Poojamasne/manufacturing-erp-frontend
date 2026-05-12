@@ -45,8 +45,8 @@ const initialMachines: Machine[] = [
   { id: "MAC-102", name: "Laser Cutter v2", type: "Precision", status: "In Use", load: 85 },
   { id: "MAC-103", name: "Lathe Pro", type: "Manual", status: "Maintenance", load: 0 },
   { id: "MAC-104", name: "3D Printer Industrial", type: "Additive", status: "Available", load: 0 },
-  { id: "MAC-105", name: "Drill Press A", type: "Manual", status: "Available", load: 10 },
-  { id: "MAC-106", name: "Hydraulic Press", type: "Heavy", status: "In Use", load: 45 },
+  // { id: "MAC-105", name: "Drill Press A", type: "Manual", status: "Available", load: 10 },
+  // { id: "MAC-106", name: "Hydraulic Press", type: "Heavy", status: "In Use", load: 45 },
 ];
 
 const initialOperators: Operator[] = [
@@ -54,8 +54,8 @@ const initialOperators: Operator[] = [
   { id: "OP-002", name: "Sarah Smith", role: "Assembly Tech", skill: "Junior", workload: 0, status: "Available", shift: "Afternoon" },
   { id: "OP-003", name: "Mike Ross", role: "Quality Control", skill: "Senior", workload: 100, status: "At Capacity", shift: "Evening" },
   { id: "OP-004", name: "Anna Bell", role: "Logistics", skill: "Intermediate", workload: 20, status: "Available", shift: "Morning" },
-  { id: "OP-005", name: "Chris Post", role: "Maintenance", skill: "Senior", workload: 50, status: "Assigned", shift: "Afternoon" },
-  { id: "OP-006", name: "Dana White", role: "Operator", skill: "Junior", workload: 10, status: "Available", shift: "Morning" },
+  // { id: "OP-005", name: "Chris Post", role: "Maintenance", skill: "Senior", workload: 50, status: "Assigned", shift: "Afternoon" },
+  // { id: "OP-006", name: "Dana White", role: "Operator", skill: "Junior", workload: 10, status: "Available", shift: "Morning" },
 ];
 
 // ==================== Helper Components ====================
@@ -327,7 +327,7 @@ const ResourceAllocation: React.FC = () => {
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          <div className="bg-white p-6 rounded-2xl border-l-4 border-orange-500 shadow-sm">
+          <div className="bg-white p-8 rounded-2xl border-l-4 border-orange-500 shadow-sm">
             <p className="text-[11px] font-bold text-gray-800 uppercase tracking-widest">Total Machines</p>
             <p className="text-2xl font-bold text-gray-700">{stats.totalMachines}</p>
             <div className="flex gap-3 mt-2 text-xs">
@@ -335,12 +335,12 @@ const ResourceAllocation: React.FC = () => {
               <span className="text-blue-600">In Use: {stats.inUseMachines}</span>
             </div>
           </div>
-          <div className="bg-white p-6 rounded-2xl border-l-4 border-blue-500 shadow-sm">
+          <div className="bg-white p-8 rounded-2xl border-l-4 border-blue-500 shadow-sm">
             <p className="text-[11px] font-bold text-gray-800 uppercase tracking-widest">Maintenance</p>
             <p className="text-2xl font-bold text-gray-700">{stats.maintenanceMachines}</p>
             <p className="text-xs text-red-600 mt-1">Machines in maintenance</p>
           </div>
-          <div className="bg-white p-6 rounded-2xl border-l-4 border-green-500 shadow-sm">
+          <div className="bg-white p-8 rounded-2xl border-l-4 border-green-500 shadow-sm">
             <p className="text-[11px] font-bold text-gray-800 uppercase tracking-widest">Total Operators</p>
             <p className="text-2xl font-bold text-gray-700">{stats.totalOperators}</p>
             <div className="flex gap-3 mt-2 text-xs">
@@ -348,7 +348,7 @@ const ResourceAllocation: React.FC = () => {
               <span className="text-blue-600">Assigned: {stats.assignedOperators}</span>
             </div>
           </div>
-          <div className="bg-white p-6 rounded-2xl border-l-4 border-amber-500 shadow-sm">
+          <div className="bg-white p-8 rounded-2xl border-l-4 border-amber-500 shadow-sm">
             <p className="text-[11px] font-bold text-gray-800 uppercase tracking-widest">At Capacity</p>
             <p className="text-2xl font-bold text-gray-700">{stats.atCapacityOperators}</p>
             <p className="text-xs text-amber-600 mt-1">Operators at max workload</p>

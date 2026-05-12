@@ -121,7 +121,7 @@ const formatDate = (date: string) => {
   const month = String(d.getMonth() + 1).padStart(2, "0");
   const year = d.getFullYear();
 
-  return `${day}/${month}/${year}`;
+  return `${day}-${month}-${year}`;
 };
 
 const ProductionPlanningScreen: React.FC = () => {
@@ -633,7 +633,7 @@ const ProductionPlanningScreen: React.FC = () => {
                 <button
                   onClick={() => goToPage(currentPage - 1)}
                   disabled={currentPage === 1}
-                  className="outline-none p-2.5 rounded-xl border border-slate-200 bg-white text-slate-500 hover:text-amber-500 disabled:opacity-30"
+                  className="outline-none p-2.5 rounded-xl border border-slate-500 bg-white text-slate-500 hover:text-amber-500 hover:border-amber-500 disabled:opacity-30"
                 >
                   <ChevronLeft size={18} className="outline-none " />
                 </button>
@@ -657,7 +657,7 @@ const ProductionPlanningScreen: React.FC = () => {
                 <button
                   onClick={() => goToPage(currentPage + 1)}
                   disabled={currentPage === totalPages}
-                  className="outline-none p-2.5 rounded-xl border border-slate-200 bg-white text-slate-500 hover:text-amber-500 disabled:opacity-30"
+                  className="outline-none p-2.5 rounded-xl border border-slate-500 bg-white text-slate-500 hover:text-amber-500 hover:border-amber-500 disabled:opacity-30"
                 >
                   <ChevronRight size={18} className="outline-none" />
                 </button>

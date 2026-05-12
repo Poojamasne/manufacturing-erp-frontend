@@ -129,7 +129,12 @@ const PriorityBadge: React.FC<{ priority: Priority }> = ({ priority }) => {
 const formatDate = (date: string) => {
   if (!date) return "-";
   const d = new Date(date);
-  return `${String(d.getDate()).padStart(2, "0")}/${String(d.getMonth() + 1).padStart(2, "0")}/${d.getFullYear()}`;
+
+  const day = String(d.getDate()).padStart(2, "0");
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const year = d.getFullYear();
+
+  return `${day}-${month}-${year}`;
 };
 
 const PurchaseRequestList: React.FC = () => {
@@ -137,7 +142,7 @@ const PurchaseRequestList: React.FC = () => {
   const statusDropdownRef = useRef<HTMLDivElement>(null);
   const priorityDropdownRef = useRef<HTMLDivElement>(null);
 
-  const [requests, _setRequests] = useState<PurchaseRequest[]>(mockPurchaseRequests);
+  const [requests, setRequests] = useState<PurchaseRequest[]>(mockPurchaseRequests);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
   const [priorityFilter, setPriorityFilter] = useState("All");
@@ -149,7 +154,7 @@ const PurchaseRequestList: React.FC = () => {
   const [isTimeDropdownOpen, setIsTimeDropdownOpen] = useState(false);
   const [_isCalendarOpen, setIsCalendarOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
-  const [selectedIds, _setSelectedIds] = useState<string[]>([]);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [selectedRequest, setSelectedRequest] = useState<PurchaseRequest | null>(null);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
 
@@ -177,8 +182,8 @@ const PurchaseRequestList: React.FC = () => {
   }, [activeDropdown]);
 
   const filteredRequests = useMemo(() => {
-    let filtered = requests.filter((r) => 
-      r.materialName.toLowerCase().includes(searchQuery.toLowerCase()) || 
+    let filtered = requests.filter((r) =>
+      r.materialName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       r.prId.toLowerCase().includes(searchQuery.toLowerCase())
     );
     if (statusFilter !== "All") filtered = filtered.filter(r => r.status === statusFilter);
@@ -187,12 +192,35 @@ const PurchaseRequestList: React.FC = () => {
   }, [requests, searchQuery, statusFilter, priorityFilter]);
 
   const paginatedData = filteredRequests.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
-//   const totalPages = Math.ceil(filteredRequests.length / itemsPerPage);
+  //   const totalPages = Math.ceil(filteredRequests.length / itemsPerPage);
+
+
+  const toggleSelectAll = () => {
+    if (
+      paginatedData.length > 0 &&
+      selectedIds.length === paginatedData.length
+    ) {
+      setSelectedIds([]);
+    } else {
+      setSelectedIds(paginatedData.map((item) => item.id));
+    }
+  };
+
+  const handleDeleteSelected = () => {
+    if (selectedIds.length === 0) return;
+
+    const updatedRequests = requests.filter(
+      (item) => !selectedIds.includes(item.id)
+    );
+
+    setRequests(updatedRequests);
+    setSelectedIds([]);
+  };
 
   return (
     <div className="min-h-screen bg-[#f4f7f6] p-4 sm:p-6 lg:p-8 text-slate-900 font-sans">
       <div className="max-w-7xl mx-auto">
-        
+
         {/* Header */}
         <header className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 mb-10">
           <div>
@@ -230,35 +258,42 @@ const PurchaseRequestList: React.FC = () => {
           <div className="p-6 flex flex-col lg:flex-row justify-between items-center gap-4 border-b border-slate-50">
             <div className="relative w-full lg:w-96">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" size={18} />
-              <input 
-                type="text" 
-                placeholder="Search material or PR ID..." 
+              <input
+                type="text"
+                placeholder="Search material or PR ID..."
                 className="w-full pl-12 pr-4 py-3.5 bg-slate-50 border-transparent rounded-2xl focus:bg-white focus:ring-4 focus:ring-orange-500/5 text-sm outline-none transition-all"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
-            
+
             <div className="flex flex-wrap gap-3">
-              <DropdownFilter 
-                label="Status" 
-                value={statusFilter} 
-                options={["All", "PENDING", "APPROVED", "ORDERED", "RECEIVED"]} 
+              <DropdownFilter
+                label="Status"
+                value={statusFilter}
+                options={["All", "PENDING", "APPROVED", "ORDERED", "RECEIVED"]}
                 active={activeDropdown === "status"}
                 onToggle={() => setActiveDropdown(activeDropdown === "status" ? null : "status")}
-                onSelect={(val:any) => { setStatusFilter(val); setActiveDropdown(null); }}
+                onSelect={(val: any) => { setStatusFilter(val); setActiveDropdown(null); }}
                 refObj={statusDropdownRef}
               />
-              <DropdownFilter 
-                label="Priority" 
-                value={priorityFilter} 
-                options={["All", "HIGH", "MEDIUM", "LOW"]} 
+              <DropdownFilter
+                label="Priority"
+                value={priorityFilter}
+                options={["All", "HIGH", "MEDIUM", "LOW"]}
                 active={activeDropdown === "priority"}
                 onToggle={() => setActiveDropdown(activeDropdown === "priority" ? null : "priority")}
-                onSelect={(val:any) => { setPriorityFilter(val); setActiveDropdown(null); }}
+                onSelect={(val: any) => { setPriorityFilter(val); setActiveDropdown(null); }}
                 refObj={priorityDropdownRef}
               />
-              <button disabled={selectedIds.length === 0} className={`p-3 rounded-xl transition-all ${selectedIds.length === 0 ? "bg-gray-100 text-gray-400" : "bg-rose-600 text-white shadow-lg shadow-rose-100"}`}>
+              <button
+                onClick={handleDeleteSelected}
+                disabled={selectedIds.length === 0}
+                className={`p-3 rounded-xl transition-all ${selectedIds.length === 0
+                  ? "bg-gray-100 text-gray-400"
+                  : "bg-rose-600 text-white shadow-lg shadow-rose-100 hover:bg-rose-700"
+                  }`}
+              >
                 <Trash2 size={20} />
               </button>
             </div>
@@ -269,8 +304,15 @@ const PurchaseRequestList: React.FC = () => {
               <thead>
                 <tr className="bg-slate-50/50">
                   <th className="w-12 p-5 text-center border-b border-slate-100">
-                    <input type="checkbox" className="h-4 w-4 appearance-none rounded border border-slate-300 bg-white checked:bg-[#F59E0B] relative checked:after:content-['✓'] checked:after:absolute checked:after:text-white checked:after:text-[10px] checked:after:left-0.5 checked:after:top-0 outline-none cursor-pointer" />
-                  </th>
+                    <input
+                      type="checkbox"
+                      checked={
+                        paginatedData.length > 0 &&
+                        selectedIds.length === paginatedData.length
+                      }
+                      onChange={toggleSelectAll}
+                      className="h-4 w-4 appearance-none rounded border border-slate-300 bg-white checked:bg-[#F59E0B] relative checked:after:content-['✓'] checked:after:absolute checked:after:text-white checked:after:text-[10px] checked:after:left-0.5 checked:after:top-0 outline-none cursor-pointer"
+                    />                  </th>
                   <th className="px-4 py-4 text-[11px] text-slate-800 uppercase tracking-widest text-center">PR ID</th>
                   <th className="px-4 py-4 text-[11px] text-slate-800 uppercase tracking-widest">Material</th>
                   <th className="px-4 py-4 text-[11px] text-slate-800 uppercase tracking-widest text-center">Qty</th>
@@ -281,25 +323,86 @@ const PurchaseRequestList: React.FC = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-50">
-                {paginatedData.map((req) => (
-                  <tr key={req.id} className="group hover:bg-orange-50/20 transition-colors">
-                    <td className="p-5 text-center">
-                      <input type="checkbox" className="h-4 w-4 appearance-none rounded border border-slate-300 bg-white checked:bg-[#F59E0B] relative checked:after:content-['✓'] checked:after:absolute checked:after:text-white checked:after:text-[10px] checked:after:left-0.5 checked:after:top-0 outline-none cursor-pointer" />
-                    </td>
-                    <td className="px-4 py-4 text-[13px] font-mono font-bold text-slate-800 text-center">{req.prId}</td>
-                    <td className="px-4 py-4 text-[13px] text-slate-700 font-medium">{req.materialName}</td>
-                    <td className="px-4 py-4 text-[13px] text-slate-700 text-center font-bold">{req.quantity} {req.unit}</td>
-                    <td className="px-4 py-4 text-center"><PriorityBadge priority={req.priority} /></td>
-                    <td className="px-4 py-4 text-[13px] text-slate-700 text-center">{formatDate(req.targetDate)}</td>
-                    <td className="px-4 py-4 text-center"><StatusBadge status={req.status} /></td>
-                    <td className="px-4 py-4 text-center">
-                      <div className="flex justify-center gap-2">
-                        <button onClick={() => { setSelectedRequest(req); setShowDetailsModal(true); }} className="p-1.5 text-slate-400 hover:text-[#F59E0B] transition-colors"><Eye size={16} /></button>
-                        <button className="p-1.5 text-slate-400 hover:text-blue-500 transition-colors"><Edit size={16} /></button>
+                {paginatedData.length > 0 ? (
+                  paginatedData.map((req) => (
+                    <tr key={req.id} className="group hover:bg-orange-50/20 transition-colors">
+                      <td className="p-5 text-center">
+                        <input
+                          type="checkbox"
+                          checked={selectedIds.includes(req.id)}
+                          onChange={() => {
+                            if (selectedIds.includes(req.id)) {
+                              setSelectedIds(selectedIds.filter((id) => id !== req.id));
+                            } else {
+                              setSelectedIds([...selectedIds, req.id]);
+                            }
+                          }}
+                          className="h-4 w-4 appearance-none rounded border border-slate-300 bg-white checked:bg-[#F59E0B] relative checked:after:content-['✓'] checked:after:absolute checked:after:text-white checked:after:text-[10px] checked:after:left-0.5 checked:after:top-0 outline-none cursor-pointer"
+                        />
+                      </td>
+
+                      <td className="px-4 py-4 text-[13px] font-mono font-bold text-slate-800 text-center">
+                        {req.prId}
+                      </td>
+
+                      <td className="px-4 py-4 text-[13px] text-slate-700 font-medium">
+                        {req.materialName}
+                      </td>
+
+                      <td className="px-4 py-4 text-[13px] text-slate-700 text-center font-bold">
+                        {req.quantity} {req.unit}
+                      </td>
+
+                      <td className="px-4 py-4 text-center">
+                        <PriorityBadge priority={req.priority} />
+                      </td>
+
+                      <td className="px-4 py-4 text-[13px] text-slate-700 text-center">
+                        {formatDate(req.targetDate)}
+                      </td>
+
+                      <td className="px-4 py-4 text-center">
+                        <StatusBadge status={req.status} />
+                      </td>
+
+                      <td className="px-4 py-4 text-center">
+                        <div className="flex justify-center gap-2">
+                          <button
+                            onClick={() => {
+                              setSelectedRequest(req);
+                              setShowDetailsModal(true);
+                            }}
+                            className="p-1.5 text-slate-400 hover:text-[#F59E0B] transition-colors"
+                          >
+                            <Eye size={16} />
+                          </button>
+
+                          <button className="p-1.5 text-slate-400 hover:text-blue-500 transition-colors">
+                            <Edit size={16} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={8} className="py-24 text-center">
+                      <div className="flex flex-col items-center justify-center">
+                        <div className="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center mb-4">
+                          <Trash2 size={28} className="text-slate-300" />
+                        </div>
+
+                        <h3 className="text-lg font-bold text-slate-700">
+                          No Purchase Requests Found
+                        </h3>
+
+                        <p className="text-sm text-slate-400 mt-1">
+                          There are currently no entries available.
+                        </p>
                       </div>
                     </td>
                   </tr>
-                ))}
+                )}
               </tbody>
             </table>
           </div>
@@ -307,9 +410,9 @@ const PurchaseRequestList: React.FC = () => {
           <footer className="p-6 bg-slate-50/50 border-t border-slate-100 flex justify-between items-center">
             <span className="text-[11px] font-bold text-slate-800 uppercase tracking-tight">Showing {paginatedData.length} of {filteredRequests.length} Requests</span>
             <div className="flex gap-1.5">
-                <button className="p-2.5 rounded-xl border bg-white text-slate-500 disabled:opacity-30"><ChevronLeft size={18}/></button>
-                <button className="w-10 h-10 rounded-xl bg-[#F59E0B] text-white font-bold text-xs">1</button>
-                <button className="p-2.5 rounded-xl border bg-white text-slate-500 disabled:opacity-30"><ChevronRight size={18}/></button>
+              <button className="outline-none p-2.5 rounded-xl border border-slate-300 bg-white text-slate-300 hover:text-amber-500 hover:border-amber-500 disabled:opacity-30"><ChevronLeft size={18} /></button>
+              <button className="w-10 h-10 rounded-xl bg-[#F59E0B] text-white font-bold text-xs">1</button>
+              <button className="outline-none p-2.5 rounded-xl border border-slate-300 bg-white text-slate-300 hover:text-amber-500 hover:border-amber-500 disabled:opacity-30"><ChevronRight size={18} /></button>
             </div>
           </footer>
         </div>
@@ -320,32 +423,32 @@ const PurchaseRequestList: React.FC = () => {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 animate-in fade-in">
           <div className="bg-white rounded-2xl max-w-2xl w-full overflow-hidden shadow-2xl">
             <div className="p-6 border-b flex justify-between items-center bg-slate-50/50">
-                <div>
-                    <h2 className="text-xl font-bold text-slate-800">{selectedRequest.prId} Details</h2>
-                    <p className="text-xs text-slate-500 font-bold uppercase tracking-widest">Requested by: {selectedRequest.requestedBy}</p>
-                </div>
-                <button onClick={() => setShowDetailsModal(false)} className="text-slate-400 text-2xl">×</button>
+              <div>
+                <h2 className="text-xl font-bold text-slate-800">{selectedRequest.prId} Details</h2>
+                <p className="text-xs text-slate-500 font-bold uppercase tracking-widest">Requested by: {selectedRequest.requestedBy}</p>
+              </div>
+              <button onClick={() => setShowDetailsModal(false)} className="text-slate-400 hover:text-rose-500 text-2xl">×</button>
             </div>
             <div className="p-8 grid grid-cols-2 gap-6">
-                <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Material</label>
-                    <p className="font-bold text-slate-800">{selectedRequest.materialName}</p>
-                </div>
-                <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Quantity</label>
-                    <p className="font-bold text-slate-800">{selectedRequest.quantity} {selectedRequest.unit}</p>
-                </div>
-                <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Status</label>
-                    <div className="mt-1"><StatusBadge status={selectedRequest.status}/></div>
-                </div>
-                <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Priority</label>
-                    <div className="mt-1"><PriorityBadge priority={selectedRequest.priority}/></div>
-                </div>
+              <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Material</label>
+                <p className="font-bold text-slate-800">{selectedRequest.materialName}</p>
+              </div>
+              <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Quantity</label>
+                <p className="font-bold text-slate-800">{selectedRequest.quantity} {selectedRequest.unit}</p>
+              </div>
+              <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Status</label>
+                <div className="mt-1"><StatusBadge status={selectedRequest.status} /></div>
+              </div>
+              <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Priority</label>
+                <div className="mt-1"><PriorityBadge priority={selectedRequest.priority} /></div>
+              </div>
             </div>
             <div className="p-6 border-t bg-slate-50/50 flex justify-end">
-                <button onClick={() => setShowDetailsModal(false)} className="px-6 py-2.5 bg-[#F59E0B] text-white rounded-xl font-bold text-sm shadow-lg shadow-orange-100 hover:bg-[#f67317] transition-all">Close Details</button>
+              <button onClick={() => setShowDetailsModal(false)} className="px-6 py-2.5 bg-[#F59E0B] text-white rounded-xl font-bold text-sm shadow-lg shadow-orange-100 hover:bg-[#f67317] transition-all">Close Details</button>
             </div>
           </div>
         </div>
@@ -356,7 +459,7 @@ const PurchaseRequestList: React.FC = () => {
 
 // ==================== Shared Sub-Components ====================
 const StatCard = ({ label, value, border }: { label: string; value: number; border: string }) => (
-  <div className={`bg-white p-6 rounded-2xl border-l-4 ${border} shadow-sm`}>
+  <div className={`bg-white p-7 rounded-2xl border-l-4 ${border} shadow-sm`}>
     <p className="text-[11px] font-bold text-gray-800 uppercase tracking-widest">{label}</p>
     <p className="text-2xl font-bold text-gray-700">{value}</p>
   </div>
@@ -369,7 +472,7 @@ const DropdownFilter = ({ label, value, options, active, onToggle, onSelect, ref
       <ChevronDown size={14} className={active ? "rotate-180" : ""} />
     </button>
     {active && (
-      <div className="absolute right-0 mt-2 w-44 bg-white rounded-2xl shadow-2xl z-50 py-2 border border-slate-50 overflow-hidden transition-all">
+      <div className="absolute right-0 mt-2 w-25 bg-white rounded-2xl shadow-2xl z-50 py-2 border border-slate-50 overflow-hidden transition-all">
         {options.map((opt: string) => (
           <button key={opt} onClick={() => onSelect(opt)} className={`w-full text-left px-4 py-2.5 text-[13px] hover:bg-slate-50 ${value === opt ? "text-amber-500 font-bold bg-orange-50/50" : "text-slate-600"}`}>
             {opt === "All" ? "All" : opt.replace("_", " ")}

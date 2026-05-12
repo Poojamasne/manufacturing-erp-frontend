@@ -7,7 +7,7 @@ import {
   MoreHorizontal,
   Filter,
   Eye,
-  Edit,
+  // Edit,
   // CheckCircle,
   AlertTriangle,
   // User,
@@ -77,6 +77,7 @@ const WorkOrderList: React.FC = () => {
   const timeFilterRef = useRef<HTMLDivElement>(null);
   const statusFilterRef = useRef<HTMLDivElement>(null);
   const shiftFilterRef = useRef<HTMLDivElement>(null);
+  const viewModalRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   const [workOrders, setWorkOrders] = useState<WorkOrder[]>(mockWorkOrders);
   const [searchQuery, setSearchQuery] = useState("");
@@ -127,6 +128,11 @@ const WorkOrderList: React.FC = () => {
       if (shiftFilterRef.current && !shiftFilterRef.current.contains(target)) {
         if (activeDropdown === "shift") setActiveDropdown(null);
       }
+      // view Ref
+      if (viewModalRef.current && !viewModalRef.current.contains(target)) {
+        setShowDetailsModal(false);
+        setSelectedOrder(null);
+      }
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
@@ -151,13 +157,15 @@ const WorkOrderList: React.FC = () => {
   };
 
   const formatDate = (date: string) => {
-  if (!date) return "-";
-  const d = new Date(date);
-  const day = String(d.getDate()).padStart(2, "0");
-  const month = String(d.getMonth() + 1).padStart(2, "0");
-  const year = d.getFullYear();
-  return `${day}/${month}/${year}`;
-};
+    if (!date) return "-";
+    const d = new Date(date);
+
+    const day = String(d.getDate()).padStart(2, "0");
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const year = d.getFullYear();
+
+    return `${day}-${month}-${year}`;
+  };
 
   const filteredWorkOrders = useMemo(() => {
     let filtered = [...workOrders];
@@ -214,10 +222,7 @@ const WorkOrderList: React.FC = () => {
   };
 
   const handleViewDetails = (order: WorkOrder) => { setSelectedOrder(order); setShowDetailsModal(true); };
-  const handleStartTask = (id: string) => {
-    setWorkOrders(workOrders.map(w => w.id === id ? { ...w, status: "IN_PROGRESS", progress: 5 } : w));
-    alert("This section is under development!");
-  };
+
   // const handleCompleteTask = (id: string) => {
   //   setWorkOrders(workOrders.map(w => w.id === id ? { ...w, status: "COMPLETED", progress: 100 } : w));
   //   alert("Task Section is under development!");
@@ -260,10 +265,10 @@ const WorkOrderList: React.FC = () => {
             </div>
             <button
               onClick={() => navigate("/production/work-orders/new-work-order")}
-              className="outline-none group flex items-center gap-1 bg-[#F59E0B] hover:bg-[#f67317] text-white px-2.5 py-2 rounded-xl font-bold text-sm shadow-xl shadow-amber-500/5 transition-all active:scale-95 whitespace-nowrap"
+              className="outline-none group flex items-center gap-1 bg-[#F59E0B] hover:bg-[#f67317] text-white px-4 py-2 rounded-xl font-bold text-sm shadow-xl shadow-amber-500/5 transition-all active:scale-95 whitespace-nowrap"
             >
               <Plus size={18} />
-              <span className="hidden sm:inline">Create New Work Order</span>
+              <span className="hidden sm:inline">Create WO</span>
               <span className="sm:hidden">New</span>
             </button>
           </div>
@@ -395,7 +400,7 @@ const WorkOrderList: React.FC = () => {
                     {/* <td className="px-4 py-4"><div className="flex items-center justify-center gap-2"><div className="w-20 h-1.5 bg-gray-100 rounded-full overflow-hidden"><div className="h-full bg-[#F59E0B] rounded-full" style={{ width: `${wo.progress}%` }} /></div><span className="text-[11px] font-semibold">{wo.progress}%</span></div></td> */}
                     <td className="px-4 py-4"><div className="flex justify-center gap-2">
                       <button onClick={() => handleViewDetails(wo)} className="outline-none p-1.5 text-slate-400 hover:text-[#F59E0B]"><Eye size={16} /></button>
-                      <button onClick={() => handleStartTask(wo.id)} className="outline-none p-1.5 text-slate-400 hover:text-green-500"><Edit size={16} /></button>
+                      {/* <button onClick={() => handleStartTask(wo.id)} className="outline-none p-1.5 text-slate-400 hover:text-green-500"><Edit size={16} /></button> */}
                       <button onClick={() => handleDelete(wo.id)} className="outline-none p-1.5 text-slate-400 hover:text-rose-600"><Trash2 size={16} /></button>
                     </div></td>
                   </tr>
@@ -422,8 +427,12 @@ const WorkOrderList: React.FC = () => {
       {/* Work Order Details Modal */}
       {showDetailsModal && selectedOrder && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
-          <div className="bg-white rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
-            <div className="sticky top-0 bg-white border-b p-6 flex justify-between"><div><h2 className="text-xl font-bold">{selectedOrder.workOrderId}</h2><p className="text-sm text-gray-500">{selectedOrder.taskName}</p></div><button onClick={() => setShowDetailsModal(false)} className="outline-none text-gray-400">✕</button></div>
+          <div ref={viewModalRef} className="bg-white rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
+            <div className="sticky top-0 bg-white border-b p-6 flex justify-between">
+              <div>
+                <h2 className="text-xl font-bold">{selectedOrder.workOrderId}</h2><p className="text-sm text-gray-500">{selectedOrder.taskName}</p>
+              </div>
+              <button onClick={() => setShowDetailsModal(false)} className="outline-none text-gray-400 hover:text-rose-400">✕</button></div>
             <div className="p-6 space-y-6">
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div className="p-3 bg-gray-50 rounded-xl"><label className="text-xs text-gray-500">Production Order</label><p className="font-semibold">{selectedOrder.productionOrderName}</p></div>
@@ -437,12 +446,12 @@ const WorkOrderList: React.FC = () => {
                 <div className="p-3 bg-gray-50 rounded-xl"><label className="text-xs text-gray-500">Est. Hours</label><p className="font-semibold">{selectedOrder.estimatedHours}</p></div>
                 <div className="p-3 bg-gray-50 rounded-xl"><label className="text-xs text-gray-500">Actual Hours</label><p className="font-semibold">{selectedOrder.actualHours || 0}</p></div>
               </div>
-              <div><h3 className="font-bold mb-2">Work Instructions</h3><div className="bg-gray-50 rounded-xl p-4"><ul className="list-disc list-inside space-y-1">{selectedOrder.instructions.map((inst, i) => <li key={i} className="text-sm">{inst}</li>)}</ul></div></div>
-              <div><h3 className="font-bold mb-2">Safety Instructions</h3><div className="bg-yellow-50 rounded-xl p-4 border border-yellow-200"><ul className="list-disc list-inside space-y-1">{selectedOrder.safetyNotes.map((note, i) => <li key={i} className="text-sm text-yellow-800">{note}</li>)}</ul></div></div>
-              <div><div className="bg-gray-100 rounded-full h-2 overflow-hidden"><div className="h-full bg-[#F59E0B] rounded-full" style={{ width: `${selectedOrder.progress}%` }} /></div><p className="text-right text-sm mt-1">{selectedOrder.progress}% Complete</p></div>
+              {/* <div><h3 className="font-bold mb-2">Work Instructions</h3><div className="bg-gray-50 rounded-xl p-4"><ul className="list-disc list-inside space-y-1">{selectedOrder.instructions.map((inst, i) => <li key={i} className="text-sm">{inst}</li>)}</ul></div></div> */}
+              {/* <div><h3 className="font-bold mb-2">Safety Instructions</h3><div className="bg-yellow-50 rounded-xl p-4 border border-yellow-200"><ul className="list-disc list-inside space-y-1">{selectedOrder.safetyNotes.map((note, i) => <li key={i} className="text-sm text-yellow-800">{note}</li>)}</ul></div></div> */}
+              {/* <div><div className="bg-gray-100 rounded-full h-2 overflow-hidden"><div className="h-full bg-[#F59E0B] rounded-full" style={{ width: `${selectedOrder.progress}%` }} /></div><p className="text-right text-sm mt-1">{selectedOrder.progress}% Complete</p></div> */}
             </div>
             <div className="sticky bottom-0 bg-white border-t p-6 flex justify-end gap-3">
-              {selectedOrder.status === "PENDING" && <button onClick={() => { handleStartTask(selectedOrder.id); setShowDetailsModal(false); }} className="outline-none px-6 py-4 bg-green-500 hover:bg-green-600 text-white rounded-xl">Start Task</button>}
+              {/* {selectedOrder.status === "PENDING" && <button onClick={() => { handleStartTask(selectedOrder.id); setShowDetailsModal(false); }} className="outline-none px-6 py-4 bg-green-500 hover:bg-green-600 text-white rounded-xl">Start Task</button>} */}
               {/* {selectedOrder.status === "IN_PROGRESS" && <button onClick={() => { handleCompleteTask(selectedOrder.id); setShowDetailsModal(false); }} className="outline-none px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-xl">Complete Task</button>} */}
               <button onClick={() => setShowDetailsModal(false)} className="outline-none px-6 py-2 bg-gray-100 hover:bg-gray-200 rounded-xl">Close</button>
             </div>

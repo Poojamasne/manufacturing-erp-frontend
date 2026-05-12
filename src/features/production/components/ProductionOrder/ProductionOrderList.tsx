@@ -6,12 +6,12 @@ import {
   ChevronRight,
   Filter,
   Eye,
-  Edit,
+  // Edit,
   Trash2,
 } from "lucide-react";
 
 type TimeFilter = "Weekly" | "Monthly" | "Quarterly" | "Yearly" | "All Time" | "Custom";
-type ProductionOrderStatus = "DRAFT" | "PLANNED" | "SCHEDULED" | "IN_PROGRESS" | "ON_HOLD" | "COMPLETED" | "CANCELLED";
+type ProductionOrderStatus = "DRAFT" | "PLANNED" | "SCHEDULED" | "IN PROGRESS" | "ON HOLD" | "COMPLETED" | "CANCELLED";
 type Priority = "HIGH" | "MEDIUM" | "LOW";
 
 interface ProductionOrder {
@@ -27,10 +27,10 @@ interface ProductionOrder {
 }
 
 const mockOrders: ProductionOrder[] = [
-  { id: "1", productionOrderId: "PO-001", salesOrderId: "SO-001", productName: "Industrial Bolt M12", quantity: 5000, deadline: "2024-05-20", status: "IN_PROGRESS", priority: "HIGH", createdAt: "2024-05-14" },
+  { id: "1", productionOrderId: "PO-001", salesOrderId: "SO-001", productName: "Industrial Bolt M12", quantity: 5000, deadline: "2024-05-20", status: "IN PROGRESS", priority: "HIGH", createdAt: "2024-05-14" },
   { id: "2", productionOrderId: "PO-002", salesOrderId: "SO-002", productName: "Aluminum Frame 4x4", quantity: 250, deadline: "2024-05-18", status: "PLANNED", priority: "HIGH", createdAt: "2024-05-12" },
-  { id: "3", productionOrderId: "PO-003", salesOrderId: "SO-003", productName: "Plastic Container L", quantity: 1000, deadline: "2024-05-22", status: "ON_HOLD", priority: "MEDIUM", createdAt: "2024-05-13" },
-  { id: "4", productionOrderId: "PO-004", salesOrderId: "SO-004", productName: "Plastic Container L", quantity: 1000, deadline: "2024-05-22", status: "ON_HOLD", priority: "MEDIUM", createdAt: "2024-05-13" },
+  { id: "3", productionOrderId: "PO-003", salesOrderId: "SO-003", productName: "Plastic Container L", quantity: 1000, deadline: "2024-05-22", status: "ON HOLD", priority: "MEDIUM", createdAt: "2024-05-13" },
+  { id: "4", productionOrderId: "PO-004", salesOrderId: "SO-004", productName: "Plastic Container L", quantity: 1000, deadline: "2024-05-22", status: "ON HOLD", priority: "MEDIUM", createdAt: "2024-05-13" },
 ];
 
 // ==================== Helper Components ====================
@@ -39,8 +39,8 @@ const StatusBadge: React.FC<{ status: ProductionOrderStatus }> = ({ status }) =>
     DRAFT: "bg-gray-100 text-gray-700 border-gray-200",
     PLANNED: "bg-blue-100 text-blue-700 border-blue-200",
     SCHEDULED: "bg-purple-100 text-purple-700 border-purple-200",
-    IN_PROGRESS: "bg-orange-100 text-orange-700 border-orange-200",
-    ON_HOLD: "bg-yellow-100 text-yellow-700 border-yellow-200",
+    "IN PROGRESS": "bg-orange-100 text-orange-700 border-orange-200",
+    "ON HOLD": "bg-yellow-100 text-yellow-700 border-yellow-200",
     COMPLETED: "bg-green-100 text-green-700 border-green-200",
     CANCELLED: "bg-red-100 text-red-700 border-red-200",
   };
@@ -59,7 +59,12 @@ const PriorityBadge: React.FC<{ priority: Priority }> = ({ priority }) => {
 const formatDate = (date: string) => {
   if (!date) return "-";
   const d = new Date(date);
-  return `${String(d.getDate()).padStart(2, "0")}/${String(d.getMonth() + 1).padStart(2, "0")}/${d.getFullYear()}`;
+
+  const day = String(d.getDate()).padStart(2, "0");
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const year = d.getFullYear();
+
+  return `${day}-${month}-${year}`;
 };
 
 const ProductionOrderList: React.FC = () => {
@@ -71,7 +76,7 @@ const ProductionOrderList: React.FC = () => {
   const [statusFilter, setStatusFilter] = useState("All");
   const [timeFilter, setTimeFilter] = useState<TimeFilter>("All Time");
   const [customRange, setCustomRange] = useState({ start: "", end: "" });
-
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [isTimeDropdownOpen, setIsTimeDropdownOpen] = useState(false);
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
@@ -83,10 +88,10 @@ const ProductionOrderList: React.FC = () => {
 
   const stats = useMemo(() => ({
     total: mockOrders.length,
-    inProgress: mockOrders.filter(o => o.status === "IN_PROGRESS").length,
+    inProgress: mockOrders.filter(o => o.status === "IN PROGRESS").length,
     completed: mockOrders.filter(o => o.status === "COMPLETED").length,
     planned: mockOrders.filter(o => o.status === "PLANNED" || o.status === "SCHEDULED").length,
-    onHold: mockOrders.filter(o => o.status === "ON_HOLD").length,
+    onHold: mockOrders.filter(o => o.status === "ON HOLD").length,
   }), []);
 
   // Sync outside click for ALL dropdowns and calendar
@@ -175,6 +180,17 @@ const ProductionOrderList: React.FC = () => {
     return pages;
   };
 
+  const toggleSelectAll = () => {
+    if (
+      paginatedOrders.length > 0 &&
+      selectedIds.length === paginatedOrders.length
+    ) {
+      setSelectedIds([]);
+    } else {
+      setSelectedIds(paginatedOrders.map((o) => o.id));
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[#f4f7f6] p-4 sm:p-6 lg:p-8 text-slate-900 font-sans">
       <div className="max-w-7xl mx-auto">
@@ -214,36 +230,36 @@ const ProductionOrderList: React.FC = () => {
               </div>
             )}
             {isCalendarOpen && (
-                <div
-                  className="absolute right-0 mt-3 bg-white p-6 rounded-2xl shadow-xl border z-50 w-72"
-                >
-                  <div className="space-y-3">
-                    <input
-                      type="date"
-                      value={customRange.start}
-                      onChange={(e) =>
-                        setCustomRange({ ...customRange, start: e.target.value })
-                      }
-                      className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500/20"
-                    />
-                    <input
-                      type="date"
-                      value={customRange.end}
-                      min={customRange.start}
-                      onChange={(e) =>
-                        setCustomRange({ ...customRange, end: e.target.value })
-                      }
-                      className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500/20"
-                    />
-                    <button
-                      onClick={handleCustomApply}
-                      className="outline-none w-full bg-[#F59E0B] text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-[#f67317]"
-                    >
-                      Apply Range
-                    </button>
-                  </div>
+              <div
+                className="absolute right-0 mt-3 bg-white p-6 rounded-2xl shadow-xl border z-50 w-72"
+              >
+                <div className="space-y-3">
+                  <input
+                    type="date"
+                    value={customRange.start}
+                    onChange={(e) =>
+                      setCustomRange({ ...customRange, start: e.target.value })
+                    }
+                    className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500/20"
+                  />
+                  <input
+                    type="date"
+                    value={customRange.end}
+                    min={customRange.start}
+                    onChange={(e) =>
+                      setCustomRange({ ...customRange, end: e.target.value })
+                    }
+                    className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500/20"
+                  />
+                  <button
+                    onClick={handleCustomApply}
+                    className="outline-none w-full bg-[#F59E0B] text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-[#f67317]"
+                  >
+                    Apply Range
+                  </button>
                 </div>
-              )}
+              </div>
+            )}
           </div>
         </header>
 
@@ -273,8 +289,8 @@ const ProductionOrderList: React.FC = () => {
                 </button>
                 {activeDropdown === "status" && (
                   <div className="absolute right-0 mt-2 w-48 bg-white rounded-2xl shadow-2xl z-50 py-2 border border-slate-50 overflow-hidden">
-                    {["All", "PLANNED", "IN_PROGRESS", "COMPLETED", "ON_HOLD"].map(s => (
-                      <button key={s} onClick={() => { setStatusFilter(s); setActiveDropdown(null); }} className="w-full text-left px-4 py-2 text-[13px] hover:bg-slate-50 text-slate-600 font-medium">{s}</button>
+                    {["All", "PLANNED", "IN PROGRESS", "COMPLETED", "ON HOLD"].map(s => (
+                      <button key={s} onClick={() => { setStatusFilter(s); setActiveDropdown(null); }} className={`outline-none w-full text-left px-4 py-2 text-[13px] hover:bg-slate-50 ${statusFilter === s ? "text-amber-500 font-bold bg-orange-50/50" : "text-slate-600"}`}>{s}</button>
                     ))}
                   </div>
                 )}
@@ -289,8 +305,15 @@ const ProductionOrderList: React.FC = () => {
               <thead>
                 <tr className="bg-slate-50/50">
                   <th className="w-12 p-5 text-center border-b border-slate-100">
-                    <input type="checkbox" className="h-4 w-4 appearance-none rounded border border-slate-300 bg-white checked:bg-[#F59E0B] outline-none" />
-                  </th>
+                    <input
+                      type="checkbox"
+                      className="h-4 w-4 cursor-pointer appearance-none rounded border border-slate-300 bg-white transition-all relative checked:bg-[#F59E0B] checked:border-[#F59E0B] after:content-[''] after:absolute after:opacity-0 checked:after:opacity-100 after:left-1.25 after:top-px after:w-1 after:h-2 after:border-white after:border-r-2 after:border-b-2 after:rotate-45 outline-none"
+                      checked={
+                        paginatedOrders.length > 0 &&
+                        selectedIds.length === paginatedOrders.length
+                      }
+                      onChange={toggleSelectAll}
+                    />                  </th>
                   <th className="px-4 py-4 text-[11px] text-slate-800 uppercase tracking-widest text-center">PO ID</th>
                   <th className="px-4 py-4 text-[11px] text-slate-800 uppercase tracking-widest text-center">Product</th>
                   <th className="px-4 py-4 text-[11px] text-slate-800 uppercase tracking-widest text-center">Qty</th>
@@ -304,8 +327,18 @@ const ProductionOrderList: React.FC = () => {
                 {paginatedOrders.map((order) => (
                   <tr key={order.id} className="group hover:bg-orange-50/20 transition-colors">
                     <td className="p-5 text-center">
-                      <input type="checkbox" className="h-4 w-4 appearance-none rounded border border-slate-300 bg-white checked:bg-[#F59E0B] outline-none" />
-                    </td>
+                      <input
+                        type="checkbox"
+                        className="h-4 w-4 cursor-pointer appearance-none rounded border border-slate-300 bg-white transition-all relative checked:bg-[#F59E0B] checked:border-[#F59E0B] after:content-[''] after:absolute after:opacity-0 checked:after:opacity-100 after:left-1.25 after:top-px after:w-1 after:h-2 after:border-white after:border-r-2 after:border-b-2 after:rotate-45 outline-none"
+                        checked={selectedIds.includes(order.id)}
+                        onChange={() => {
+                          if (selectedIds.includes(order.id)) {
+                            setSelectedIds(selectedIds.filter((id) => id !== order.id));
+                          } else {
+                            setSelectedIds([...selectedIds, order.id]);
+                          }
+                        }}
+                      />                    </td>
                     <td className="px-4 py-4 text-[13px] font-mono font-bold text-slate-800 text-center">{order.productionOrderId}</td>
                     <td className="px-4 py-4 text-[13px] text-slate-700 text-center">{order.productName}</td>
                     <td className="px-4 py-4 text-[13px] text-slate-700 text-center font-bold">{order.quantity.toLocaleString()}</td>
@@ -315,7 +348,7 @@ const ProductionOrderList: React.FC = () => {
                     <td className="px-4 py-4 text-center">
                       <div className="flex justify-center gap-2">
                         <button onClick={() => { setSelectedOrder(order); setShowDetailsModal(true); }} className="p-1.5 text-slate-400 hover:text-[#F59E0B] transition-colors"><Eye size={16} /></button>
-                        <button className="p-1.5 text-slate-400 hover:text-blue-500 transition-colors"><Edit size={16} /></button>
+                        {/* <button className="p-1.5 text-slate-400 hover:text-blue-500 transition-colors"><Edit size={16} /></button> */}
                       </div>
                     </td>
                   </tr>
@@ -330,13 +363,13 @@ const ProductionOrderList: React.FC = () => {
               Showing {(currentPage - 1) * itemsPerPage + 1} to {Math.min(currentPage * itemsPerPage, filteredOrders.length)} of {filteredOrders.length} Orders
             </div>
             <div className="flex items-center gap-2">
-              <button onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1} className="outline-none p-2.5 rounded-xl border border-slate-200 bg-white text-slate-500 hover:text-amber-500 disabled:opacity-30"><ChevronLeft size={18} /></button>
+              <button onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1} className="outline-none p-2.5 rounded-xl border border-slate-500 bg-white text-slate-500 hover:text-amber-500 hover:border-amber-500 disabled:opacity-30"><ChevronLeft size={18} /></button>
               <div className="flex gap-1.5">
                 {getPageNumbers().map(n => (
                   <button key={n} onClick={() => setCurrentPage(n)} className={`outline-none min-w-10 h-10 rounded-xl text-xs font-bold transition-all ${currentPage === n ? "bg-[#F59E0B] text-white shadow-lg" : "bg-white text-slate-500 border border-slate-200"}`}>{n}</button>
                 ))}
               </div>
-              <button onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages} className="outline-none p-2.5 rounded-xl border border-slate-200 bg-white text-slate-500 hover:text-amber-500 disabled:opacity-30"><ChevronRight size={18} /></button>
+              <button onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages} className="outline-none p-2.5 rounded-xl border border-slate-500 bg-white text-slate-500 hover:text-amber-500 hover:border-amber-500 disabled:opacity-30"><ChevronRight size={18} /></button>
             </div>
           </footer>
         </div>
@@ -344,11 +377,11 @@ const ProductionOrderList: React.FC = () => {
 
       {/* Details Modal */}
       {showDetailsModal && selectedOrder && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div ref={modalContentRef} className="bg-white rounded-[2.5rem] max-w-2xl w-full shadow-2xl overflow-hidden animate-in zoom-in-95">
+        <div className="fixed inset-0 bg-black/60  flex items-center justify-center z-50 p-4">
+          <div ref={modalContentRef} className="bg-white rounded-2xl max-w-2xl w-full shadow-2xl overflow-hidden animate-in zoom-in-95">
             <div className="p-8 border-b flex justify-between items-center bg-slate-50/50">
-              <h2 className="text-2xl font-black text-slate-800 uppercase tracking-tight italic">Production details</h2>
-              <button onClick={() => setShowDetailsModal(false)} className="text-slate-400 hover:text-slate-600 text-2xl">×</button>
+              <h2 className="text-2xl font-black text-slate-800 uppercase tracking-tight">Production details</h2>
+              <button onClick={() => setShowDetailsModal(false)} className="text-slate-400 hover:text-rose-600 text-2xl">×</button>
             </div>
             <div className="p-10 grid grid-cols-1 md:grid-cols-2 gap-10">
               <ModalDetail label="Product Details" value={selectedOrder.productName} />
@@ -358,7 +391,7 @@ const ProductionOrderList: React.FC = () => {
             </div>
             <div className="p-8 border-t bg-slate-50/50 flex justify-between items-center">
               <div className="flex gap-4 items-center">Status: <StatusBadge status={selectedOrder.status} /></div>
-              <button onClick={() => setShowDetailsModal(false)} className="px-6 py-3 bg-[#F59E0B] hover:bg-[#f67317] text-white rounded-xl font-black text-[11px] uppercase tracking-widest shadow-xl transition-all">Close Details</button>
+              <button onClick={() => setShowDetailsModal(false)} className="px-4 py-2 bg-[#F59E0B] hover:bg-[#f67317] text-white rounded-xl font-black text-[11px] uppercase tracking-widest shadow-xl transition-all">Close Details</button>
             </div>
           </div>
         </div>

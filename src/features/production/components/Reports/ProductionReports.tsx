@@ -13,12 +13,13 @@ import {
   Factory,
   Package,
   AlertCircle,
-  Play,
+  // Play,
   Printer,
   ClipboardList,
   Calendar,
   X,
   Trash2,
+  TrendingUp,
 } from "lucide-react";
 
 // ==================== Types ====================
@@ -59,11 +60,11 @@ interface MaterialRequirement {
 // ==================== Mock Data ====================
 const productionOrders: ProductionOrder[] = [
   { id: "1", productionOrderId: "PO-001", salesOrderId: "SO-001", productName: "Industrial Bolt M12", quantity: 5000, completedQuantity: 3250, rejectedQuantity: 45, deadline: "2024-05-20", startDate: "2024-05-15", status: "IN_PROGRESS", priority: "HIGH", progress: 65, shift: "MORNING", assignedMachine: "CNC Machine B", assignedOperator: "John Doe", workInstructions: "Set CNC parameters to 1200 RPM. Use cooling fluid every 50 units.", createdAt: "2024-05-14" },
-  { id: "2", productionOrderId: "PO-002", salesOrderId: "SO-002", productName: "Aluminum Frame 4x4", quantity: 250, completedQuantity: 0, rejectedQuantity: 0, deadline: "2024-05-18", startDate: "", status: "PLANNED", priority: "HIGH", progress: 0, shift: "MORNING", assignedMachine: "", assignedOperator: "", workInstructions: "", createdAt: "2024-05-12" },
-  { id: "3", productionOrderId: "PO-003", salesOrderId: "SO-003", productName: "Plastic Container L", quantity: 1000, completedQuantity: 300, rejectedQuantity: 12, deadline: "2024-05-22", startDate: "2024-05-17", status: "ON_HOLD", priority: "MEDIUM", progress: 30, shift: "EVENING", assignedMachine: "Injection Molder", assignedOperator: "Sarah Wilson", workInstructions: "Set mold temperature to 220°C. Cycle time 45 seconds.", createdAt: "2024-05-13" },
+  { id: "2", productionOrderId: "PO-002", salesOrderId: "SO-002", productName: "Aluminum Frame 4x4", quantity: 250, completedQuantity: 0, rejectedQuantity: 0, deadline: "2024-05-18", startDate: "", status: "IN_PROGRESS", priority: "HIGH", progress: 0, shift: "MORNING", assignedMachine: "", assignedOperator: "", workInstructions: "", createdAt: "2024-05-12" },
+  { id: "3", productionOrderId: "PO-003", salesOrderId: "SO-003", productName: "Plastic Container L", quantity: 1000, completedQuantity: 300, rejectedQuantity: 12, deadline: "2024-05-22", startDate: "2024-05-17", status: "COMPLETED", priority: "MEDIUM", progress: 30, shift: "EVENING", assignedMachine: "Injection Molder", assignedOperator: "Sarah Wilson", workInstructions: "Set mold temperature to 220°C. Cycle time 45 seconds.", createdAt: "2024-05-13" },
   { id: "4", productionOrderId: "PO-004", salesOrderId: "SO-004", productName: "Rubber Gasket Set", quantity: 3000, completedQuantity: 3000, rejectedQuantity: 28, deadline: "2024-05-19", startDate: "2024-05-10", status: "COMPLETED", priority: "HIGH", progress: 100, shift: "MORNING", assignedMachine: "Assembly Line 1", assignedOperator: "Jane Smith", workInstructions: "Inspect each gasket for defects. Package in sets of 50.", createdAt: "2024-05-09" },
   { id: "5", productionOrderId: "PO-005", salesOrderId: "SO-005", productName: "Steel Plates 6mm", quantity: 1500, completedQuantity: 0, rejectedQuantity: 0, deadline: "2024-05-25", startDate: "", status: "SCHEDULED", priority: "MEDIUM", progress: 0, shift: "NIGHT", assignedMachine: "CNC Machine A", assignedOperator: "Mike Johnson", workInstructions: "Cut to 300x300mm tolerance ±0.5mm", createdAt: "2024-05-15" },
-  { id: "6", productionOrderId: "PO-006", salesOrderId: "SO-006", productName: "Copper Wires", quantity: 8000, completedQuantity: 0, rejectedQuantity: 0, deadline: "2024-05-28", startDate: "", status: "DRAFT", priority: "LOW", progress: 0, shift: "MORNING", assignedMachine: "", assignedOperator: "", workInstructions: "", createdAt: "2024-05-16" },
+  { id: "6", productionOrderId: "PO-006", salesOrderId: "SO-006", productName: "Copper Wires", quantity: 8000, completedQuantity: 0, rejectedQuantity: 0, deadline: "2024-05-28", startDate: "", status: "COMPLETED", priority: "LOW", progress: 0, shift: "MORNING", assignedMachine: "", assignedOperator: "", workInstructions: "", createdAt: "2024-05-16" },
 ];
 
 const materialRequirements: MaterialRequirement[] = [
@@ -94,7 +95,7 @@ const downtimeBreakdown = [
 const formatDate = (date: string) => {
   if (!date) return "-";
   const d = new Date(date);
-  return `${String(d.getDate()).padStart(2, "0")}/${String(d.getMonth() + 1).padStart(2, "0")}/${d.getFullYear()}`;
+  return `${String(d.getDate()).padStart(2, "0")}-${String(d.getMonth() + 1).padStart(2, "0")}-${d.getFullYear()}`;
 };
 
 const formatTime = (totalMinutes: number) => {
@@ -164,7 +165,7 @@ const ProductionReports: React.FC = () => {
   const [selectedOrder, setSelectedOrder] = useState<ProductionOrder | null>(null);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [hoveredShift, setHoveredShift] = useState<number | null>(null);
-  const [activeView, setActiveView] = useState<"orders" | "materials">("orders");
+  const [activeView, setActiveView] = useState<"orders" | "materials">("materials");
   const [isAlertDismissed, setIsAlertDismissed] = useState(false);
   const [materialAlerts, setMaterialAlerts] = useState<MaterialRequirement[]>(materialRequirements);
 
@@ -374,7 +375,7 @@ const ProductionReports: React.FC = () => {
           <div className="bg-white p-6 rounded-2xl border-l-4 border-blue-500 shadow-sm hover:shadow-md transition">
             <div className="flex items-center justify-between mb-2">
               <p className="text-[11px] font-bold text-gray-800 uppercase tracking-widest">In Progress</p>
-              <Play size={20} className="text-blue-500" />
+              <TrendingUp size={20} className="text-blue-500" />
             </div>
             <h3 className="text-2xl font-extrabold text-gray-700">{stats.inProgress}</h3>
           </div>
@@ -394,7 +395,7 @@ const ProductionReports: React.FC = () => {
           </div>
           <div className="bg-white p-6 rounded-2xl border-l-4 border-red-500 shadow-sm hover:shadow-md transition">
             <div className="flex items-center justify-between mb-2">
-              <p className="text-[11px] font-bold text-gray-800 uppercase tracking-widest">Material Shortages</p>
+              <p className="text-[11px] font-bold text-gray-800 uppercase "> Mat. Shortages</p>
               <AlertTriangle size={20} className="text-red-500" />
             </div>
             <h3 className="text-2xl font-extrabold text-red-600">{stats.materialShortages}</h3>
@@ -510,19 +511,19 @@ const ProductionReports: React.FC = () => {
 
             <div className="mt-14 pt-4 border-t border-slate-100 flex justify-between items-center">
               <div className="flex items-center gap-4">
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-1">
                   <span className="text-[11px] text-gray-500">Average:</span>
                   <span className="text-sm font-bold text-gray-800">{averageEfficiency}%</span>
                 </div>
                 <div className="w-px h-4 bg-gray-200" />
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1">
                   <span className="text-[11px] text-gray-500">Peak:</span>
                   <span className="text-sm font-bold text-emerald-600">{Math.max(...trendData.map(p => p.actual))}%</span>
                 </div>
                 <div className="w-px h-4 bg-gray-200" />
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1">
                   <span className="text-[11px] text-gray-500">Best Shift:</span>
-                  <span className="text-sm font-bold text-amber-500">{bestShift.label}</span>
+                  <span className="text-[12px] font-bold text-amber-500">{bestShift.label}</span>
                 </div>
               </div>
               <div className="text-[10px] text-gray-400">Hover bars for details</div>
@@ -602,7 +603,7 @@ const ProductionReports: React.FC = () => {
 
         {/* View Toggle - Matching Dashboard Quick Actions Style */}
         <div className="flex gap-3 mb-6">
-          <button
+          {/* <button
             onClick={() => setActiveView("orders")}
             className={`px-4 py-2 outline-none text-sm font-bold rounded-xl transition-all flex items-center gap-2 ${activeView === "orders"
               ? "bg-[#F59E0B] text-white shadow-md"
@@ -610,7 +611,7 @@ const ProductionReports: React.FC = () => {
               }`}
           >
             <Factory size={16} /> Production Orders
-          </button>
+          </button> */}
           <button
             onClick={() => setActiveView("materials")}
             className={`px-4 py-2 outline-none text-sm font-bold rounded-xl transition-all flex items-center gap-2 ${activeView === "materials"
@@ -784,13 +785,13 @@ const ProductionReports: React.FC = () => {
                   Showing {(currentPage - 1) * itemsPerPage + 1} to {Math.min(currentPage * itemsPerPage, filteredOrders.length)} of {filteredOrders.length} Orders
                 </div>
                 <div className="flex items-center gap-2">
-                  <button onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1} className="p-2.5 rounded-xl border border-slate-200 bg-white text-slate-500 hover:text-amber-500 disabled:opacity-30">
+                  <button onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1} className="p-2.5 rounded-xl border border-slate-500 bg-white text-slate-500 hover:text-amber-500 hover:border-amber-500 disabled:opacity-30">
                     <ChevronLeft size={18} />
                   </button>
                   <div className="flex gap-1.5">
                     {getPageNumbers().map((page, i) => page === "..." ? (<span key={i} className="px-2 text-slate-300"><MoreHorizontal size={14} /></span>) : (<button key={i} onClick={() => setCurrentPage(page as number)} className={`min-w-10 h-10 rounded-xl text-xs font-bold ${currentPage === page ? "bg-[#F59E0B] text-white shadow-lg" : "bg-white text-slate-500 border border-slate-200"}`}>{page}</button>))}
                   </div>
-                  <button onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages} className="p-2.5 rounded-xl border border-slate-200 bg-white text-slate-500 hover:text-amber-500 disabled:opacity-30">
+                  <button onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages} className="p-2.5 rounded-xl border border-slate-500 bg-white text-slate-500 hover:text-amber-500 hover:border-amber-500 disabled:opacity-30">
                     <ChevronRight size={18} />
                   </button>
                 </div>

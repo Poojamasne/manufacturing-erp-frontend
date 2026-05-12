@@ -2,8 +2,6 @@ import React, { useState, useMemo } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
     ChevronRight,
-    Save,
-    Loader2,
     Package,
     ClipboardCheck,
     Database,
@@ -129,12 +127,12 @@ const EditProductionPlan: React.FC = () => {
                 <div className="flex items-center justify-between mb-10 bg-white p-6 rounded-3xl border border-slate-100 shadow-sm">
                     {steps.map((step, idx) => (
                         <React.Fragment key={step.id}>
-                            <div className={`flex items-center gap-3 ${currentStep >= step.id ? "cursor-pointer" : "cursor-not-allowed"}`} 
-                            onClick={() => {
-                                if (currentStep > step.id) {
-                                    setCurrentStep(step.id);
-                                }
-                            }}>
+                            <div className={`flex items-center gap-3 ${currentStep >= step.id ? "cursor-pointer" : "cursor-not-allowed"}`}
+                                onClick={() => {
+                                    if (currentStep > step.id) {
+                                        setCurrentStep(step.id);
+                                    }
+                                }}>
                                 <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm transition-all ${currentStep >= step.id ? "bg-[#F59E0B] text-white shadow-lg shadow-orange-200" : "bg-slate-100 text-slate-400"
                                     }`}>
                                     {step.id}
@@ -165,7 +163,7 @@ const EditProductionPlan: React.FC = () => {
                             <DisplayField label="Customer" value={planData.customerName} icon={<User size={14} />} />
                         </div>
                         <div className="flex justify-end mt-10">
-                            <button onClick={() => setCurrentStep(2)} className="bg-slate-900 text-white px-10 py-3 rounded-xl font-bold text-sm hover:bg-slate-800 transition-all">Edit Quantities</button>
+                            <button onClick={() => setCurrentStep(2)} className="bg-slate-900 text-white px-4 py-3 rounded-xl font-bold text-sm hover:bg-slate-800 transition-all">Edit Quantities</button>
                         </div>
                     </div>
                 )}
@@ -195,8 +193,8 @@ const EditProductionPlan: React.FC = () => {
                             </div>
                         </div>
                         <div className="flex justify-end gap-4 mt-12">
-                            <button onClick={() => setCurrentStep(1)} className="px-8 py-3 rounded-xl font-bold text-slate-400">Cancel</button>
-                            <button onClick={() => setCurrentStep(3)} className="bg-[#F59E0B] text-white px-10 py-3 rounded-xl font-bold text-sm shadow-lg">Re-Check Materials</button>
+                            <button onClick={() => setCurrentStep(1)} className="px-4 py-2 rounded-xl font-bold text-slate-400 hover:text-slate-500">Cancel</button>
+                            <button onClick={() => setCurrentStep(3)} className="bg-[#F59E0B] hover:bg-[#f67317] text-white px-4 py-2 rounded-xl font-bold text-sm shadow-lg">Re-Check Materials</button>
                         </div>
                     </div>
                 )}
@@ -213,10 +211,11 @@ const EditProductionPlan: React.FC = () => {
                             <table className="w-full text-left">
                                 <thead>
                                     <tr className="border-b border-slate-50">
-                                        <th className="pb-4 text-[11px] font-black text-slate-400 uppercase tracking-widest">Material</th>
-                                        <th className="pb-4 text-[11px] font-black text-slate-400 uppercase tracking-widest text-center">In Stock</th>
-                                        <th className="pb-4 text-[11px] font-black text-slate-400 uppercase tracking-widest text-center">New Requirement</th>
-                                        <th className="pb-4 text-[11px] font-black text-slate-400 uppercase tracking-widest text-center">Balance</th>
+                                        <th className="pb-4 text-[11px] font-black text-gray-800 uppercase tracking-widest">Material</th>
+                                        <th className="pb-4 text-[11px] font-black text-gray-800 uppercase tracking-widest text-center">In Stock</th>
+                                        <th className="pb-4 text-[11px] font-black text-gray-800 uppercase tracking-widest text-center">New Requirement</th>
+                                        <th className="pb-4 text-[11px] font-black text-gray-800 uppercase tracking-widest text-center">Status</th>
+                                        <th className="pb-4 text-[11px] font-black text-gray-800 uppercase tracking-widest text-center">Shortage</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-slate-50">
@@ -227,9 +226,14 @@ const EditProductionPlan: React.FC = () => {
                                             <td className="py-5 text-center font-black text-slate-800">{item.requiredQuantity}</td>
                                             <td className="py-5 text-center">
                                                 {item.shortage > 0 ? (
-                                                    <span className="text-rose-500 font-black">-{item.shortage}</span>
-                                                ) : (
+                                                    <span className="text-rose-500 font-black text-[10px] uppercase bg-rose-50 px-2 py-1 rounded">Shortage</span>) : (
                                                     <span className="text-emerald-500 font-black text-[10px] uppercase bg-emerald-50 px-2 py-1 rounded">Available</span>
+                                                )}
+                                            </td>
+                                            <td className="py-5 text-center">
+                                                {item.shortage > 0 ? (
+                                                    <span className="text-rose-500 font-bold">{item.shortage}</span>) : (
+                                                    <span className="text-emerald-500 font-bold">0</span>
                                                 )}
                                             </td>
                                         </tr>
@@ -237,8 +241,8 @@ const EditProductionPlan: React.FC = () => {
                                 </tbody>
                             </table>
                             <div className="mt-10 flex justify-end gap-4">
-                                <button onClick={() => setCurrentStep(2)} className="px-8 py-3 rounded-xl font-bold text-slate-400">Back</button>
-                                <button onClick={() => setCurrentStep(4)} className="bg-slate-900 text-white px-10 py-3 rounded-xl font-bold text-sm">Finalize Changes</button>
+                                <button onClick={() => setCurrentStep(2)} className="px-4 py-2 rounded-xl font-bold text-slate-400 hover:text-slate-500">Back</button>
+                                <button onClick={() => setCurrentStep(4)} className="bg-slate-900 hover:bg-slate-800 text-white px-4 py-2 rounded-xl font-bold text-sm">Finalize Changes</button>
                             </div>
                         </div>
                     </div>
@@ -252,7 +256,7 @@ const EditProductionPlan: React.FC = () => {
                                 {isMaterialAvailable ? <CheckCircle2 size={40} /> : <AlertTriangle size={40} />}
                             </div>
                             <h2 className="text-2xl font-black text-slate-800 mb-2">
-                                {isMaterialAvailable ? "Changes Verified" : "Material Shortage Detected After Edit"}
+                                {isMaterialAvailable ? "Changes Verified" : "Material Shortage Detected"}
                             </h2>
                             <p className="text-slate-500 mb-10 font-medium">
                                 {isMaterialAvailable
@@ -264,20 +268,18 @@ const EditProductionPlan: React.FC = () => {
                                 <button
                                     onClick={handleUpdatePR}
                                     disabled={loading}
-                                    className=" bg-amber-500 text-white py-2 px-4 rounded-xl font-bold text-sm uppercase  hover:bg-amber-600 transition-all flex items-center justify-center gap-1 shadow-xl"
+                                    className=" bg-amber-500 text-white py-2 px-4 rounded-xl font-bold text-sm hover:bg-amber-600 transition-all flex items-center justify-center shadow-xl"
                                 >
-                                    {loading ? <Loader2 size={20} className="animate-spin" /> : <Save size={20} />}
-                                    Create Purchase Request
+                                    Create Purchase Req.
                                 </button>
                                 <button
                                     onClick={handleUpdate}
                                     disabled={loading}
-                                    className=" bg-slate-900 text-white py-2 px-4 rounded-xl font-bold text-sm uppercase  hover:bg-slate-800 transition-all flex items-center justify-center gap-1 shadow-xl"
+                                    className=" bg-slate-900 text-white py-2 px-4 rounded-xl font-bold text-sm hover:bg-slate-800 transition-all flex items-center justify-center shadow-xl"
                                 >
-                                    {loading ? <Loader2 size={20} className="animate-spin" /> : <Save size={20} />}
                                     Update Production Plan
                                 </button>
-                                <button onClick={() => setCurrentStep(2)} className="text-amber-500 font-bold text-sm hover:text-rose-600 transition-colors border-amber-500 border hover:border-rose-500 py-2 px-4 rounded-xl">Adjust Quantity Again</button>
+                                <button onClick={() => setCurrentStep(2)} className="text-[#F59E0B] font-bold text-sm hover:text-rose-600 transition-colors border-amber-500 border hover:border-rose-500 py-2 px-4 rounded-xl">Adjust Quantity Again</button>
                                 <button onClick={() => navigate('/production/planning')} className="text-rose-500 font-bold text-sm hover:text-rose-400 transition-colors border-rose-500 border hover:border-rose-600 py-2 px-4 rounded-xl">Cancel</button>
                             </div>
                         </div>

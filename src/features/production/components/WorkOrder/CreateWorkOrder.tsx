@@ -2,8 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   ChevronRight,
-  Save,
-  Loader2,
+
   Settings,
   Cpu,
   User,
@@ -78,14 +77,14 @@ const CreateWorkOrder: React.FC = () => {
   return (
     <div className="min-h-screen bg-[#f4f7f6] p-4 md:p-8 pb-24 font-sans text-slate-900">
       <div className="max-w-6xl mx-auto">
-        
+
         {/* Breadcrumbs */}
         <div className="flex items-center gap-2 text-gray-400 text-sm mb-1">
           <button
-            onClick={() => navigate("/production/planning")}
+            onClick={() => navigate("/production/work-orders")}
             className="hover:text-[#F59E0B] transition-colors font-medium"
           >
-            Production planning
+            Work Orders
           </button>
           <ChevronRight size={14} />
           <span className="text-gray-800 font-bold">New Work Order</span>
@@ -94,31 +93,58 @@ const CreateWorkOrder: React.FC = () => {
         <h1 className="text-3xl font-black text-slate-800 mb-8 tracking-tight">Generate Work Orders</h1>
 
         {/* Step Progress Bar */}
-        <div className="flex items-center gap-6 mb-10 bg-white p-6 rounded-4xl border border-slate-100 shadow-sm w-fit">
-            <div className="flex items-center gap-3">
-                <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm ${currentStep === 1 ? "bg-[#F59E0B] text-white shadow-lg" : "bg-emerald-500 text-white"}`}>
-                    {currentStep > 1 ? <CheckCircle2 size={20}/> : "1"}
-                </div>
-                <span className="text-xs font-black uppercase tracking-widest text-slate-800">Order Selection</span>
+        <div className="w-full bg-white p-4 sm:p-6 rounded-4xl border border-slate-100 shadow-sm mb-10">
+          <div className="flex items-center justify-between gap-3 sm:gap-6">
+
+            {/* Step 1 */}
+            <div className="flex flex-1 items-center gap-3 min-w-0">
+              <div
+                className={`shrink-0 w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm ${currentStep === 1
+                    ? "bg-[#F59E0B] text-white shadow-lg"
+                    : "bg-[#F59E0B] text-white"
+                  }`}
+              >
+                {currentStep > 1 ? <CheckCircle2 size={20} /> : "1"}
+              </div>
+
+              <span className="text-[10px] sm:text-xs font-black uppercase tracking-widest text-slate-800 truncate">
+                Order Selection
+              </span>
             </div>
-            <div className="w-12 h-px bg-slate-200" />
-            <div className="flex items-center gap-3">
-                <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm ${currentStep === 2 ? "bg-[#F59E0B] text-white shadow-lg" : "bg-slate-100 text-slate-400"}`}>
-                    2
-                </div>
-                <span className={`text-xs font-black uppercase tracking-widest ${currentStep === 2 ? "text-slate-800" : "text-slate-400"}`}>Task Assignment</span>
+
+            {/* Line */}
+            <div className="flex-1 h-px bg-slate-200 max-w-24 sm:max-w-full" />
+
+            {/* Step 2 */}
+            <div className="flex flex-1 items-center justify-end gap-3 min-w-0">
+              <span
+                className={`text-[10px] sm:text-xs font-black uppercase tracking-widest truncate ${currentStep === 2 ? "text-slate-800" : "text-slate-400"
+                  }`}
+              >
+                Task Assignment
+              </span>
+
+              <div
+                className={`shrink-0 w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm ${currentStep === 2
+                    ? "bg-[#F59E0B] text-white shadow-lg"
+                    : "bg-slate-100 text-slate-400"
+                  }`}
+              >
+                2
+              </div>
             </div>
+          </div>
         </div>
 
         {/* Step 1: Select Production Order */}
         {currentStep === 1 && (
           <div className="bg-white rounded-[2.5rem] shadow-sm border border-slate-100 overflow-hidden">
-            <div className="p-8 border-b border-slate-50 bg-slate-50/30">
+            <div className="px-8 py-6 border-b border-slate-50 bg-slate-50/30">
               <h3 className="font-bold text-lg flex items-center gap-2 text-slate-700">
                 <LayoutGrid size={20} className="text-[#F59E0B]" /> Select Production Order to Break Down
               </h3>
             </div>
-            <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="px-8 py-4 grid grid-cols-1 md:grid-cols-2 gap-6">
               {mockProductionOrders.map((po) => (
                 <button
                   key={po.id}
@@ -142,11 +168,11 @@ const CreateWorkOrder: React.FC = () => {
           <div className="space-y-6">
             {/* Order Context Header */}
             <div className="bg-slate-900 rounded-4xl p-8 text-white flex justify-between items-center">
-                <div>
-                    <p className="text-[10px] font-black uppercase text-slate-400 tracking-[0.2em]">Breaking Down Order</p>
-                    <h2 className="text-2xl font-bold">{selectedPO.productName} ({selectedPO.poId})</h2>
-                </div>
-                <button onClick={() => setCurrentStep(1)} className="text-sm font-bold text-[#F59E0B] hover:underline">Change Order</button>
+              <div>
+                <p className="text-[10px] font-black uppercase text-slate-400 tracking-[0.2em]">Breaking Down Order</p>
+                <h2 className="text-2xl font-bold">{selectedPO.productName} ({selectedPO.poId})</h2>
+              </div>
+              <button onClick={() => setCurrentStep(1)} className="text-sm font-bold text-[#F59E0B] hover:underline">Change Order</button>
             </div>
 
             {/* Dynamic Task List */}
@@ -155,75 +181,75 @@ const CreateWorkOrder: React.FC = () => {
                 <div key={task.id} className="bg-white rounded-[2.5rem] shadow-sm border border-slate-100 p-8 animate-in fade-in slide-in-from-bottom-4">
                   <div className="flex justify-between items-center mb-6">
                     <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 bg-slate-50 rounded-lg flex items-center justify-center text-xs font-black text-slate-400">0{index + 1}</div>
-                        <h3 className="font-bold text-lg text-slate-800">Task Details</h3>
+                      <div className="w-8 h-8 bg-slate-50 rounded-lg flex items-center justify-center text-xs font-black text-slate-400">0{index + 1}</div>
+                      <h3 className="font-bold text-lg text-slate-800">Task Details</h3>
                     </div>
                     {tasks.length > 1 && (
-                        <button onClick={() => removeTask(task.id)} className="text-rose-500 hover:bg-rose-50 p-2 rounded-xl transition-colors">
-                            <Trash2 size={18}/>
-                        </button>
+                      <button onClick={() => removeTask(task.id)} className="text-rose-500 hover:bg-rose-50 p-2 rounded-xl transition-colors">
+                        <Trash2 size={18} />
+                      </button>
                     )}
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {/* Task Name */}
                     <div className="space-y-2">
-                        <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest flex items-center gap-1.5"><Settings size={12}/> Task Name</label>
-                        <input 
-                            type="text" 
-                            placeholder="e.g., Cutting, Welding, Assembly"
-                            value={task.name}
-                            onChange={(e) => updateTask(task.id, "name", e.target.value)}
-                            className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-3.5 font-bold focus:ring-2 focus:ring-[#F59E0B] outline-none text-sm"
-                        />
+                      <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest flex items-center gap-1.5"><Settings size={12} /> Task Name</label>
+                      <input
+                        type="text"
+                        placeholder="e.g., Cutting, Welding, Assembly"
+                        value={task.name}
+                        onChange={(e) => updateTask(task.id, "name", e.target.value)}
+                        className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-3.5 font-bold focus:ring-2 focus:ring-[#F59E0B] outline-none text-sm"
+                      />
                     </div>
 
                     {/* Machine Assignment */}
                     <div className="space-y-2">
-                        <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest flex items-center gap-1.5"><Cpu size={12}/> Assigned Machine</label>
-                        <select 
-                            value={task.machine}
-                            onChange={(e) => updateTask(task.id, "machine", e.target.value)}
-                            className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-3.5 font-bold focus:ring-2 focus:ring-[#F59E0B] outline-none text-sm"
-                        >
-                            <option value="">Select Machine...</option>
-                            {mockMachines.map(m => <option key={m} value={m}>{m}</option>)}
-                        </select>
+                      <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest flex items-center gap-1.5"><Cpu size={12} /> Assigned Machine</label>
+                      <select
+                        value={task.machine}
+                        onChange={(e) => updateTask(task.id, "machine", e.target.value)}
+                        className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-3.5 font-bold focus:ring-2 focus:ring-[#F59E0B] outline-none text-sm"
+                      >
+                        <option value="">Select Machine...</option>
+                        {mockMachines.map(m => <option key={m} value={m}>{m}</option>)}
+                      </select>
                     </div>
 
                     {/* Operator Assignment */}
                     <div className="space-y-2">
-                        <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest flex items-center gap-1.5"><User size={12}/> Assigned Operator</label>
-                        <select 
-                            value={task.operator}
-                            onChange={(e) => updateTask(task.id, "operator", e.target.value)}
-                            className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-3.5 font-bold focus:ring-2 focus:ring-[#F59E0B] outline-none text-sm"
-                        >
-                            <option value="">Select Operator...</option>
-                            {mockOperators.map(o => <option key={o} value={o}>{o}</option>)}
-                        </select>
+                      <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest flex items-center gap-1.5"><User size={12} /> Assigned Operator</label>
+                      <select
+                        value={task.operator}
+                        onChange={(e) => updateTask(task.id, "operator", e.target.value)}
+                        className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-3.5 font-bold focus:ring-2 focus:ring-[#F59E0B] outline-none text-sm"
+                      >
+                        <option value="">Select Operator...</option>
+                        {mockOperators.map(o => <option key={o} value={o}>{o}</option>)}
+                      </select>
                     </div>
 
                     {/* Start Date */}
                     <div className="space-y-2">
-                        <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest flex items-center gap-1.5"><Calendar size={12}/> Start Date</label>
-                        <input 
-                            type="date"
-                            value={task.startDate}
-                            onChange={(e) => updateTask(task.id, "startDate", e.target.value)}
-                            className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-3.5 font-bold focus:ring-2 focus:ring-[#F59E0B] outline-none text-sm"
-                        />
+                      <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest flex items-center gap-1.5"><Calendar size={12} /> Start Date</label>
+                      <input
+                        type="date"
+                        value={task.startDate}
+                        onChange={(e) => updateTask(task.id, "startDate", e.target.value)}
+                        className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-3.5 font-bold focus:ring-2 focus:ring-[#F59E0B] outline-none text-sm"
+                      />
                     </div>
 
                     {/* End Date */}
                     <div className="space-y-2">
-                        <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest flex items-center gap-1.5"><Calendar size={12}/> End Date</label>
-                        <input 
-                            type="date"
-                            value={task.endDate}
-                            onChange={(e) => updateTask(task.id, "endDate", e.target.value)}
-                            className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-3.5 font-bold focus:ring-2 focus:ring-[#F59E0B] outline-none text-sm"
-                        />
+                      <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest flex items-center gap-1.5"><Calendar size={12} /> End Date</label>
+                      <input
+                        type="date"
+                        value={task.endDate}
+                        onChange={(e) => updateTask(task.id, "endDate", e.target.value)}
+                        className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-3.5 font-bold focus:ring-2 focus:ring-[#F59E0B] outline-none text-sm"
+                      />
                     </div>
                   </div>
                 </div>
@@ -232,21 +258,20 @@ const CreateWorkOrder: React.FC = () => {
 
             {/* Actions Footer */}
             <div className="flex flex-col md:flex-row justify-between items-center gap-4 mt-10">
-                <button 
-                    onClick={addTask}
-                    className="flex items-center gap-2 px-8 py-4 bg-white border border-slate-200 text-slate-600 rounded-2xl font-bold text-sm hover:bg-slate-50 transition-all"
-                >
-                    <Plus size={18}/> Add Another Task
-                </button>
+              <button
+                onClick={addTask}
+                className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 text-slate-600 hover:text-slate-700 rounded-xl font-bold text-sm hover:bg-slate-50 transition-all"
+              >
+                <Plus size={18} /> Add Another Task
+              </button>
 
-                <button
-                    onClick={handleFinalSubmit}
-                    disabled={loading}
-                    className="w-full md:w-auto bg-slate-900 text-white px-12 py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-slate-800 transition-all flex items-center justify-center gap-3 shadow-xl"
-                  >
-                    {loading ? <Loader2 size={18} className="animate-spin" /> : <Save size={18} />}
-                    Create Work Orders
-                </button>
+              <button
+                onClick={handleFinalSubmit}
+                disabled={loading}
+                className="w-full md:w-auto bg-slate-900 text-white px-4 py-2 rounded-xl font-black text-xs uppercase tracking-widest hover:bg-slate-800 transition-all flex items-center justify-center shadow-xl"
+              >
+                Create Work Orders
+              </button>
             </div>
           </div>
         )}

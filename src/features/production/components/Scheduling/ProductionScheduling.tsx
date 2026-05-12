@@ -32,19 +32,22 @@ interface WorkOrder {
 
 // ==================== Mock Data ====================
 const mockWorkOrders: WorkOrder[] = [
-  { id: "1", workOrderId: "WO-1001", productName: "Industrial Bolt M12", productionOrderId: "PO-990", taskCount: 5, machineName: "Milling Station A", operatorName: "John Doe", shift: "MORNING", startDate: "2024-05-10", endDate: "2024-05-12", status: "IN_PROGRESS", createdAt: new Date().toISOString() },
-  { id: "2", workOrderId: "WO-1002", productName: "Aluminum Frame 4x4", productionOrderId: "PO-991", taskCount: 3, machineName: "Inspection Lab", operatorName: "Jane Smith", shift: "EVENING", startDate: "2024-05-15", endDate: "2024-05-15", status: "PENDING", createdAt: "2024-05-01T10:00:00Z" },
-  { id: "3", workOrderId: "WO-1003", productName: "Plastic Container L", productionOrderId: "PO-992", taskCount: 8, machineName: "Line 4", operatorName: "Mike Ross", shift: "NIGHT", startDate: "2024-05-11", endDate: "2024-05-14", status: "ASSIGNED", createdAt: "2024-01-15T10:00:00Z" },
+  { id: "1", workOrderId: "WO-1001", productName: "Industrial Bolt M12", productionOrderId: "PO-990", taskCount: 5, machineName: "Milling Station A", operatorName: "Yogesh Pote", shift: "MORNING", startDate: "2024-05-10", endDate: "2024-05-12", status: "IN_PROGRESS", createdAt: new Date().toISOString() },
+  { id: "2", workOrderId: "WO-1002", productName: "Aluminum Frame 4x4", productionOrderId: "PO-991", taskCount: 3, machineName: "Inspection Lab", operatorName: "Shubham Tiwari", shift: "EVENING", startDate: "2024-05-15", endDate: "2024-05-15", status: "PENDING", createdAt: "2024-05-01T10:00:00Z" },
+  { id: "3", workOrderId: "WO-1003", productName: "Plastic Container L", productionOrderId: "PO-992", taskCount: 8, machineName: "Line 4", operatorName: "Ram Sharma", shift: "NIGHT", startDate: "2024-05-11", endDate: "2024-05-14", status: "ASSIGNED", createdAt: "2024-01-15T10:00:00Z" },
+  { id: "4", workOrderId: "WO-1004", productName: "Steel Beam 10x20", productionOrderId: "PO-993", taskCount: 6, machineName: "Welding Station", operatorName: "Shyam Kumar", shift: "MORNING", startDate: "2024-05-12", endDate: "2024-05-13", status: "COMPLETED", createdAt: "2024-05-10T10:00:00Z" },
 ];
 
 // ==================== Helper Components ====================
 const formatDate = (date: string) => {
   if (!date) return "-";
   const d = new Date(date);
+
   const day = String(d.getDate()).padStart(2, "0");
   const month = String(d.getMonth() + 1).padStart(2, "0");
   const year = d.getFullYear();
-  return `${day}/${month}/${year}`;
+
+  return `${day}-${month}-${year}`;
 };
 
 const WorkOrderScheduling: React.FC = () => {
@@ -405,7 +408,7 @@ const WorkOrderScheduling: React.FC = () => {
 
 // ==================== Sub-Components ====================
 const StatCard = ({ label, value, color }: { label: string; value: number | string; color: string }) => (
-  <div className={`bg-white p-6 rounded-2xl border-l-4 ${color} shadow-sm transition-transform`}>
+  <div className={`bg-white p-8 rounded-xl border-l-4 ${color} shadow-sm transition-transform`}>
     <p className="text-[11px] font-bold text-gray-800 uppercase tracking-widest">{label}</p>
     <p className="text-2xl font-black text-slate-700 tracking-tight">{value}</p>
   </div>

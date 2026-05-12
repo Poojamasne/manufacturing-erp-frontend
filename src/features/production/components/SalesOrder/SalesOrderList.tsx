@@ -115,16 +115,19 @@ const PriorityBadge: React.FC<{ priority: Priority }> = ({ priority }) => {
 const formatDate = (date: string) => {
   if (!date) return "-";
   const d = new Date(date);
+
   const day = String(d.getDate()).padStart(2, "0");
   const month = String(d.getMonth() + 1).padStart(2, "0");
   const year = d.getFullYear();
-  return `${day}/${month}/${year}`;
+
+  return `${day}-${month}-${year}`;
 };
 
 const SalesOrderList: React.FC = () => {
   const timeDropdownRef = useRef<HTMLDivElement>(null);
   const statusDropdownRef = useRef<HTMLDivElement>(null);
   const priorityDropdownRef = useRef<HTMLDivElement>(null);
+  const viewSORef = useRef<HTMLDivElement>(null);
 
   const [orders, _setOrders] = useState<SalesOrder[]>(mockSalesOrders);
   const [searchQuery, setSearchQuery] = useState("");
@@ -153,6 +156,11 @@ const SalesOrderList: React.FC = () => {
       if (timeDropdownRef.current && !timeDropdownRef.current.contains(target)) {
         setIsTimeDropdownOpen(false);
         setIsCalendarOpen(false);
+      }
+
+      if (viewSORef.current && !viewSORef.current.contains(target)) {
+        setShowDetailsModal(false);
+        setSelectedOrder(null);
       }
       if (activeDropdown === "status" && statusDropdownRef.current && !statusDropdownRef.current.contains(target)) {
         setActiveDropdown(null);
@@ -379,7 +387,7 @@ const SalesOrderList: React.FC = () => {
                   <th className="w-12 p-5 text-center border-b border-slate-100">
                     <input
                       type="checkbox"
-                      className="h-4 w-4 cursor-pointer appearance-none rounded border border-slate-300 bg-white transition-all relative checked:bg-[#F59E0B] checked:border-[#F59E0B] outline-none"
+                      className="h-4 w-4 cursor-pointer appearance-none rounded border border-slate-300 bg-white transition-all relative checked:bg-[#F59E0B] checked:border-[#F59E0B] after:content-[''] after:absolute after:opacity-0 checked:after:opacity-100 after:left-1.25 after:top-px after:w-1 after:h-2 after:border-white after:border-r-2 after:border-b-2 after:rotate-45 outline-none"
                       checked={paginatedOrders.length > 0 && selectedIds.length === paginatedOrders.length}
                       onChange={toggleSelectAll}
                     />
@@ -399,7 +407,7 @@ const SalesOrderList: React.FC = () => {
                     <td className="p-5 text-center">
                       <input
                         type="checkbox"
-                        className="h-4 w-4 cursor-pointer appearance-none rounded border border-slate-300 bg-white transition-all relative checked:bg-[#F59E0B] checked:border-[#F59E0B] outline-none"
+                        className="h-4 w-4 cursor-pointer appearance-none rounded border border-slate-300 bg-white transition-all relative checked:bg-[#F59E0B] checked:border-[#F59E0B] after:content-[''] after:absolute after:opacity-0 checked:after:opacity-100 after:left-1.25 after:top-px after:w-1 after:h-2 after:border-white after:border-r-2 after:border-b-2 after:rotate-45 outline-none"
                         checked={selectedIds.includes(order.id)}
                         onChange={() => {
                           if (selectedIds.includes(order.id)) setSelectedIds(selectedIds.filter((id) => id !== order.id));
@@ -470,13 +478,13 @@ const SalesOrderList: React.FC = () => {
       {/* Details Modal (Theme Synced) */}
       {showDetailsModal && selectedOrder && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl max-w-3xl w-full shadow-2xl overflow-hidden">
+          <div ref={viewSORef} className="bg-white rounded-2xl max-w-3xl w-full shadow-2xl overflow-hidden">
             <div className="bg-white border-b p-6 flex justify-between">
               <div>
                 <h2 className="text-xl font-bold">{selectedOrder.salesOrderId}</h2>
                 <p className="text-sm text-gray-500">{selectedOrder.customerName}</p>
               </div>
-              <button onClick={() => setShowDetailsModal(false)} className="text-gray-400 text-2xl">×</button>
+              <button onClick={() => setShowDetailsModal(false)} className="text-gray-400 text-2xl hover:text-rose-500">×</button>
             </div>
             <div className="p-6 space-y-6">
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
@@ -505,7 +513,9 @@ const SalesOrderList: React.FC = () => {
               </div>
             </div>
             <div className="bg-white border-t p-6 flex justify-end gap-3">
-              <button className="px-4 py-2 border rounded-xl font-semibold text-sm flex items-center gap-2 hover:bg-slate-50 transition-colors">
+              <button
+                onClick={() => { alert("Exporting Sales Order") }}
+                className="px-4 py-2 border rounded-xl font-semibold text-sm text-white bg-slate-800 flex items-center gap-2 hover:bg-slate-900 transition-colors">
                 <Download size={16} /> Export SO
               </button>
               <button

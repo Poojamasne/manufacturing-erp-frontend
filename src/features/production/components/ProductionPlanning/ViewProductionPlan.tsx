@@ -67,6 +67,16 @@ const ViewProductionPlan: React.FC = () => {
         }
     };
 
+    const formatDate = (date: string) => {
+  if (!date) return "-";
+  const d = new Date(date);
+
+  const day = String(d.getDate()).padStart(2, "0");
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const year = d.getFullYear();
+
+  return `${day}-${month}-${year}`;
+};
     return (
         <div className="min-h-screen bg-[#f4f7f6] p-4 md:p-8 pb-24 font-sans text-slate-900">
             <div className="max-w-6xl mx-auto">
@@ -90,7 +100,7 @@ const ViewProductionPlan: React.FC = () => {
                             <h1 className="text-3xl font-black text-slate-800 tracking-tight">{mockPlan.planId}</h1>
                             <span className={getStatusStyle(mockPlan.status)}>{mockPlan.status}</span>
                         </div>
-                        <p className="text-slate-400 font-bold text-xs uppercase tracking-widest">Created on {mockPlan.createdAt}</p>
+                        <p className="text-slate-400 font-bold text-xs uppercase tracking-widest">Created on {formatDate(mockPlan.createdAt)}</p>
                     </div>
 
                     <div className="flex gap-3 w-full md:w-auto">
@@ -98,7 +108,7 @@ const ViewProductionPlan: React.FC = () => {
                             <Download size={18} /> Download Plan
                         </button>
                         <button
-                            onClick={() => navigate(`/production/planning/edit/${mockPlan.id || id}`)}
+                            onClick={() => navigate(`/production/planning/edit-plan/${ id}`)}
                             className="outline-none flex-1 md:flex-initial flex items-center justify-center gap-2 bg-[#F59E0B] text-white px-8 py-3 rounded-2xl font-bold text-sm shadow-lg shadow-orange-200 hover:bg-[#f67317] transition-all"
                         >
                             <Edit size={18} /> Edit Plan
@@ -119,7 +129,7 @@ const ViewProductionPlan: React.FC = () => {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-y-10 gap-x-6">
                                 <DataPoint label="Target Product" value={mockPlan.productName} />
                                 <DataPoint label="Quantity to Produce" value={`${mockPlan.quantityRequired} Units`} />
-                                <DataPoint label="Expected Completion" value={mockPlan.deliveryDate} />
+                                <DataPoint label="Expected Completion" value={formatDate(mockPlan.deliveryDate)} />
                                 <DataPoint label="Originating Sales Order" value={mockPlan.salesOrderId} isLink />
                             </div>
                         </div>
