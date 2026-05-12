@@ -115,7 +115,7 @@ const MaterialIssueExecution: React.FC = () => {
         {/* HEADER */}
         <header className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 mb-10">
           <div>
-            <h1 className="text-3xl font-extrabold text-slate-800 tracking-tight uppercase leading-none">Issue Material</h1>
+            <h1 className="text-3xl font-extrabold text-slate-800 tracking-tight leading-none">Issue Material</h1>
             <p className="text-sm text-gray-500 mt-1 font-medium">Manage Material Execution Flow</p>
           </div>
 

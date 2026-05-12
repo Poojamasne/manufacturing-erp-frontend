@@ -154,8 +154,8 @@ const MaterialIssueRequestHandling: React.FC = () => {
         {/* HEADER */}
         <header className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 mb-10">
           <div>
-            <h1 className="text-3xl font-extrabold text-slate-800 tracking-tight uppercase leading-none">Issue Request Handling</h1>
-            <p className="text-sm text-gray-500 mt-2 font-medium tracking-wide uppercase">Production Demand Log & Stock Verification</p>
+            <h1 className="text-3xl font-extrabold text-slate-800 tracking-tight leading-none">Issue Request Handling</h1>
+            <p className="text-sm text-gray-500 mt-2 font-medium tracking-wide">Production Demand Log & Stock Verification</p>
           </div>
 
           <div className="relative" ref={timeDropdownRef}>
