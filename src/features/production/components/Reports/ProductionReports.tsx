@@ -414,14 +414,44 @@ const ProductionReports: React.FC = () => {
                 <h4 className="font-semibold text-red-800 mb-3">Critical Material Shortages Alert</h4>
                 <div className="space-y-3">
                   {shortageMaterials.map((material, idx) => (
-                    <div key={idx} className="flex flex-wrap items-center justify-between gap-3 p-3 bg-white rounded-xl">
-                      <span className="font-medium text-gray-800">{material.materialName}</span>
-                      <div className="flex gap-4 text-sm">
-                        <span>Required: <strong>{material.requiredQty.toLocaleString()} {material.unit}</strong></span>
-                        <span>Available: <strong>{material.availableQty.toLocaleString()} {material.unit}</strong></span>
-                        <span className="text-red-600">Shortage: <strong>{material.shortage.toLocaleString()} {material.unit}</strong></span>
+                    <div
+                      key={idx}
+                      className="grid grid-cols-[220px_1fr_120px] items-center gap-4 p-3 bg-white rounded-xl"
+                    >
+                      <span className="font-medium text-gray-800 truncate">
+                        {material.materialName}
+                      </span>
+
+                      <div className="grid grid-cols-3 gap-4 text-sm">
+                        <span>
+                          Required:
+                          <strong>
+                            {" "}
+                            {material.requiredQty.toLocaleString()} {material.unit}
+                          </strong>
+                        </span>
+
+                        <span>
+                          Available:
+                          <strong>
+                            {" "}
+                            {material.availableQty.toLocaleString()} {material.unit}
+                          </strong>
+                        </span>
+
+                        <span className="text-red-600">
+                          Shortage:
+                          <strong>
+                            {" "}
+                            {material.shortage.toLocaleString()} {material.unit}
+                          </strong>
+                        </span>
                       </div>
-                      <button onClick={() => handleCreatePO(material.materialName)} className="px-3 py-1.5 bg-[#F59E0B] text-white rounded-lg text-sm hover:bg-[#f67317] transition">
+
+                      <button
+                        onClick={() => handleCreatePO(material.materialName)}
+                        className="w-full px-3 py-1.5 bg-[#F59E0B] text-white rounded-lg text-sm hover:bg-[#f67317] transition"
+                      >
                         Request PO
                       </button>
                     </div>
