@@ -211,9 +211,9 @@ const CreateProductionPlan: React.FC = () => {
                                             <td className="py-5 text-center font-black text-slate-800">{item.requiredQuantity}</td>
                                             <td className="py-5 text-center">
                                                 {item.shortage > 0 ? (
-                                                    <span className="text-rose-500 font-black text-[10px] uppercase bg-emerald-50 px-2 py-1 rounded">Shortage</span>
+                                                    <span className="text-rose-500 font-black text-[10px] uppercase px-2 py-1 rounded">Shortage</span>
                                                 ) : (
-                                                    <span className="text-emerald-500 font-black text-[10px] uppercase bg-emerald-50 px-2 py-1 rounded">Available</span>
+                                                    <span className="text-emerald-500 font-black text-[10px] uppercase px-2 py-1 rounded">Available</span>
                                                 )}
                                             </td>
                                             <td className="py-5 text-center">
@@ -229,7 +229,7 @@ const CreateProductionPlan: React.FC = () => {
                             </table>
                             <div className="mt-10 flex justify-end gap-4">
                                 <button onClick={() => setCurrentStep(2)} className="px-4 py-2 rounded-xl font-bold  text-[#F59E0B] hover:text-[#f67317] border hover:border-amber-500">Back</button>
-                                <button onClick={() => setCurrentStep(4)} className="bg-slate-900 hover:bg-slate-800 text-white px-4 py-2 rounded-xl font-bold text-sm">Proceed to Decision</button>
+                                <button onClick={() => setCurrentStep(4)} className="bg-slate-900 hover:bg-slate-800 text-white px-4 py-2 rounded-xl font-bold text-sm">Proceed</button>
                             </div>
                         </div>
                     </div>

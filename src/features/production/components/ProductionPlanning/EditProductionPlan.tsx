@@ -226,8 +226,8 @@ const EditProductionPlan: React.FC = () => {
                                             <td className="py-5 text-center font-black text-slate-800">{item.requiredQuantity}</td>
                                             <td className="py-5 text-center">
                                                 {item.shortage > 0 ? (
-                                                    <span className="text-rose-500 font-black text-[10px] uppercase bg-rose-50 px-2 py-1 rounded">Shortage</span>) : (
-                                                    <span className="text-emerald-500 font-black text-[10px] uppercase bg-emerald-50 px-2 py-1 rounded">Available</span>
+                                                    <span className="text-rose-500 font-black text-[10px] uppercase  px-2 py-1 rounded">Shortage</span>) : (
+                                                    <span className="text-emerald-500 font-black text-[10px] uppercase  px-2 py-1 rounded">Available</span>
                                                 )}
                                             </td>
                                             <td className="py-5 text-center">
@@ -241,7 +241,7 @@ const EditProductionPlan: React.FC = () => {
                                 </tbody>
                             </table>
                             <div className="mt-10 flex justify-end gap-4">
-                                <button onClick={() => setCurrentStep(2)} className="px-4 py-2 rounded-xl font-bold text-slate-400 hover:text-slate-500">Back</button>
+                                <button onClick={() => setCurrentStep(2)} className="px-4 py-2 border rounded-xl font-bold text-slate-400 hover:text-slate-500">Back</button>
                                 <button onClick={() => setCurrentStep(4)} className="bg-slate-900 hover:bg-slate-800 text-white px-4 py-2 rounded-xl font-bold text-sm">Finalize Changes</button>
                             </div>
                         </div>
@@ -264,23 +264,23 @@ const EditProductionPlan: React.FC = () => {
                                     : "The new quantities exceed current stock. Updating will trigger an updated Purchase Request."}
                             </p>
 
-                            <div className="flex gap-3">
+                            <div className="flex justify-center gap-3">
                                 <button
                                     onClick={handleUpdatePR}
                                     disabled={loading}
                                     className=" bg-amber-500 text-white py-2 px-4 rounded-xl font-bold text-sm hover:bg-amber-600 transition-all flex items-center justify-center shadow-xl"
                                 >
-                                    Create Purchase Req.
+                                    Create PR
                                 </button>
                                 <button
                                     onClick={handleUpdate}
                                     disabled={loading}
                                     className=" bg-slate-900 text-white py-2 px-4 rounded-xl font-bold text-sm hover:bg-slate-800 transition-all flex items-center justify-center shadow-xl"
                                 >
-                                    Update Production Plan
+                                    Update PP
                                 </button>
-                                <button onClick={() => setCurrentStep(2)} className="text-[#F59E0B] font-bold text-sm hover:text-rose-600 transition-colors border-amber-500 border hover:border-rose-500 py-2 px-4 rounded-xl">Adjust Quantity Again</button>
-                                <button onClick={() => navigate('/production/planning')} className="text-rose-500 font-bold text-sm hover:text-rose-400 transition-colors border-rose-500 border hover:border-rose-600 py-2 px-4 rounded-xl">Cancel</button>
+                                <button onClick={() => setCurrentStep(2)} className="text-[#F59E0B] font-bold text-sm hover:text-amber-600 transition-colors border-amber-500 border hover:border-amber-500 py-2 px-3 rounded-xl">Adjust Quantity</button>
+                                <button onClick={() => navigate('/production/planning')} className="text-rose-500 font-bold text-sm hover:text-rose-400 transition-colors border-rose-500 border hover:border-rose-600 py-2 px-5 rounded-xl">Cancel</button>
                             </div>
                         </div>
                     </div>

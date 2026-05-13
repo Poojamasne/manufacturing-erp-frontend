@@ -264,7 +264,7 @@ const WorkOrderScheduling: React.FC = () => {
                 <ChevronDown size={14} className={activeDropdown === "status" ? "rotate-180" : ""} />
               </button>
               {activeDropdown === "status" && (
-                <div className="absolute right-0 mt-2 w-48 bg-white rounded-2xl shadow-2xl z-50 py-2 border border-slate-50 overflow-hidden">
+                <div className="absolute right-0 mt-2 w-30 bg-white rounded-2xl shadow-2xl z-50 py-2 border border-slate-50 overflow-hidden">
                   {["All", "PENDING", "ASSIGNED", "IN_PROGRESS", "COMPLETED"].map(s => (
                     <button
                       key={s} onClick={() => { setStatusFilter(s); setActiveDropdown(null); }}

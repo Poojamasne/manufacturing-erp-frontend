@@ -409,7 +409,7 @@ const ResourceAllocation: React.FC = () => {
                   <ChevronDown size={14} className={activeDropdown === "status" ? "outline-none rotate-180" : ""} />
                 </button>
                 {activeDropdown === "status" && (
-                  <div className="absolute right-0 mt-2 w-40 bg-white rounded-2xl shadow-2xl z-50 py-2 overflow-hidden">
+                  <div className="absolute right-0 mt-2 w-30 bg-white rounded-2xl shadow-2xl z-50 py-2 overflow-hidden">
                     {statusOptions.map((opt) => (
                       <button
                         key={opt}

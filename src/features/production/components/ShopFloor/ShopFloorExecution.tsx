@@ -274,7 +274,7 @@ const ShopFloorExecution: React.FC = () => {
                 <ChevronDown size={14} className={activeDropdown === "status" ? "rotate-180" : ""} />
               </button>
               {activeDropdown === "status" && (
-                <div className="absolute right-0 mt-2 w-40 bg-white rounded-2xl shadow-2xl z-50 py-2 overflow-hidden">
+                <div className="absolute right-0 mt-2 w-30 bg-white rounded-2xl shadow-2xl z-50 py-2 overflow-hidden">
                   {["All", "OPEN", "IN_PROGRESS", "COMPLETED"].map((opt) => (
                     <button key={opt} onClick={() => { setStatusFilter(opt); setActiveDropdown(null); }} className={`outline-none w-full text-left px-4 py-2.5 text-[13px] hover:bg-slate-50 ${statusFilter === opt ? "text-amber-500 font-bold bg-orange-50/50" : "text-slate-600"}`}>{opt}</button>
                   ))}

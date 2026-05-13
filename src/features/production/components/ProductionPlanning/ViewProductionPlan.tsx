@@ -158,7 +158,7 @@ const ViewProductionPlan: React.FC = () => {
                                                 <td className="px-8 py-5 text-center font-black text-slate-800">{mat.requiredQuantity}</td>
                                                 <td className="px-8 py-5 text-center text-slate-500">{mat.availableQuantity}</td>
                                                 <td className="px-8 py-5 text-right">
-                                                    <span className={`inline-flex items-center gap-1.5 font-black text-[10px] uppercase px-2 py-1 rounded ${mat.status === "Sufficient" ? "text-emerald-500 bg-emerald-50" : "text-rose-500 bg-rose-50"
+                                                    <span className={`inline-flex items-center gap-1.5 font-black text-[10px] uppercase px-2 py-1 rounded ${mat.status === "Sufficient" ? "text-emerald-500 " : "text-rose-500"
                                                         }`}>
                                                         {mat.status === "Sufficient" ? <CheckCircle2 size={12} /> : <AlertTriangle size={12} />}
                                                         {mat.status}
