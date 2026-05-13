@@ -98,11 +98,16 @@ const Login: React.FC = () => {
       return;
     }
 
-    if (email === "operator@production.com" && password === "operator123") {
-      localStorage.setItem("token", "test-token-production-operator");
-      localStorage.setItem("designation", "Shop Floor Operator");
-      localStorage.setItem("userName", "Shop Floor Operator");
-      navigate("/production/dashboard");
+    if (
+      email &&
+      email.trim() === "purchasemanager@erp.com" &&
+      password &&
+      password.trim() === "purchasemanager123"
+    ) {
+      localStorage.setItem("token", "test-token-purchase-manager");
+      localStorage.setItem("designation", "Purchase Manager");
+      localStorage.setItem("userName", "Purchase Manager");
+      navigate("/purchase/dashboard");
       return;
     }
 
@@ -120,7 +125,7 @@ const Login: React.FC = () => {
             <h1 className="text-3xl font-semibold text-white leading-snug mb-4">
               Manufacturing ERP System
             </h1>
-            <div className="space-y-3 text-sm text-[#f3f4e6]">
+            {/* <div className="space-y-3 text-sm text-[#f3f4e6]">
               <div className="flex items-center gap-2">
                 <CheckCircle2 size={14} /> Streamlined Business Processes
               </div>
@@ -132,6 +137,25 @@ const Login: React.FC = () => {
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircle2 size={14} /> Analytics Dashboard
+              </div>
+            </div> */}
+            {/* Test Credentials */}
+            <h1 className="text-xl font-semibold text-slate-800 leading-snug mb-4">
+              Test Credentials
+            </h1>
+            <div className="space-y-3 text-sm text-[#f3f4e6]">
+              <div className="flex items-center gap-2">
+                <CheckCircle2 size={14} /> Production Planner: planner@production.com / planner123
+              </div>
+              <div className="flex items-center gap-2">
+                <CheckCircle2 size={14} />Sales Manager: salesmanager@erp.com / sales123
+              </div>
+              <div className="flex items-center gap-2">
+                <CheckCircle2 size={14} />Inventory Manager: inventory@erp.com / inventory123
+
+              </div>
+              <div className="flex items-center gap-2">
+                <CheckCircle2 size={14} />Purchase Manager: purchasemanager@erp.com / purchasemanager123
               </div>
             </div>
           </div>
@@ -238,14 +262,6 @@ const Login: React.FC = () => {
               {loading ? <Loader2 className="animate-spin" size={18} /> : <>Login</>}
             </button>
           </form>
-
-          <div className="mt-6 text-center text-xs text-gray-400 border-t pt-4">
-            <p className="font-semibold mb-1">Test Credentials:</p>
-            <p>Production Planner: planner@production.com / planner123</p>
-            <p>Sales Manager: salesmanager@erp.com / sales123</p>
-            <p>  Inventory Manager: inventory@erp.com / inventory123</p>
-          </div>
-
           <div className="mt-4 text-center text-[10px] text-gray-500 uppercase tracking-widest">
             Zonixtec ERP System • {new Date().getFullYear()}
           </div>
