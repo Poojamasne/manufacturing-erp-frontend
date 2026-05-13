@@ -513,11 +513,12 @@ const SalesOrderList: React.FC = () => {
               </div>
             </div>
             <div className="bg-white border-t p-6 flex justify-end gap-3">
-              <button
+              {/* <button
                 onClick={() => { alert("Exporting Sales Order") }}
-                className="px-4 py-2 border rounded-xl font-semibold text-sm text-white bg-slate-800 flex items-center gap-2 hover:bg-slate-900 transition-colors">
-                <Download size={16} /> Export SO
-              </button>
+                className="px-4 py-2 border rounded-xl font-semibold text-sm text-white bg-slate-800 flex items-center  hover:bg-slate-900 transition-colors">
+                <Download size={16} />
+                 Export SO
+              </button> */}
               <button
                 onClick={() => setShowDetailsModal(false)}
                 className="px-4 py-2 bg-[#F59E0B] text-white rounded-xl font-semibold text-sm shadow-md hover:bg-[#f67317] transition-colors"
