@@ -243,7 +243,7 @@ const Login: React.FC = () => {
             <p className="font-semibold mb-1">Test Credentials:</p>
             <p>Production Planner: planner@production.com / planner123</p>
             <p>Sales Manager: salesmanager@erp.com / sales123</p>
-            <p>  Inventory Manager:inventory@erp.com /inventory123</p>
+            <p>  Inventory Manager: inventory@erp.com / inventory123</p>
           </div>
 
           <div className="mt-4 text-center text-[10px] text-gray-500 uppercase tracking-widest">
