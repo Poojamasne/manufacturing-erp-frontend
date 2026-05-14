@@ -33,6 +33,7 @@ const Sidebar: React.FC = () => {
         [-ms-overflow-style:none] 
         [&::-webkit-scrollbar]:hidden"
       >
+
         {/* purchase manager Dashboard */}
         <button
           onClick={() => {
@@ -50,6 +51,25 @@ const Sidebar: React.FC = () => {
             alt=""
           />
           <span className={`${isActive("/purchase/dashboard") ? "font-bold" : "font-semibold"} text-sm`}>Dashboard</span>
+        </button>
+
+        {/* purchase Requests */}
+        <button
+          onClick={() => {
+            navigate("/purchase/purchase-requests")
+            document.title = "Manufacturing ERP - Purchase Requests";
+          }}
+          className={`outline-none w-full flex items-center gap-3 px-4 py-3 cursor-pointer rounded-xl transition-all duration-200 ${isActive("/purchase/purchase-requests")
+            ? "bg-[#F59E0B] text-white shadow-md"
+            : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
+            }`}
+        >
+          <img
+            src="/icons/Purchase_manager/Create-PR.svg"
+            className={`h-5 w-5 ${isActive("/purchase/purchase-requests") ? "" : "invert opacity-60"}`}
+            alt=""
+          />
+          <span className={`${isActive("/purchase/purchase-requests") ? "font-bold" : "font-semibold"} text-sm`}>Purchase Requests</span>
         </button>
 
 

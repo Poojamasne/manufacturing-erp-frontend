@@ -37,11 +37,12 @@ const Navbar = ({ onMenuClick }: { onMenuClick: () => void }) => {
     const existingNotes = JSON.parse(localStorage.getItem("purchase_notes") || "[]");
 
     const newNote = {
+      path: window.location.pathname,
       text: note,
       date: new Date().toISOString(),
     };
 
-    localStorage.setItem("production_notes", JSON.stringify([newNote, ...existingNotes]));
+    localStorage.setItem("purchase_notes", JSON.stringify([newNote, ...existingNotes]));
 
     setNote("");
     setOpenNote(false);
@@ -110,7 +111,7 @@ const Navbar = ({ onMenuClick }: { onMenuClick: () => void }) => {
               <div className="absolute right-0 mt-3 z-50">
                 <div className="w-72 bg-white rounded-2xl shadow-xl border border-[#F59E0B]/10 p-4 animate-[fadeIn_0.2s_ease]">
                   <div className="flex justify-between items-center mb-3">
-                    <p className="text-sm font-semibold text-gray-800">Add Production Note</p>
+                    <p className="text-sm font-semibold text-gray-800">Add Purchase Note</p>
                     <button
                       onClick={() => setOpenNote(false)}
                       className="text-gray-400 hover:text-red-500"
@@ -122,7 +123,7 @@ const Navbar = ({ onMenuClick }: { onMenuClick: () => void }) => {
                   <textarea
                     value={note}
                     onChange={(e) => setNote(e.target.value)}
-                    placeholder="Write your production note..."
+                    placeholder="Write your Purchase note..."
                     className="w-full h-24 resize-none border border-gray-200 rounded-xl p-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#F59E0B]/20"
                   />
 
