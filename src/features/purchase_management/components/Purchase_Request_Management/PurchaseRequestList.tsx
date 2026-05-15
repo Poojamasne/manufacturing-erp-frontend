@@ -11,89 +11,17 @@ import {
   Trash2,
   Plus,
   Building2,
+  SearchAlert,
 } from "lucide-react";
+import { useAppDispatch, useAppSelector } from "../../../../app/store/hook";
+import { deletePurchaseRequest, getAllPurchaseRequests } from "../../ModuleStateFiles/PurchaseRequestManagementSlice";
+import type { RootState } from "../../../../app/store/store";
 
-// ==================== Types ====================
+//  Types 
 type TimeFilter = "Weekly" | "Monthly" | "Quarterly" | "Yearly" | "All Time" | "Custom";
 
-interface PurchaseRequest {
-  id: string;
-  materialName: string;
-  materialCode: string;
-  quantity: number;
-  unit: string;
-  requiredDate: string;
-  department: string;
-  priority: "HIGH" | "MEDIUM" | "LOW";
-  status: "Draft" | "Submitted" | "Approved" | "In Process" | "Completed" | "Rejected";
-  created_at: string;
-}
 
-// ==================== Mock Data (SRS 3.3.3) ====================
-const mockPRs: PurchaseRequest[] = [
-  {
-    id: "PR-2024-001",
-    materialName: "Industrial Bolt M12",
-    materialCode: "HDW-B-M12",
-    quantity: 5000,
-    unit: "pcs",
-    requiredDate: "2024-05-20",
-    department: "Production",
-    priority: "HIGH",
-    status: "Submitted",
-    created_at: "2024-05-10",
-  },
-  {
-    id: "PR-2024-002",
-    materialName: "Aluminum Frame 4x4",
-    materialCode: "AL-F-44",
-    quantity: 250,
-    unit: "units",
-    requiredDate: "2024-05-18",
-    department: "Inventory",
-    priority: "HIGH",
-    status: "Approved",
-    created_at: "2024-05-11",
-  },
-  {
-    id: "PR-2024-003",
-    materialName: "Hydraulic Fluid",
-    materialCode: "CHEM-HF-01",
-    quantity: 100,
-    unit: "Ltrs",
-    requiredDate: "2024-05-25",
-    department: "Maintenance",
-    priority: "MEDIUM",
-    status: "In Process",
-    created_at: "2024-05-12",
-  },
-  {
-    id: "PR-2024-004",
-    materialName: "Safety Vest XL",
-    materialCode: "PPE-SV-XL",
-    quantity: 50,
-    unit: "pcs",
-    requiredDate: "2024-06-01",
-    department: "Operations",
-    priority: "LOW",
-    status: "Draft",
-    created_at: "2024-05-09",
-  },
-  {
-    id: "PR-2024-005",
-    materialName: "Steel Plate 6mm",
-    materialCode: "STL-PL-06",
-    quantity: 1500,
-    unit: "kg",
-    requiredDate: "2024-05-28",
-    department: "Production",
-    priority: "HIGH",
-    status: "Rejected",
-    created_at: "2024-05-13",
-  },
-];
-
-// ==================== Helper Components ====================
+// Helper Components 
 const StatusBadge: React.FC<{ status: string }> = ({ status }) => {
   const styles: { [key: string]: string } = {
     HIGH: "text-red-600 bg-red-50 border-red-100",
@@ -125,9 +53,9 @@ const PurchaseRequestList: React.FC = () => {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const filterRef = useRef<HTMLDivElement>(null);
   const calendarRef = useRef<HTMLDivElement>(null);
-
+  const dispatch = useAppDispatch();
   // State
-  const requests = mockPRs;
+  const { purchaseRequests } = useAppSelector((state: RootState) => state.purchaseRequests);
   const [searchQuery, setSearchQuery] = useState("");
   const [priorityFilter, setPriorityFilter] = useState<string>("All");
   const [timeFilter, setTimeFilter] = useState<TimeFilter>("All Time");
@@ -141,7 +69,7 @@ const PurchaseRequestList: React.FC = () => {
   const [isTimeDropdownOpen, setIsTimeDropdownOpen] = useState(false);
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
-  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [selectedIds, setSelectedIds] = useState<(string | number)[]>([]);
 
   // Close dropdowns
   useEffect(() => {
@@ -154,15 +82,19 @@ const PurchaseRequestList: React.FC = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  useEffect(() => {
+    dispatch(getAllPurchaseRequests());
+  }, [dispatch]);
+
   // Filter Logic
   const filteredRequests = useMemo(() => {
-    let filtered = [...requests];
+    let filtered = [...purchaseRequests];
     if (searchQuery) {
       filtered = filtered.filter(
         (r) =>
-          r.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          r.materialName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          r.materialCode.toLowerCase().includes(searchQuery.toLowerCase())
+          r.id.toString().toLowerCase().includes(searchQuery.toLowerCase()) ||
+          r.material_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          r.material_code.toLowerCase().includes(searchQuery.toLowerCase())
       );
     }
     if (priorityFilter !== "All") filtered = filtered.filter((r) => r.priority === priorityFilter);
@@ -180,7 +112,7 @@ const PurchaseRequestList: React.FC = () => {
     });
 
     return filtered.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
-  }, [requests, searchQuery, priorityFilter, timeFilter, customRange]);
+  }, [purchaseRequests, searchQuery, priorityFilter, timeFilter, customRange]);
 
   // Pagination Logic
   const totalPages = Math.ceil(filteredRequests.length / itemsPerPage);
@@ -223,7 +155,7 @@ const PurchaseRequestList: React.FC = () => {
                         else setTimeFilter(tab as TimeFilter);
                         setIsTimeDropdownOpen(false);
                       }}
-                      className={`w-full text-left px-4 py-2 text-[13px] ${timeFilter === tab ? "text-amber-500 font-bold bg-orange-50/50" : "text-slate-600 hover:bg-slate-50"}`}
+                      className={`outline-none w-full text-left px-4 py-2 text-[13px] ${timeFilter === tab ? "text-amber-500 font-bold bg-orange-50/50" : "text-slate-600 hover:bg-slate-50"}`}
                     >
                       {tab}
                     </button>
@@ -239,7 +171,7 @@ const PurchaseRequestList: React.FC = () => {
                     <input type="date" className="w-full p-2 border rounded-lg outline-none focus:ring-2 focus:ring-orange-500/20"
                       onChange={(e) => setCustomRange({ ...customRange, end: e.target.value })} />
                     <button onClick={() => { setTimeFilter("Custom"); setIsCalendarOpen(false); }}
-                      className="w-full bg-[#F59E0B] hover:bg-[#f67317] text-white px-4 py-2 rounded-lg text-sm font-bold">Apply Range</button>
+                      className="outline-none w-full bg-[#F59E0B] hover:bg-[#f67317] text-white px-4 py-2 rounded-lg text-sm font-bold">Apply Range</button>
                   </div>
                 </div>
               )}
@@ -247,10 +179,10 @@ const PurchaseRequestList: React.FC = () => {
 
             <button
               onClick={() => navigate("/purchase/purchase-requests/create-purchase-request")}
-              className="group flex items-center gap-1 bg-[#F59E0B] hover:bg-[#f67317] text-white px-3 py-2 rounded-xl font-bold text-sm shadow-xl transition-all active:scale-95"
+              className="group flex items-center gap-1 bg-[#F59E0B] hover:bg-[#f67317] text-white px-4 py-2 rounded-xl font-bold text-sm shadow-xl transition-all active:scale-95"
             >
               <Plus size={18} />
-              <span>Create New PR</span>
+              <span>Create PR</span>
             </button>
           </div>
         </header>
@@ -273,7 +205,7 @@ const PurchaseRequestList: React.FC = () => {
             <div className="flex gap-3" ref={filterRef}>
               <button
                 onClick={() => setActiveDropdown(activeDropdown === "priority" ? null : "priority")}
-                className={`px-4 py-3 rounded-xl border text-[13px] font-bold flex items-center gap-2 ${priorityFilter !== "All" ? "bg-orange-50 border-orange-200 text-amber-500" : "bg-white border-slate-200 text-slate-600"}`}
+                className={`outline-none px-4 py-3 rounded-xl border text-[13px] font-bold flex items-center gap-2 ${priorityFilter !== "All" ? "bg-orange-50 border-orange-200 text-amber-500" : "bg-white border-slate-200 text-slate-600"}`}
               >
                 {priorityFilter === "All" ? "Priority" : priorityFilter}
                 <ChevronDown size={14} className={activeDropdown === "priority" ? "rotate-180" : ""} />
@@ -283,12 +215,12 @@ const PurchaseRequestList: React.FC = () => {
                 <div className="absolute mt-14 w-32 bg-white rounded-2xl shadow-2xl z-50 py-2">
                   {["All", "HIGH", "MEDIUM", "LOW"].map((opt) => (
                     <button key={opt} onClick={() => { setPriorityFilter(opt); setActiveDropdown(null); }}
-                      className="w-full text-left px-4 py-2 text-[13px] hover:bg-slate-50">{opt}</button>
+                      className={`outline-none w-full text-left px-4 py-2 text-[13px] hover:bg-slate-50 ${priorityFilter === opt ? "bg-amber-50 text-[#F59E0B] font-bold" : ""}`}>{opt}</button>
                   ))}
                 </div>
               )}
 
-              <button disabled={selectedIds.length === 0} className={`p-3 rounded-xl ${selectedIds.length === 0 ? "bg-gray-100 text-gray-400" : "bg-rose-600 text-white hover:bg-rose-700"}`}>
+              <button disabled={selectedIds.length === 0} className={`outline-none p-3 rounded-xl ${selectedIds.length === 0 ? "bg-gray-100 text-gray-400" : "bg-rose-600 text-white hover:bg-rose-700"}`}>
                 <Trash2 size={20} />
               </button>
             </div>
@@ -318,7 +250,7 @@ const PurchaseRequestList: React.FC = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-50">
-                {paginatedData.map((pr) => (
+                {paginatedData.length > 0 ? paginatedData.map((pr) => (
                   <tr key={pr.id} className="group hover:bg-orange-50/20 transition-colors">
                     <td className="p-5 text-center">
                       <input
@@ -331,8 +263,8 @@ const PurchaseRequestList: React.FC = () => {
                     <td className="px-4 py-4 text-[13px] font-mono font-bold text-slate-800 text-center">{pr.id}</td>
                     <td className="px-4 py-4 text-center">
                       <div className="flex flex-col items-center">
-                        <span className="text-[13px] font-bold text-slate-700">{pr.materialName}</span>
-                        <span className="text-[10px] text-slate-400 uppercase tracking-tight">{pr.materialCode}</span>
+                        <span className="text-[13px] font-bold text-slate-700">{pr.material_name}</span>
+                        <span className="text-[10px] text-slate-400 uppercase tracking-tight">{pr.material_code}</span>
                       </div>
                     </td>
                     <td className="px-4 py-4 text-[13px] text-slate-700 text-center">
@@ -344,7 +276,7 @@ const PurchaseRequestList: React.FC = () => {
                         {pr.department}
                       </div>
                     </td>
-                    <td className="px-4 py-4 text-[13px] text-slate-700 text-center">{formatDate(pr.requiredDate)}</td>
+                    <td className="px-4 py-4 text-[13px] text-slate-700 text-center">{formatDate(pr.required_date)}</td>
                     <td className="px-4 py-4 text-center">
                       <div className="flex flex-col gap-1 items-center">
                         <StatusBadge status={pr.status} />
@@ -357,13 +289,27 @@ const PurchaseRequestList: React.FC = () => {
                     </td>
                     <td className="px-4 py-4">
                       <div className="flex justify-center gap-2">
-                        <button className="p-1.5 text-slate-400 hover:text-[#F59E0B] transition-colors"><Eye size={16} /></button>
-                        <button className="p-1.5 text-slate-400 hover:text-green-500 transition-colors"><Edit size={16} /></button>
-                        <button className="p-1.5 text-slate-400 hover:text-rose-600 transition-colors"><Trash2 size={16} /></button>
+                        <button
+                          onClick={() => navigate("/purchase/purchase-requests/view-purchase-request/" + pr.id)}
+                          className="outline-none p-1.5 text-slate-400 hover:text-[#F59E0B] transition-colors"><Eye size={16} /></button>
+                        <button
+                          onClick={() => navigate("/purchase/purchase-requests/edit-purchase-request/" + pr.id)}
+                          className="outline-none p-1.5 text-slate-400 hover:text-green-500 transition-colors"><Edit size={16} /></button>
+                        <button
+                          onClick={() => dispatch(deletePurchaseRequest(pr.id))}
+                          className="outline-none p-1.5 text-slate-400 hover:text-rose-600 transition-colors"><Trash2 size={16} /></button>
                       </div>
                     </td>
                   </tr>
-                ))}
+                )) : <tr>
+                  <td
+                    colSpan={9}
+                    className="py-16 text-center text-slate-600 font-semibold text-lg"
+                  >
+                    <SearchAlert size={48} className="mx-auto mb-4 text-amber-600" />
+                    Purchase Requests Not Found
+                  </td>
+                </tr>}
               </tbody>
             </table>
           </div>
@@ -376,19 +322,19 @@ const PurchaseRequestList: React.FC = () => {
               </div>
               <div className="flex items-center gap-2">
                 <button onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))} disabled={currentPage === 1}
-                  className="p-2.5 rounded-xl border border-slate-200 bg-white text-slate-400 hover:text-amber-500 hover:border-amber-500 disabled:opacity-30">
+                  className="outline-none p-2.5 rounded-xl border border-slate-200 bg-white text-slate-400 hover:text-amber-500 hover:border-amber-500 disabled:opacity-30">
                   <ChevronLeft size={18} />
                 </button>
                 <div className="flex items-center gap-1.5">
                   {[...Array(totalPages)].map((_, i) => (
                     <button key={i} onClick={() => setCurrentPage(i + 1)}
-                      className={`min-w-10 h-10 rounded-xl text-xs font-bold transition-all ${currentPage === i + 1 ? "bg-[#F59E0B] text-white shadow-lg" : "bg-white text-slate-500 border border-slate-200"}`}>
+                      className={`outline-none  min-w-10 h-10 rounded-xl text-xs font-bold transition-all ${currentPage === i + 1 ? "bg-[#F59E0B] text-white shadow-lg" : "bg-white text-slate-500 border border-slate-200"}`}>
                       {i + 1}
                     </button>
                   ))}
                 </div>
                 <button onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))} disabled={currentPage === totalPages}
-                  className="p-2.5 rounded-xl border border-slate-200 bg-white text-slate-400 hover:text-amber-500 hover:border-amber-500 disabled:opacity-30">
+                  className="outline-none p-2.5 rounded-xl border border-slate-200 bg-white text-slate-400 hover:text-amber-500 hover:border-amber-500 disabled:opacity-30">
                   <ChevronRight size={18} />
                 </button>
               </div>

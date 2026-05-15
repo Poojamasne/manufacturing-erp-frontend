@@ -14,6 +14,12 @@ import {
   Hash
 } from "lucide-react";
 
+// Import Redux Actions and Types
+import { createPurchaseRequest } from "../../ModuleStateFiles/PurchaseRequestManagementSlice";
+import type { RootState } from "../../../../app/store/store"; // Adjust path
+import { useAppDispatch } from "../../../../app/store/hook";
+import { useAppSelector } from "../../../common/ReduxMainHooks";
+
 // ==================== Types & Mock Data ====================
 interface MaterialMaster {
   id: string;
@@ -32,16 +38,23 @@ const mockMaterials: MaterialMaster[] = [
 
 const CreatePurchaseRequest: React.FC = () => {
   const navigate = useNavigate();
-  const [currentStep, setCurrentStep] = useState(1);
-  const [loading, setLoading] = useState(false);
+  const dispatch = useAppDispatch();
 
-  // Form State (SRS 3.3.1 Input Fields)
+  // Get loading state from Redux
+  const { loading } = useAppSelector((state: RootState) => state.purchaseRequests);
+
+  const [currentStep, setCurrentStep] = useState(1);
+
+  // Updated Form State to align with Slice Keys (SRS 3.3.1)
   const [formData, setFormData] = useState({
-    material: null as MaterialMaster | null,
-    quantity: "",
-    requiredDate: "",
+    material_name: "",
+    material_code: "",
+    unit: "",
+    quantity: 0,
+    required_date: "",
     department: "",
     priority: "MEDIUM" as "LOW" | "MEDIUM" | "HIGH",
+    requested_by: "Current User", // Mocked user session
   });
 
   const steps = [
@@ -52,15 +65,8 @@ const CreatePurchaseRequest: React.FC = () => {
   ];
 
   const handleFinalAction = async () => {
-    setLoading(true);
-    // Simulating System Behavior: Generate unique PR ID (SRS 3.3.2)
-    const generatedPRID = `PR-${Math.floor(1000 + Math.random() * 9000)}`;
-
-    setTimeout(() => {
-      setLoading(false);
-      alert(`Purchase Request ${generatedPRID} Created Successfully!`);
-      navigate("/purchase/requests");
-    }, 1500);
+    // Dispatching the Redux Thunk instead of local timeout
+    dispatch(createPurchaseRequest(formData, navigate));
   };
 
   return (
@@ -104,19 +110,21 @@ const CreatePurchaseRequest: React.FC = () => {
           <div className="bg-white rounded-[2.5rem] shadow-sm border border-slate-100 overflow-hidden animate-in fade-in slide-in-from-bottom-4">
             <div className="px-8 py-4 border-b border-slate-50 bg-slate-50/30 flex flex-col md:flex-row justify-between items-center gap-4">
               <h3 className="font-bold text-lg flex items-center gap-2 text-slate-700">
-                <Search size={20} className="text-[#F59E0B]" />
                 Select Material
               </h3>
               <div className="relative w-full md:w-64">
-                <input type="text" placeholder="Search code..." className="w-full pl-4 pr-10 py-2 rounded-xl border border-slate-200 text-sm outline-none focus:ring-2 focus:ring-amber-500/20" />
-                <Search className="absolute right-3 top-2.5 text-slate-300" size={16} />
+                <Search className="absolute left-3 top-2.5 text-slate-300" size={16} />
+                <input type="text" placeholder="Search code..." className="w-full pl-10 pr-4 py-2 rounded-xl border border-slate-200 text-sm outline-none focus:ring-2 focus:ring-amber-500/20" />
               </div>
             </div>
             <div className="px-8 py-4 grid grid-cols-1 md:grid-cols-4 gap-6">
               {mockMaterials.map((m) => (
                 <button
                   key={m.id}
-                  onClick={() => { setFormData({ ...formData, material: m }); setCurrentStep(2); }}
+                  onClick={() => {
+                    setFormData({ ...formData, material_name: m.name, material_code: m.code, unit: m.unit });
+                    setCurrentStep(2);
+                  }}
                   className="group text-left p-6 border border-slate-300 rounded-4xl hover:border-[#F59E0B] hover:bg-orange-50/20 transition-all relative overflow-hidden"
                 >
                   <span className="text-[13px] font-black text-[#F59E0B] uppercase tracking-[0.2em]">{m.code}</span>
@@ -133,26 +141,26 @@ const CreatePurchaseRequest: React.FC = () => {
         )}
 
         {/* Step 2: Request Details */}
-        {currentStep === 2 && formData.material && (
+        {currentStep === 2 && formData.material_name && (
           <div className="bg-white rounded-[2.5rem] shadow-sm border border-slate-100 p-10 animate-in fade-in zoom-in-95">
             <div className="flex items-center gap-3 border-b border-slate-50 pb-6 mb-8">
               <div className="p-3 bg-orange-50 rounded-2xl"><Info className="text-[#F59E0B]" /></div>
               <div>
                 <h3 className="font-bold text-xl">Requirement Details</h3>
-                <p className="text-sm text-slate-400 font-medium">Specify quantity and timeline for {formData.material.name}</p>
+                <p className="text-sm text-slate-400 font-medium">Specify quantity and timeline for {formData.material_name}</p>
               </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-10">
               <div className="space-y-2">
                 <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-700 flex items-center gap-1.5">
-                  <Database size={14} /> Quantity Required ({formData.material.unit})
+                  <Database size={14} /> Quantity Required ({formData.unit})
                 </label>
                 <input
                   type="number"
                   min={1}
                   value={formData.quantity}
-                  onChange={(e) => setFormData({ ...formData, quantity: e.target.value })}
+                  onChange={(e) => setFormData({ ...formData, quantity: Number(e.target.value) })}
                   className="appearance-none w-full bg-slate-50 border border-slate-200 px-6 py-4 rounded-3xl font-bold outline-none focus:ring-4 focus:ring-amber-500/10 focus:border-amber-500"
                   placeholder="0.00"
                 />
@@ -163,9 +171,9 @@ const CreatePurchaseRequest: React.FC = () => {
                 </label>
                 <input
                   type="date"
-                  value={formData.requiredDate}
-                  onChange={(e) => setFormData({ ...formData, requiredDate: e.target.value })}
-                  className="w-full bg-slate-50 border border-slate-200 px-6 py-4 rounded-3xl font-bold outline-none focus:ring-4 focus:ring-amber-500/10 focus:border-amber-500"
+                  value={formData.required_date}
+                  onChange={(e) => setFormData({ ...formData, required_date: e.target.value })}
+                  className="outline-none w-full bg-slate-50 border border-slate-200 px-6 py-4 rounded-3xl font-bold focus:ring-4 focus:ring-amber-500/10 focus:border-amber-500"
                 />
               </div>
               <div className="space-y-2">
@@ -180,17 +188,16 @@ const CreatePurchaseRequest: React.FC = () => {
                   <option value="">Select Department</option>
                   <option value="Production">Production</option>
                   <option value="Inventory">Inventory</option>
-                  {/* <option value="Maintenance">Maintenance</option> */}
                 </select>
               </div>
             </div>
 
             <div className="flex justify-end gap-4">
-              <button onClick={() => setCurrentStep(1)} className="px-4 py-2 rounded-xl font-bold text-[#F59E0B] border border-transparent hover:border-amber-500 transition-all">Back</button>
+              <button onClick={() => setCurrentStep(1)} className="outline-none px-4 py-2 rounded-xl font-bold text-[#F59E0B] border border-transparent hover:border-amber-500 transition-all">Back</button>
               <button
-                disabled={!formData.quantity || !formData.requiredDate || !formData.department}
+                disabled={!formData.quantity || !formData.required_date || !formData.department}
                 onClick={() => setCurrentStep(3)}
-                className="bg-slate-900 disabled:opacity-30 text-white px-4 py-2 rounded-xl font-bold text-sm hover:bg-slate-800 transition-all shadow-lg"
+                className="outline-none bg-slate-900 disabled:opacity-30 text-white px-4 py-2 rounded-xl font-bold text-sm hover:bg-slate-800 transition-all shadow-lg"
               >
                 Review
               </button>
@@ -208,11 +215,11 @@ const CreatePurchaseRequest: React.FC = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-12">
               <div className="space-y-6">
-                <DetailBox label="Material" value={formData.material?.name || ""} icon={<Package size={14} />} />
-                <DetailBox label="Item Code" value={formData.material?.code || ""} icon={<Hash size={14} />} />
+                <DetailBox label="Material" value={formData.material_name} icon={<Package size={14} />} />
+                <DetailBox label="Item Code" value={formData.material_code} icon={<Hash size={14} />} />
                 <div className="grid grid-cols-2 gap-4">
-                  <DetailBox label="Quantity" value={`${formData.quantity} ${formData.material?.unit}`} icon={<Database size={14} />} />
-                  <DetailBox label="Target Date" value={formData.requiredDate} icon={<Calendar size={14} />} />
+                  <DetailBox label="Quantity" value={`${formData.quantity} ${formData.unit}`} icon={<Database size={14} />} />
+                  <DetailBox label="Target Date" value={formData.required_date} icon={<Calendar size={14} />} />
                 </div>
               </div>
 
@@ -223,9 +230,9 @@ const CreatePurchaseRequest: React.FC = () => {
                     <button
                       key={p}
                       onClick={() => setFormData({ ...formData, priority: p as any })}
-                      className={`flex items-center justify-between px-6 py-4 rounded-2xl text-xs font-black transition-all ${formData.priority === p
-                          ? 'bg-[#F59E0B] text-white shadow-xl scale-[1.02]'
-                          : 'bg-white text-slate-400 border border-slate-200 hover:bg-slate-100'
+                      className={`outline-none flex items-center justify-between px-6 py-4 rounded-2xl text-xs font-black transition-all ${formData.priority === p
+                        ? 'bg-[#F59E0B] text-white shadow-xl scale-[1.02]'
+                        : 'bg-white text-slate-400 border border-slate-200 hover:bg-slate-100'
                         }`}
                     >
                       {p}
@@ -237,8 +244,8 @@ const CreatePurchaseRequest: React.FC = () => {
             </div>
 
             <div className="flex justify-end gap-4">
-              <button onClick={() => setCurrentStep(2)} className="px-4 py-2 rounded-xl text-sm font-bold text-[#F59E0B] hover:text-[#ffb73a] border border-amber-500 transition-all">Modify Details</button>
-              <button onClick={() => setCurrentStep(4)} className="bg-slate-900 text-white px-4 py-2 rounded-xl font-bold text-sm shadow-xl hover:bg-slate-800 transition-all">Submit Request</button>
+              <button onClick={() => setCurrentStep(2)} className="outline-none px-4 py-2 rounded-xl text-sm font-bold text-[#F59E0B] hover:text-[#ffb73a] border border-amber-500 transition-all">Modify Details</button>
+              <button onClick={() => setCurrentStep(4)} className="outline-none bg-slate-900 text-white px-4 py-2 rounded-xl font-bold text-sm shadow-xl hover:bg-slate-800 transition-all">Finalize</button>
             </div>
           </div>
         )}
@@ -259,11 +266,11 @@ const CreatePurchaseRequest: React.FC = () => {
                 <button
                   onClick={handleFinalAction}
                   disabled={loading}
-                  className="bg-slate-900 text-white px-4 py-2 rounded-xl font-bold text-sm hover:bg-slate-800 transition-all flex items-center justify-center gap-2 shadow-2xl disabled:opacity-50"
+                  className="outline-none bg-slate-900 text-white px-4 py-2 rounded-xl font-bold text-sm hover:bg-slate-800 transition-all flex items-center justify-center gap-2 shadow-2xl disabled:opacity-50 min-w-45"
                 >
                   {loading ? "Generating PR..." : "Confirm & Create PR"}
                 </button>
-                <button onClick={() => navigate("/purchase/purchase-requests")} className="rounded-xl font-bold text-sm text-[#F59E0B] hover:text-red-500 border hover:border-rose-500 py-2 px-4 transition-colors">
+                <button onClick={() => navigate("/purchase/purchase-requests")} className="outline-none rounded-xl font-bold text-sm text-[#F59E0B] hover:text-red-500 border hover:border-rose-500 py-2 px-4 transition-colors">
                   Cancel Request
                 </button>
               </div>
@@ -279,11 +286,11 @@ const CreatePurchaseRequest: React.FC = () => {
 
 const DetailBox: React.FC<{ label: string; value: string; icon: React.ReactNode }> = ({ label, value, icon }) => (
   <div className="space-y-2">
-    <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 flex items-center gap-1.5">
+    <label className="outline-none text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 flex items-center gap-1.5">
       {icon} {label}
     </label>
-    <div className="text-slate-800 font-bold text-base bg-slate-50/50 px-4 py-3 rounded-2xl border border-slate-50">
-      {value}
+    <div className="outline-none text-slate-800 font-bold text-base bg-slate-50/50 px-4 py-3 rounded-2xl border border-slate-50">
+      {value || "-"}
     </div>
   </div>
 );

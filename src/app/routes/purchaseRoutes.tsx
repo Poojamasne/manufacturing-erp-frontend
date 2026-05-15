@@ -6,6 +6,8 @@ import InventoryLayout from "../../features/purchase_management/layout/PurchaseM
 import { withSuspense } from "./routeUtils";
 import CreatePurchaseRequest from "../../features/purchase_management/components/Purchase_Request_Management/CreatePurchaseRequest";
 import PurchaseRequestList from "../../features/purchase_management/components/Purchase_Request_Management/PurchaseRequestList";
+import EditPurchaseRequest from "../../features/purchase_management/components/Purchase_Request_Management/EditPurchaseRequest";
+import ViewPurchaseRequest from "../../features/purchase_management/components/Purchase_Request_Management/ViewPurchaseRequest";
 
 const PurchaseDashboard = lazy(
   () => import("../../features/purchase_management/components/Dashboard/Dashboard")
@@ -26,6 +28,8 @@ export const purchaseRoutes: RouteObject[] = [
           { path: "dashboard", element: withSuspense(<PurchaseDashboard />) },
           { path: "purchase-requests", element: withSuspense(<PurchaseRequestList />) },
           { path: "purchase-requests/create-purchase-request", element: withSuspense(<CreatePurchaseRequest />) },
+          { path: "purchase-requests/edit-purchase-request/:id", element: withSuspense(<EditPurchaseRequest />) },
+          { path: "purchase-requests/view-purchase-request/:id", element: withSuspense(<ViewPurchaseRequest />) },
           { path: "notes", element: withSuspense(<PurchaseNotes />) },
         ],
       },

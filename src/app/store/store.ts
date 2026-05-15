@@ -12,7 +12,8 @@ import reportReducer from "../../features/sales/ModuleStateFiles/ReportSlice";
 import inventoryMaterialReceiptReducer from "../../features/inventory/ModuleStateFiles/MaterialReceiptSlice";
 import inventoryWarehouseReducer from "../../features/inventory/ModuleStateFiles/WarehouseSlice";
 import inventoryMaterialIssueAndExecutionReducer from "../../features/inventory/ModuleStateFiles/MaterialIssueAndExecutionSlice";
-
+// Purchase Management Reducers
+import purchaseRequestReducer from "../../features/purchase_management/ModuleStateFiles/PurchaseRequestManagementSlice";
 const store = configureStore({
   reducer: {
     auth: authReducer,
@@ -29,6 +30,8 @@ const store = configureStore({
     inventoryWarehouse: inventoryWarehouseReducer,
     inventoryMaterialIssueAndExecution:
       inventoryMaterialIssueAndExecutionReducer,
+    // Purchase Management Reducers
+    purchaseRequests: purchaseRequestReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
