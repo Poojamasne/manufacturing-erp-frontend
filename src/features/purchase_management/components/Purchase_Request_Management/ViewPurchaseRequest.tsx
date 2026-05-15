@@ -183,7 +183,7 @@ const DetailBox: React.FC<{ label: string; value: string }> = ({ label, value })
         <label className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400 group-hover:text-[#F59E0B] transition-colors">
             {label}
         </label>
-        <div className="text-slate-800 font-black text-base break-words leading-tight">
+        <div className="text-slate-800 font-black text-base wrap-break-word leading-tight">
             {value || "-"}
         </div>
     </div>
