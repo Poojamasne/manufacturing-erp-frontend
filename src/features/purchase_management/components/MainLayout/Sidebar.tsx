@@ -109,6 +109,7 @@ const Sidebar: React.FC = () => {
           />
           <span className={`${isActive("/purchase/rfqs") ? "font-bold" : "font-semibold"} text-sm`}>RFQ Management</span>
         </button>
+
         {/* Vendor Quotation Management */}
         <button
           onClick={() => {
@@ -126,6 +127,25 @@ const Sidebar: React.FC = () => {
             alt=""
           />
           <span className={`${isActive("/purchase/vendor-quotations") ? "font-bold" : "font-semibold"} text-sm`}>Vendor Quotations</span>
+        </button>
+
+        {/* Purchase Order Management */}
+        <button
+          onClick={() => {
+            navigate("/purchase/purchase-orders")
+            document.title = "Manufacturing ERP - Purchase Order Management";
+          }}
+          className={`outline-none w-full flex items-center gap-3 px-4 py-3 cursor-pointer rounded-xl transition-all duration-200 ${isActive("/purchase/purchase-orders")
+            ? "bg-[#F59E0B] text-white shadow-md"
+            : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
+            }`}
+        >
+          <img
+            src="/icons/Purchase_manager/PO.svg"
+            className={`h-5 w-5 ${isActive("/purchase/purchase-orders") ? "" : "invert opacity-60"}`}
+            alt=""
+          />
+          <span className={`${isActive("/purchase/purchase-orders") ? "font-bold" : "font-semibold"} text-sm`}>Purchase Orders</span>
         </button>
       </nav>
 

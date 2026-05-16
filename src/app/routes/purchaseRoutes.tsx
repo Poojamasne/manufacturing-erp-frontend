@@ -22,6 +22,10 @@ import ViewQuotation from "../../features/purchase_management/components/Vendor_
 import QuotationList from "../../features/purchase_management/components/Vendor_Quotation_Management/VendorQuotationList";
 import CreateQuotation from "../../features/purchase_management/components/Vendor_Quotation_Management/CreateQuotation";
 import EditQuotation from "../../features/purchase_management/components/Vendor_Quotation_Management/EditVendorQuotation";
+import PurchaseOrderList from "../../features/purchase_management/components/Purchase_Order_Management/PurchaseOrderList";
+import ViewPurchaseOrder from "../../features/purchase_management/components/Purchase_Order_Management/ViewPurchaseOrder";
+import EditPurchaseOrder from "../../features/purchase_management/components/Purchase_Order_Management/EditPurchaseOrder";
+import CreatePurchaseOrder from "../../features/purchase_management/components/Purchase_Order_Management/CreatePurchaseOrder";
 
 const PurchaseDashboard = lazy(
   () => import("../../features/purchase_management/components/Dashboard/Dashboard")
@@ -65,6 +69,11 @@ export const purchaseRoutes: RouteObject[] = [
           { path: "vendor-quotations/edit-vendor-quotation/:id", element: withSuspense(<EditQuotation />) },
           { path: "vendor-quotations/view-vendor-quotation/:id", element: withSuspense(<ViewQuotation />) },
 
+          // Purchase Order Routes
+          { path: "purchase-orders", element: withSuspense(<PurchaseOrderList />) },
+          { path: "purchase-orders/create-purchase-order", element: withSuspense(<CreatePurchaseOrder />) },
+          { path: "purchase-orders/edit-purchase-order/:id", element: withSuspense(<EditPurchaseOrder />) },
+          { path: "purchase-orders/view-purchase-order/:id", element: withSuspense(<ViewPurchaseOrder />) },
           { path: "notes", element: withSuspense(<PurchaseNotes />) },
         ],
       },
