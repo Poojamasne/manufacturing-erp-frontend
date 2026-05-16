@@ -81,7 +81,7 @@ const EditVendorQuotation: React.FC = () => {
 
         {/* Breadcrumbs */}
         <div className="flex items-center gap-2 text-gray-400 text-sm mb-1">
-          <button onClick={() => navigate("/purchase/quotations")} className="outline-none hover:text-[#F59E0B] transition-colors font-medium">
+          <button onClick={() => navigate("/purchase/vendor-quotations")} className="outline-none hover:text-[#F59E0B] transition-colors font-medium">
             Bids & Quotations
           </button>
           <ChevronRight size={14} />

@@ -1,23 +1,25 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
-import type { AppDispatch } from "../../../app/store/store";
+import type { AppDispatch, RootState } from "../../../app/store/store";
 import Swal from "sweetalert2";
 import toast from "react-hot-toast";
 import type { NavigateFunction } from "react-router-dom";
+import { VendorQuotationPDF } from "../utils/VendorQuotationPDF";
+import { pdf } from "@react-pdf/renderer";
 
-// ==================== Types (SRS 3.6) ====================
+
 export interface Quotation {
     id: number | string;
-    quotation_id: string; // VQT-XXXX
-    rfq_ref: string; // Linked RFQ ID
+    quotation_id: string;
+    rfq_ref: string;
     vendor_name: string;
     material_name: string;
     unit_price: number;
     total_amount: number;
-    delivery_lead_time: number; // e.g., "5 Days"
-    payment_terms: string; // e.g., "Net 30"
+    delivery_lead_time: number;
+    payment_terms: string;
     validity_date: string;
     status: "Draft" | "Submitted" | "Under Review" | "Accepted" | "Rejected";
-    created_at: string; // Required for Time Filtering
+    created_at: string;
 }
 
 const initialState = {
@@ -29,7 +31,7 @@ const initialState = {
             rfq_ref: "RFQ-5501",
             vendor_name: "Tata Steel Ltd",
             material_name: "Industrial Bolt M12",
-            unit_price: 15.50,
+            unit_price: 15,
             total_amount: 77500,
             delivery_lead_time: 3,
             payment_terms: "Net 30",
@@ -43,7 +45,7 @@ const initialState = {
             rfq_ref: "RFQ-5501",
             vendor_name: "Global Fasteners",
             material_name: "Industrial Bolt M12",
-            unit_price: 14.20,
+            unit_price: 14,
             total_amount: 71000,
             delivery_lead_time: 7,
             payment_terms: "Advance",
@@ -70,12 +72,12 @@ const quotationSlice = createSlice({
             state.loading = false;
             state.error = action.payload;
         },
-        // ACTION: GET ALL
+
         getAllQuotationSuccess: (state, action: PayloadAction<Quotation[]>) => {
             state.loading = false;
             state.quotations = action.payload;
         },
-        // ACTION: GET SINGLE
+
         getQuotationSuccess: (state, action: PayloadAction<number | string>) => {
             state.loading = false;
             const found = state.quotations.find(
@@ -83,12 +85,12 @@ const quotationSlice = createSlice({
             );
             state.quotation = found || null;
         },
-        // ACTION: CREATE
+
         createQuotationSuccess: (state, action: PayloadAction<Quotation>) => {
             state.loading = false;
             state.quotations.unshift(action.payload);
         },
-        // ACTION: UPDATE
+
         updateQuotationSuccess: (state, action: PayloadAction<Quotation>) => {
             state.loading = false;
             state.quotations = state.quotations.map((q) =>
@@ -96,7 +98,7 @@ const quotationSlice = createSlice({
             );
             state.quotation = action.payload;
         },
-        // ACTION: DELETE
+
         deleteQuotationSuccess: (state, action: PayloadAction<number | string>) => {
             state.loading = false;
             state.quotations = state.quotations.filter((q) => q.id !== action.payload);
@@ -121,17 +123,17 @@ export const {
 
 export default quotationSlice.reducer;
 
-// --- STATE-ONLY ASYNC ACTIONS (THUNKS) ---
 
-// 1. GET ALL QUOTATIONS
+
+
 export const getAllQuotations = () => async (dispatch: AppDispatch) => {
     dispatch(request());
     Swal.fire({
         title: "Syncing Bids...",
         text: "Analyzing vendor quotations...",
         allowOutsideClick: false,
-        customClass:{
-            loader:"lead-loader"
+        customClass: {
+            loader: "lead-loader"
         },
         didOpen: () => { Swal.showLoading(); }
     });
@@ -143,15 +145,15 @@ export const getAllQuotations = () => async (dispatch: AppDispatch) => {
     }, 800);
 };
 
-// 2. CREATE VENDOR QUOTATION (SRS 3.6.1)
+
 export const createQuotationEntry = (payload: any, navigate: NavigateFunction) => async (dispatch: AppDispatch) => {
     dispatch(request());
     Swal.fire({
         title: "Recording Bid...",
         text: "Uploading supplier commercials to RFQ...",
         allowOutsideClick: false,
-        customClass:{
-            loader:"lead-loader"
+        customClass: {
+            loader: "lead-loader"
         },
         didOpen: () => { Swal.showLoading(); }
     });
@@ -182,14 +184,14 @@ export const createQuotationEntry = (payload: any, navigate: NavigateFunction) =
     }, 1200);
 };
 
-// 3. EDIT QUOTATION (SRS 3.6.3 - Finalization Prep)
+
 export const editQuotationEntry = (id: string | number, payload: any, navigate: NavigateFunction) => async (dispatch: AppDispatch) => {
     dispatch(request());
     Swal.fire({
         title: "Updating Bid...",
         text: "Applying commercial modifications...",
-        customClass:{
-            loader:"lead-loader"
+        customClass: {
+            loader: "lead-loader"
         },
         allowOutsideClick: false,
         didOpen: () => { Swal.showLoading(); }
@@ -214,7 +216,7 @@ export const editQuotationEntry = (id: string | number, payload: any, navigate: 
     }, 1000);
 };
 
-// 4. DELETE QUOTATION
+
 export const deleteQuotationEntry = (id: number | string, navigate?: NavigateFunction) => async (dispatch: AppDispatch) => {
     const result = await Swal.fire({
         title: "Discard Quotation?",
@@ -244,10 +246,10 @@ export const deleteQuotationEntry = (id: number | string, navigate?: NavigateFun
         }, 500);
     }
 };
-// 5. DELETE QUOTATION
+
 export const deleteQuotationEntries = (ids: (number | string)[]) => async (dispatch: AppDispatch) => {
     const result = await Swal.fire({
-        title:  "Discard Selected Quotations?",
+        title: "Discard Selected Quotations?",
         text: "Selected bids will be removed from the comparison matrix.",
         icon: "warning",
         iconColor: "#F59E0B",
@@ -276,14 +278,14 @@ export const deleteQuotationEntries = (ids: (number | string)[]) => async (dispa
     }
 };
 
-// 5. GET SINGLE QUOTATION
+
 export const getQuotationEntry = (id: number | string) => async (dispatch: AppDispatch) => {
     dispatch(request());
     Swal.fire({
         title: "Loading Commercials...",
         allowOutsideClick: false,
-        customClass:{
-            loader:"lead-loader"
+        customClass: {
+            loader: "lead-loader"
         },
         didOpen: () => { Swal.showLoading(); }
     });
@@ -293,4 +295,78 @@ export const getQuotationEntry = (id: number | string) => async (dispatch: AppDi
         dispatch(endRequest());
         Swal.close();
     }, 700);
+};
+
+export const exportQuotationToPDF = (id: number | string) => async (dispatch: AppDispatch, getState: () => RootState) => {
+    dispatch(request());
+
+    Swal.fire({
+        title: "Preparing Document...",
+        text: "Generating formal quotation from local records.",
+        allowOutsideClick: false,
+        customClass: {
+            loader: 'lead-loader'
+        },
+        didOpen: () => {
+            Swal.showLoading();
+        }
+    });
+
+    try {
+
+        const state = getState();
+        const quotationData = state.vendorQuotations.quotations.find(
+            (q: any) => String(q.id) === String(id) || String(q.quotation_id) === String(id)
+        );
+        let ref = state?.rfqManagement?.rfqs?.find(
+            (q: any) => String(quotationData && quotationData.rfq_ref) === String(q) || String(quotationData && quotationData.rfq_ref) === String(q.rfq_id)
+        )
+
+        if (!quotationData) {
+            throw new Error("Quotation record not found in local state.");
+        }
+
+        console.log(quotationData);
+
+        let newQuotationData = {
+            ...quotationData,
+            quantity: ref?.quantity,
+            unit: ref?.unit,
+        }
+
+        console.log("report data: ", newQuotationData);
+
+        const blob = await pdf(<VendorQuotationPDF data={newQuotationData} />).toBlob();
+
+
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = `Quotation_${quotationData.quotation_id}.pdf`;
+
+
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+
+        URL.revokeObjectURL(url);
+
+        dispatch(endRequest());
+        Swal.close();
+
+        toast.success("PDF Downloaded Successfully");
+
+    } catch (error: any) {
+        Swal.close();
+        const message = error.message || "Failed to generate PDF";
+        dispatch(failure(message));
+
+        Swal.fire({
+            icon: 'error',
+            title: 'Export Error',
+            text: message,
+            confirmButtonColor: '#F59E0B'
+        });
+    }
 };

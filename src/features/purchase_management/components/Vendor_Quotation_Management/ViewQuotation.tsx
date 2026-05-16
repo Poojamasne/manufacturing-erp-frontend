@@ -3,6 +3,7 @@ import { useNavigate, useParams, Link } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../../../app/store/hook";
 import {
   deleteQuotationEntry,
+  exportQuotationToPDF,
   getQuotationEntry,
 } from "../../ModuleStateFiles/VendorQuotationSlice";
 import {
@@ -11,12 +12,13 @@ import {
   Calendar,
   Clock,
   FileText,
- 
+
   Activity,
   Trash2,
   Edit,
   IndianRupeeIcon,
   Handshake,
+  Download,
 } from "lucide-react";
 
 const ViewQuotation: React.FC = () => {
@@ -38,12 +40,20 @@ const ViewQuotation: React.FC = () => {
       </div>
     );
 
+  if (!quotation) {
+    return (
+      <div className="p-20 text-center font-bold text-slate-400">
+        Quotation not found.
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-[#f4f7f6] p-4 md:p-8 pb-24 font-sans text-slate-900">
       <div className="max-w-6xl mx-auto">
         <div className="flex items-center gap-2 text-gray-400 text-sm mb-1">
           <button
-            onClick={() => navigate("/purchase/quotations")}
+            onClick={() => navigate("/purchase/vendor-quotations")}
             className="hover:text-[#F59E0B] font-medium"
           >
             Bids
@@ -67,17 +77,24 @@ const ViewQuotation: React.FC = () => {
               onClick={() =>
                 dispatch(deleteQuotationEntry(quotation.id, navigate))
               }
-              className="outline-none flex items-center gap-1 px-4 py-2 text-[#f59e0b] hover:text-rose-500 border hover:bg-white rounded-xl font-black text-sm shadow-xl shadow-rose-100 transition-all"
+              className="outline-none flex items-center gap-1 px-4 py-2 text-[#f59e0b] hover:text-rose-500 border hover:bg-white rounded-xl font-bold text-sm shadow-xl shadow-rose-100 transition-all"
             >
               <Trash2 size={20} /> Delete
             </button>
             <Link
               to={`/purchase/vendor-quotations/edit-vendor-quotation/${quotation.id}`}
-              className="outline-none flex items-center gap-1 px-4 py-2 bg-[#F59E0B] text-white rounded-xl font-black text-sm shadow-xl shadow-orange-100 transition-all"
+              className="outline-none flex items-center gap-1 px-4 py-2 bg-[#F59E0B] hover:bg-[#f67317] text-white rounded-xl font-bold text-sm shadow-xl shadow-orange-100 transition-all"
             >
               <Edit size={18} />
               Edit
             </Link>
+            <button
+              onClick={() => dispatch(exportQuotationToPDF(quotation.id))}
+              className="outline-none flex items-center gap-1 px-4 py-2 bg-[#f67317] hover:bg-amber-500 text-white rounded-xl font-bold text-sm shadow-xl shadow-orange-100 transition-all"
+            >
+              <Download size={18} />
+              Download PDF
+            </button>
           </div>
         </div>
 
@@ -179,7 +196,7 @@ const ViewQuotation: React.FC = () => {
           </div>
         </div>
       </div>
-    </div>
+    </div >
   );
 };
 

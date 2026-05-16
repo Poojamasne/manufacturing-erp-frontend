@@ -12,13 +12,15 @@ import {
   Plus,
   SearchAlert,
   Clock,
- 
+  Download,
+
 } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "../../../../app/store/hook";
 import {
   getAllQuotations,
   deleteQuotationEntry,
   deleteQuotationEntries,
+  exportQuotationToPDF,
 } from "../../ModuleStateFiles/VendorQuotationSlice";
 import type { RootState } from "../../../../app/store/store";
 
@@ -424,6 +426,12 @@ const VendorQuotationList: React.FC = () => {
                             className="outline-none p-1.5 text-slate-400 hover:text-rose-600 transition-colors"
                           >
                             <Trash2 size={16} />
+                          </button>
+                          <button
+                            onClick={() => dispatch(exportQuotationToPDF(q.id))}
+                            className="outline-none p-1.5 text-slate-400 hover:text-blue-500 transition-colors"
+                          >
+                            <Download size={16} />
                           </button>
                         </div>
                       </td>

@@ -38,7 +38,7 @@ const CreateQuotation: React.FC = () => {
             <div className="max-w-6xl mx-auto">
                 <div className="flex items-center gap-2 text-gray-400 text-sm mb-1">
                     <button
-                        onClick={() => navigate("/purchase/quotations")}
+                        onClick={() => navigate("/purchase/vendor-quotations")}
                         className="hover:text-[#F59E0B] font-medium"
                     >
                         Bids & Quotations
