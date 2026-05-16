@@ -8,6 +8,20 @@ import CreatePurchaseRequest from "../../features/purchase_management/components
 import PurchaseRequestList from "../../features/purchase_management/components/Purchase_Request_Management/PurchaseRequestList";
 import EditPurchaseRequest from "../../features/purchase_management/components/Purchase_Request_Management/EditPurchaseRequest";
 import ViewPurchaseRequest from "../../features/purchase_management/components/Purchase_Request_Management/ViewPurchaseRequest";
+import VendorList from "../../features/purchase_management/components/VendorManagement/VendorList";
+import CreateVendor from "../../features/purchase_management/components/VendorManagement/CreateVendor";
+import ViewVendor from "../../features/purchase_management/components/VendorManagement/ViewVendor";
+import EditVendor from "../../features/purchase_management/components/VendorManagement/EditVendor";
+
+// RFQ Components
+import RFQList from "../../features/purchase_management/components/RFQ_Management/RFQList";
+import CreateRFQ from "../../features/purchase_management/components/RFQ_Management/CreateRFQ";
+import EditRFQ from "../../features/purchase_management/components/RFQ_Management/EditRFQ";
+import ViewRFQ from "../../features/purchase_management/components/RFQ_Management/ViewRFQ";
+import ViewQuotation from "../../features/purchase_management/components/Vendor_Quotation_Management/ViewQuotation";
+import QuotationList from "../../features/purchase_management/components/Vendor_Quotation_Management/VendorQuotationList";
+import CreateQuotation from "../../features/purchase_management/components/Vendor_Quotation_Management/CreateQuotation";
+import EditQuotation from "../../features/purchase_management/components/Vendor_Quotation_Management/EditVendorQuotation";
 
 const PurchaseDashboard = lazy(
   () => import("../../features/purchase_management/components/Dashboard/Dashboard")
@@ -26,10 +40,31 @@ export const purchaseRoutes: RouteObject[] = [
         children: [
           { index: true, element: withSuspense(<PurchaseDashboard />) },
           { path: "dashboard", element: withSuspense(<PurchaseDashboard />) },
+
+          // Purchase Request Routes
           { path: "purchase-requests", element: withSuspense(<PurchaseRequestList />) },
           { path: "purchase-requests/create-purchase-request", element: withSuspense(<CreatePurchaseRequest />) },
           { path: "purchase-requests/edit-purchase-request/:id", element: withSuspense(<EditPurchaseRequest />) },
           { path: "purchase-requests/view-purchase-request/:id", element: withSuspense(<ViewPurchaseRequest />) },
+
+          // Vendor Management Routes
+          { path: "vendors", element: withSuspense(<VendorList />) },
+          { path: "vendors/create-vendor", element: withSuspense(<CreateVendor />) },
+          { path: "vendors/view-vendor/:id", element: withSuspense(<ViewVendor />) },
+          { path: "vendors/edit-vendor/:id", element: withSuspense(<EditVendor />) },
+
+          // RFQ Routes
+          { path: "rfqs", element: withSuspense(<RFQList />) },
+          { path: "rfqs/create-rfq", element: withSuspense(<CreateRFQ />) },
+          { path: "rfqs/edit-rfq/:id", element: withSuspense(<EditRFQ />) },
+          { path: "rfqs/view-rfq/:id", element: withSuspense(<ViewRFQ />) },
+
+          // Vendor Quotation Routes
+          { path: "vendor-quotations", element: withSuspense(<QuotationList />) },
+          { path: "vendor-quotations/create-vendor-quotation", element: withSuspense(<CreateQuotation />) },
+          { path: "vendor-quotations/edit-vendor-quotation/:id", element: withSuspense(<EditQuotation />) },
+          { path: "vendor-quotations/view-vendor-quotation/:id", element: withSuspense(<ViewQuotation />) },
+
           { path: "notes", element: withSuspense(<PurchaseNotes />) },
         ],
       },

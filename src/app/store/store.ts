@@ -14,6 +14,14 @@ import inventoryWarehouseReducer from "../../features/inventory/ModuleStateFiles
 import inventoryMaterialIssueAndExecutionReducer from "../../features/inventory/ModuleStateFiles/MaterialIssueAndExecutionSlice";
 // Purchase Management Reducers
 import purchaseRequestReducer from "../../features/purchase_management/ModuleStateFiles/PurchaseRequestManagementSlice";
+// Vendor Management
+import vendorManagementReducer from "../../features/purchase_management/ModuleStateFiles/VendorManagementSlice";
+// RFQ Management
+import rfqManagementReducer from "../../features/purchase_management/ModuleStateFiles/RFQManagementSlice";
+
+// Vendor Quotation Management 
+import vendorQuotationReducer from "../../features/purchase_management/ModuleStateFiles/VendorQuotationSlice";
+
 const store = configureStore({
   reducer: {
     auth: authReducer,
@@ -32,6 +40,9 @@ const store = configureStore({
       inventoryMaterialIssueAndExecutionReducer,
     // Purchase Management Reducers
     purchaseRequests: purchaseRequestReducer,
+    vendorManagement: vendorManagementReducer,
+    rfqManagement: rfqManagementReducer,
+    vendorQuotations: vendorQuotationReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

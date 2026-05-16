@@ -72,7 +72,61 @@ const Sidebar: React.FC = () => {
           <span className={`${isActive("/purchase/purchase-requests") ? "font-bold" : "font-semibold"} text-sm`}>Purchase Requests</span>
         </button>
 
+        {/* Vendor Management */}
+        <button
+          onClick={() => {
+            navigate("/purchase/vendors")
+            document.title = "Manufacturing ERP - Vendor Management";
+          }}
+          className={`outline-none w-full flex items-center gap-3 px-4 py-3 cursor-pointer rounded-xl transition-all duration-200 ${isActive("/purchase/vendors")
+            ? "bg-[#F59E0B] text-white shadow-md"
+            : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
+            }`}
+        >
+          <img
+            src="/icons/Purchase_manager/Vendors.svg"
+            className={`h-5 w-5 ${isActive("/purchase/vendors") ? "" : "invert opacity-60"}`}
+            alt=""
+          />
+          <span className={`${isActive("/purchase/vendors") ? "font-bold" : "font-semibold"} text-sm`}>Vendor Management</span>
+        </button>
 
+        {/* RFQ Management */}
+        <button
+          onClick={() => {
+            navigate("/purchase/rfqs")
+            document.title = "Manufacturing ERP - RFQ Management";
+          }}
+          className={`outline-none w-full flex items-center gap-3 px-4 py-3 cursor-pointer rounded-xl transition-all duration-200 ${isActive("/purchase/rfqs")
+            ? "bg-[#F59E0B] text-white shadow-md"
+            : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
+            }`}
+        >
+          <img
+            src="/icons/Purchase_manager/RFQs.svg"
+            className={`h-5 w-5 ${isActive("/purchase/rfqs") ? "" : "invert opacity-60"}`}
+            alt=""
+          />
+          <span className={`${isActive("/purchase/rfqs") ? "font-bold" : "font-semibold"} text-sm`}>RFQ Management</span>
+        </button>
+        {/* Vendor Quotation Management */}
+        <button
+          onClick={() => {
+            navigate("/purchase/vendor-quotations")
+            document.title = "Manufacturing ERP - Vendor Quotation Management";
+          }}
+          className={`outline-none w-full flex items-center gap-3 px-4 py-3 cursor-pointer rounded-xl transition-all duration-200 ${isActive("/purchase/vendor-quotations")
+            ? "bg-[#F59E0B] text-white shadow-md"
+            : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
+            }`}
+        >
+          <img
+            src="/icons/Purchase_manager/Quotation.svg"
+            className={`h-5 w-5 ${isActive("/purchase/vendor-quotations") ? "" : "invert opacity-60"}`}
+            alt=""
+          />
+          <span className={`${isActive("/purchase/vendor-quotations") ? "font-bold" : "font-semibold"} text-sm`}>Vendor Quotations</span>
+        </button>
       </nav>
 
       {/* FIXED FOOTER */}
