@@ -26,6 +26,11 @@ import PurchaseOrderList from "../../features/purchase_management/components/Pur
 import ViewPurchaseOrder from "../../features/purchase_management/components/Purchase_Order_Management/ViewPurchaseOrder";
 import EditPurchaseOrder from "../../features/purchase_management/components/Purchase_Order_Management/EditPurchaseOrder";
 import CreatePurchaseOrder from "../../features/purchase_management/components/Purchase_Order_Management/CreatePurchaseOrder";
+import GoodsReceiptList from "../../features/purchase_management/components/GRN(Goods_Receipt_Note)/GoodsReceiptList";
+import CreateGRN from "../../features/purchase_management/components/GRN(Goods_Receipt_Note)/CreateGRN";
+import EditGRN from "../../features/purchase_management/components/GRN(Goods_Receipt_Note)/EditGRN";
+import ViewGRN from "../../features/purchase_management/components/GRN(Goods_Receipt_Note)/ViewGRN";
+import QCVerification from "../../features/purchase_management/components/GRN(Goods_Receipt_Note)/QCVerification";
 
 const PurchaseDashboard = lazy(
   () => import("../../features/purchase_management/components/Dashboard/Dashboard")
@@ -74,6 +79,15 @@ export const purchaseRoutes: RouteObject[] = [
           { path: "purchase-orders/create-purchase-order", element: withSuspense(<CreatePurchaseOrder />) },
           { path: "purchase-orders/edit-purchase-order/:id", element: withSuspense(<EditPurchaseOrder />) },
           { path: "purchase-orders/view-purchase-order/:id", element: withSuspense(<ViewPurchaseOrder />) },
+
+
+          // Goods Receipt Routes
+          { path: "goods-receipts", element: withSuspense(<GoodsReceiptList />) },
+          { path: "goods-receipts/create-goods-receipt", element: withSuspense(<CreateGRN />) },
+          { path: "goods-receipts/edit-goods-receipt/:id", element: withSuspense(<EditGRN />) },
+          { path: "goods-receipts/view-goods-receipt/:id", element: withSuspense(<ViewGRN />) },
+          { path: "goods-receipts/qc-check/:id", element: withSuspense(<QCVerification />) },
+
           { path: "notes", element: withSuspense(<PurchaseNotes />) },
         ],
       },

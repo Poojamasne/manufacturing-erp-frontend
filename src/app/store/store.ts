@@ -22,6 +22,8 @@ import rfqManagementReducer from "../../features/purchase_management/ModuleState
 import vendorQuotationReducer from "../../features/purchase_management/ModuleStateFiles/VendorQuotationSlice";
 // Purchase Order Management
 import purchaseOrderReducer from "../../features/purchase_management/ModuleStateFiles/PurchaseOrderSlice";
+// Goods Receipt Management
+import goodsReceiptReducer from "../../features/purchase_management/ModuleStateFiles/GoodsReceiptSlice";
 const store = configureStore({
   reducer: {
     auth: authReducer,
@@ -44,6 +46,7 @@ const store = configureStore({
     rfqManagement: rfqManagementReducer,
     vendorQuotations: vendorQuotationReducer,
     purchaseOrders: purchaseOrderReducer,
+    goodsReceipts: goodsReceiptReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

@@ -147,6 +147,25 @@ const Sidebar: React.FC = () => {
           />
           <span className={`${isActive("/purchase/purchase-orders") ? "font-bold" : "font-semibold"} text-sm`}>Purchase Orders</span>
         </button>
+
+        {/* Goods Receipt Management */}
+        <button
+          onClick={() => {
+            navigate("/purchase/goods-receipts")
+            document.title = "Manufacturing ERP - Goods Receipt Management";
+          }}
+          className={`outline-none w-full flex items-center gap-3 px-4 py-3 cursor-pointer rounded-xl transition-all duration-200 ${isActive("/purchase/goods-receipts")
+            ? "bg-[#F59E0B] text-white shadow-md"
+            : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
+            }`}
+        >
+          <img
+            src="/icons/Purchase_manager/GRN.svg"
+            className={`h-5 w-5 ${isActive("/purchase/goods-receipts") ? "" : "invert opacity-60"}`}
+            alt=""
+          />
+          <span className={`${isActive("/purchase/goods-receipts") ? "font-bold" : "font-semibold"} text-sm`}>Goods Receipts</span>
+        </button>
       </nav>
 
       {/* FIXED FOOTER */}

@@ -4,7 +4,6 @@ import { useAppDispatch, useAppSelector } from "../../../../app/store/hook";
 import { createQuotationEntry } from "../../ModuleStateFiles/VendorQuotationSlice";
 import {
     ChevronRight,
-    Truck,
     FileText,
     CheckCircle2,
     ArrowRight,
@@ -240,7 +239,7 @@ const CreateQuotation: React.FC = () => {
                             Record quotation for <b>{formData.material_name}</b> from supplier{" "}
                             <b>{formData.vendor_name}</b>.
                         </p>
-                        <div className="bg-slate-50 p-8 rounded-4xl border border-slate-100 mb-10 text-left grid grid-cols-1 md:grid-cols-2 gap-10">
+                        <div className="bg-slate-50 p-8 rounded-4xl border border-slate-100 mb-10 text-center grid grid-cols-1 md:grid-cols-2">
                             <div>
                                 <label className="text-[9px] font-black uppercase text-slate-400 tracking-widest mb-1 block">
                                     Quoted Price
@@ -253,11 +252,11 @@ const CreateQuotation: React.FC = () => {
                                 <label className="text-[9px] font-black uppercase text-slate-400 tracking-widest mb-1 block">
                                     Expected Delivery
                                 </label>
-                                <p className="font-black text-slate-800 text-lg flex items-center gap-2">
-                                    <Truck size={18} className="text-[#F59E0B]" />{" "}
-                                    {formData.delivery_lead_time}
+                                <p className="font-black text-slate-900 text-2xl">
+                                    {formData.delivery_lead_time} Days
                                 </p>
                             </div>
+
                         </div>
                         <div className="flex justify-center gap-6">
                             <button

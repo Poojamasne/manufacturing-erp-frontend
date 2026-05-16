@@ -8,19 +8,19 @@ import {
     Filter,
     Edit,
     Eye,
-    Plus,
-    Calendar,
     Trash2,
+    Plus,
     SearchAlert,
-    Download,
+    ClipboardCheck,
+    Hash,
+    CheckCircle2,
 } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "../../../../app/store/hook";
 import {
-    getAllPurchaseOrders,
-    deletePurchaseOrderEntry,
-    deletePurchaseOrderEntries,
-    exportPOToPDF,
-} from "../../ModuleStateFiles/PurchaseOrderSlice";
+    getAllGoodsReceipts,
+    deleteGoodsReceiptEntry,
+    deleteGoodsReceiptEntries,
+} from "../../ModuleStateFiles/GoodsReceiptSlice";
 import type { RootState } from "../../../../app/store/store";
 
 type TimeFilter =
@@ -31,14 +31,11 @@ type TimeFilter =
     | "All Time"
     | "Custom";
 
-const StatusBadge: React.FC<{ status: string }> = ({ status }) => {
+const QCStatusBadge: React.FC<{ status: string }> = ({ status }) => {
     const styles: { [key: string]: string } = {
-        Draft: "text-slate-500 bg-slate-50 border-slate-100",
-        "Pending Approval": "text-amber-600 bg-amber-50 border-amber-100 font-bold",
+        Pending: "text-amber-600 bg-amber-50 border-amber-100 animate-pulse",
         Approved: "text-emerald-600 bg-emerald-50 border-emerald-100 font-black",
-        "Sent to Vendor": "text-blue-600 bg-blue-50 border-blue-100",
         Rejected: "text-rose-600 bg-rose-50 border-rose-100",
-        Completed: "text-purple-600 bg-purple-50 border-purple-100",
     };
     return (
         <span
@@ -55,7 +52,7 @@ const formatDate = (date: string) => {
     return `${String(d.getDate()).padStart(2, "0")}-${String(d.getMonth() + 1).padStart(2, "0")}-${d.getFullYear()}`;
 };
 
-const PurchaseOrderList: React.FC = () => {
+const GoodsReceiptList: React.FC = () => {
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
 
@@ -63,11 +60,11 @@ const PurchaseOrderList: React.FC = () => {
     const filterRef = useRef<HTMLDivElement>(null);
     const calendarRef = useRef<HTMLDivElement>(null);
 
-    const { pos } = useAppSelector((state: RootState) => state.purchaseOrders);
+    const { grns } = useAppSelector((state: RootState) => state.goodsReceipts);
 
     // Filter States
     const [searchQuery, setSearchQuery] = useState("");
-    const [statusFilter, setStatusFilter] = useState<string>("All");
+    const [qcFilter, setQcFilter] = useState<string>("All");
     const [timeFilter, setTimeFilter] = useState<TimeFilter>("All Time");
     const [customRange, setCustomRange] = useState({ start: "", end: "" });
 
@@ -82,10 +79,10 @@ const PurchaseOrderList: React.FC = () => {
     const [selectedIds, setSelectedIds] = useState<(string | number)[]>([]);
 
     useEffect(() => {
-        dispatch(getAllPurchaseOrders());
+        dispatch(getAllGoodsReceipts());
     }, [dispatch]);
 
-    // Handle Outside Click
+    // Handle Outside Click for dropdowns
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
             if (
@@ -108,27 +105,27 @@ const PurchaseOrderList: React.FC = () => {
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, []);
 
-    // Complex Filter Logic
-    const filteredPOs = useMemo(() => {
-        let filtered = [...pos];
+    // SRS Compliant Filter Logic (Search by Batch, Supplier, or PO Ref)
+    const filteredGRNs = useMemo(() => {
+        let filtered = [...grns];
 
-        // Search Filter
         if (searchQuery) {
             filtered = filtered.filter(
-                (p) =>
-                    p.po_id.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                    p.vendor_name.toLowerCase().includes(searchQuery.toLowerCase()),
+                (g) =>
+                    g.grn_id.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    g.supplier_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    g.batch_number.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    g.po_ref.toLowerCase().includes(searchQuery.toLowerCase()),
             );
         }
 
-        // Status Filter
-        if (statusFilter !== "All") {
-            filtered = filtered.filter((p) => p.status === statusFilter);
+        if (qcFilter !== "All") {
+            filtered = filtered.filter((g) => g.qc_status === qcFilter);
         }
 
         // Time Filtering logic
-        filtered = filtered.filter((p) => {
-            const date = new Date(p.created_at);
+        filtered = filtered.filter((g) => {
+            const date = new Date(g.created_at);
             const now = new Date();
             if (timeFilter === "Weekly")
                 return (now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24) <= 7;
@@ -142,9 +139,10 @@ const PurchaseOrderList: React.FC = () => {
             if (timeFilter === "Yearly")
                 return date.getFullYear() === now.getFullYear();
             if (timeFilter === "Custom" && customRange.start && customRange.end) {
-                const start = new Date(customRange.start);
-                const end = new Date(customRange.end);
-                return date >= start && date <= end;
+                return (
+                    date >= new Date(customRange.start) &&
+                    date <= new Date(customRange.end)
+                );
             }
             return true;
         });
@@ -153,14 +151,13 @@ const PurchaseOrderList: React.FC = () => {
             (a, b) =>
                 new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
         );
-    }, [pos, searchQuery, statusFilter, timeFilter, customRange]);
+    }, [grns, searchQuery, qcFilter, timeFilter, customRange]);
 
-    // Pagination Logic
-    const totalPages = Math.ceil(filteredPOs.length / itemsPerPage);
-    const paginatedData = filteredPOs.slice(
+    const paginatedData = filteredGRNs.slice(
         (currentPage - 1) * itemsPerPage,
         currentPage * itemsPerPage,
     );
+    const totalPages = Math.ceil(filteredGRNs.length / itemsPerPage);
 
     const toggleSelectAll = () => {
         if (selectedIds.length === paginatedData.length && paginatedData.length > 0)
@@ -173,16 +170,16 @@ const PurchaseOrderList: React.FC = () => {
             <div className="max-w-7xl mx-auto">
                 <header className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 mb-10">
                     <div>
-                        <h1 className="text-3xl font-extrabold text-slate-800 tracking-tight">
-                            Purchase Orders
+                        <h1 className="text-3xl font-extrabold text-slate-800 tracking-tight uppercase">
+                            Material Inward Logs
                         </h1>
                         <p className="text-sm text-gray-500 mt-1 font-medium">
-                            Execute procurement contracts and manage approvals
+                            Monitor arrivals and coordinate quality control
                         </p>
                     </div>
 
                     <div className="flex items-center gap-3 w-full md:w-auto">
-                        {/* Time Filter Dropdown */}
+                        {/* Time Filter - Matching PO Style */}
                         <div className="relative" ref={dropdownRef}>
                             <button
                                 onClick={() => setIsTimeDropdownOpen(!isTimeDropdownOpen)}
@@ -264,17 +261,16 @@ const PurchaseOrderList: React.FC = () => {
 
                         <button
                             onClick={() =>
-                                navigate("/purchase/purchase-orders/create-purchase-order")
+                                navigate("/purchase/goods-receipts/create-goods-receipt")
                             }
                             className="outline-none group flex items-center gap-1 bg-[#F59E0B] hover:bg-[#f67317] text-white px-4 py-2 rounded-xl font-bold text-sm shadow-xl transition-all active:scale-95"
                         >
                             <Plus size={18} />
-                            <span>Create PO</span>
+                            <span>Log Inward</span>
                         </button>
                     </div>
                 </header>
 
-                {/* Table Container */}
                 <div className="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
                     {/* Toolbar */}
                     <div className="p-6 flex flex-col lg:flex-row justify-between items-center gap-4 border-b border-slate-50">
@@ -285,10 +281,10 @@ const PurchaseOrderList: React.FC = () => {
                             />
                             <input
                                 type="text"
-                                placeholder="Search PO ID or Supplier..."
+                                placeholder="Search by Supplier, PO, or Batch..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                className="w-full pl-12 pr-4 py-3.5 bg-slate-50 border-transparent rounded-2xl focus:bg-white focus:ring-4 focus:ring-orange-500/5 text-sm outline-none transition-all"
+                                className="w-full pl-12 pr-4 py-3.5 bg-slate-50 border-transparent rounded-2xl focus:bg-white text-sm outline-none transition-all"
                             />
                         </div>
 
@@ -296,35 +292,27 @@ const PurchaseOrderList: React.FC = () => {
                             <div className="relative">
                                 <button
                                     onClick={() =>
-                                        setActiveDropdown(
-                                            activeDropdown === "status" ? null : "status",
-                                        )
+                                        setActiveDropdown(activeDropdown === "qc" ? null : "qc")
                                     }
-                                    className={`outline-none px-4 py-3 rounded-xl border text-[13px] font-bold flex items-center gap-2 transition-all ${statusFilter !== "All" ? "bg-orange-50 border-orange-200 text-amber-500" : "bg-white border-slate-200 text-slate-600"}`}
+                                    className={`outline-none px-4 py-3 rounded-xl border text-[13px] font-bold flex items-center gap-2 transition-all ${qcFilter !== "All" ? "bg-orange-50 border-orange-200 text-amber-500" : "bg-white border-slate-200 text-slate-600"}`}
                                 >
-                                    {statusFilter === "All" ? "Status" : statusFilter}
+                                    {qcFilter === "All" ? "Quality Status" : qcFilter}
                                     <ChevronDown
                                         size={14}
-                                        className={activeDropdown === "status" ? "rotate-180" : ""}
+                                        className={activeDropdown === "qc" ? "rotate-180" : ""}
                                     />
                                 </button>
 
-                                {activeDropdown === "status" && (
-                                    <div className="absolute right-0 mt-2 w-24 bg-white rounded-2xl shadow-2xl z-50 py-2 border border-slate-50">
-                                        {[
-                                            "All",
-                                            "Pending Approval",
-                                            "Approved",
-                                            "Sent to Vendor",
-                                            "Completed",
-                                        ].map((opt) => (
+                                {activeDropdown === "qc" && (
+                                    <div className="absolute right-0 mt-2 w-32 bg-white rounded-2xl shadow-2xl z-50 py-2 border border-slate-50">
+                                        {["All", "Pending", "Approved", "Rejected"].map((opt) => (
                                             <button
                                                 key={opt}
                                                 onClick={() => {
-                                                    setStatusFilter(opt);
+                                                    setQcFilter(opt);
                                                     setActiveDropdown(null);
                                                 }}
-                                                className={`outline-none w-full text-left px-4 py-2 text-[13px] hover:bg-slate-50 ${statusFilter === opt ? "bg-amber-50 text-[#F59E0B] font-bold" : ""}`}
+                                                className={`outline-none w-full text-left px-4 py-2 text-[13px] hover:bg-slate-50 ${qcFilter === opt ? "bg-amber-50 text-[#F59E0B] font-bold" : ""}`}
                                             >
                                                 {opt}
                                             </button>
@@ -335,9 +323,7 @@ const PurchaseOrderList: React.FC = () => {
 
                             <button
                                 disabled={selectedIds.length === 0}
-                                onClick={() =>
-                                    dispatch(deletePurchaseOrderEntries(selectedIds))
-                                }
+                                onClick={() => dispatch(deleteGoodsReceiptEntries(selectedIds))}
                                 className={`outline-none p-3 rounded-xl transition-all ${selectedIds.length === 0 ? "bg-gray-100 text-gray-400" : "bg-rose-600 text-white hover:bg-rose-700 shadow-lg"}`}
                             >
                                 <Trash2 size={20} />
@@ -345,7 +331,6 @@ const PurchaseOrderList: React.FC = () => {
                         </div>
                     </div>
 
-                    {/* Table */}
                     <div className="w-full overflow-x-auto">
                         <table className="w-full text-left border-collapse">
                             <thead>
@@ -362,19 +347,19 @@ const PurchaseOrderList: React.FC = () => {
                                         />
                                     </th>
                                     <th className="px-6 py-5 text-[11px] text-slate-800 uppercase tracking-widest border-b border-slate-100 text-center font-bold">
-                                        PO ID
+                                        GRN ID
                                     </th>
                                     <th className="px-6 py-5 text-[11px] text-slate-800 uppercase tracking-widest border-b border-slate-100 font-bold">
-                                        Supplier / References
+                                        Supplier / Context
                                     </th>
                                     <th className="px-6 py-5 text-[11px] text-slate-800 uppercase tracking-widest border-b border-slate-100 text-center font-bold">
-                                        Total (Inc. Tax)
+                                        Received Qty
                                     </th>
                                     <th className="px-6 py-5 text-[11px] text-slate-800 uppercase tracking-widest border-b border-slate-100 text-center font-bold">
-                                        Delivery By
+                                        Batch No
                                     </th>
                                     <th className="px-4 py-5 text-[11px] text-slate-800 uppercase tracking-widest border-b border-slate-100 text-center font-bold">
-                                        Status
+                                        QC Status
                                     </th>
                                     <th className="px-6 py-5 text-[11px] text-slate-800 uppercase tracking-widest border-b border-slate-100 text-center font-bold">
                                         Actions
@@ -383,96 +368,105 @@ const PurchaseOrderList: React.FC = () => {
                             </thead>
                             <tbody className="divide-y divide-slate-50">
                                 {paginatedData.length > 0 ? (
-                                    paginatedData.map((po) => (
+                                    paginatedData.map((grn) => (
                                         <tr
-                                            key={po.id}
+                                            key={grn.id}
                                             className="group hover:bg-orange-50/20 transition-all"
                                         >
                                             <td className="p-5 text-center">
                                                 <input
                                                     type="checkbox"
-                                                    className="h-4 w-4 cursor-pointer appearance-none rounded border border-slate-300 bg-white transition-all relative checked:bg-[#F59E0B] checked:border-[#F59E0B] after:content-[''] after:absolute after:opacity-0 checked:after:opacity-100 after:left-1.25 after:top-px after:w-1 after:h-2 after:border-white after:border-r-2 after:border-b-2 after:rotate-45 outline-none"
-                                                    checked={selectedIds.includes(po.id)}
+                                            className="h-4 w-4 cursor-pointer appearance-none rounded border border-slate-300 bg-white transition-all relative checked:bg-[#F59E0B] checked:border-[#F59E0B] after:content-[''] after:absolute after:opacity-0 checked:after:opacity-100 after:left-1.25 after:top-px after:w-1 after:h-2 after:border-white after:border-r-2 after:border-b-2 after:rotate-45 outline-none"
+                                                    checked={selectedIds.includes(grn.id)}
                                                     onChange={() =>
                                                         setSelectedIds((prev) =>
-                                                            prev.includes(po.id)
-                                                                ? prev.filter((id) => id !== po.id)
-                                                                : [...prev, po.id],
+                                                            prev.includes(grn.id)
+                                                                ? prev.filter((id) => id !== grn.id)
+                                                                : [...prev, grn.id],
                                                         )
                                                     }
                                                 />
                                             </td>
                                             <td className="px-6 py-5 text-[13px] font-mono font-black text-slate-800 text-center">
-                                                {po.po_id}
+                                                {grn.grn_id}
                                             </td>
                                             <td className="px-6 py-5">
                                                 <div className="flex flex-col">
                                                     <span className="text-[14px] font-black text-slate-800 leading-tight group-hover:text-amber-600 transition-colors">
-                                                        {po.vendor_name}
+                                                        {grn.supplier_name}
                                                     </span>
-                                                    <div className="flex items-center gap-2 mt-1">
-                                                        <span className="text-[9px] text-slate-400 font-bold border border-slate-200 px-1.5 rounded bg-white uppercase">
-                                                            RFQ: {po.rfq_ref}
-                                                        </span>
-                                                        <span className="text-[9px] text-slate-400 font-bold border border-slate-200 px-1.5 rounded bg-white uppercase">
-                                                            PR: {po.pr_ref}
-                                                        </span>
-                                                    </div>
+                                                    <span className="text-[9px] text-slate-400 font-bold border border-slate-100 px-1.5 rounded bg-white w-fit mt-1 uppercase">
+                                                        PO Ref: {grn.po_ref}
+                                                    </span>
                                                 </div>
                                             </td>
-                                            <td className="px-6 py-5 text-center font-black text-slate-800 text-sm decoration-2">
-                                                ₹{po.total_amount.toLocaleString()}
+                                            <td className="px-6 py-5 text-center font-black text-slate-800 text-sm">
+                                                {grn.quantity_received.toLocaleString()}
                                             </td>
                                             <td className="px-6 py-5 text-center font-bold text-slate-600">
-                                                <div className="flex items-center justify-center gap-1.5">
-                                                    <Calendar size={12} className="text-slate-300" />
-                                                    <span className="text-[12px]">
-                                                        {formatDate(po.delivery_date)}
-                                                    </span>
+                                                <div className="flex items-center justify-center gap-1.5 text-[11px]">
+                                                    <Hash size={12} className="text-slate-300" />
+                                                    {grn.batch_number}
                                                 </div>
                                             </td>
                                             <td className="px-4 py-5 text-center">
-                                                <StatusBadge status={po.status} />
+                                                <QCStatusBadge status={grn.qc_status} />
                                             </td>
                                             <td className="px-6 py-5">
-                                                <div className="flex justify-center gap-2">
+                                                <div className="flex justify-center items-center gap-2">
                                                     <button
+                                                        title="View Goods Receipt"
                                                         onClick={() =>
                                                             navigate(
-                                                                "/purchase/purchase-orders/view-purchase-order/" +
-                                                                po.id,
+                                                                "/purchase/goods-receipts/view-goods-receipt/" + grn.id
                                                             )
                                                         }
                                                         className="outline-none p-1.5 text-slate-400 hover:text-[#F59E0B] transition-all active:scale-90"
                                                     >
                                                         <Eye size={16} />
                                                     </button>
+
                                                     <button
+                                                        title="Edit Goods Receipt"
                                                         onClick={() =>
                                                             navigate(
-                                                                "/purchase/purchase-orders/edit-purchase-order/" +
-                                                                po.id,
+                                                                "/purchase/goods-receipts/edit-goods-receipt/" + grn.id
                                                             )
                                                         }
-                                                        className="outline-none p-1.5 text-slate-400 hover:text-green-500 transition-all active:scale-90"
+                                                        className="outline-none p-1.5 text-slate-400 hover:text-green-400 transition-all active:scale-90"
                                                     >
                                                         <Edit size={16} />
                                                     </button>
+
+                                                    {grn.qc_status === "Pending" ? (
+                                                        <button
+                                                            title="Quality Check"
+                                                            onClick={() =>
+                                                                navigate(`/purchase/goods-receipts/qc-check/${grn.id}`)
+                                                            }
+                                                            className="outline-none p-1.5 text-slate-400 hover:text-blue-500 transition-all active:scale-90"
+                                                        >
+                                                            <ClipboardCheck size={16} />
+                                                        </button>
+                                                    ) : (
+                                                        <button
+                                                            disabled
+                                                            title={`QC Status: ${grn.qc_status}`}
+                                                            className={`outline-none p-1.5 cursor-not-allowed ${grn.qc_status === "Approved"
+                                                                    ? "text-green-500"
+                                                                    : "text-red-500"
+                                                                }`}
+                                                        >
+                                                            <CheckCircle2 size={16} />
+                                                        </button>
+                                                    )}
+
                                                     <button
-                                                        onClick={() =>
-                                                            dispatch(deletePurchaseOrderEntry(po.id))
-                                                        }
+                                                        title="Delete Goods Receipt"
+                                                        onClick={() => dispatch(deleteGoodsReceiptEntry(grn.id))}
                                                         className="outline-none p-1.5 text-slate-400 hover:text-rose-500 transition-all active:scale-90"
                                                     >
                                                         <Trash2 size={16} />
-                                                    </button>
-                                                    <button
-                                                        onClick={() =>
-                                                            dispatch(exportPOToPDF(po.id))
-                                                        }
-                                                        className="outline-none p-1.5 text-slate-400 hover:text-indigo-500 transition-all active:scale-90"
-                                                    >
-                                                        <Download size={16} />
                                                     </button>
                                                 </div>
                                             </td>
@@ -486,7 +480,7 @@ const PurchaseOrderList: React.FC = () => {
                                                 className="mx-auto mb-4 text-amber-600 opacity-20"
                                             />
                                             <p className="text-slate-400 font-bold tracking-tight">
-                                                No Purchase Orders Found
+                                                No Inbound Logs Found
                                             </p>
                                         </td>
                                     </tr>
@@ -500,8 +494,8 @@ const PurchaseOrderList: React.FC = () => {
                         <footer className="p-6 bg-slate-50/50 border-t border-slate-100 flex flex-col md:flex-row justify-between items-center gap-6">
                             <div className="text-[11px] font-bold text-slate-800 uppercase tracking-widest">
                                 Showing{" "}
-                                {Math.min(currentPage * itemsPerPage, filteredPOs.length)} of{" "}
-                                {filteredPOs.length} Total Contracts
+                                {Math.min(currentPage * itemsPerPage, filteredGRNs.length)} of{" "}
+                                {filteredGRNs.length} GRN Entries
                             </div>
                             <div className="flex items-center gap-2">
                                 <button
@@ -518,7 +512,7 @@ const PurchaseOrderList: React.FC = () => {
                                         <button
                                             key={i}
                                             onClick={() => setCurrentPage(i + 1)}
-                                            className={`outline-none min-w-10 h-10 rounded-xl text-xs font-bold transition-all shadow-sm active:scale-95 ${currentPage === i + 1 ? "bg-[#F59E0B] text-white" : "bg-white text-slate-500 border border-slate-200"}`}
+                                            className={`outline-none min-w-10 h-10 rounded-xl text-xs font-bold transition-all shadow-sm active:scale-95 ${currentPage === i + 1 ? "bg-[#F59E0B] text-white" : "bg-white text-slate-500 border border-slate-200 hover:bg-slate-50"}`}
                                         >
                                             {i + 1}
                                         </button>
@@ -542,4 +536,4 @@ const PurchaseOrderList: React.FC = () => {
     );
 };
 
-export default PurchaseOrderList;
+export default GoodsReceiptList;

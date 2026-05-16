@@ -43,13 +43,13 @@ const initialState = {
             delivery_date: "2024-06-05",
             payment_terms: "Net 30",
             status: "Approved",
-            created_at: "2024-05-10T10:00:00Z",
+            created_at: "2026-05-10T10:00:00Z",
         },
         {
             id: 2,
             po_id: "PO-9902",
             rfq_ref: "RFQ-5502",
-            pr_ref: "PR-2024-005",
+            pr_ref: "PR-2026-005",
             vendor_name: "Reliance Industrial",
             material_name: "Steel Plate 6mm",
             quantity: 1500,
@@ -57,7 +57,7 @@ const initialState = {
             tax_percentage: 12,
             tax_amount: 81000,
             total_amount: 756000,
-            delivery_date: "2024-06-12",
+            delivery_date: "2026-06-12",
             payment_terms: "Advance",
             status: "Pending Approval",
             created_at: "2024-05-15T14:30:00Z",
@@ -329,10 +329,15 @@ export const exportPOToPDF = (id: number | string) => async (dispatch: AppDispat
         const poData = state.purchaseOrders.pos.find(
             p => String(p.id) === String(id) || String(p.po_id) === String(id)
         );
+        console.log("Po data : ", poData);
+        let ref = state?.rfqManagement?.rfqs?.find(
+            (q: any) => String(poData && poData.rfq_ref) === String(q.rfq_id)
+        )
+        console.log("Ref: ", ref);
 
         if (!poData) throw new Error("Purchase Order record not found.");
-
-        const blob = await pdf(<PurchaseOrderPDF data={poData} />).toBlob();
+        let updatedPoData = { ...poData, unit: ref ? ref.unit : "Units" };
+        const blob = await pdf(<PurchaseOrderPDF data={updatedPoData} />).toBlob();
         const url = URL.createObjectURL(blob);
         const link = document.createElement("a");
         link.href = url;

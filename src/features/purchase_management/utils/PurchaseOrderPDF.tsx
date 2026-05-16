@@ -204,8 +204,26 @@ export const PurchaseOrderPDF = ({ data }: { data: any }) => {
                             <Text style={{ fontSize: 10, fontWeight: 'bold' }}>{data.material_name}</Text>
                             <Text style={{ fontSize: 7, color: '#64748b', marginTop: 2 }}>Specifications as per RFQ {data.rfq_ref}</Text>
                         </View>
-                        <Text style={{ width: '15%', textAlign: 'center', fontSize: 10 }}>{data.quantity}</Text>
-                        <Text style={{ width: '20%', textAlign: 'right', fontSize: 10 }}>{formatINR(data.unit_price)}</Text>
+                        <View
+                            style={{
+                                width: '15%',
+                                flexDirection: 'row',
+                                justifyContent: 'center',
+                                alignItems: 'flex-end',
+                            }}
+                        >
+                            <Text style={{ fontSize: 10 }}>{data.quantity}</Text>
+
+                            <Text
+                                style={{
+                                    fontSize: 7,
+                                    color: '#64748b',
+                                    marginLeft: 2,
+                                }}
+                            >
+                                {data.unit}
+                            </Text>
+                        </View>                        <Text style={{ width: '20%', textAlign: 'right', fontSize: 10 }}>{formatINR(data.unit_price)}</Text>
                         <Text style={{ width: '20%', textAlign: 'right', fontSize: 10, fontWeight: 'bold' }}>{formatINR(subtotal)}</Text>
                     </View>
                 </View>
