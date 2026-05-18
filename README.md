@@ -38,7 +38,7 @@ Designed to streamline lead management, analytics, and overall sales workflow wi
 
 - 🎨 **UI/UX Enhancements**
   - Clean and modern design  
-  - Consistent theme (`#005d52`)  
+  - Consistent theme (`#F59E0B`)  
   - Smooth animations and hover effects  
 
 - 📱 **Responsive Design**
