@@ -284,7 +284,7 @@ const GoodsReceiptList: React.FC = () => {
                                 placeholder="Search by Supplier, PO, or Batch..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-12 pr-4 py-3.5 bg-slate-50 border-transparent rounded-2xl focus:bg-white focus:ring-4 focus:ring-orange-500/5 text-sm outline-none transition-all"
+                                className="w-full pl-12 pr-4 py-3.5 bg-slate-50 border-transparent rounded-2xl focus:bg-white focus:ring-4 focus:ring-orange-500/5 text-sm outline-none transition-all"
                             />
                         </div>
 
@@ -376,7 +376,7 @@ const GoodsReceiptList: React.FC = () => {
                                             <td className="p-5 text-center">
                                                 <input
                                                     type="checkbox"
-                                            className="h-4 w-4 cursor-pointer appearance-none rounded border border-slate-300 bg-white transition-all relative checked:bg-[#F59E0B] checked:border-[#F59E0B] after:content-[''] after:absolute after:opacity-0 checked:after:opacity-100 after:left-1.25 after:top-px after:w-1 after:h-2 after:border-white after:border-r-2 after:border-b-2 after:rotate-45 outline-none"
+                                                    className="h-4 w-4 cursor-pointer appearance-none rounded border border-slate-300 bg-white transition-all relative checked:bg-[#F59E0B] checked:border-[#F59E0B] after:content-[''] after:absolute after:opacity-0 checked:after:opacity-100 after:left-1.25 after:top-px after:w-1 after:h-2 after:border-white after:border-r-2 after:border-b-2 after:rotate-45 outline-none"
                                                     checked={selectedIds.includes(grn.id)}
                                                     onChange={() =>
                                                         setSelectedIds((prev) =>
@@ -453,8 +453,8 @@ const GoodsReceiptList: React.FC = () => {
                                                             disabled
                                                             title={`QC Status: ${grn.qc_status}`}
                                                             className={`outline-none p-1.5 cursor-not-allowed ${grn.qc_status === "Approved"
-                                                                    ? "text-green-500"
-                                                                    : "text-red-500"
+                                                                ? "text-green-500"
+                                                                : "text-red-500"
                                                                 }`}
                                                         >
                                                             <CheckCircle2 size={16} />
