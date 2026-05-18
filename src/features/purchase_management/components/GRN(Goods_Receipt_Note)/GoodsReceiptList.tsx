@@ -284,7 +284,7 @@ const GoodsReceiptList: React.FC = () => {
                                 placeholder="Search by Supplier, PO, or Batch..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                className="w-full pl-12 pr-4 py-3.5 bg-slate-50 border-transparent rounded-2xl focus:bg-white text-sm outline-none transition-all"
+                className="w-full pl-12 pr-4 py-3.5 bg-slate-50 border-transparent rounded-2xl focus:bg-white focus:ring-4 focus:ring-orange-500/5 text-sm outline-none transition-all"
                             />
                         </div>
 

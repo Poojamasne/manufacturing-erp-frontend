@@ -7,7 +7,7 @@ import {
     Truck,
     Package,
     CheckCircle2,
- 
+
 } from "lucide-react";
 
 const CreateGRN: React.FC = () => {
@@ -176,8 +176,9 @@ const CreateGRN: React.FC = () => {
                             </button>
                             <button
                                 onClick={() => setCurrentStep(3)}
-                                disabled={!formData.quantity_received || !formData.batch_number}
-                                className="outline-none bg-slate-900 hover:bg-slate-800 text-white px-4 py-2 rounded-xl font-bold text-sm shadow-xl active:scale-95 transition-all"
+                                disabled={!formData.quantity_received || !formData.batch_number || !formData.warehouse_location}
+                                className="outline-none bg-slate-900 disabled:opacity-30 text-white px-4 py-2 rounded-xl font-bold text-sm hover:bg-slate-800 transition-all shadow-lg"
+                            // style={!formData.quantity_received || !formData.batch_number || !formData.warehouse_location ? {opacity:0}:undefined}
                             >
                                 Review Log
                             </button>
@@ -197,7 +198,7 @@ const CreateGRN: React.FC = () => {
                             Logging inward of <b>{formData.quantity_received} units</b> from{" "}
                             <b>{formData.supplier_name}</b>.
                         </p>
-                        <div className="bg-slate-50 p-8 rounded-[2rem] border border-slate-100 text-left grid grid-cols-2 md:grid-cols-4 gap-6 mb-10">
+                        <div className="bg-slate-50 p-8 rounded-4xl border border-slate-100 text-left grid grid-cols-2 md:grid-cols-4 gap-6 mb-10">
                             <div>
                                 <label className="text-[9px] font-black text-slate-400 uppercase">
                                     PO Ref

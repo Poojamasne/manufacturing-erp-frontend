@@ -1,5 +1,5 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
-import type { AppDispatch } from "../../../app/store/store";
+import type { AppDispatch, RootState } from "../../../app/store/store";
 import Swal from "sweetalert2";
 import type { NavigateFunction } from "react-router-dom";
 import toast from "react-hot-toast";
@@ -152,7 +152,7 @@ export const getAllPurchaseRequests = () => async (dispatch: AppDispatch) => {
 };
 
 // 2. CREATE PURCHASE REQUEST
-export const createPurchaseRequest = (payload: any, navigate: NavigateFunction) => async (dispatch: AppDispatch) => {
+export const createPurchaseRequest = (payload: any, navigate: NavigateFunction) => async (dispatch: AppDispatch, getState: () => RootState) => {
     dispatch(request());
     Swal.fire({
         title: "Submitting Request...",
@@ -161,11 +161,14 @@ export const createPurchaseRequest = (payload: any, navigate: NavigateFunction) 
         customClass: { loader: "lead-loader" },
         didOpen: () => { Swal.showLoading(); }
     });
-
+    const { purchaseRequests } = getState().purchaseRequests;
     setTimeout(() => {
+        const nextId = purchaseRequests.length > 0
+            ? Math.max(...purchaseRequests.map(pr => Number(pr.id))) + 1
+            : 1;
         const newPR: PurchaseRequest = {
             ...payload,
-            id: Date.now(),
+            id: nextId, // Simulated unique ID
             pr_id: `PR-${Math.floor(1000 + Math.random() * 9000)}`, // Auto-behavior
             status: "Submitted", // Default status
             created_at: new Date().toISOString(),

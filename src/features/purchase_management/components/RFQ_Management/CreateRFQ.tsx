@@ -171,14 +171,14 @@ const CreateRFQ: React.FC = () => {
                         <div className="flex justify-end gap-4">
                             <button
                                 onClick={() => setCurrentStep(1)}
-                                className="outline-none font-bold text-[#F59E0B] hover:border-amber-300 text-sm border px-4 py-2 rounded-xl transition-all"
+                                className="outline-none font-bold text-[#F59E0B] hover:text-rose-500 text-sm border px-4 py-2 rounded-xl transition-all"
                             >
                                 Back
                             </button>
                             <button
                                 onClick={() => setCurrentStep(3)}
                                 disabled={formData.vendors.length === 0}
-                                className="outline-none bg-slate-900 hover:bg-slate-800 text-white px-4 py-2 rounded-xl font-bold text-sm shadow-xl"
+                                className="outline-none bg-slate-900 disabled:opacity-30 hover:bg-slate-800 text-white px-4 py-2 rounded-xl font-bold text-sm shadow-xl"
                             >
                                 Define Deadline
                             </button>

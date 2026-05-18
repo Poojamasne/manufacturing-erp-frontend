@@ -160,8 +160,8 @@ const CreatePurchaseOrder: React.FC = () => {
                             <button
                                 onClick={() => setCurrentStep(3)}
                                 disabled={!formData.delivery_date || !formData.tax_percentage}
-                                className="outline-none bg-slate-900 hover:bg-slate-800 text-white px-4 py-2 rounded-xl font-bold text-sm shadow-xl active:scale-95 transition-all"
-                                style={!formData.delivery_date || !formData.tax_percentage ? { cursor: "not-allowed", opacity: 0.6 } : {}}
+                                className="outline-none bg-slate-900 disabled:opacity-30 hover:bg-slate-800 text-white px-4 py-2 rounded-xl font-bold text-sm shadow-xl active:scale-95 transition-all"
+                                // style={!formData.delivery_date || !formData.tax_percentage ? { cursor: "not-allowed", opacity: 0.6 } : {}}
                             >
                                 Review Contract
                             </button>

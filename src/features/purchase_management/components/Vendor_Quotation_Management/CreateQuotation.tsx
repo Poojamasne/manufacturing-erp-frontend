@@ -122,8 +122,8 @@ const CreateQuotation: React.FC = () => {
                             <button
                                 onClick={() => setCurrentStep(2)}
                                 disabled={!formData.rfq_ref || !formData.vendor_name}
-                                className="outline-none bg-slate-900 hover:bg-slate-800 text-white px-4 py-2 rounded-xl font-bold text-sm shadow-xl flex items-center gap-1 active:scale-95 transition-all"
-                                style={!formData.rfq_ref || !formData.vendor_name ? { opacity: 0.5, cursor: 'not-allowed' } : undefined}
+                                className="outline-none bg-slate-900 disabled:opacity-30 hover:bg-slate-800 text-white px-4 py-2 rounded-xl font-bold text-sm shadow-xl flex items-center gap-1 active:scale-95 transition-all"
+                                // style={!formData.rfq_ref || !formData.vendor_name ? { opacity: 0.5, cursor: 'not-allowed' } : undefined}
                             >
                                 Terms <ArrowRight size={16} />
                             </button>
@@ -218,8 +218,8 @@ const CreateQuotation: React.FC = () => {
                             <button
                                 disabled={!formData.unit_price || !formData.delivery_lead_time || !formData.validity_date || !formData.payment_terms}
                                 onClick={() => setCurrentStep(3)}
-                                className="outline-none bg-slate-900 hover:bg-slate-800 text-white px-4 py-2 rounded-xl font-bold text-sm shadow-xl"
-                                style={!formData.unit_price || !formData.delivery_lead_time || !formData.validity_date || !formData.payment_terms ? { opacity: 0.5, cursor: 'not-allowed' } : undefined}
+                                className="outline-none bg-slate-900 disabled:opacity-30 hover:bg-slate-800 text-white px-4 py-2 rounded-xl font-bold text-sm shadow-xl"
+                                // style={!formData.unit_price || !formData.delivery_lead_time || !formData.validity_date || !formData.payment_terms ? { opacity: 0.5, cursor: 'not-allowed' } : undefined}
                             >
                                 Review
                             </button>

@@ -82,7 +82,7 @@ const CreatePurchaseRequest: React.FC = () => {
           <span className="text-gray-800 font-bold">New PR</span>
         </div>
 
-        <h1 className="text-3xl font-black text-slate-800 mb-8 tracking-tight">Raise Request</h1>
+        <h1 className="text-3xl font-black text-slate-800 mb-8 tracking-tight">Create Purchase Request</h1>
 
         {/* Step Progress Bar */}
         <div className="flex items-center justify-between mb-10 bg-white p-6 rounded-3xl border border-slate-100 shadow-sm">
@@ -193,7 +193,7 @@ const CreatePurchaseRequest: React.FC = () => {
             </div>
 
             <div className="flex justify-end gap-4">
-              <button onClick={() => setCurrentStep(1)} className="outline-none px-4 py-2 rounded-xl font-bold text-[#F59E0B] border border-transparent hover:border-amber-500 transition-all">Back</button>
+              <button onClick={() => setCurrentStep(1)} className="outline-none px-4 py-2 rounded-xl font-bold text-[#F59E0B] border hover:text-rose-500 transition-all">Back</button>
               <button
                 disabled={!formData.quantity || !formData.required_date || !formData.department}
                 onClick={() => setCurrentStep(3)}

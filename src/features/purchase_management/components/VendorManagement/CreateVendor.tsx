@@ -73,8 +73,8 @@ const CreateVendor: React.FC = () => {
                             >
                                 <div
                                     className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm transition-all ${currentStep >= step.id
-                                            ? "bg-[#F59E0B] text-white shadow-lg shadow-orange-200"
-                                            : "bg-slate-100 text-slate-400"
+                                        ? "bg-[#F59E0B] text-white shadow-lg shadow-orange-200"
+                                        : "bg-slate-100 text-slate-400"
                                         }`}
                                 >
                                     {step.id}
@@ -131,8 +131,8 @@ const CreateVendor: React.FC = () => {
                         <div className="flex justify-end mt-10">
                             <button
                                 onClick={() => setCurrentStep(2)}
-                                disabled={!formData.name}
-                                className="outline-none bg-slate-900 hover:bg-slate-800 text-white px-4 py-2 rounded-xl font-bold text-sm shadow-xl flex items-center gap-2"
+                                disabled={!formData.name || !formData.contact_person}
+                                className="outline-none bg-slate-900 disabled:opacity-30 hover:bg-slate-800 text-white px-4 py-2 rounded-xl font-bold text-sm shadow-xl flex items-center gap-2"
                             >
                                 Contact Details <ArrowRight size={16} />
                             </button>
@@ -192,13 +192,14 @@ const CreateVendor: React.FC = () => {
                         <div className="flex justify-end gap-4 mt-10">
                             <button
                                 onClick={() => setCurrentStep(1)}
-                                className="px-4 py-2 rounded-xl font-bold text-[#F59E0B] hover:border "
+                                className="px-4 py-2 rounded-xl font-bold text-[#F59E0B] border hover:text-rose-500 "
                             >
                                 Back
                             </button>
                             <button
                                 onClick={() => setCurrentStep(3)}
-                                className="outline-none bg-slate-900 hover:bg-slate-800 text-white px-4 py-2 rounded-xl font-bold text-sm shadow-xl"
+                                disabled={!formData.email || !formData.phone || !formData.address}
+                                className="outline-none bg-slate-900 disabled:opacity-30 hover:bg-slate-800 text-white px-4 py-2 rounded-xl font-bold text-sm shadow-xl"
                             >
                                 Category & Rating
                             </button>
@@ -257,13 +258,14 @@ const CreateVendor: React.FC = () => {
                         <div className="flex justify-end gap-4 mt-10">
                             <button
                                 onClick={() => setCurrentStep(2)}
-                                className="px-4 py-2 rounded-xl font-bold text-[#F59E0B] hover:border text-sm"
+                                className="px-4 py-2 rounded-xl font-bold text-[#F59E0B] border hover:text-rose-500 text-sm"
                             >
                                 Back
                             </button>
                             <button
                                 onClick={() => setCurrentStep(4)}
-                                className="outline-none bg-slate-900 hover:bg-slate-800 text-white px-4 py-2 rounded-xl font-bold text-sm"
+                                disabled={!formData.category || !formData.rating}
+                                className="outline-none bg-slate-900 disabled:opacity-30 hover:bg-slate-800 text-white px-4 py-2 rounded-xl font-bold text-sm"
                             >
                                 Review
                             </button>
@@ -326,7 +328,7 @@ const CreateVendor: React.FC = () => {
                             <button
                                 onClick={handleFinish}
                                 disabled={loading}
-                                className="outline-none bg-slate-900 text-white px-4 py-2 rounded-xl font-black text-sm hover:bg-slate-800 transition-all shadow-2xl disabled:opacity-50"
+                                className="outline-none bg-slate-900 text-white px-4 py-2 rounded-xl font-bold text-sm hover:bg-slate-800 transition-all shadow-2xl disabled:opacity-50"
                             >
                                 {loading ? "Registering..." : "Onboard Vendor"}
                             </button>

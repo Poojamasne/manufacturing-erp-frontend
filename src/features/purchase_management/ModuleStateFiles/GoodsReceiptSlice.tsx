@@ -128,6 +128,7 @@ export const createGoodsReceiptEntry = (payload: any, navigate: NavigateFunction
         title: "Recording Receipt...",
         text: "Verifying PO reference and logging materials...",
         allowOutsideClick: false,
+        customClass: { loader: "lead-loader" },
         didOpen: () => { Swal.showLoading(); }
     });
 
